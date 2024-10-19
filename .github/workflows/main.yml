@@ -20,7 +20,6 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
           script: | # 실행할 스크립트
             cd /home/ubuntu/nodetest
-            git pull origin main
+            git pull nodetest main
             pm2 kill
-            npm i --force
             pm2 start node.js

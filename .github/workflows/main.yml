@@ -24,4 +24,4 @@ jobs:
             git pull origin main
             git merge origin/main 
             pm2 kill
-            pm2 start node.js
+            sudo pm2 start node --name node --interpreter=/usr/bin/node -- /home/ubuntu/nodetest/node.js

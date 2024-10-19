@@ -21,5 +21,6 @@ jobs:
           script: | # 실행할 스크립트
             cd /home/ubuntu
             git pull nodetest main
+            cd /home/ubuntu/nodetest
             pm2 kill
             pm2 start node.js

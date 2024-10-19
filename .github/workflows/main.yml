@@ -20,13 +20,6 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
           script: | # 실행할 스크립트
             cd /home/ubuntu/nodetest
-            git fetch origin
-            git status # 변경된 파일 확인
-            if [ -n "$(git status --porcelain)" ]; then
-              echo "Local changes detected. Committing changes."
-              git add .
-              git commit -m "Auto commit before pull"
-            fi
             git pull origin main
             pm2 kill
             pm2 start node.js

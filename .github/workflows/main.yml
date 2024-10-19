@@ -20,8 +20,8 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
           script: | # 실행할 스크립트
             cd /home/ubuntu/nodetest
-            cd /home/ubuntu/nodetest
-            git fetch origin
-            git reset --hard origin/main    # 로컬 브랜치를 리모트 브랜치의 최신 상태로 강제로 리셋
+            git config pull.rebase false  # 병합 방식으로 설정
+            git pull origin main
+            git merge origin/main 
             pm2 kill
             pm2 start node.js

@@ -4,7 +4,7 @@ os: linux
 files:
   - source:  /
     destination: /home/ubuntu/nodetest
-    overwrite: yes
+    fileExistsBehavior: OVERWRITE
 
 permissions:
   - object: /

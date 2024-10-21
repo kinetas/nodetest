@@ -1,27 +1,67 @@
-# dev.yml
-name: dev branch auto ci process script
+name: Deploy to Amazon EC2
 
-on: # 아래 job을 실행시킬 상황
+on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: universty-assignment-test-bucket
+  CODE_DEPLOY_APPLICATION_NAME: test
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: universty-assignment-test-bucket-deploy-group
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
-    name: deploy
-    runs-on: ubuntu-latest # 실행될 인스턴스 OS와 버전
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
 
     steps:
-      - name: excuting remote ssh commands
-        uses: appleboy/ssh-action@v0.1.6 # ssh 접속하는 오픈소스
-        with:
-          host: ${{ secrets.REMOTE_IP }} # 인스턴스 IP
-          username: ${{ secrets.REMOTE_USER }} # 우분투 아이디
-          key: ${{ secrets.REMOTE_PRIVATE_KEY }} # ec2 instance pem key
-          port: ${{ secrets.REMOTE_SSH_PORT }} # 접속포트
-          script: | # 실행할 스크립트
-            cd /home/ubuntu/nodetest
-            git config pull.rebase false  # 병합 방식으로 설정
-            git pull origin main
-            git merge origin/main 
-            pm2 kill
-            sudo pm2 start node --name node --interpreter=/usr/bin/node -- /home/ubuntu/nodetest/node.js
+    # 기본 체크아웃
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Node.js 설치
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'  
+        
+    # 의존성 설치
+    - name: Install dependencies
+      run: npm install
+
+    # 빌드 작업
+    - name: Build
+      run: npm run build  # 빌드 과정이 있다면, 스크립트 이름에 맞게 수정
+
+    # AWS 인증 설정
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # 빌드 결과물을 S3 버킷에 업로드
+    - name: Upload to AWS S3
+      run: |
+        zip -r release.zip *  # 전체 파일을 압축
+        aws deploy push \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --ignore-hidden-files \
+          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          --source .
+
+    # S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
+    - name: Deploy to AWS EC2 from S3
+      run: |
+        aws deploy create-deployment \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip

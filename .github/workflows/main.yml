@@ -36,8 +36,8 @@ jobs:
       run: npm install
 
     # 빌드 작업
-    - name: Build
-      run: npm run build  # 빌드 과정이 있다면, 스크립트 이름에 맞게 수정
+    #- name: Build
+    #  run: npm run build  # 빌드 과정이 있다면, 스크립트 이름에 맞게 수정
 
     # AWS 인증 설정
     - name: Configure AWS credentials

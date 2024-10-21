@@ -5,6 +5,8 @@ files:
   - source:  /
     destination: /home/ubuntu/nodetest
     fileExistsBehavior: OVERWRITE
+    overwrite: true
+    overwrite: yes
 
 permissions:
   - object: /
@@ -13,6 +15,10 @@ permissions:
     group: ubuntu
 
 hooks:
+  BeforeInstall:
+    - location: scripts/cleanup.sh
+      timeout: 300
+      runas: ubuntu
   AfterInstall:
     - location: scripts/stop.sh
       timeout: 60

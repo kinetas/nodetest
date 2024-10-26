@@ -10,6 +10,10 @@ env:
   S3_BUCKET_NAME: universty-assignment-test-bucket
   CODE_DEPLOY_APPLICATION_NAME: test
   CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: universty-assignment-test-bucket-deploy-group
+  DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+  DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+  DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
 
 permissions:
   contents: read

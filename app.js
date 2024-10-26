@@ -1,26 +1,27 @@
+require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
-
+//환경변수로 고칠것
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
   process.env.DATABASE_USERNAME,
   process.env.DATABASE_PASSWORD,
   {
     host: process.env.DATABASE_HOST,
-    dialect: 'mysql'
+    dialect: 'mysql',
+    port: 3306
   }
 );
 
 app.get('/', function (req, res) {
-  res.send('Hey World!!')
+  res.send('H! World!!')
 })
-
 app.listen(3000,async () => {
   try{
     await sequelize.authenticate();
-    console.log('연결 성공');
+    console.log('clear');
   }catch(err){
-    console.error('연결 실패:', err);
+    console.error('fail', err);
   }
 })

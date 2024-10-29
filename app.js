@@ -27,7 +27,7 @@ app.listen(3000,async () => {
 })
 
 
-const User = sequelize.define('User', {
+/*const User = sequelize.define('User', {
   name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -48,12 +48,12 @@ app.post('/signup', async (req, res) => {
   const { name, id, pw } = req.body;
   try {
     await User.create({ name, id, pw });
-    res.send("íšŒì›ê°€ì… ì™„ë£Œ");
+    res.send("?šŒ?›ê°??… ?™„ë£?");
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
-      res.status(400).send("ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ID");
+      res.status(400).send("?´ë¯? ì¡´ì¬?•˜?Š” ID");
     } else {
-      res.status(500).send("ì„œë²„ ì˜¤ë¥˜");
+      res.status(500).send("?„œë²? ?˜¤ë¥?");
     }
   }
 });
@@ -64,13 +64,13 @@ app.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({ where: { id } });
     if (!user) {
-      res.status(400).send("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ID");
+      res.status(400).send("ì¡´ì¬?•˜ì§? ?•Š?Š” ID");
     } else if (user.pw !== pw) {
-      res.status(400).send("ë¹„ë°€ë²ˆí˜¸ê°€ ë¶ˆì¼ì¹˜");
+      res.status(400).send("ë¹„ë??ë²ˆí˜¸ê°? ë¶ˆì¼ì¹?");
     } else {
-      res.send("ë¡œê·¸ì¸ ì„±ê³µ");
+      res.send("ë¡œê·¸?¸ ?„±ê³?");
     }
   } catch (error) {
-    res.status(500).send("ì„œë²„ ì˜¤ë¥˜");
+    res.status(500).send("?„œë²? ?˜¤ë¥?");
   }
-});
+});*/

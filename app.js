@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
-//È¯°æº¯¼ö·Î °íÄ¥°Í
+//ÃˆÂ¯Â°Ã¦ÂºÂ¯Â¼Ã¶Â·ÃŽ Â°Ã­Ã„Â¥Â°Ã
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
   process.env.DATABASE_USERNAME,
@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
 );
 
 app.get('/', function (req, res) {
-  res.send('H! World!!')
+  res.send('Hi World!!')
 })
 app.listen(3000,async () => {
   try{
@@ -48,12 +48,12 @@ app.post('/signup', async (req, res) => {
   const { name, id, pw } = req.body;
   try {
     await User.create({ name, id, pw });
-    res.send("?��?���??�� ?���?");
+    res.send("?šŒ?›ê°??ž… ?™„ë£?");
   } catch (error) {
     if (error.name === 'SequelizeUniqueConstraintError') {
-      res.status(400).send("?���? 존재?��?�� ID");
+      res.status(400).send("?´ë¯? ì¡´ìž¬?•˜?Š” ID");
     } else {
-      res.status(500).send("?���? ?���?");
+      res.status(500).send("?„œë²? ?˜¤ë¥?");
     }
   }
 });
@@ -64,13 +64,13 @@ app.post('/login', async (req, res) => {
   try {
     const user = await User.findOne({ where: { id } });
     if (!user) {
-      res.status(400).send("존재?���? ?��?�� ID");
+      res.status(400).send("ì¡´ìž¬?•˜ì§? ?•Š?Š” ID");
     } else if (user.pw !== pw) {
-      res.status(400).send("비�??번호�? 불일�?");
+      res.status(400).send("ë¹„ë??ë²ˆí˜¸ê°? ë¶ˆì¼ì¹?");
     } else {
-      res.send("로그?�� ?���?");
+      res.send("ë¡œê·¸?¸ ?„±ê³?");
     }
   } catch (error) {
-    res.status(500).send("?���? ?���?");
+    res.status(500).send("?„œë²? ?˜¤ë¥?");
   }
 });*/

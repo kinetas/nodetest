@@ -35,7 +35,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-// body-parser 미들웨어 추가
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

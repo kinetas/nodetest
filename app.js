@@ -12,7 +12,7 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     port: 3306
   }
-);
+); 
 
 app.get('/', function (req, res) {
   res.send('Hi World!!')

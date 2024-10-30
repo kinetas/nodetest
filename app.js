@@ -1,4 +1,4 @@
-/*require('dotenv').config();
+require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
@@ -24,8 +24,8 @@ app.listen(3000,async () => {
   }catch(err){
     console.error('fail', err);
   }
-})*/
-
+})
+/*
 //============================================
 require('dotenv').config();
 const express = require('express');
@@ -130,3 +130,4 @@ sequelize.sync().then(() => {
   });
 });
 
+*/

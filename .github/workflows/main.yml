@@ -27,14 +27,11 @@ jobs:
     steps:
     # 기본 체크아웃
     - name: Checkout
-      #uses: actions/checkout@v3
-      #버전 업데이트
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
     # Node.js 설치
     - name: Set up Node.js
-      #uses: actions/setup-node@v3
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v3
       with:
         node-version: '20'  
         

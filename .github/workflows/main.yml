@@ -14,6 +14,8 @@ env:
   DATABASE_USER: ${{ secrets.DATABASE_USERNAME }}
   DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
   DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+  REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
+  REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
 
 permissions:
   contents: read
@@ -25,25 +27,21 @@ jobs:
     environment: production
 
     steps:
-    # 기본 체크아웃
+    # Checkout code
     - name: Checkout
       uses: actions/checkout@v3
 
-    # Node.js 설치
+    # Set up Node.js
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '20'  
-        
-    # 의존성 설치
+        node-version: '20'
+
+    # Install dependencies
     - name: Install dependencies
       run: npm install
 
-    # 빌드 작업
-    #- name: Build
-    #  run: npm run build  # 빌드 과정이 있다면, 스크립트 이름에 맞게 수정
-
-    # AWS 인증 설정
+    # Configure AWS credentials
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4.0.2
       with:
@@ -51,17 +49,33 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    # 빌드 결과물을 S3 버킷에 업로드
+    # Upload code to AWS S3
     - name: Upload to AWS S3
       run: |
-        zip -r release.zip *  # 전체 파일을 압축
+        zip -r release.zip *
         aws deploy push \
           --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
           --ignore-hidden-files \
           --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
           --source .
 
-    # S3 버킷에 있는 파일을 대상으로 CodeDeploy 실행
+    # Create .env file with environment variables
+    - name: Create .env file
+      run: |
+        echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+        echo "DATABASE_USER=${{ secrets.DATABASE_USERNAME }}" >> .env
+        echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+        echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+
+    # Copy .env to EC2
+    - name: Copy .env to EC2
+      run: |
+        echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
+        chmod 600 my-key.pem
+        scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
+        rm my-key.pem  # 키 파일을 삭제하여 보안 유지
+
+    # Deploy to AWS EC2 from S3
     - name: Deploy to AWS EC2 from S3
       run: |
         aws deploy create-deployment \
@@ -69,3 +83,4 @@ jobs:
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
           --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+

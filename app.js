@@ -1,4 +1,4 @@
-require('dotenv').config();
+/*require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
@@ -24,27 +24,14 @@ app.listen(3000,async () => {
   }catch(err){
     console.error('fail', err);
   }
-})
-
-app.get('/', async function (req, res){
-    try{
-        await sequelize.authenticate();
-        res.send('clear')
-      }catch(err){
-        res.send('fail', err);
-      }
-})
+})*/
 
 //============================================
-/*
-require('dotenv').config();
 const express = require('express');
-const { Sequelize, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
-
 const app = express();
-app.use(express.json());
+const { Sequelize, DataTypes } = require('sequelize');
 
+// Sequelize 초기화
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
   process.env.DATABASE_USERNAME,
@@ -56,7 +43,7 @@ const sequelize = new Sequelize(
   }
 );
 
-// 사용자 모델 정의
+// User 모델 정의
 const User = sequelize.define('User', {
   username: {
     type: DataTypes.STRING,
@@ -72,57 +59,31 @@ const User = sequelize.define('User', {
 // 데이터베이스 동기화
 sequelize.sync();
 
-// 테스트용 사용자 추가
-async function addTestUser() {
-  const hashedPassword = await bcrypt.hash('1234', 10);
-  await User.create({
-    username: '1111',
-    password: hashedPassword
-  });
-}
-
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
-  try {
-    // 1. ID가 존재하는지 확인
-    const user = await User.findOne({ where: { username } });
-
-    if (!user) {
-      // 2. ID가 존재하지 않으면 존재하지 않는다는 text 출력
-      return res.status(404).json({ message: "사용자 ID가 존재하지 않습니다." });
-    }
-
-    // 3. ID가 존재한다면
-    // 4. PW가 일치하는지 확인
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      // 5. PW가 일치하지 않으면 일치하지 않는다는 text 출력
-      return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
-    }
-
-    // 6. PW가 일치한다면
-    // 7. 로그인 성공 text 출력
-    res.json({ message: "로그인 성공" });
-
-  } catch (error) {
-    console.error('로그인 에러:', error);
-    res.status(500).json({ message: "서버 에러가 발생했습니다." });
-  }
-});
-
 app.get('/', function (req, res) {
   res.send('Hi World!!');
+});
+
+// '/login' 경로에 대한 GET 요청 처리
+app.get('/login', async (req, res) => {
+  try {
+    // 데이터베이스에서 모든 사용자 정보 조회
+    const users = await User.findAll({
+      attributes: ['username', 'password']
+    });
+
+    // 사용자 정보를 JSON 형태로 응답
+    res.json(users);
+  } catch (error) {
+    console.error('사용자 정보 조회 실패:', error);
+    res.status(500).send('서버 오류가 발생했습니다.');
+  }
 });
 
 app.listen(3000, async () => {
   try {
     await sequelize.authenticate();
     console.log('데이터베이스 연결 성공');
-    await addTestUser();
-    console.log('테스트 사용자 추가 완료');
   } catch (err) {
     console.error('데이터베이스 연결 실패:', err);
   }
-});*/
+});

@@ -1,4 +1,4 @@
-
+/*
 const express = require('express');
 const dotenv = require('dotenv');
 const sequelize = require('./config/db');
@@ -23,7 +23,7 @@ sequelize.authenticate()
     })
     .catch(err => {
         console.error('Unable to connect to the database:', err);
-    });
+    });*/
 //==================================================================
 /*
 const express = require('express');
@@ -61,4 +61,21 @@ sequelize.authenticate()
     .catch(err => {
         console.error('Unable to connect to the database:', err);
     });
-*/
+======================================*/
+const express = require('express');
+const path = require('path');
+
+const app = express();
+
+// Static folder setup to serve the HTML file
+app.use(express.static('public'));
+
+// Route to serve the HTML file
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+const PORT = 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${PORT}`);
+});

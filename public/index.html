@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>·Î±×ÀÎ Å×½ºÆ®</title>
+    <title>ë¡œê·¸ì¸ í…ŒìŠ¤íŠ¸</title>
 </head>
 <body>
-    <h1>·Î±×ÀÎ Å×½ºÆ®</h1>
+    <h1>ë¡œê·¸ì¸ í…ŒìŠ¤íŠ¸</h1>
     <form id="loginForm">
-        <input type="text" id="u_id" placeholder="¾ÆÀÌµğ" required><br><br>
-        <input type="password" id="u_password" placeholder="ºñ¹Ğ¹øÈ£" required><br><br>
-        <button type="submit">·Î±×ÀÎ</button>
+        <input type="text" id="u_id" placeholder="ì•„ì´ë””" required><br><br>
+        <input type="password" id="u_password" placeholder="ë¹„ë°€ë²ˆí˜¸" required><br><br>
+        <button type="submit">ë¡œê·¸ì¸</button>
     </form>
     <div id="result"></div>
 
@@ -20,7 +20,7 @@
             const u_id = document.getElementById('u_id').value;
             const u_password = document.getElementById('u_password').value;
             
-            fetch('/api/auth/login', { // API °æ·Î ¼öÁ¤
+            fetch('/api/auth/login', { // API ê²½ë¡œ ìˆ˜ì •
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,14 +30,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message === 'Login successful') {
-                    document.getElementById('result').textContent = `·Î±×ÀÎ ¼º°ø! È¯¿µÇÕ´Ï´Ù, ${data.user.nickname}´Ô!`;
+                    document.getElementById('result').textContent = `ë¡œê·¸ì¸ ì„±ê³µ! í™˜ì˜í•©ë‹ˆë‹¤, ${data.user.nickname}ë‹˜!`;
                 } else {
                     document.getElementById('result').textContent = data.message;
                 }
             })
             .catch((error) => {
                 console.error('Error:', error);
-                document.getElementById('result').textContent = '·Î±×ÀÎ Áß ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.';
+                document.getElementById('result').textContent = 'ë¡œê·¸ì¸ ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.';
             });
         });
     </script>

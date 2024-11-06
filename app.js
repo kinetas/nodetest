@@ -1,4 +1,4 @@
-/*
+
 const express = require('express');
 const dotenv = require('dotenv');
 const sequelize = require('./config/db');
@@ -23,8 +23,9 @@ sequelize.authenticate()
     })
     .catch(err => {
         console.error('Unable to connect to the database:', err);
-    });*/
+    });
 //==================================================================
+/*
 const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
@@ -60,3 +61,4 @@ sequelize.authenticate()
     .catch(err => {
         console.error('Unable to connect to the database:', err);
     });
+*/

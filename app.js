@@ -1,8 +1,7 @@
-require('dotenv').config();
+/*require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
-//ÃˆÂ¯Â°Ã¦ÂºÂ¯Â¼Ã¶Â·ÃŽ Â°Ã­Ã„Â¥Â°Ã
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
   process.env.DATABASE_USERNAME,
@@ -24,7 +23,7 @@ app.listen(3000,async () => {
   }catch(err){
     console.error('fail', err);
   }
-})
+})*/
 
 /*
 //============================================
@@ -131,3 +130,30 @@ sequelize.sync().then(() => {
   });
 });
 */
+const express = require('express');
+const dotenv = require('dotenv');
+const sequelize = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+
+const PORT = process.env.PORT || 3000;
+
+// �����ͺ��̽� ���� Ȯ��
+sequelize.authenticate()
+    .then(() => {
+        console.log('Database connected...');
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('Unable to connect to the database:', err);
+    });
+    
+

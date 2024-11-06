@@ -26,6 +26,14 @@ app.listen(3000,async () => {
   }
 })
 
+app.get('/', async function (req, res){
+    try{
+        await sequelize.authenticate();
+        res.send('clear')
+      }catch(err){
+        res.send('fail', err);
+      }
+})
 
 //============================================
 /*

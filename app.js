@@ -1,4 +1,4 @@
-/*require('dotenv').config();
+require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
@@ -24,10 +24,11 @@ app.listen(3000,async () => {
   }catch(err){
     console.error('fail', err);
   }
-})*/
+})
 
 
 //============================================
+/*
 require('dotenv').config();
 const express = require('express');
 const { Sequelize, DataTypes } = require('sequelize');
@@ -116,4 +117,4 @@ app.listen(3000, async () => {
   } catch (err) {
     console.error('데이터베이스 연결 실패:', err);
   }
-});
+});*/

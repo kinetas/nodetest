@@ -23,21 +23,14 @@ app.listen(3000,async () => {
   }catch(err){
     console.error('fail', err);
   }
-})*/
+})
 
 /*
 //============================================
 require('dotenv').config();
 const express = require('express');
-const { Sequelize, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
-
 const app = express();
-
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const { Sequelize, DataTypes } = require('sequelize');
 
 const sequelize = new Sequelize(
   process.env.DATABASE_NAME,
@@ -50,110 +43,49 @@ const sequelize = new Sequelize(
   }
 );
 
+// User ëª¨ë¸ ? •?˜ (?‹¤? œ ?…Œ?´ë¸? êµ¬ì¡°?— ë§žì¶¤)
 const User = sequelize.define('User', {
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  userId: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
   password: {
     type: DataTypes.STRING,
     allowNull: false
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
+}, {
+  tableName: 'user', // ?‹¤? œ ?…Œ?´ë¸? ?´ë¦„ì´ 'user'?¸ ê²½ìš°
+  timestamps: false // createdAt, updatedAt ì»¬ëŸ¼?´ ?—†?Š” ê²½ìš°
 });
-
-async function signup(username, userId, password) {
-  try {
-    const existingUser = await User.findOne({ where: { userId } });
-    if (existingUser) {
-      return { success: false, message: 'ex id' };
-    }
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    await User.create({ username, userId, password: hashedPassword });
-    return { success: true, message: 'Signup Success' };
-  } catch (error) {
-    console.error('Signup Error:', error);
-    return { success: false, message: 'Error' };
-  }
-}
-
-async function login(userId, password) {
-  try {
-    const user = await User.findOne({ where: { userId } });
-    if (!user) {
-      return { success: false, message: 'No User' };
-    }
-    
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return { success: false, message: 'PW' };
-    }
-
-    return { success: true, message: 'Login Success', user: { id: user.id, username: user.username, userId: user.userId } };
-  } catch (error) {
-    console.error('Login Error:', error);
-    return { success: false, message: 'Login Error' };
-  }
-}
 
 app.get('/', function (req, res) {
   res.send('Hi World!!');
 });
 
-app.post('/signup', async (req, res) => {
-  const { username, userId, password } = req.body;
-  const result = await signup(username, userId, password);
-  res.json(result);
+// ?‚¬?š©?ž ? •ë³´ë?? ê°?? ¸?˜¤?Š” ?ƒˆë¡œìš´ ?¼?š°?Š¸
+app.get('/users', async function (req, res) {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'name'] // password?Š” ë³´ì•ˆ?ƒ ? œ?™¸
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('?‚¬?š©?ž ? •ë³? ì¡°íšŒ ?‹¤?Œ¨:', error);
+    res.status(500).send('?„œë²? ?˜¤ë¥˜ê?? ë°œìƒ?–ˆ?Šµ?‹ˆ?‹¤.');
+  }
 });
 
-app.post('/login', async (req, res) => {
-  const { userId, password } = req.body;
-  const result = await login(userId, password);
-  res.json(result);
-});
-
-sequelize.sync().then(() => {
-  app.listen(3000, '0.0.0.0', async () => {
-    try {
-      await sequelize.authenticate();
-      console.log('Database connection has been established successfully.');
-      console.log('Server is running on port 3000');
-    } catch (err) {
-      console.error('Unable to connect to the database:', err);
-    }
-  });
+app.listen(3000, async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('?°?´?„°ë² ì´?Š¤ ?—°ê²? ?„±ê³?');
+  } catch (err) {
+    console.error('?°?´?„°ë² ì´?Š¤ ?—°ê²? ?‹¤?Œ¨:', err);
+  }
 });
 */
-const express = require('express');
-const dotenv = require('dotenv');
-const sequelize = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
-
-dotenv.config();
-
-const app = express();
-app.use(express.json());
-
-app.use('/api/auth', authRoutes);
-
-const PORT = process.env.PORT || 3000;
-
-// µ¥ÀÌÅÍº£ÀÌ½º ¿¬°á È®ÀÎ
-sequelize.authenticate()
-    .then(() => {
-        console.log('Database connected...');
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
-    })
-    .catch(err => {
-        console.error('Unable to connect to the database:', err);
-    });
-    
-

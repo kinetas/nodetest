@@ -1,4 +1,4 @@
-/*require('dotenv').config();
+require('dotenv').config();
 const express = require('express')
 const app = express()
 const {Sequelize}=require('sequelize');
@@ -24,10 +24,10 @@ app.listen(3000,async () => {
   }catch(err){
     console.error('fail', err);
   }
-})*/
+})
 
 //============================================
-const express = require('express');
+/*const express = require('express');
 const app = express();
 const { Sequelize, DataTypes } = require('sequelize');
 
@@ -64,7 +64,7 @@ app.get('/', function (req, res) {
 });
 
 // '/login' 경로에 대한 GET 요청 처리
-app.get('/login', async (req, res) => {
+app.get('/', async (req, res) => {
   try {
     // 데이터베이스에서 모든 사용자 정보 조회
     const users = await User.findAll({
@@ -86,4 +86,4 @@ app.listen(3000, async () => {
   } catch (err) {
     console.error('데이터베이스 연결 실패:', err);
   }
-});
+});*/

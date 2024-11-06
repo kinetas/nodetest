@@ -62,7 +62,7 @@ sequelize.authenticate()
         console.error('Unable to connect to the database:', err);
     });
 ======================================*/
-/*const express = require('express');
+const express = require('express');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 
@@ -81,44 +81,6 @@ app.use((req, res, next) => {
 });
 
 // ±âº» HTML ÆÄÀÏ Á¦°ø
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-const PORT = 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
-});
-*/
-
-//========================================
-
-const express = require('express');
-const path = require('path');
-const authRoutes = require('./routes/authRoutes');
-
-const app = express();
-app.use(express.json()); // JSON 형식의 요청을 처리할 수 있도록 설정
-
-// 모든 응답에 대해 UTF-8 인코딩 설정
-app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    next();
-});
-
-// Static folder to serve the HTML file with UTF-8 encoding
-app.use(express.static('public', {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.html')) {
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        }
-    }
-}));
-
-// 로그인 API 라우트
-app.use('/api/auth', authRoutes);
-
-// 기본 HTML 파일 제공
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

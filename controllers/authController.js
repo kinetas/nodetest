@@ -9,8 +9,8 @@ exports.login = async (req, res) => {
        
         console.log('Received login request:', u_id, u_password);
 
-        res.status(200).json({ message: 'Testing' }); // 사용자 조회
-        /*const user = await User.findOne({ where: { u_id } });
+        // 사용자 조회
+        const user = await User.findOne({ where: { u_id } });
 
         // 사용자가 없거나 비밀번호가 일치하지 않는 경우
         if (!user) {
@@ -31,7 +31,7 @@ exports.login = async (req, res) => {
                 location: user.u_location,
                 birth: user.u_birth,
             }
-        });*/
+        });
     } catch (error) {
         console.error('로그인 오류:', error);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });

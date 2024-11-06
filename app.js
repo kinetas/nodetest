@@ -13,7 +13,7 @@ app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-// ÂµÂ¥??ÃŒÃ??�ÃÂºÂ�???ÃŒÂ½Âº Â¿Â¬Â°Ã¡ Ã?�Â�???ÃŽ
+// 횂쨉횂짜??횄흸횄��┚꺜띊궰봤궰�??횄흸횂쩍횂쨘 횂쩔횂짭횂째횄징 횄�녍궰�??횄탐
 sequelize.authenticate()
     .then(() => {
         console.log('Database connected...');
@@ -37,20 +37,20 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// ? ????  ?ŒŒ?¼ ? œê³µì??? ?œ??????��? ë¯¸ë??��????��????��? ì¶??��???
+// ?혻���?혻혖 ?흸흸?혶쩌 ?혻흹챗쨀쨉챙혶��� ?흹���?��◑� 챘짱쨍챘��쑣�?��봔�?��벬� 챙쨋��씳�??
 app.use(express.static('public'));
 
-// API ?¼?š°?Š¸
+// API ?혶쩌?큄째?힋쨍
 app.use('/api/auth', authRoutes);
 
-// ë£¨íŠ¸ ê²½ë¡œ ???��????��??Ÿ¬ ì¶??��???
+// 챘짙짢챠힋쨍 챗짼쩍챘징흹 ?��◈�?��쑣�?타짭 챙쨋��씳�??
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 
-// ?°?´???�°ë² �?´?Š¤ ???�°ê�?? ??��????¸
+// ?혥째?혶쨈?��왖걘ヂ꼲졗�혶쨈?힋짚 ?��붋걘ぢ�? ?�꽓���?혶쨍
 sequelize.authenticate()
     .then(() => {
         console.log('Database connected...');
@@ -67,12 +67,12 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
-app.use(express.json()); // JSON Çü½Ä??Ç ¿äÃ»??» Ã³¸®ÇÒ ¼ö ??Öµµ·Ï ¼³Á¤
+app.use(express.json()); // JSON 횉체쩍횆��횉 쩔채횄쨩��쨩 횄쨀쨍짰횉횘 쩌철 ��횜쨉쨉쨌횕 쩌쨀횁짚
 
 // Static folder to serve the HTML file
 app.use(express.static('public'));
 
-// ·Î±×??Î API ¶ó¿ìÆ®
+// 쨌횓짹횞��횓 API 쨋처쩔챙횈짰
 app.use('/api/auth', authRoutes);
 
 app.use((req, res, next) => {
@@ -80,7 +80,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// ±âº» HTML ÆÄ??Ï Á¦°ø
+// 짹창쨘쨩 HTML 횈횆��횕 횁짝째첩
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));

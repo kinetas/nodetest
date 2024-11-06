@@ -1,25 +1,25 @@
-// User ¸ğµ¨ ºÒ·¯¿À±â
-const User = require('../models/userModel'); // °æ·Î¸¦ È®ÀÎÇÏ¼¼¿ä
+// User ëª¨ë¸ ë¶ˆëŸ¬ì˜¤ê¸°
+const User = require('../models/userModel'); // ê²½ë¡œë¥¼ í™•ì¸í•˜ì„¸ìš”
 
-// ·Î±×ÀÎ Ã³¸® ÇÔ¼ö
+// ë¡œê·¸ì¸ ì²˜ë¦¬ í•¨ìˆ˜
 exports.login = async (req, res) => {
     const { u_id, u_password } = req.body;
 
     try {
-        // »ç¿ëÀÚ Á¶È¸
+        // ì‚¬ìš©ì ì¡°íšŒ
         const user = await User.findOne({ where: { u_id } });
 
-        // »ç¿ëÀÚ°¡ ¾ø°Å³ª ºñ¹Ğ¹øÈ£°¡ ÀÏÄ¡ÇÏÁö ¾Ê´Â °æ¿ì
+        // ì‚¬ìš©ìê°€ ì—†ê±°ë‚˜ ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠëŠ” ê²½ìš°
         if (!user) {
-            return res.status(401).json({ message: 'Á¸ÀçÇÏÁö ¾Ê´Â »ç¿ëÀÚÀÔ´Ï´Ù.' });
+            return res.status(401).json({ message: 'ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ì‚¬ìš©ìì…ë‹ˆë‹¤.' });
         }
 
-        // ºñ¹Ğ¹øÈ£ ÀÏÄ¡ ¿©ºÎ È®ÀÎ (´Ü¼ø ¹®ÀÚ¿­ ºñ±³)
+        // ë¹„ë°€ë²ˆí˜¸ ì¼ì¹˜ ì—¬ë¶€ í™•ì¸ (ë‹¨ìˆœ ë¬¸ìì—´ ë¹„êµ)
         if (u_password !== user.u_password) {
-            return res.status(401).json({ message: 'ºñ¹Ğ¹øÈ£°¡ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù.' });
+            return res.status(401).json({ message: 'ë¹„ë°€ë²ˆí˜¸ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.' });
         }
 
-        // ·Î±×ÀÎ ¼º°ø ½Ã ÀÀ´ä
+        // ë¡œê·¸ì¸ ì„±ê³µ ì‹œ ì‘ë‹µ
         return res.status(200).json({
             message: 'Login successful',
             user: {
@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('·Î±×ÀÎ ¿À·ù:', error);
-        res.status(500).json({ message: '¼­¹ö ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.' });
+        console.error('ë¡œê·¸ì¸ ì˜¤ë¥˜:', error);
+        res.status(500).json({ message: 'ì„œë²„ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.' });
     }
 };

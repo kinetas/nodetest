@@ -65,9 +65,9 @@ sequelize.sync();
 
 // 테스트용 사용자 추가
 async function addTestUser() {
-  const hashedPassword = await bcrypt.hash('testpassword', 10);
+  const hashedPassword = await bcrypt.hash('1234', 10);
   await User.create({
-    username: 'testuser',
+    username: '1111',
     password: hashedPassword
   });
 }

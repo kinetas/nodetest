@@ -13,7 +13,7 @@ app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-// ÂµÂ¥Ã€ÃŒÃ…ÃÂºÂ£Ã€ÃŒÂ½Âº Â¿Â¬Â°Ã¡ ÃˆÂ®Ã€ÃŽ
+// ÂµÂ¥??ÃŒÃ…ÃÂºÂ£??ÃŒÂ½Âº Â¿Â¬Â°Ã¡ ÃˆÂ®??ÃŽ
 sequelize.authenticate()
     .then(() => {
         console.log('Database connected...');
@@ -36,24 +36,24 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// ì •ì  íŒŒì¼ ì œê³µì„ ìœ„í•œ ë¯¸ë“¤ì›¨ì–´ ì¶”ê°€
+// ? •?  ?ŒŒ?¼ ? œê³µì„ ?œ„?•œ ë¯¸ë“¤?›¨?–´ ì¶”ê??
 app.use(express.static('public'));
 
-// API ë¼ìš°íŠ¸
+// API ?¼?š°?Š¸
 app.use('/api/auth', authRoutes);
 
-// ë£¨íŠ¸ ê²½ë¡œ í•¸ë“¤ëŸ¬ ì¶”ê°€
+// ë£¨íŠ¸ ê²½ë¡œ ?•¸?“¤?Ÿ¬ ì¶”ê??
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
 
-// ë°ì´í„°ë² ì´ìŠ¤ ì—°ê²° í™•ì¸
+// ?°?´?„°ë² ì´?Š¤ ?—°ê²? ?™•?¸
 sequelize.authenticate()
     .then(() => {
         console.log('Database connected...');
-        app.listen(PORT, () => {
+        app.listen(PORT,'0.0.0.0', () => {
             console.log(`Server running on port ${PORT}`);
         });
     })

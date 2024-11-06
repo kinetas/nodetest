@@ -64,13 +64,18 @@ sequelize.authenticate()
 ======================================*/
 const express = require('express');
 const path = require('path');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
+app.use(express.json()); // JSON 형식의 요청을 처리할 수 있도록 설정
 
-// Static folder setup to serve the HTML file
+// Static folder to serve the HTML file
 app.use(express.static('public'));
 
-// Route to serve the HTML file
+// 로그인 API 라우트
+app.use('/api/auth', authRoutes);
+
+// 기본 HTML 파일 제공
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

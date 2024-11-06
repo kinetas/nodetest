@@ -75,6 +75,11 @@ app.use(express.static('public'));
 // 로그인 API 라우트
 app.use('/api/auth', authRoutes);
 
+app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    next();
+});
+
 // 기본 HTML 파일 제공
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));

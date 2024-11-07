@@ -5,13 +5,9 @@ const app = express();
 const PORT = 3000;
 app.use(express.json()); // JSON 파싱을 위한 미들웨어 설정
 app.use(express.urlencoded({ extended: true })); // URL 인코딩된 데이터 파싱을 위한 미들웨어 설정
-app.use('/api/auth', authRoutes);
 
 // Static folder to serve the HTML file
 app.use(express.static('public'));
-// 쨌횓짹횞��횓 API 쨋처쩔챙횈짰
-app.use('/api/auth', authRoutes);
-
 
 app.use((req, res, next) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -29,6 +25,8 @@ app.get('/dashboard', (req, res) => {
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html')); // 회원가입 HTML 파일
 });
+
+app.use('/api/auth', authRoutes);
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);

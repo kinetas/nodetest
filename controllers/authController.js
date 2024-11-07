@@ -19,17 +19,17 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
         }
 
-        // 비밀번호 일치 여부 확인 (단순 문자열 비교)
-        if (u_password !== user.u_password) {
-            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
-        }
+        // // 비밀번호 일치 여부 확인 (단순 문자열 비교)
+        // if (u_password !== user.u_password) {
+        //     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+        // }
 
         // 비밀번호 일치 여부 확인 (bcrypt 사용) // 수정
         // 입력받은 PW를 동일한 방식으로 암호화 후 비교
-        // const isMatch = await comparePassword(u_password, user.u_password); // 수정
-        // if (!isMatch) {
-        //     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
-        // }
+        const isMatch = await comparePassword(u_password, user.u_password); // 수정
+        if (!isMatch) {
+            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+        }
 
 
         // 로그인 성공 시 응답

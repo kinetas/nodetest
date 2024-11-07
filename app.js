@@ -9,11 +9,6 @@ app.use(express.urlencoded({ extended: true })); // URL 인코딩된 데이터 �
 // Static folder to serve the HTML file
 app.use(express.static('public'));
 
-app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    next();
-});
-
 // 짹창쨘쨩 HTML 횈횆��횕 횁짝째첩
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -27,6 +22,11 @@ app.get('/register', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+app.use((req, res) => {
+    res.status(404).send('404 Not Found');
+});
+
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);

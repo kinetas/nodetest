@@ -1,7 +1,7 @@
 // User 모델 불러오기
 const User = require('../models/userModel'); // 경로를 확인하세요
 
-const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
+//const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
 
 // 로그인 처리 함수
 exports.login = async (req, res) => {

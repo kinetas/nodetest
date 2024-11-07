@@ -31,9 +31,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message === 'Login successful') {
-                    window.location.href = '/dashboard'; // 로그인 성공 시 대시보드로 리디렉션
+                    window.location.href = data.redirectUrl; // 대시보드 페이지로 리디렉션
                 } else {
-                    document.getElementById('result').textContent = data.message;
+                document.getElementById('result').textContent = data.message; // 오류 메시지 출력
                 }
             })
             .catch((error) => {
@@ -41,6 +41,7 @@
                 document.getElementById('result').textContent = '로그인 중 오류가 발생했습니다.';
             });
         });
+
 
         // 회원가입 버튼 클릭 시 회원가입 페이지로 이동
         document.getElementById('registerButton').addEventListener('click', function() {

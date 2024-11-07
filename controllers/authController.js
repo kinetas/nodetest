@@ -1,5 +1,5 @@
 // User 모델 불러오기
-const User = require('../models/userModel'); // 경로를 확인하세요
+//const User = require('../models/userModel'); // 경로를 확인하세요
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
 
@@ -20,16 +20,16 @@ exports.login = async (req, res) => {
         }
 
         // 비밀번호 일치 여부 확인 (단순 문자열 비교)
-        // if (u_password !== user.u_password) {
-        //     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
-        // }
+        if (u_password !== user.u_password) {
+            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+        }
 
         // 비밀번호 일치 여부 확인 (bcrypt 사용) // 수정
         // 입력받은 PW를 동일한 방식으로 암호화 후 비교
-        const isMatch = await comparePassword(u_password, user.u_password); // 수정
-        if (!isMatch) {
-            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
-        }
+        // const isMatch = await comparePassword(u_password, user.u_password); // 수정
+        // if (!isMatch) {
+        //     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+        // }
 
 
         // 로그인 성공 시 응답
@@ -59,22 +59,22 @@ exports.register = async (req, res) => {
         }
     
         // // 새 사용자 생성
-        // const newUser = await User.create({
-        //     u_id,
-        //     u_password, // 아직 암호화하지 않음
-        //     u_nickname,
-        //     u_name,
-        // });
-
-        // 비밀번호 암호화 // 수정
-        const hashedPassword = await hashPassword(u_password); // 수정
-        // 새 사용자 생성
         const newUser = await User.create({
             u_id,
-            u_password: hashedPassword, // 암호화된 비밀번호 저장 // 수정
+            u_password, // 아직 암호화하지 않음
             u_nickname,
             u_name,
         });
+
+        // // 비밀번호 암호화 // 수정
+        // const hashedPassword = await hashPassword(u_password); // 수정
+        // // 새 사용자 생성
+        // const newUser = await User.create({
+        //     u_id,
+        //     u_password: hashedPassword, // 암호화된 비밀번호 저장 // 수정
+        //     u_nickname,
+        //     u_name,
+        // });
 
     
         // 성공 응답

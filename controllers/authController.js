@@ -21,7 +21,11 @@ exports.login = async (req, res) => {
         if (u_password !== user.u_password) {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
-
+        req.session.user = {
+            id: user.u_id,
+            nickname: user.u_nickname,
+            name: user.u_name,
+        };
         // 로그인 성공 시 응답
         return res.status(200).json({
             message: 'Login successful',
@@ -30,7 +34,8 @@ exports.login = async (req, res) => {
                 name: user.u_name,
                 location: user.u_location,
                 birth: user.u_birth,
-            }
+            },
+            redirectUrl: '/dashboard' // 리디렉션할 URL
         });
     } catch (error) {
         console.error('로그인 오류:', error);

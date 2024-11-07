@@ -85,6 +85,9 @@ app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+app.get('/dashboard', (req, res) => {
+    res.send('Hello World'); // 대시보드 페이지에 "Hello World" 출력
+});
 
 const PORT = 3000;
 app.listen(PORT, '0.0.0.0', () => {

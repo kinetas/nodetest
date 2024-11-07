@@ -37,7 +37,7 @@
             })
             .catch((error) => {
                 console.error('Error:', error);
-                document.getElementById('result').textContent = '회원가입 중 오류가 발생했습니다.';
+                document.getElementById('result').textContent = `회원가입 중 ${error}오류가 발생했습니다.`;
             });
         });
     </script>

@@ -54,7 +54,7 @@ app.get('/register', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 
-// app.use('/dashboard', missionRoutes); // 미션 라우트를 /dashboard로 설정
+app.use('/dashboard', missionRoutes); // 미션 라우트를 /dashboard로 설정
 
 app.use((req, res) => {
     res.status(404).send('404 Not Found');

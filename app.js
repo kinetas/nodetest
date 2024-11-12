@@ -5,9 +5,9 @@ const authRoutes = require('./routes/authRoutes'); // 라우트 가져오기
 const app = express();
 const PORT = 3000;
 
-// //cors
-// const cors = require('cors');
-// app.use(cors({ origin: '*' }));
+//cors
+const cors = require('cors');
+app.use(cors({ origin: '*' }));
 
 app.use(express.json()); // JSON 파싱을 위한 미들웨어 설정
 app.use(express.urlencoded({ extended: true })); // URL 인코딩된 데이터 파싱을 위한 미들웨어 설정

@@ -1,9 +1,9 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // 비밀번호 암호화 함수
 const hashPassword = async (password) => {
-    const saltRounds = 10; // 솔트 라운드 수
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const salt = await bcrypt.genSalt(10); // 솔트 생성
+    const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
 };
 

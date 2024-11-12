@@ -30,8 +30,13 @@ const requireAuth = (req, res, next) => {
 // 예시: 대시보드 라우트 보호
 app.get('/dashboard', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-    const userId = req.session.user.id;
-    res.json({ userId });
+    // const userId = req.session.user.id;
+    // res.json({ userId });
+});
+
+// 유저 정보를 반환하는 라우트 추가
+app.get('/user-info', requireAuth, (req, res) => {
+    res.json({ userId: req.session.user.id });
 });
 
 // 짹창쨘쨩 HTML 횈횆��횕 횁짝째첩

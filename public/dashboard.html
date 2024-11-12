@@ -23,16 +23,20 @@
     <h1 id="greeting">Loading...</h1> <!-- 세션에 저장된 유저 ID를 출력할 자리 -->
 
     <script>
-        // 서버에서 유저 ID 가져오기
-        fetch('/dashboard')
-            .then(response => response.json())
+        fetch('/user-info')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('로그인이 필요합니다.');
+                }
+                return response.json();
+            })
             .then(data => {
                 const greetingElement = document.getElementById('greeting');
                 greetingElement.textContent = `Hello, ${data.userId}`; // 유저 ID 출력
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('greeting').textContent = '로그인이 필요합니다.';
+                document.getElementById('greeting').textContent = error.message;
             });
     </script>
 </body>

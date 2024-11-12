@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session'); //세션추가
 const path = require('path');
 const authRoutes = require('./routes/authRoutes'); // 라우트 가져오기
+// const missionRoutes = require('./routes/missionRoutes'); // 미션 라우트 불러오기
 const app = express();
 const PORT = 3000;
 
@@ -52,6 +53,8 @@ app.get('/register', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+// app.use('/dashboard', missionRoutes); // 미션 라우트를 /dashboard로 설정
 
 app.use((req, res) => {
     res.status(404).send('404 Not Found');

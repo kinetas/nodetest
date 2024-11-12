@@ -10,6 +10,7 @@ exports.getUserMissions = async (req, res) => {
         const missions = await Mission.findAll({
             where: { u1_id: userId }
         });
+        console.log('Missions found:', missions);
         
         res.json({ missions });
     } catch (error) {

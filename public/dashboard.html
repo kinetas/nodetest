@@ -38,6 +38,28 @@
                 console.error('Error:', error);
                 document.getElementById('greeting').textContent = error.message;
             });
+
+        // 미션 리스트 가져오기
+        fetch('/dashboard/missions')
+            .then(response => response.json())
+            .then(data => {
+                const missionListElement = document.getElementById('missionList');
+                missionListElement.innerHTML = '';
+
+                if (data.missions && data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = mission.m_title;
+                        missionListElement.appendChild(listItem);
+                    });
+                } else {
+                    missionListElement.textContent = '미션이 없습니다.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('missionList').textContent = '미션 목록을 불러오는데 실패했습니다.';
+            });
     </script>
 </body>
 </html>

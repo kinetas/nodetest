@@ -28,7 +28,7 @@ exports.login = async (req, res) => {
 
         // 로그인 성공 시 세션에 사용자 정보 저장
         req.session.user = {
-            id: user.id,
+            id: user.u_id,
             nickname: user.u_nickname,
             name: user.u_name,
         };

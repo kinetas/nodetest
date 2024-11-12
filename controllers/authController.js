@@ -19,11 +19,6 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
         }
 
-        // // 비밀번호 일치 여부 확인 (단순 문자열 비교)
-        // if (u_password !== user.u_password) {
-        //     return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
-        // }
-
         // 비밀번호 일치 여부 확인 (bcrypt 사용) // 수정
         // 입력받은 PW를 동일한 방식으로 암호화 후 비교
         const isMatch = await comparePassword(u_password, user.u_password); // 수정
@@ -31,12 +26,12 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // // 로그인 성공 시 세션에 사용자 정보 저장
-        // req.session.user = {
-        //     id: user.id,
-        //     nickname: user.u_nickname,
-        //     name: user.u_name,
-        // };
+        // 로그인 성공 시 세션에 사용자 정보 저장
+        req.session.user = {
+            id: user.id,
+            nickname: user.u_nickname,
+            name: user.u_name,
+        };
 
         // 로그인 성공 시 응답
         return res.status(200).json({
@@ -64,14 +59,6 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: '이미 사용 중인 아이디입니다.' });
         }
     
-        // // 새 사용자 생성
-        // const newUser = await User.create({
-        //     u_id,
-        //     u_password, // 아직 암호화하지 않음
-        //     u_nickname,
-        //     u_name,
-        // });
-
         // 비밀번호 암호화 // 수정
         const hashedPassword = await hashPassword(u_password); // 수정
         // 새 사용자 생성

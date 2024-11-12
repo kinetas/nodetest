@@ -1,27 +1,36 @@
 const express = require('express');
-// const session = require('express-session'); //세션추가
+const session = require('express-session'); //세션추가
 const path = require('path');
 const authRoutes = require('./routes/authRoutes'); // 라우트 가져오기
 const app = express();
 const PORT = 3000;
 
-// //cors
-// const cors = require('cors');
-// app.use(cors({ origin: '*' }));
-
 app.use(express.json()); // JSON 파싱을 위한 미들웨어 설정
 app.use(express.urlencoded({ extended: true })); // URL 인코딩된 데이터 파싱을 위한 미들웨어 설정
 
-// // 세션 설정
-// app.use(session({
-//     secret: 'your_secret_key', // 세션 암호화에 사용할 키
-//     resave: false, // 세션을 항상 저장할지 여부
-//     saveUninitialized: false, // 초기화되지 않은 세션을 저장할지 여부
-//     cookie: { maxAge: 1000 * 60 * 60 * 24 } // 쿠키의 유효 기간 (여기서는 하루)
-// }));
+// 세션 설정
+app.use(session({
+    secret: 'your_secret_key', // 세션 암호화에 사용할 키
+    resave: false, // 세션을 항상 저장할지 여부
+    saveUninitialized: false, // 초기화되지 않은 세션을 저장할지 여부
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 쿠키의 유효 기간 (여기서는 하루)
+}));
 
 // Static folder to serve the HTML file
 app.use(express.static('public'));
+
+// 세션 인증 미들웨어
+const requireAuth = (req, res, next) => {
+    if (!req.session.user) {
+        return res.status(401).json({ message: '로그인이 필요합니다.' });
+    }
+    next();
+};
+
+// 예시: 대시보드 라우트 보호
+app.get('/dashboard', requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
 
 // 짹창쨘쨩 HTML 횈횆��횕 횁짝째첩
 app.get('/', (req, res) => {

@@ -31,6 +31,12 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
 
+        // // 로그인 성공 시 세션에 사용자 정보 저장
+        // req.session.user = {
+        //     id: user.id,
+        //     nickname: user.u_nickname,
+        //     name: user.u_name,
+        // };
 
         // 로그인 성공 시 응답
         return res.status(200).json({

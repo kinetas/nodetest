@@ -23,6 +23,8 @@
     <h1 id="greeting">Loading...</h1> <!-- 세션에 저장된 유저 ID를 출력할 자리 -->
     <h2>미션 리스트</h2>
     <ul id="missionList">Loading missions...</ul> <!-- 미션 리스트를 출력할 자리 -->
+    <!-- public/dashboard.html -->
+    <button onclick="window.location.href='/rooms'">방</button>
     <script>
         fetch('/user-info')
             .then(response => {

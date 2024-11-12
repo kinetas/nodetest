@@ -1,0 +1,82 @@
+<!-- public/rooms.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>방 목록</h1>
+    <ul id="roomList">Loading rooms...</ul> <!-- 방 목록을 표시할 요소 -->
+    <input type="text" id="userIdInput" placeholder="추가/삭제할 유저 ID 입력">
+    <button onclick="addRoom()">방 추가</button>
+    <button onclick="deleteRoom()">방 삭제</button>
+
+    <script>
+        const userId = ''; // 세션 ID에 따라 사용자 ID를 여기에 할당
+
+        // 페이지 로드 시 방 목록 가져오기
+        fetch('/api/rooms')
+            .then(response => response.json())
+            .then(data => {
+                const roomListElement = document.getElementById('roomList');
+                roomListElement.innerHTML = '';
+                if (data.rooms && data.rooms.length > 0) {
+                    data.rooms.forEach(room => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${room.u1_id} - ${room.u2_id}`;
+                        roomListElement.appendChild(listItem);
+                    });
+                } else {
+                    roomListElement.textContent = '방이 없습니다.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('roomList').textContent = '방 목록을 불러오는 데 실패했습니다.';
+            });
+
+        // 방 추가 함수
+        function addRoom() {
+            const u2_id = document.getElementById('userIdInput').value;
+            fetch('/api/rooms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ u1_id: userId, u2_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        // 방 삭제 함수
+        function deleteRoom() {
+            const u2_id = document.getElementById('userIdInput').value;
+            fetch(`/api/rooms/${u2_id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>

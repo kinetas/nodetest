@@ -25,13 +25,13 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.DATE,
     allowNull: false,
   },
-  m_reward: {
+  m_reword: {
     type: DataTypes.STRING(20),
     allowNull: true,
   },
 }, {
-  tableName: 'misson', // ½ÇÁ¦ Å×ÀÌºí ÀÌ¸§¿¡ ¸ÂÃç ¼³Á¤ÇÕ´Ï´Ù.
-  timestamps: false,   // createdAt ¹× updatedAt ÄÃ·³À» »ç¿ëÇÏÁö ¾ÊÀ¸¹Ç·Î false·Î ¼³Á¤
+  tableName: 'misson', // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
+  timestamps: false,   // createdAt ï¿½ï¿½ updatedAt ï¿½Ã·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ falseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 });
 
 module.exports = Mission;

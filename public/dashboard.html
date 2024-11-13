@@ -64,7 +64,7 @@
         <button onclick="createMission()">미션 생성</button>
     </div>
 
-    <h1 id="greeting">Hello, User!</h1>
+    <h1 id="greeting">Hello, </h1>
     <h2>미션 삭제</h2>
 
     <!-- 미션 삭제 폼 -->
@@ -86,7 +86,7 @@
             })
             .then(data => {
                 const greetingElement = document.getElementById('greeting');
-                greetingElement.textContent = `Hello, ${data.userId}`; // 유저 ID 출력
+                greetingElement.textContent = `Hello, ${data.userId}\n`; // 유저 ID 출력
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -103,7 +103,7 @@
                     if (data.missions && data.missions.length > 0) {
                         data.missions.forEach(mission => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `ID: ${mission.m_id}, Title: ${mission.m_title}`;
+                            listItem.textContent = `ID: ${mission.m_id}, RID: ${mission.u2_id}, Title: ${mission.m_title}`;
                             missionListElement.appendChild(listItem);
                         });
                     } else {

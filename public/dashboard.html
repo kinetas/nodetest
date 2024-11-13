@@ -53,7 +53,7 @@
     <h2>미션 리스트</h2>
     <ul id="missionList">Loading missions...</ul> <!-- 미션 리스트를 출력할 자리 -->
 
-    <!-- 미션 생성/삭제 폼 -->
+    <!-- 미션 생성 폼 -->
     <div class="form-container">
         <h3>미션 생성</h3>
         <div class="error" id="errorMessage"></div>
@@ -73,6 +73,17 @@
         <input type="text" id="m_id" placeholder="미션 ID">
         <button onclick="deleteMission()">미션 삭제</button>
     </div>
+
+    <!-- 미션 인증 폼 -->
+    <h1 id="greeting">Hello, </h1>
+
+    <h2>미션 인증</h2>
+    <div class="form-container">
+        <input type="text" id="m_id_input" placeholder="미션 ID 입력">
+        <button onclick="successMission()">미션 인증 성공</button>
+        <button onclick="failureMission()">미션 인증 실패</button>
+    </div>
+
 
     <!-- public/dashboard.html -->
     <button onclick="window.location.href='/rooms'">방</button>
@@ -192,6 +203,53 @@
                 document.getElementById('errorMessage').textContent = '미션 삭제 중 오류가 발생했습니다.';
             });
         }
+
+        //미션 성공
+        function successMission() {
+            const m_id = document.getElementById('m_id_input').value;
+            if (!m_id) {
+                alert("미션 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/successMission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('미션 인증 성공 중 오류가 발생했습니다.');
+            });
+        }
+
+        //미션 실패
+        function failureMission() {
+            const m_id = document.getElementById('m_id_input').value;
+            if (!m_id) {
+                alert("미션 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/failureMission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('미션 인증 실패 중 오류가 발생했습니다.');
+            });
+        }
+        
     </script>
 </body>
 </html>

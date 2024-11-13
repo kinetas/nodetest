@@ -94,3 +94,45 @@ exports.getUserMissions = async (req, res) => {
         res.status(500).json({ message: '미션 리스트를 불러오는데 실패했습니다.' });
     }
 };
+
+// 미션 성공 처리 함수
+exports.successMission = async (req, res) => {
+    const { m_id } = req.body;
+
+    try {
+        const mission = await Mission.findOne({ where: { m_id } });
+
+        if (!mission) {
+            return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        mission.m_status = '성공';
+        await mission.save();
+
+        res.json({ success: true, message: '미션이 성공으로 갱신되었습니다.' });
+    } catch (error) {
+        console.error('미션 성공 처리 오류:', error);
+        res.status(500).json({ success: false, message: '미션 인증 성공 처리 중 오류가 발생했습니다.' });
+    }
+};
+
+// 미션 실패 처리 함수
+exports.failureMission = async (req, res) => {
+    const { m_id } = req.body;
+
+    try {
+        const mission = await Mission.findOne({ where: { m_id } });
+
+        if (!mission) {
+            return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        mission.m_status = '실패';
+        await mission.save();
+
+        res.json({ success: true, message: '미션이 실패로 갱신되었습니다.' });
+    } catch (error) {
+        console.error('미션 실패 처리 오류:', error);
+        res.status(500).json({ success: false, message: '미션 인증 실패 처리 중 오류가 발생했습니다.' });
+    }
+};

@@ -23,21 +23,27 @@
         li {
             margin: 5px 0;
         }
-        .button-container {
+        .form-container {
             margin-top: 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
+            width: 300px;
         }
-        button {
-            margin: 5px;
+        .form-container input[type="text"],
+        .form-container input[type="date"] {
+            margin: 5px 0;
+            padding: 8px;
+            width: 100%;
+            font-size: 16px;
+        }
+        .form-container button {
+            margin: 10px 0;
             padding: 10px 20px;
             font-size: 16px;
         }
-        input[type="text"] {
-            margin: 0 10px;
-            padding: 8px;
-            font-size: 16px;
-            width: 100px;
+        .error {
+            color: red;
         }
     </style>
 </head>
@@ -47,10 +53,17 @@
     <h2>미션 리스트</h2>
     <ul id="missionList">Loading missions...</ul> <!-- 미션 리스트를 출력할 자리 -->
 
-    <!-- 버튼 및 텍스트박스 영역 -->
-    <div class="button-container">
-        <input type="text" id="missionIdInput" placeholder="미션 ID 입력"> <!-- 미션 ID 입력 텍스트박스 -->
-        <button onclick="createMission()">미션생성</button>
+    <!-- 미션 생성/삭제 폼 -->
+    <div class="form-container">
+        <h3>미션 생성</h3>
+        <div class="error" id="errorMessage"></div>
+        <input type="text" id="m_id" placeholder="미션 ID">
+        <input type="text" id="u1_id" placeholder="미션 생성자 ID">
+        <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
+        <input type="text" id="m_title" placeholder="미션 이름">
+        <input type="date" id="m_deadline" placeholder="미션 마감일">
+        <input type="text" id="m_reword" placeholder="보상">
+        <button onclick="createMission()">미션 생성</button>
         <button onclick="deleteMission()">미션삭제</button>
     </div>
 
@@ -95,10 +108,42 @@
                     document.getElementById('missionList').textContent = '미션 목록을 불러오는데 실패했습니다.';
                 });
 
-            // 미션 생성 함수
-            function createMission() {
-                alert("미션 생성 기능은 아직 구현되지 않았습니다.");
+        // 미션 생성 함수
+        function createMission() {
+            // 입력 값 가져오기
+            const m_id = document.getElementById('m_id').value;
+            const u1_id = document.getElementById('u1_id').value;
+            const u2_id = document.getElementById('u2_id').value;
+            const m_title = document.getElementById('m_title').value;
+            const m_deadline = document.getElementById('m_deadline').value;
+            const m_reword = document.getElementById('m_reword').value;
+
+            // 필수 값 검증
+            if (!m_id || !u1_id || !u2_id) {
+                document.getElementById('errorMessage').textContent = "미션 ID, 생성자 ID, 받는 사용자 ID는 필수 항목입니다.";
+                return;
             }
+
+            // 서버로 데이터 전송
+            fetch('/dashboard/missioncreate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id, u1_id, u2_id, m_title, m_deadline, m_reword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('미션이 성공적으로 생성되었습니다.');
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = '미션 생성 중 오류가 발생했습니다.';
+            });
+        }
 
             // 미션 삭제 함수
             function deleteMission() {

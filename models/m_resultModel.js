@@ -26,3 +26,4 @@ const MResult = sequelize.define('MResult', {
 });
 
 module.exports = MResult;
+//모델 수정필요 =>u2생성

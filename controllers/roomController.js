@@ -12,6 +12,11 @@ exports.getRooms = async (req, res) => {
 exports.addRoom = async (req, res) => {
     const u1_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
     const { u2_id } = req.body;
+    // u1_id와 u2_id가 같으면 initAddRoom 호출
+    if (u1_id === u2_id) {
+        await exports.initAddRoom({ body: { u1_id } }, res); // initAddRoom 호출
+        return; // initAddRoom 호출 후 함수 종료
+    }
 
     try {
         await Room.create({ u1_id, u2_id, r_title: `${u1_id}-${u2_id}` });

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>채팅방</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>채팅방</h1>
+    <div id="chatMessages">메시지 목록</div>
+    <input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+    <button onclick="sendMessage()">전송</button>
+
+    <script>
+        // URL에서 roomId 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('roomId'); // URL 파라미터에서 roomId 추출
+        const socket = io("http://43.203.233.135:3000");
+
+        socket.on("connect", () => {
+            console.log("서버에 연결되었습니다.");
+            socket.emit("joinRoom", { roomId });
+        });
+
+        socket.on("message", (data) => {
+            const chatMessages = document.getElementById("chatMessages");
+            const messageElement = document.createElement("div");
+            messageElement.textContent = data.message;
+            chatMessages.appendChild(messageElement);
+        });
+
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            socket.emit("sendMessage", { roomId, message });
+            document.getElementById("messageInput").value = ""; // 메시지 입력란 비우기
+        }
+    </script>
+</body>
+</html>

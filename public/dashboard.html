@@ -58,6 +58,7 @@
         <h3>미션 생성</h3>
         <div class="error" id="errorMessage"></div>
         <input type="text" id="m_id" placeholder="미션 ID">
+        <input type="text" id="u1_id" placeholder="미션 생성자 ID">
         <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
         <input type="text" id="m_title" placeholder="미션 이름">
         <input type="date" id="m_deadline" placeholder="미션 마감일">
@@ -107,18 +108,31 @@
                     document.getElementById('missionList').textContent = '미션 목록을 불러오는데 실패했습니다.';
                 });
 
+            let userId = null; // 로그인한 유저 ID를 저장할 변수
+
+            // 로그인한 사용자 정보를 가져와 userId에 저장
+            fetch('/user-info')
+                .then(response => response.json())
+                .then(data => {
+                    userId = data.userId; // 세션에서 가져온 로그인한 유저 ID 저장
+                    document.getElementById('greeting').textContent = `Hello, ${userId}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('greeting').textContent = '로그인이 필요합니다.';
+                });
+
         // 미션 생성 함수
         function createMission() {
             // 입력 값 가져오기
             const m_id = document.getElementById('m_id').value;
-            const u1_id = data.userId;
             const u2_id = document.getElementById('u2_id').value;
             const m_title = document.getElementById('m_title').value;
             const m_deadline = document.getElementById('m_deadline').value;
             const m_reword = document.getElementById('m_reword').value;
 
             // 필수 값 검증
-            if (!m_id || !u1_id || !u2_id) {
+            if (!m_id || !userId || !u2_id) {
                 document.getElementById('errorMessage').textContent = "미션 ID, 생성자 ID, 받는 사용자 ID는 필수 항목입니다.";
                 return;
             }
@@ -127,7 +141,7 @@
             fetch('/dashboard/missioncreate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ m_id, u1_id, u2_id, m_title, m_deadline, m_reword })
+                body: JSON.stringify({ m_id, u1_id: userId, u2_id, m_title, m_deadline, m_reword })
             })
             .then(response => response.json())
             .then(data => {

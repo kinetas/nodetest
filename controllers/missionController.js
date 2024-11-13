@@ -1,5 +1,6 @@
 // controllers/missionController.js
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
+const { sequelize } = require('../models/missionModel'); // sequelize 객체 불러오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {

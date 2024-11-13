@@ -1,0 +1,86 @@
+name: Deploy to Amazon EC2
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: universty-assignment-test-bucket
+  CODE_DEPLOY_APPLICATION_NAME: test
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: universty-assignment-test-bucket-deploy-group
+  DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+  DATABASE_USER: ${{ secrets.DATABASE_USERNAME }}
+  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+  DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+  REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
+  REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4.0.2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Upload code to AWS S3
+    - name: Upload to AWS S3
+      run: |
+        zip -r release.zip *
+        aws deploy push \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --ignore-hidden-files \
+          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          --source .
+
+    # Create .env file with environment variables
+    - name: Create .env file
+      run: |
+        echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+        echo "DATABASE_USER=${{ secrets.DATABASE_USERNAME }}" >> .env
+        echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+        echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+
+    # Copy .env to EC2
+    - name: Copy .env to EC2
+      run: |
+        echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
+        chmod 600 my-key.pem
+        scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
+        rm my-key.pem  # 키 파일을 삭제하여 보안 유지
+
+    # Deploy to AWS EC2 from S3
+    - name: Deploy to AWS EC2 from S3
+      run: |
+        aws deploy create-deployment \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+

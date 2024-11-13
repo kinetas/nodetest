@@ -19,7 +19,7 @@ const server = https.createServer({
 }, app);
 const io = socketIo(server, {
   cors: {
-    origin: 'https://yourdomain.com',  // 여기다가 도메인 설정
+    origin: 'https://yourdomain.com',  // 여기다가 도메인 설정해보자
     methods: ['GET', 'POST']
   }
 });

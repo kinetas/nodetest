@@ -98,7 +98,7 @@ exports.getUserMissions = async (req, res) => {
 // 미션 성공 처리 함수
 exports.successMission = async (req, res) => {
     const { m_id } = req.body;
-
+    const u1_id = req.session.user.id;
     try {
         const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
@@ -119,7 +119,7 @@ exports.successMission = async (req, res) => {
 // 미션 실패 처리 함수
 exports.failureMission = async (req, res) => {
     const { m_id } = req.body;
-
+    const u1_id = req.session.user.id;
     try {
         const mission = await Mission.findOne({ where: { m_id, u1_id } });
 

@@ -12,12 +12,11 @@ exports.createMission = async (req, res) => {
     }
 
     try {
-        // u2_id별 최대 m_id 조회
+        // 현재 최대 m_id 조회
         const maxMission = await Mission.findOne({
-            where: { u2_id }, // 특정 u2_id 그룹의 최대 m_id 조회
             attributes: [[sequelize.fn('MAX', sequelize.col('m_id')), 'max_m_id']]
         });
-        const maxId = maxMission?.dataValues.max_m_id || 0; // 현재 u2_id의 최대 m_id가 없으면 0으로 초기화
+        const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 m_id가 없으면 0으로 초기화
         const newMId = parseInt(maxId) + 1; // 새로운 m_id 값
 
         // 미션 생성 및 DB 저장

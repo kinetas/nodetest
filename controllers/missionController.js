@@ -3,7 +3,7 @@ const Mission = require('../models/missionModel'); // Mission 모델 불러오�
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
-    const { m_id, u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
+    const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
 
     // 필수 값 검증
     if (!m_id || !u1_id || !u2_id) {
@@ -11,9 +11,16 @@ exports.createMission = async (req, res) => {
     }
 
     try {
+        // 현재 최대 m_id 조회
+        const maxMission = await Mission.findOne({
+            attributes: [[sequelize.fn('MAX', sequelize.col('m_id')), 'max_m_id']]
+        });
+        const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 m_id가 없으면 0으로 초기화
+        const newMId = parseInt(maxId) + 1; // 새로운 m_id 값
+
         // 미션 생성 및 DB 저장
         await Mission.create({
-            m_id,
+            m_id: newMId.toString(),
             u1_id,
             u2_id,
             m_title,

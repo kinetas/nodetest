@@ -3,6 +3,8 @@ const User = require('../models/userModel'); // 경로를 확인하세요
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
 
+const roomController = require('./roomController'); // roomController 가져오기
+
 // 로그인 처리 함수
 exports.login = async (req, res) => {
     const { u_id, u_password } = req.body;
@@ -49,6 +51,8 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 };
+
+// 회원가입 함수
 exports.register = async (req, res) => {
     const { u_id, u_password, u_nickname, u_name } = req.body; // 요청 바디에서 사용자 정보 가져오기
     
@@ -69,7 +73,9 @@ exports.register = async (req, res) => {
             u_name,
         });
 
-    
+        // 회원가입 성공 후 방 생성
+        await roomController.addRoom({ body: { u2_id: u_id }, session: { user: { id: u_id } } }, res);
+
         // 성공 응답
         res.status(201).json({
             message: '회원가입이 완료되었습니다.',

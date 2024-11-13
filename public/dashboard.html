@@ -52,7 +52,7 @@
                     if (data.missions && data.missions.length > 0) {
                         data.missions.forEach(mission => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = mission.m_title;
+                            listItem.textContent = `ID: ${mission.m_id}, Title: ${mission.m_title}`;
                             missionListElement.appendChild(listItem);
                         });
                     } else {

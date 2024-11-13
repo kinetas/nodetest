@@ -75,7 +75,7 @@ exports.register = async (req, res) => {
         });
 
         // 회원가입 성공 후 방 생성
-        await roomController.addRoom({ body: { u2_id: u_id }, session: { user: { id: u_id } } }, res);
+        await roomController.initAddRoom({ body: { u1_id: u_id } }, res);
 
         // 성공 응답
         res.status(201).json({

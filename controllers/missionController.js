@@ -54,6 +54,7 @@ exports.createMission = async (req, res) => {
 // 미션 삭제 함수
 exports.deleteMission = async (req, res) => {
     const { m_id } = req.body;
+    const u1_id = req.session.user.id; // 세션에서 로그인한 사용자 ID 가져오기
 
     if (!m_id) {
         return res.json({ success: false, message: '미션 ID는 필수 항목입니다.' });
@@ -61,11 +62,11 @@ exports.deleteMission = async (req, res) => {
 
     try {
         // 해당 m_id로 미션 조회
-        const mission = await Mission.findOne({ where: { m_id } });
+        const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
-            // 미션이 존재하지 않는 경우
-            return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+            // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
+            return res.json({ success: false, message: '해당 미션이 존재하지 않거나 삭제 권한이 없습니다.' });
         }
 
         // 미션 삭제

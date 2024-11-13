@@ -2,8 +2,8 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const https = require('https');
-const fs = require('fs');
+//const https = require('https');
+//const fs = require('fs');
 const cors = require('cors');
 
 const db = require('./config/db');
@@ -13,13 +13,13 @@ const missionRoutes = require('./routes/missionRoutes');
 const logger = require('./logger');
 
 const app = express();
-const server = https.createServer({
+const server = http.createServer(/*{
   key: fs.readFileSync('/path/to/private-key.pem'),
   cert: fs.readFileSync('/path/to/certificate.pem')
-}, app);
+},*/ app);
 const io = socketIo(server, {
   cors: {
-    origin: 'https://yourdomain.com',  // 여기다가 도메인 설정
+    origin: 'http://yourdomain.com',  // 여기다가 도메인 설정
     methods: ['GET', 'POST']
   }
 });
@@ -58,6 +58,6 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(443, () => {
-  console.log('HTTPS Server running on port 443');
+server.listen(3000, () => {
+  console.log('HTTP Server running on port 3000');
 });

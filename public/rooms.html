@@ -18,6 +18,8 @@
             color: #333;
         }
     </style>
+    <!-- Socket.io 클라이언트 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
 </head>
 <body>
     <h1>방 목록</h1>
@@ -27,6 +29,11 @@
     <button onclick="deleteRoom()">방 삭제</button>
 
     <script>
+        const socket = io("http://43.203.233.135:3000"); // 서버에 연결
+        socket.on("connect", () => {
+            console.log("서버에 연결되었습니다.");
+        });
+
         const userId = ''; // 세션 ID에 따라 사용자 ID를 여기에 할당
 
         // 페이지 로드 시 방 목록 가져오기
@@ -77,6 +84,12 @@
                 location.reload();
             });
         }
+
+        // 실시간으로 방 목록 업데이트 (예: 방이 추가되거나 삭제되었을 때)
+        socket.on("roomUpdated", () => {
+            // 방 목록 새로고침
+            location.reload();
+        });
     </script>
 </body>
 </html>

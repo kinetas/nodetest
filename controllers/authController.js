@@ -55,7 +55,7 @@ exports.login = async (req, res) => {
 // 회원가입 함수
 exports.register = async (req, res) => {
     req.session.destroy(); // 세션 초기화
-    const { u_id, u_password, u_nickname, u_name } = req.body; // 요청 바디에서 사용자 정보 가져오기
+    const { u_id, u_password, u_nickname, u_name, u_birth, u_mail } = req.body; // 요청 바디에서 사용자 정보 가져오기
     
     try {
         // 이미 존재하는 사용자 확인
@@ -72,6 +72,8 @@ exports.register = async (req, res) => {
             u_password: hashedPassword, // 암호화된 비밀번호 저장 // 수정
             u_nickname,
             u_name,
+            u_birth,
+            u_mail
         });
 
         // 회원가입 성공 후 방 생성
@@ -84,6 +86,8 @@ exports.register = async (req, res) => {
                 id: newUser.u_id,
                 nickname: newUser.u_nickname,
                 name: newUser.u_name,
+                birth: newUser.u_birth,
+                mail: newUser.u_mail
             },
         });
     } catch (error) {

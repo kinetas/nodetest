@@ -57,7 +57,6 @@
     <div class="form-container">
         <h3>미션 생성</h3>
         <div class="error" id="errorMessage"></div>
-        <input type="text" id="m_id" placeholder="미션 ID">
         <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
         <input type="text" id="m_title" placeholder="미션 이름">
         <input type="date" id="m_deadline" placeholder="미션 마감일">
@@ -140,7 +139,7 @@
             fetch('/dashboard/missioncreate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ m_id, u1_id: userId, u2_id, m_title, m_deadline, m_reword })
+                body: JSON.stringify({ u1_id: userId, u2_id, m_title, m_deadline, m_reword })
             })
             .then(response => response.json())
             .then(data => {

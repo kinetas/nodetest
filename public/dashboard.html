@@ -131,8 +131,8 @@
             const m_reword = document.getElementById('m_reword').value;
 
             // 필수 값 검증
-            if (!m_id || !userId || !u2_id) {
-                document.getElementById('errorMessage').textContent = "미션 ID, 생성자 ID, 받는 사용자 ID는 필수 항목입니다.";
+            if (!u2_id) {
+                document.getElementById('errorMessage').textContent = "받는 사용자 ID는 필수 항목입니다.";
                 return;
             }
 

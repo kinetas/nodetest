@@ -6,8 +6,8 @@ exports.createMission = async (req, res) => {
     const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
 
     // 필수 값 검증
-    if (!m_id || !u1_id || !u2_id) {
-        return res.json({ success: false, message: '미션 ID, 생성자 ID, 받는 사용자 ID는 필수 항목입니다.' });
+    if (!u2_id) {
+        return res.json({ success: false, message: '받는 사용자 ID는 필수 항목입니다.' });
     }
 
     try {

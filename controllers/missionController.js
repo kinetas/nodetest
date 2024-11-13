@@ -93,9 +93,3 @@ exports.getUserMissions = async (req, res) => {
         res.status(500).json({ message: '미션 리스트를 불러오는데 실패했습니다.' });
     }
 };
-// exports.saveResult = async (req,res) => {
-//     시퀀스
-//     m_id,u1,u2 파악
-//     앱,웹에서 status를 정의할 버튼이나 텍스트박스필요 -> 정보값 가져오기
-//     db에서 찾은 후 정보 수정 후 미션 테이블에서는 삭제후 결과 테이블에서 성공여부로만 데이터가 남음 따라서 미션 생성,삭제시에 미션 결과 테이블에도 같이 생성 삭제가 되야함 그리고 result 모델 수정도 필요
-// }

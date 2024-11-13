@@ -14,8 +14,8 @@ exports.addRoom = async (req, res) => {
     const { u2_id } = req.body;
     const type = "close";
 
-    //if 오픈채팅방이면 type = "open"
-    //조건을 뭘로 할 것인지
+    //==========if 오픈채팅방이면 type = "open"======================
+    //==========     조건을 뭘로 할 것인지     ======================
 
     // u1_id와 u2_id가 같으면 initAddRoom 호출
     if (u1_id === u2_id) {

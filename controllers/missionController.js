@@ -112,7 +112,7 @@ exports.successMission = async (req, res) => {
         res.json({ success: true, message: '미션이 성공으로 갱신되었습니다.' });
     } catch (error) {
         console.error('미션 성공 처리 오류:', error);
-        res.status(500).json({ success: false, message: '미션 인증 성공 처리 중 오류가 발생했습니다.' });
+        res.status(500).json({ success: false, message: `미션 인증 성공 처리 중 ${error}오류가 발생했습니다.` });
     }
 };
 

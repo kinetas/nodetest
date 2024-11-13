@@ -41,8 +41,8 @@ exports.login = async (req, res) => {
             user: {
                 nickname: user.u_nickname,
                 name: user.u_name,
-                location: user.u_location,
                 birth: user.u_birth,
+                mail: user.u_mail,
             },
             redirectUrl: '/dashboard' // 리디렉션할 URL
         });

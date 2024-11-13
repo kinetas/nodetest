@@ -65,6 +65,16 @@
         <button onclick="deleteMission()">미션삭제</button>
     </div>
 
+    <h1 id="greeting">Hello, User!</h1>
+    <h2>미션 삭제</h2>
+
+    <!-- 미션 삭제 폼 -->
+    <div class="form-container">
+        <div class="error" id="errorMessage"></div>
+        <input type="text" id="m_id" placeholder="미션 ID">
+        <button onclick="deleteMission()">미션 삭제</button>
+    </div>
+
     <!-- public/dashboard.html -->
     <button onclick="window.location.href='/rooms'">방</button>
     <script>
@@ -155,10 +165,34 @@
             });
         }
 
-            // 미션 삭제 함수
-            function deleteMission() {
-                alert("미션 삭제 기능은 아직 구현되지 않았습니다.");
+        // 미션 삭제 함수
+        function deleteMission() {
+            const m_id = document.getElementById('m_id').value;
+
+            if (!m_id) {
+                document.getElementById('errorMessage').textContent = "미션 ID를 입력하세요.";
+                return;
             }
+
+            fetch('/dashboard/missiondelete', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('미션이 성공적으로 삭제되었습니다.');
+                    location.reload(); // 페이지 새로고침
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = '미션 삭제 중 오류가 발생했습니다.';
+            });
+        }
     </script>
 </body>
 </html>

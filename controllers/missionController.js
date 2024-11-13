@@ -36,6 +36,32 @@ exports.createMission = async (req, res) => {
     }
 };
 
+// 미션 삭제 함수
+exports.deleteMission = async (req, res) => {
+    const { m_id } = req.body;
+
+    if (!m_id) {
+        return res.json({ success: false, message: '미션 ID는 필수 항목입니다.' });
+    }
+
+    try {
+        // 해당 m_id로 미션 조회
+        const mission = await Mission.findOne({ where: { m_id } });
+
+        if (!mission) {
+            // 미션이 존재하지 않는 경우
+            return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        // 미션 삭제
+        await mission.destroy();
+        res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
+    } catch (error) {
+        console.error('미션 삭제 오류:', error);
+        res.status(500).json({ success: false, message: '미션 삭제 중 오류가 발생했습니다.' });
+    }
+};
+
 // 미션 리스트 조회 함수
 exports.getUserMissions = async (req, res) => {
     try {

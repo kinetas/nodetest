@@ -12,6 +12,11 @@ exports.getRooms = async (req, res) => {
 exports.addRoom = async (req, res) => {
     const u1_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
     const { u2_id } = req.body;
+    const type = "close";
+
+    //if 오픈채팅방이면 type = "open"
+    //조건을 뭘로 할 것인지
+
     // u1_id와 u2_id가 같으면 initAddRoom 호출
     if (u1_id === u2_id) {
         await exports.initAddRoom({ body: { u1_id } }, res); // initAddRoom 호출
@@ -19,8 +24,8 @@ exports.addRoom = async (req, res) => {
     }
 
     try {
-        await Room.create({ u1_id, u2_id, r_title: `${u1_id}-${u2_id}` });
-        await Room.create({ u1_id: u2_id, u2_id:u1_id, r_title: `${u2_id}-${u1_id}` });
+        await Room.create({ u1_id, u2_id, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
+        await Room.create({ u1_id: u2_id, u2_id:u1_id, r_title: `${u2_id}-${u1_id}`, r_type: `${type}` });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

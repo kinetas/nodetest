@@ -40,6 +40,7 @@ exports.initAddRoom = async (req, res) => {
     }
 };
 
+//방 삭제
 exports.deleteRoom = async (req, res) => {
     const u1_id = req.session.user.id;
     const { u2_id } = req.params;

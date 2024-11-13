@@ -1,6 +1,7 @@
 // controllers/missionController.js
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
 const { sequelize } = require('../models/missionModel'); // sequelize 객체 불러오기
+const Room = require('../models/roomModel'); // Room 모델 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
@@ -12,6 +13,13 @@ exports.createMission = async (req, res) => {
     }
 
     try {
+        // u1_id와 u2_id 조합의 Room이 존재하는지 확인
+        const roomExists = await Room.findOne({ where: { u1_id, u2_id } });
+        
+        if (!roomExists) {
+            return res.json({ success: false, message: '미션을 생성하기 전에 방이 존재해야 합니다.' });
+        }
+
         // 현재 최대 m_id 조회
         const maxMission = await Mission.findOne({
             attributes: [[sequelize.fn('MAX', sequelize.col('m_id')), 'max_m_id']]

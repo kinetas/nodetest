@@ -32,7 +32,7 @@ exports.initAddRoom = async (req, res) => {
     const { u1_id } = req.body;
 
     try {
-        await Room.create({ u1_id, u2_id:u1_id, r_title: `${u1_id}` });
+        await Room.create({ u1_id, u2_id:u1_id, r_title: `${u1_id}`, r_type:"close" });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

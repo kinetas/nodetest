@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
         });
     } catch (error) {
         console.error('로그인 오류:', error);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+        res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
     }
 };
 

@@ -1,6 +1,33 @@
 // controllers/missionController.js
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
 
+// 미션 생성 함수
+exports.createMission = async (req, res) => {
+    const { m_id, u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
+
+    // 필수 값 검증
+    if (!m_id || !u1_id || !u2_id) {
+        return res.json({ success: false, message: '미션 ID, 생성자 ID, 받는 사용자 ID는 필수 항목입니다.' });
+    }
+
+    try {
+        // 미션 생성 및 DB 저장
+        await Mission.create({
+            m_id,
+            u1_id,
+            u2_id,
+            m_title,
+            m_deadline,
+            m_reword
+        });
+
+        res.json({ success: true, message: '미션이 성공적으로 생성되었습니다.' });
+    } catch (error) {
+        console.error('미션 생성 오류:', error);
+        res.status(500).json({ success: false, message: '미션 생성 중 오류가 발생했습니다.' });
+    }
+};
+
 // 미션 리스트 조회 함수
 exports.getUserMissions = async (req, res) => {
     try {

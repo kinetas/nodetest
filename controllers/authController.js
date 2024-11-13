@@ -41,21 +41,21 @@ exports.login = async (req, res) => {
             user: {
                 nickname: user.u_nickname,
                 name: user.u_name,
-                location: user.u_location,
                 birth: user.u_birth,
+                mail: user.u_mail,
             },
             redirectUrl: '/dashboard' // 리디렉션할 URL
         });
     } catch (error) {
         console.error('로그인 오류:', error);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+        res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
     }
 };
 
 // 회원가입 함수
 exports.register = async (req, res) => {
     req.session.destroy(); // 세션 초기화
-    const { u_id, u_password, u_nickname, u_name } = req.body; // 요청 바디에서 사용자 정보 가져오기
+    const { u_id, u_password, u_nickname, u_name, u_birth, u_mail } = req.body; // 요청 바디에서 사용자 정보 가져오기
     
     try {
         // 이미 존재하는 사용자 확인
@@ -66,12 +66,21 @@ exports.register = async (req, res) => {
     
         // 비밀번호 암호화 // 수정
         const hashedPassword = await hashPassword(u_password); // 수정
+        // 연도, 월, 일 추출
+        const year = parseInt(u_birth.slice(0, 2), 10) + 2000; // 2000년대 가정 (2001년 이후)
+        const month = parseInt(u_birth.slice(2, 4), 10) - 1; // 월 (0부터 시작하므로 -1 필요)
+        const day = parseInt(u_birth.slice(4, 6), 10); // 일
+        // Date 객체 생성
+        const u_birthDate = new Date(year, month, day);
+
         // 새 사용자 생성
         const newUser = await User.create({
             u_id,
             u_password: hashedPassword, // 암호화된 비밀번호 저장 // 수정
             u_nickname,
             u_name,
+            u_birth: u_birthDate,
+            u_mail
         });
 
         // 회원가입 성공 후 방 생성
@@ -84,6 +93,8 @@ exports.register = async (req, res) => {
                 id: newUser.u_id,
                 nickname: newUser.u_nickname,
                 name: newUser.u_name,
+                birth: newUser.u_birth,
+                mail: newUser.u_mail
             },
         });
     } catch (error) {

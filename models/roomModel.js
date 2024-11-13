@@ -16,6 +16,10 @@ const Room = sequelize.define('Room', {
     type: DataTypes.STRING(30),
     allowNull: false,
   },
+  r_type: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+  },
 }, {
   tableName: 'room',
   timestamps: false,

@@ -29,6 +29,10 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: true,
   },
+  m_status: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+  },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� ������� �����Ƿ� false�� ����

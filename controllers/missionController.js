@@ -2,7 +2,7 @@
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
 const { sequelize } = require('../models/missionModel'); // sequelize 객체 불러오기
 const Room = require('../models/roomModel'); // Room 모델 가져오기
-const Result = require('../models/m_resultModel');
+const resultController = require('./resultController'); // resultController 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
@@ -27,7 +27,8 @@ exports.createMission = async (req, res) => {
         });
         const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 m_id가 없으면 0으로 초기화
         const newMId = parseInt(maxId) + 1; // 새로운 m_id 값
-
+        
+        let stat = "진행중";
         // 미션 생성 및 DB 저장
         await Mission.create({
             m_id: newMId.toString(),
@@ -35,8 +36,13 @@ exports.createMission = async (req, res) => {
             u2_id,
             m_title,
             m_deadline,
-            m_reword
+            m_reword,
+            m_status: stat
         });
+
+        // m_result 테이블에 데이터 저장
+        const u_id = u1_id; // 세션에서 로그인한 유저 ID 가져오기
+        const result = await resultController.saveResult(newMId.toString(), u_id, m_deadline, stat);
 
         res.json({ success: true, message: '미션이 성공적으로 생성되었습니다.' });
     } catch (error) {

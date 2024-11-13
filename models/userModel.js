@@ -23,7 +23,7 @@ const User = sequelize.define('user', {
         type: DataTypes.DATE,
         allowNull: true
     },
-    u_location: {
+    u_mail: {
         type: DataTypes.STRING,
         allowNull: true
     }

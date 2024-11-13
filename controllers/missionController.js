@@ -105,6 +105,11 @@ exports.successMission = async (req, res) => {
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
         }
+        
+         // m_status가 "진행중"일 때만 상태 변경 가능
+         if (mission.m_status !== '진행중') {
+            return res.json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
+        }
 
         mission.m_status = '성공';
         await mission.save();
@@ -125,6 +130,11 @@ exports.failureMission = async (req, res) => {
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        // m_status가 "진행중"일 때만 상태 변경 가능
+        if (mission.m_status !== '진행중') {
+            return res.json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
         }
 
         mission.m_status = '실패';

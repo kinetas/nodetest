@@ -100,7 +100,7 @@ exports.successMission = async (req, res) => {
     const { m_id } = req.body;
 
     try {
-        const mission = await Mission.findOne({ where: { m_id } });
+        const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
@@ -121,7 +121,7 @@ exports.failureMission = async (req, res) => {
     const { m_id } = req.body;
 
     try {
-        const mission = await Mission.findOne({ where: { m_id } });
+        const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });

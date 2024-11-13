@@ -220,6 +220,7 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
+                location.reload(); // 페이지 새로고침
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -243,6 +244,7 @@
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
+                location.reload(); // 페이지 새로고침
             })
             .catch(error => {
                 console.error('Error:', error);

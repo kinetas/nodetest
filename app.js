@@ -7,6 +7,9 @@ const roomRoutes = require('./routes/roomRoutes');
 const app = express();
 const PORT = 3000;
 
+const cors = require('cors');
+app.use(cors());  // 모든 출처의 요청을 허용
+
 app.use(express.json()); // JSON �뙆�떛�쓣 �쐞�븳 誘몃뱾�썾�뼱 �꽕�젙
 app.use(express.urlencoded({ extended: true })); // URL �씤肄붾뵫�맂 �뜲�씠�꽣 �뙆�떛�쓣 �쐞�븳 誘몃뱾�썾�뼱 �꽕�젙
 

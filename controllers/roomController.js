@@ -33,7 +33,7 @@ exports.addRoom = async (req, res) => {
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅
-        res.status(500).json({ message: '방 추가 중 오류가 발생했습니다.' });
+        res.status(500).json({ message: `방 추가 중 ${error}오류가 발생했습니다.` });
     }
 };
 
@@ -58,6 +58,6 @@ exports.deleteRoom = async (req, res) => {
         await Room.destroy({ where: { u1_id:u2_id, u2_id:u1_id } });
         res.json({ message: '방이 성공적으로 삭제되었습니다.' });
     } catch (error) {
-        res.status(500).json({ message: '방 삭제 중 오류가 발생했습니다.' });
+        res.status(500).json({ message: `방 삭제 중 ${error}오류가 발생했습니다.` });
     }
 };

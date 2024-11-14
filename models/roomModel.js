@@ -12,6 +12,11 @@ const Room = sequelize.define('Room', {
     primaryKey: true,
     allowNull: false,
   },
+  r_id: {
+    type: DataTypes.STRING(40),
+    primaryKey: true,
+    allowNull: false,
+  },
   r_title: {
     type: DataTypes.STRING(30),
     allowNull: false,

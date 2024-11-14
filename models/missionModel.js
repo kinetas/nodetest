@@ -5,7 +5,7 @@ const Mission = sequelize.define('Mission', {
   m_id: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    primaryKey: true,
+    unique: true,
   },
   u1_id: {
     type: DataTypes.STRING(20),
@@ -16,6 +16,11 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: false,
     primaryKey: true,
+  },
+  r_id: {
+    type: DataTypes.STRING(40),
+    primaryKey: true,
+    allowNull: false,
   },
   m_title: {
     type: DataTypes.STRING(30),
@@ -35,7 +40,7 @@ const Mission = sequelize.define('Mission', {
   },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
-  timestamps: false,   // createdAt �� updatedAt �÷��� ������� �����Ƿ� false�� ����
+  timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
 });
 
 module.exports = Mission;

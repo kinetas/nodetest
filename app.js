@@ -41,6 +41,8 @@ app.get('/user-info', requireAuth, (req, res) => {
     res.json({ userId: req.session.user.id });
 });
 
+
+
 // 吏뱀갹夷섏Ł HTML �쉱�쉮占쏙옙�슃 �쉧吏앹㎏泥�
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -54,6 +56,10 @@ app.get('/register', (req, res) => {
 });
 app.get('/rooms', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'rooms.html'));
+});
+
+app.get('/findinfo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //아이디/비밀번호 찾기 페이지
 });
 
 app.use('/api/auth', authRoutes);

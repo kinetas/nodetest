@@ -19,7 +19,7 @@ const server = http.createServer(/*{
 },*/ app);
 const io = socketIo(server, {
   cors: {
-    origin: 'http://43.203.233.135',  // 여기다가 도메인 설정
+    origin: ['http://43.203.233.135', 'http://localhost:3000'],  // 여기다가 도메인 설정
     methods: ['GET', 'POST']
   }
 });

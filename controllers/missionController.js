@@ -78,9 +78,7 @@ exports.deleteMission = async (req, res) => {
         }
 
         // 미션 삭제
-        await mission.destroy(
-            { where: { m_id, u1_id } }
-        );
+        await mission.destroy();
         res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
     } catch (error) {
         console.error('미션 삭제 오류:', error);

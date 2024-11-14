@@ -70,7 +70,7 @@ exports.deleteMission = async (req, res) => {
 
     try {
         // 해당 m_id로 미션 조회
-        const mission = await Mission.findOne({ where: { m_id, u1_id } });
+        const mission = await Mission.findOne({ where: { m_id } });
 
         if (!mission) {
             // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우

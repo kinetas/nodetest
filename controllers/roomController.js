@@ -24,8 +24,12 @@ exports.addRoom = async (req, res) => {
     }
 
     try {
-        await Room.create({ u1_id, u2_id, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
-        await Room.create({ u1_id: u2_id, u2_id:u1_id, r_title: `${u2_id}-${u1_id}`, r_type: `${type}` });
+        const roomId = Math.random().toString(36).substr(2, 9); // 방 아이디 랜덤 생성
+
+        await Room.create({ u1_id, u2_id, r_id: roomId, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
+        
+        //반대방 생성
+        await Room.create({ u1_id: u2_id, u2_id:u1_id, r_id: roomId, r_title: `${u2_id}-${u1_id}`, r_type: `${type}` });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

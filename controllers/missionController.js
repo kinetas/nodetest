@@ -76,17 +76,7 @@ exports.deleteMission = async (req, res) => {
             // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
             return res.json({ success: false, message: '해당 미션이 존재하지 않거나 삭제 권한이 없습니다.' });
         }
-
-        // // 해당 m_id로 미션 조회
-        // const mission = await Mission.findOne({ where: { m_id, u1_id } });
-
-        // if (!mission) {
-        //     // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
-        //     return res.json({ success: false, message: '해당 미션이 존재하지 않거나 삭제 권한이 없습니다.' });
-        // }
-
-        // // 미션 삭제
-        // await mission.destroy();
+        
         res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
     } catch (error) {
         console.error('미션 삭제 오류:', error);

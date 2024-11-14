@@ -15,7 +15,7 @@ app.post('/', (req, res) => {
 
   // 클라이언트에서 보낸 값이 1일 경우 성공 처리
   if (value === 1) {
-    res.status(200).send(서버에서 받은 값: ${value});  // 서버에서 받은 값 1
+    res.status(200).send(`서버에서 받은 값: ${value}`);  // 서버에서 받은 값 1
   } else {
     res.status(400).send('잘못된 값');  // 잘못된 값 처리
   }

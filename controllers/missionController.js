@@ -70,7 +70,7 @@ exports.deleteMission = async (req, res) => {
 
     try {
         // 해당 m_id로 미션 조회
-        const mission = await Mission.findOne({ where: { m_id } });
+        const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
             // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
@@ -110,7 +110,7 @@ exports.successMission = async (req, res) => {
     const { m_id } = req.body;
     const u1_id = req.session.user.id;
     try {
-        const mission = await Mission.findOne({ where: { m_id } });
+        const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
@@ -137,7 +137,7 @@ exports.failureMission = async (req, res) => {
     const { m_id } = req.body;
     const u1_id = req.session.user.id;
     try {
-        const mission = await Mission.findOne({ where: { m_id } });
+        const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });

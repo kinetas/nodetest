@@ -21,17 +21,23 @@ exports.createMission = async (req, res) => {
             return res.json({ success: false, message: '미션을 생성하기 전에 방이 존재해야 합니다.' });
         }
 
-        // 현재 최대 m_id 조회
-        const maxMission = await Mission.findOne({
-            attributes: [[sequelize.fn('MAX', sequelize.col('m_id')), 'max_m_id']]
-        });
-        const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 m_id가 없으면 0으로 초기화
-        const newMId = parseInt(maxId) + 1; // 새로운 m_id 값
+        // // 현재 최대 m_id 조회
+        // const maxMission = await Mission.findOne({
+        //     attributes: [[sequelize.fn('MAX', sequelize.col('m_id')), 'max_m_id']]
+        // });
+        // const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 m_id가 없으면 0으로 초기화
+        // const newMId = parseInt(maxId) + 1; // 새로운 m_id 값
+
+        const missionId = uuidv4();
+        if (!uuidValidate(missionId)) {
+            console.error("생성된 UUID가 유효하지 않습니다.");
+            return; // 또는 throw new Error("유효하지 않은 UUID 생성");
+        }
         
         let stat = "진행중";
         // 미션 생성 및 DB 저장
         await Mission.create({
-            m_id: newMId.toString(),
+            m_id: missionId,
             u1_id,
             u2_id,
             m_title,

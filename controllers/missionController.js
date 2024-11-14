@@ -32,6 +32,7 @@ exports.createMission = async (req, res) => {
         const missionId = uuidv4();
         if (!uuidValidate(missionId)) {
             console.error("생성된 UUID가 유효하지 않습니다.");
+            res.status(500).json({ success: false, message: `생성된 UUID가 유효하지 않습니다.` });
             return; // 또는 throw new Error("유효하지 않은 UUID 생성");
         }
         
@@ -49,7 +50,7 @@ exports.createMission = async (req, res) => {
 
         // m_result 테이블에 데이터 저장
         const u_id = u1_id; // 세션에서 로그인한 유저 ID 가져오기
-        const result = await resultController.saveResult(newMId.toString(), u_id, m_deadline, stat);
+        const result = await resultController.saveResult(missionId, u_id, m_deadline, stat);
 
         res.json({ success: true, message: '미션이 성공적으로 생성되었습니다.' });
     } catch (error) {

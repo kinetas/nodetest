@@ -21,7 +21,7 @@ const server = http.createServer(/*{
 //socket.io 서버 초기화
 const io = socketIo(server, {
   cors: {
-    origin: ['http://43.203.233.135', 'http://localhost:3000'],  // 여기다가 도메인 설정
+    origin: ['http://43.203.233.135', 'http://localhost:3001'],  // 여기다가 도메인 설정
     methods: ['GET', 'POST']
   }
 });
@@ -62,5 +62,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(3000, () => {
-  console.log('HTTP Server running on port 3000');
+  console.log('HTTP Server running on port 3001');
 });

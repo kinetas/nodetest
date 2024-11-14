@@ -15,12 +15,6 @@ const Mission = sequelize.define('Mission', {
   u2_id: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    primaryKey: true,
-  },
-  r_id: {
-    type: DataTypes.STRING(40),
-    primaryKey: true,
-    allowNull: false,
   },
   m_title: {
     type: DataTypes.STRING(30),

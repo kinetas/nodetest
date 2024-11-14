@@ -119,9 +119,10 @@ exports.successMission = async (req, res) => {
             return res.json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
         }
 
-        mission.m_status = '성공';
-        await mission.save();
-
+        await Mission.update(
+            { m_status: '성공' },
+            { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+        );
         res.json({ success: true, message: '미션이 성공으로 갱신되었습니다.' });
     } catch (error) {
         console.error('미션 성공 처리 오류:', error);

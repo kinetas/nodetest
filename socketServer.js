@@ -24,6 +24,7 @@ const io = socketIo(server, {
     origin: ['http://43.203.233.135:3000', 'http://43.203.233.135:3001', 'http://localhost:3000', 'http://localhost:3001'],
     methods: ['GET', 'POST'],
   },
+  path: '/socket.io'  // path 설정
 });
 
 app.use(cors());

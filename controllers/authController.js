@@ -99,7 +99,7 @@ exports.register = async (req, res) => {
         });
     } catch (error) {
         console.error('회원가입 오류:', error);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+        res.status(500).json({ message: `서버 오류 (${error}) 가 발생했습니다.` });
     }
 };
 

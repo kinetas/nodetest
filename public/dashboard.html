@@ -85,6 +85,8 @@
     </div>
 
 
+    <button onclick="logout()">로그아웃</button>
+
     <!-- public/dashboard.html -->
     <button onclick="window.location.href='/rooms'">방</button>
     <script>
@@ -252,6 +254,27 @@
             });
         }
         
+        // 로그아웃 함수
+        function logout() {
+            fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/'; // 메인 페이지로 리디렉션
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('로그아웃 오류:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
+            });
+        }
     </script>
 </body>
 </html>

@@ -44,7 +44,7 @@ exports.initAddRoom = async (req, res) => {
     const maxRoomId = await Room.findOne({
         attributes: [[sequelize.fn('MAX', sequelize.col('r_id')), 'max_r_id']]
     });
-    const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 r_id가 없으면 0으로 초기화
+    const maxId = maxRoomId.dataValues.max_r_id || 0; // 현재 최대 r_id가 없으면 0으로 초기화
     const newRId = parseInt(maxId) + 1; // 새로운 r_id 값
 
     try {

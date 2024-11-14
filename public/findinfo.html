@@ -17,5 +17,33 @@
         <input type="text" id="userId" placeholder="아이디" required><br><br>
         <button type="button" id="findPasswordButton">비밀번호 찾기</button>
     </form>
+    <script>
+        document.getElementById('findIdButton').addEventListener('click', function() {
+            const name = document.getElementById('name').value;
+            const nickname = document.getElementById('nickname').value;
+            const birthdate = document.getElementById('birthdate').value;
+            const email = document.getElementById('email').value;
+    
+            fetch('/api/auth/findUid', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, nickname, birthdate, email })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.userId) {
+                    document.getElementById('userId').value = data.userId;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('아이디 조회 중 오류가 발생했습니다.');
+            });
+        });
+    </script>
 </body>
 </html>

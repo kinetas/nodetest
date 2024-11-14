@@ -1,5 +1,6 @@
 #!/bin/bash
 
-# Node.js ¾ÖÇÃ¸®ÄÉÀÌ¼Ç ½ÃÀÛ
-cd /home/ubuntu/nodetest  # ¾ÖÇÃ¸®ÄÉÀÌ¼Ç µğ·ºÅä¸®·Î ÀÌµ¿
+# Node.js ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+cd /home/ubuntu/nodetest  # ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½Ìµï¿½
 pm2 start app.js
+pm2 start socketServer.js

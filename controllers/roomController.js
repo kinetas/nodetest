@@ -40,12 +40,15 @@ exports.addRoom = async (req, res) => {
 exports.initAddRoom = async (req, res) => {
     const { u1_id } = req.body;
 
-    // 현재 최대 r_id + 1
-    const maxRoomId = await Room.findOne({
-        attributes: [[sequelize.fn('MAX', sequelize.col('r_id')), 'max_r_id']]
+    // 모든 r_id 중 최대값 조회
+    const maxRoom = await Room.findOne({
+        attributes: ['r_id'],
+        order: [['r_id', 'DESC']]
     });
-    const maxId = maxRoomId.dataValues.max_r_id || 0; // 현재 최대 r_id가 없으면 0으로 초기화
-    const newRId = parseInt(maxId) + 1; // 새로운 r_id 값
+    
+    // 최대 r_id에 1을 더해 newRId 생성
+    const maxId = maxRoom ? parseInt(maxRoom.r_id) : 0;
+    const newRId = maxId + 1;
 
     try {
         await Room.create({ u1_id, u2_id:u1_id, r_id:newRId, r_title: `${u1_id}`, r_type:"close" });

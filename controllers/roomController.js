@@ -1,5 +1,6 @@
 // controllers/roomController.js
 const Room = require('../models/roomModel');
+const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 exports.getRooms = async (req, res) => {
     const userId = req.session.user.id;
@@ -24,7 +25,13 @@ exports.addRoom = async (req, res) => {
     }
 
     try {
-        const roomId = Math.random().toString(36).substr(2, 9); // 방 아이디 랜덤 생성
+        // const roomId = Math.random().toString(36).substr(2, 9); // 방 아이디 랜덤 생성
+        
+        const roomId = uuidv4();
+        if (!uuidValidate(roomId)) {
+            console.error("생성된 UUID가 유효하지 않습니다.");
+            return; // 또는 throw new Error("유효하지 않은 UUID 생성");
+        }
 
         await Room.create({ u1_id, u2_id, r_id: roomId, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
         
@@ -40,18 +47,14 @@ exports.addRoom = async (req, res) => {
 exports.initAddRoom = async (req, res) => {
     const { u1_id } = req.body;
 
-    // 모든 r_id 중 최대값 조회
-    const maxRoom = await Room.findOne({
-        attributes: ['r_id'],
-        order: [['r_id', 'DESC']]
-    });
-    
-    // 최대 r_id에 1을 더해 newRId 생성
-    const maxId = maxRoom ? parseInt(maxRoom.r_id) : 0;
-    const newRId = maxId + 1;
+    const roomId = uuidv4();
+    if (!uuidValidate(roomId)) {
+        console.error("생성된 UUID가 유효하지 않습니다.");
+        return; // 또는 throw new Error("유효하지 않은 UUID 생성");
+    }
 
     try {
-        await Room.create({ u1_id, u2_id:u1_id, r_id:newRId, r_title: `${u1_id}`, r_type:"close" });
+        await Room.create({ u1_id, u2_id:u1_id, r_id:roomId, r_title: `${u1_id}`, r_type:"close" });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

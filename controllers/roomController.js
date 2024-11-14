@@ -40,8 +40,15 @@ exports.addRoom = async (req, res) => {
 exports.initAddRoom = async (req, res) => {
     const { u1_id } = req.body;
 
+    // 현재 최대 r_id + 1
+    const maxRoomId = await Room.findOne({
+        attributes: [[sequelize.fn('MAX', sequelize.col('r_id')), 'max_r_id']]
+    });
+    const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 r_id가 없으면 0으로 초기화
+    const newRId = parseInt(maxId) + 1; // 새로운 r_id 값
+
     try {
-        await Room.create({ u1_id, u2_id:u1_id, r_title: `${u1_id}`, r_type:"close" });
+        await Room.create({ u1_id, u2_id:u1_id, r_id:newRId, r_title: `${u1_id}`, r_type:"close" });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

@@ -17,6 +17,8 @@ const server = http.createServer(/*{
   key: fs.readFileSync('/path/to/private-key.pem'),
   cert: fs.readFileSync('/path/to/certificate.pem')
 },*/ app);
+
+//socket.io 서버 초기화
 const io = socketIo(server, {
   cors: {
     origin: ['http://43.203.233.135', 'http://localhost:3000'],  // 여기다가 도메인 설정
@@ -30,6 +32,7 @@ app.use('/auth', authRoutes);
 app.use('/chat', chatRoutes);
 app.use('/mission', missionRoutes);
 
+//클라이언트에서 보내는 connect 이벤트 처리
 io.on('connection', (socket) => {
   console.log('A user connected');
 

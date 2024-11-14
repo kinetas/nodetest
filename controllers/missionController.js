@@ -78,7 +78,9 @@ exports.deleteMission = async (req, res) => {
         }
 
         // 미션 삭제
-        await mission.destroy();
+        await mission.destroy(
+            { where: { m_id, u1_id } }
+        );
         res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
     } catch (error) {
         console.error('미션 삭제 오류:', error);
@@ -135,7 +137,7 @@ exports.failureMission = async (req, res) => {
     const { m_id } = req.body;
     const u1_id = req.session.user.id;
     try {
-        const mission = await Mission.findOne({ where: { m_id, u1_id } });
+        const mission = await Mission.findOne({ where: { m_id } });
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
@@ -146,8 +148,10 @@ exports.failureMission = async (req, res) => {
             return res.json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
         }
 
-        mission.m_status = '실패';
-        await mission.save();
+        await Mission.update(
+            { m_status: '실패' },
+            { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+        );
 
         res.json({ success: true, message: '미션이 실패로 갱신되었습니다.' });
     } catch (error) {

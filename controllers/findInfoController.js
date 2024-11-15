@@ -6,11 +6,11 @@ exports.findUid = async (req, res) => {
     const { name, nickname, birthdate, email } = req.body;
 
     try {
-        // 생년월일을 Date 형식으로 변환
-        const year = parseInt(birthdate.slice(0, 2), 10) + 2000; // 2000년대 출생 가정
-        const month = parseInt(birthdate.slice(2, 4), 10) - 1; // 월은 0부터 시작하므로 -1
-        const day = parseInt(birthdate.slice(4, 6), 10);
-        const birthDate = new Date(year, month, day);
+        // // 생년월일을 Date 형식으로 변환
+        // const year = parseInt(birthdate.slice(0, 2), 10) + 2000; // 2000년대 출생 가정
+        // const month = parseInt(birthdate.slice(2, 4), 10) - 1; // 월은 0부터 시작하므로 -1
+        // const day = parseInt(birthdate.slice(4, 6), 10);
+        // const birthDate = new Date(year, month, day);
 
         // DB에서 조건에 맞는 사용자 조회
         const user = await User.findOne({

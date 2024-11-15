@@ -2,9 +2,12 @@ const db = require('../config/db');
 
 exports.createRoom = (socket, roomName) => {
   const roomId = Math.random().toString(36).substr(2, 9);
+  const u1_id = socket.handshake.query.u1_id;//클라이언트에서 전달된 user ID
+  const u2_id = socket.handshake.query.u2_id;
+  
   socket.join(roomId);
   // 방 제목과 함께 room 테이블에 저장
-  db.query('INSERT INTO room (u1_id, u2_id, r_title, r_type) VALUES (?, ?, ?, ?)', 
+  db.query('INSERT INTO room (u1_id, u2_id, r_id, r_title, r_type) VALUES (?, ?, ?, ?, ?)',
     [u1_id, u2_id, roomName, 'public'],  // 예시로 'public' 방 유형을 설정
     (err, result) => {
       if (err) {

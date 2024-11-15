@@ -103,6 +103,11 @@ exports.friendRequestAccept = async (req, res) => {
             f_id: f_id,
         });
 
+        await IFriend.create({
+            u_id: f_id,
+            f_id: req.session.user.id,
+        });
+
         // t_friend 테이블 상태 업데이트
         const result = await TFriend.update(
             { f_status: 1 }, // 1 = 수락

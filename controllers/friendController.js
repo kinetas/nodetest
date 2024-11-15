@@ -92,7 +92,7 @@ exports.friendRequestSend = async (req, res) => {
             where: { u_id: f_id, f_id: u_id },
         });
 
-        // 시나리오 1: 상대방이 나에게 요청을 보낸 상태인지 확인
+        // 상대방이 나에게 요청을 보낸 상태인지 확인
         if (reverseRequest && reverseRequest.f_status === 0) {
             return res.status(400).json({ success: false, message: '상대방의 친구 요청이 이미 와 있습니다.' });
         }
@@ -130,7 +130,7 @@ exports.friendRequestSend = async (req, res) => {
             }
         }
 
-        // 시나리오 2: 상대방이 요청하지 않았고 기존 상태가 없는 경우 새 요청 생성
+        // 상대방이 요청하지 않았고 기존 상태가 없는 경우 새 요청 생성
         if (!existingRequest && !reverseRequest) {
             const request = await TFriend.create({
                 u_id,
@@ -143,10 +143,10 @@ exports.friendRequestSend = async (req, res) => {
         }
 
         // 요청이 비정상적으로 처리되지 않은 경우
-        return res.status(500).json({ success: false, message: `친구 요청 처리 중 예상치 못한 오류 (${error})가 발생했습니다.` });
+        return res.status(500).json({ success: false, message: '친구 요청 처리 중 예상치 못한 오류가 발생했습니다.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: `친구 요청 전송 중 오류 (${error})가 발생했습니다.` });
+        res.status(500).json({ success: false, message: `친구 요청 전송 중 오류 (${error.message})가 발생했습니다.` });
     }
 };
 

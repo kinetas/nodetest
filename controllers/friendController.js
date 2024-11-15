@@ -131,7 +131,7 @@ exports.friendRequestSend = async (req, res) => {
         }
 
         // 상대방이 요청하지 않았고 기존 상태가 없는 경우 새 요청 생성
-        if (!existingRequest && !reverseRequest) {
+        if (!existingRequest && (!reverseRequest || (reverseRequest && reverseRequest.f_status !== 0))) {
             const request = await TFriend.create({
                 u_id,
                 f_id,

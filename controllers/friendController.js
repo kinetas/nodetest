@@ -150,37 +150,58 @@ exports.friendRequestSend = async (req, res) => {
     }
 };
 
+
 // 친구 요청 수락 함수
 exports.friendRequestAccept = async (req, res) => {
     const { f_id } = req.body; // 친구 요청한 ID
+    const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
+
     try {
-        // i_friend 테이블에 저장
+        // t_friend 테이블에서 유효한 친구 요청 확인
+        const existingRequest = await TFriend.findOne({
+            where: { u_id: f_id, f_id: u_id, f_status: 0 },
+        });
+
+        if (!existingRequest) {
+            return res.status(404).json({ success: false, message: '친구 요청을 찾을 수 없습니다.' });
+        }
+
+        // i_friend 테이블에서 기존 친구 관계 확인
+        const isFriend = await IFriend.findOne({
+            where: { u_id, f_id },
+        });
+
+        const isFriendReverse = await IFriend.findOne({
+            where: { u_id: f_id, f_id: u_id },
+        });
+
+        if (isFriend || isFriendReverse) {
+            return res.status(400).json({ success: false, message: '이미 친구 관계가 존재합니다.' });
+        }
+
+        // i_friend 테이블에 양방향 친구 관계 추가
         await IFriend.create({
-            u_id: req.session.user.id,
-            f_id: f_id,
+            u_id,
+            f_id,
         });
 
         await IFriend.create({
             u_id: f_id,
-            f_id: req.session.user.id,
+            f_id: u_id,
         });
 
-        // t_friend 테이블 상태 업데이트
-        const result = await TFriend.update(
-            { f_status: 1 }, // 1 = 수락
+        // t_friend 테이블 상태 업데이트 (수락 상태)
+        await TFriend.update(
+            { f_status: 1 },
             {
                 where: {
                     u_id: f_id,
-                    f_id: req.session.user.id,
+                    f_id: u_id,
                 },
             }
         );
 
-        if (result[0] > 0) {
-            res.json({ success: true, message: '친구 요청이 수락되었습니다.' });
-        } else {
-            res.status(404).json({ success: false, message: '친구 요청을 찾을 수 없습니다.' });
-        }
+        res.json({ success: true, message: '친구 요청이 수락되었습니다.' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: `친구 요청 수락 중 오류 (${error})가 발생했습니다.` });

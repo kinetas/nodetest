@@ -67,8 +67,8 @@ app.get('/rooms', (req, res) => {
 app.get('/findinfo', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //아이디/비밀번호 찾기 페이지
 });
-app.get('/cvote', requireAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'cvote.html'));
+app.get('/cVote', requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
 });
 
 

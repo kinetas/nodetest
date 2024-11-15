@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>커뮤니티 투표</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+        .vote-item { margin-bottom: 10px; padding: 10px; background: #fff; border: 1px solid #ccc; }
+        button { margin-left: 5px; }
+    </style>
+</head>
+<body>
+    <h1>커뮤니티 투표</h1>
+    <div id="voteList">Loading...</div>
+
+    <h2>투표 생성</h2>
+    <input type="text" id="c_title" placeholder="제목">
+    <textarea id="c_contents" placeholder="내용"></textarea>
+    <button onclick="createVote()">투표 생성</button>
+
+    <script>
+        function loadVotes() {
+            fetch('/votes')
+                .then(response => response.json())
+                .then(data => {
+                    const voteList = document.getElementById('voteList');
+                    voteList.innerHTML = '';
+                    data.votes.forEach((vote, index) => {
+                        const voteDiv = document.createElement('div');
+                        voteDiv.className = 'vote-item';
+                        voteDiv.innerHTML = `
+                            ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
+                            <button onclick="voteAction('${vote.c_number}', 'good')">좋아요</button>
+                            <button onclick="voteAction('${vote.c_number}', 'bad')">싫어요</button>
+                        `;
+                        voteList.appendChild(voteDiv);
+                    });
+                });
+        }
+
+        function createVote() {
+            const c_title = document.getElementById('c_title').value;
+            const c_contents = document.getElementById('c_contents').value;
+
+            fetch('/votes/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ c_title, c_contents })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('투표가 생성되었습니다.');
+                        loadVotes();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        function voteAction(c_number, action) {
+            fetch('/votes/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ c_number, action })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadVotes();
+                    } else {
+                        alert(data.message);
+                    }
+                });
+        }
+
+        loadVotes();
+    </script>
+</body>
+</html>

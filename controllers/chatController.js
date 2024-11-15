@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const chatController = require('./controllers/chatController');
 
 exports.createRoom = (socket, roomName) => {
   const roomId = Math.random().toString(36).substr(2, 9);

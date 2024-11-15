@@ -4,7 +4,7 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��졇�삤湲�
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄뀡 �씪�슦�듃 遺덈윭�삤湲�
 const roomRoutes = require('./routes/roomRoutes');
-const friendRoutes = require('./routes/friendRoutes');
+// const friendRoutes = require('./routes/friendRoutes');
 const app = express();
 const PORT = 3000;
 
@@ -77,8 +77,8 @@ app.use('/api/auth', authRoutes);
 app.use('/dashboard', missionRoutes); // 誘몄뀡 �씪�슦�듃瑜� /dashboard濡� �꽕�젙
 app.use('/api/rooms', roomRoutes);
 
-// 친구 리스트 라우트 추가
-app.use('/dashboard/friends', friendRoutes);
+// // 친구 리스트 라우트 추가
+// app.use('/dashboard/friends', friendRoutes);
 
 app.use((req, res) => {
     res.status(404).send('404 Not Found');

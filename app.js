@@ -4,8 +4,13 @@ const path = require('path');
 const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��졇�삤湲�
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄뀡 �씪�슦�듃 遺덈윭�삤湲�
 const roomRoutes = require('./routes/roomRoutes');
+const friendRoutes = require('./routes/friendRoutes');
 const app = express();
 const PORT = 3000;
+
+
+
+
 
 const cors = require('cors');
 app.use(cors());  // 모든 출처의 요청을 허용
@@ -65,10 +70,15 @@ app.get('/findinfo', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //아이디/비밀번호 찾기 페이지
 });
 
+
+
 app.use('/api/auth', authRoutes);
 
 app.use('/dashboard', missionRoutes); // 誘몄뀡 �씪�슦�듃瑜� /dashboard濡� �꽕�젙
 app.use('/api/rooms', roomRoutes);
+
+// 친구 리스트 라우트 추가
+app.use('/dashboard/friends', friendRoutes);
 
 app.use((req, res) => {
     res.status(404).send('404 Not Found');

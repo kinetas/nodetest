@@ -50,21 +50,23 @@ exports.printTFriend = async (req, res) => {
 exports.friendDelete = async (req, res) => {
     const { f_id } = req.body; // 삭제할 친구 ID
     try {
-        const result = await IFriend.destroy({
+        // u_id와 f_id 관계 삭제
+        const result1 = await IFriend.destroy({
             where: {
                 u_id: req.session.user.id,
                 f_id: f_id,
             },
         });
 
-        // const result2 = await IFriend.destroy({
-        //     where: {
-        //         u_id: f_id,
-        //         f_id: req.session.user.id
-        //     },
-        // });
+        // f_id와 u_id 관계 삭제 (양방향 관계)
+        const result2 = await IFriend.destroy({
+            where: {
+                u_id: f_id,
+                f_id: req.session.user.id,
+            },
+        });
 
-        if (result) {
+        if (result1 > 0 && result2 > 0) {
             res.json({ success: true, message: '친구가 성공적으로 삭제되었습니다.' });
         } else {
             res.status(404).json({ success: false, message: '삭제할 친구를 찾을 수 없습니다.' });

@@ -86,9 +86,21 @@
 
     <h2>i_friend 목록</h2>
     <ul id="iFriendsList">로딩 중...</ul>
+    <div class="form-container">
+        <input type="text" id="if_id_input" placeholder="친구 ID 입력">
+        <button onclick="friendDelete()">친구 삭제</button> 
+    </div>
+    
+
     <h2>t_friend 목록</h2>
     <ul id="tFriendsList">로딩 중...</ul>
-
+    <div class="form-container">
+        <input type="text" id="tf_id_input" placeholder="친구 ID 입력">
+        <button onclick="friendRequestSend()">요청 보내기</button>
+        <button onclick="friendRequestAccept()">요청 수락</button>
+        <button onclick="friendRequestReject()">요청 거절</button>
+    </div>
+    
 
     <button onclick="logout()">로그아웃</button>
 
@@ -325,6 +337,110 @@
                 console.error('Error fetching t_friend list:', error);
                 document.getElementById('tFriendsList').textContent = 't_friend 목록을 불러오는 중 오류가 발생했습니다.';
             });
+
+        // 친구 삭제 함수
+        function friendDelete() {
+            const f_id = document.getElementById('if_id_input').value;
+
+            if (!f_id) {
+                alert("삭제할 친구 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/friends/delete', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ f_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // 친구 요청 보내기 함수
+        function friendRequestSend() {
+            const f_id = document.getElementById('tf_id_input').value;
+
+            if (!f_id) {
+                alert("요청할 친구 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/friends/request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ f_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // 친구 요청 수락 함수
+        function friendRequestAccept() {
+            const f_id = document.getElementById('tf_id_input').value;
+
+            if (!f_id) {
+                alert("수락할 친구 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/friends/accept', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ f_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // 친구 요청 거절 함수
+        function friendRequestReject() {
+            const f_id = document.getElementById('tf_id_input').value;
+
+            if (!f_id) {
+                alert("거절할 친구 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/friends/reject', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ f_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
 </body>
 </html>

@@ -21,7 +21,7 @@
 
     <script>
         function loadVotes() {
-            fetch('/cVote')
+            fetch('/api/cVote')
                 .then(response => response.json())
                 .then(data => {
                     const voteList = document.getElementById('voteList');
@@ -43,7 +43,7 @@
             const c_title = document.getElementById('c_title').value;
             const c_contents = document.getElementById('c_contents').value;
 
-            fetch('/cVote/create', {
+            fetch('/api/cVote/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ c_title, c_contents })
@@ -60,7 +60,7 @@
         }
 
         function voteAction(c_number, action) {
-            fetch('/cVote/action', {
+            fetch('/api/cVote/action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ c_number, action })

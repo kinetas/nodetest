@@ -25,7 +25,7 @@ exports.getVotes = async (req, res) => {
 // 투표 생성
 exports.createVote = async (req, res) => {
     const { c_title, c_contents } = req.body;
-    const u_id = req.session.userId; // 세션에서 u_id 가져오기, 기본 값 설정
+    const u_id = req.session.user.id; // 세션에서 u_id 가져오기, 기본 값 설정
 
     if (!u_id || !c_title || !c_contents) {
         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });

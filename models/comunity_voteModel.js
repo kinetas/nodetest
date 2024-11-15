@@ -33,7 +33,7 @@ const CVote = sequelize.define('CVote', {
     allowNull: false,
   },
 }, {
-  tableName: 'CVote',
+  tableName: 'comunity_vote',
   timestamps: false,
 });
 

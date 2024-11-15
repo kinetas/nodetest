@@ -26,17 +26,22 @@
                 .then(data => {
                     const voteList = document.getElementById('voteList');
                     voteList.innerHTML = '';
-                    data.votes.forEach((vote, index) => {
-                        const voteDiv = document.createElement('div');
-                        voteDiv.className = 'vote-item';
-                        voteDiv.innerHTML = `
-                            ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
-                            <button onclick="voteAction('${vote.c_number}', 'good')">좋아요</button>
-                            <button onclick="voteAction('${vote.c_number}', 'bad')">싫어요</button>
-                        `;
-                        voteList.appendChild(voteDiv);
-                    });
-                });
+                    if (data.success && data.votes && Array.isArray(data.votes)) {
+                        data.votes.forEach((vote, index) => {
+                            const voteDiv = document.createElement('div');
+                            voteDiv.className = 'vote-item';
+                            voteDiv.innerHTML = `
+                                ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
+                                <button onclick="voteAction('${vote.c_number}', 'good')">좋아요</button>
+                                <button onclick="voteAction('${vote.c_number}', 'bad')">싫어요</button>
+                            `;
+                            voteList.appendChild(voteDiv);
+                        });
+                    } else {
+                        voteList.innerHTML = '투표가 없습니다.';
+                    }
+                })
+                .catch(error => console.error("Error loading votes:", error));
         }
 
         function createVote() {

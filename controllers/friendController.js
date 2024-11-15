@@ -114,7 +114,7 @@ exports.friendRequestAccept = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: '친구 요청 수락 중 오류가 발생했습니다.' });
+        res.status(500).json({ success: false, message: `친구 요청 수락 중 오류 (${error})가 발생했습니다.` });
     }
 };
 

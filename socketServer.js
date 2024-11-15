@@ -6,6 +6,7 @@ const socketIo = require('socket.io');
 //const fs = require('fs');
 const cors = require('cors');
 
+const chatController = require('./controllers/chatController');
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const chatRoutes = require('./routes/chatRoutes');

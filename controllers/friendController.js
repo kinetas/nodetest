@@ -16,18 +16,33 @@ exports.printIFriend = async (req, res) => {
     }
 };
 
-// t_friend 테이블의 f_id 리스트 출력
+// t_friend 테이블의 요청 리스트 출력
 exports.printTFriend = async (req, res) => {
     try {
         const tFriends = await TFriend.findAll({
-            attributes: ['f_id'],
-            where: { u_id: req.session.user.id, f_status: 0 }, // 세션 사용자 ID 기준, 상태 0(요청)
+            attributes: ['u_id', 'f_id'],
+            where: { f_status: 0 }, // 상태 0(요청)
         });
-        const requestList = tFriends.map(friend => friend.f_id);
-        res.json({ success: true, tFriends: requestList });
+
+        const sentRequests = tFriends
+            .filter(friend => friend.u_id === req.session.user.id)
+            .map(friend => friend.f_id);
+
+        const receivedRequests = tFriends
+            .filter(friend => friend.f_id === req.session.user.id)
+            .map(friend => friend.u_id);
+
+        res.json({
+            success: true,
+            sentRequests,
+            receivedRequests,
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 't_friend 데이터를 불러오는 중 오류가 발생했습니다.' });
+        res.status(500).json({
+            success: false,
+            message: 't_friend 데이터를 불러오는 중 오류가 발생했습니다.',
+        });
     }
 };
 

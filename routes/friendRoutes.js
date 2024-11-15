@@ -9,4 +9,16 @@ router.get('/ifriends', requireAuth, friendController.printIFriend);
 // t_friend 리스트 출력
 router.get('/tfriends', requireAuth, friendController.printTFriend);
 
+// 친구 삭제
+router.delete('/delete', requireAuth, friendController.friendDelete);
+
+// 친구 요청 보내기
+router.post('/request', requireAuth, friendController.friendRequestSend);
+
+// 친구 요청 수락
+router.post('/accept', requireAuth, friendController.friendRequestAccept);
+
+// 친구 요청 거절
+router.post('/reject', requireAuth, friendController.friendRequestReject);
+
 module.exports = router;

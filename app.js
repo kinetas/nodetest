@@ -5,11 +5,9 @@ const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄뀡 �씪�슦�듃 遺덈윭�삤湲�
 const roomRoutes = require('./routes/roomRoutes');
 const friendRoutes = require('./routes/friendRoutes');
+const cVoteRoutes = require('./routes/cVoteRoutes'); 
 const app = express();
 const PORT = 3000;
-
-
-
 
 
 const cors = require('cors');
@@ -69,7 +67,9 @@ app.get('/rooms', (req, res) => {
 app.get('/findinfo', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //아이디/비밀번호 찾기 페이지
 });
-
+app.get('/cVote', requireAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
+});
 
 
 app.use('/api/auth', authRoutes);
@@ -79,7 +79,7 @@ app.use('/api/rooms', roomRoutes);
 
 // 친구 리스트 라우트 추가
 app.use('/dashboard/friends', friendRoutes);
-
+app.use('/api/cVote', cVoteRoutes);
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
 });

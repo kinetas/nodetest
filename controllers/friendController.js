@@ -57,14 +57,14 @@ exports.friendDelete = async (req, res) => {
             },
         });
 
-        const result2 = await IFriend.destroy({
-            where: {
-                u_id: f_id,
-                f_id: req.session.user.id
-            },
-        });
+        // const result2 = await IFriend.destroy({
+        //     where: {
+        //         u_id: f_id,
+        //         f_id: req.session.user.id
+        //     },
+        // });
 
-        if (result && result2) {
+        if (result) {
             res.json({ success: true, message: '친구가 성공적으로 삭제되었습니다.' });
         } else {
             res.status(404).json({ success: false, message: '삭제할 친구를 찾을 수 없습니다.' });

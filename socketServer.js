@@ -2,6 +2,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const chatController = require('./controllers/chatController');
 //const https = require('https');
 //const fs = require('fs');
 const cors = require('cors');

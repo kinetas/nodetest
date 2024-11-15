@@ -10,7 +10,7 @@ exports.login = async (req, res) => {
     const { u_id, u_password } = req.body;
 
     try {
-       
+
         console.log('Received login request:', u_id, u_password);
 
         // 사용자 조회

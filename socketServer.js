@@ -24,6 +24,7 @@ const io = socketIo(server, {
   cors: {
     origin: ['http://43.203.233.135:3000', 'http://43.203.233.135:3001', 'http://localhost:3000', 'http://localhost:3001'],
     methods: ['GET', 'POST'],
+    credentials: true //세션 쿠키 관리
   },
   path: '/socket.io'  // path 설정
 });
@@ -34,7 +35,7 @@ app.use('/auth', authRoutes);
 app.use('/chat', chatRoutes);
 app.use('/mission', missionRoutes);
 
-//클라이언트에서 보내는 connect 이벤트 처리
+//소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('A user connected');
 

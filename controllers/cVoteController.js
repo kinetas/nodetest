@@ -1,5 +1,5 @@
 const { Op } = require('sequelize');
-const CVote = require('../models/CVote');
+const CVote = require('../models/comunity_voteModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 exports.getVotes = async (req, res) => {

@@ -89,7 +89,7 @@ exports.friendRequestSend = async (req, res) => {
         res.json({ success: true, message: '친구 요청이 성공적으로 전송되었습니다.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: '친구 요청 전송 중 오류가 발생했습니다.' });
+        res.status(500).json({ success: false, message: `친구 요청 전송 중 오류 (${error})가 발생했습니다.` });
     }
 };
 

@@ -7,6 +7,11 @@ const roomRoutes = require('./routes/roomRoutes');
 const app = express();
 const PORT = 3000;
 
+const friendController = require('./controllers/friendController');
+
+app.get('/dashboard/ifriends', requireAuth, friendController.printIFriend);
+app.get('/dashboard/tfriends', requireAuth, friendController.printTFriend);
+
 const cors = require('cors');
 app.use(cors());  // 모든 출처의 요청을 허용
 

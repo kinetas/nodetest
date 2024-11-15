@@ -1,43 +1,32 @@
-// // i_friend 리스트 가져오기
-// fetch('/dashboard/friends/ifriends')
-//     .then(response => response.json())
-//     .then(data => {
-//         const iFriendsListElement = document.getElementById('iFriendsList');
-//         iFriendsListElement.innerHTML = '';
+const IFriend = require('../models/i_friendModel'); // i_friend 모델
+const TFriend = require('../models/t_friendModel'); // t_friend 모델
 
-//         if (data.iFriends && data.iFriends.length > 0) {
-//             data.iFriends.forEach(fId => {
-//                 const listItem = document.createElement('li');
-//                 listItem.textContent = `친구 아이디: ${fId}`;
-//                 iFriendsListElement.appendChild(listItem);
-//             });
-//         } else {
-//             iFriendsListElement.textContent = 'i_friend 목록이 없습니다.';
-//         }
-//     })
-//     .catch(error => {
-//         console.error('Error fetching i_friend list:', error);
-//         document.getElementById('iFriendsList').textContent = 'i_friend 목록을 불러오는 중 오류가 발생했습니다.';
-//     });
+// i_friend 테이블의 f_id 리스트 출력
+exports.printIFriend = async (req, res) => {
+    try {
+        const iFriends = await IFriend.findAll({
+            attributes: ['f_id'],
+            where: { u_id: req.session.user.id }, // 세션 사용자 ID 기준
+        });
+        const friendList = iFriends.map(friend => friend.f_id);
+        res.json({ success: true, iFriends: friendList });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'i_friend 데이터를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
 
-// // t_friend 리스트 가져오기
-// fetch('/dashboard/friends/tfriends')
-//     .then(response => response.json())
-//     .then(data => {
-//         const tFriendsListElement = document.getElementById('tFriendsList');
-//         tFriendsListElement.innerHTML = '';
-
-//         if (data.tFriends && data.tFriends.length > 0) {
-//             data.tFriends.forEach(fId => {
-//                 const listItem = document.createElement('li');
-//                 listItem.textContent = `요청온 친구 아이디: ${fId}`;
-//                 tFriendsListElement.appendChild(listItem);
-//             });
-//         } else {
-//             tFriendsListElement.textContent = 't_friend 목록이 없습니다.';
-//         }
-//     })
-//     .catch(error => {
-//         console.error('Error fetching t_friend list:', error);
-//         document.getElementById('tFriendsList').textContent = 't_friend 목록을 불러오는 중 오류가 발생했습니다.';
-//     });
+// t_friend 테이블의 f_id 리스트 출력
+exports.printTFriend = async (req, res) => {
+    try {
+        const tFriends = await TFriend.findAll({
+            attributes: ['f_id'],
+            where: { u_id: req.session.user.id, f_status: 0 }, // 세션 사용자 ID 기준, 상태 0(요청)
+        });
+        const requestList = tFriends.map(friend => friend.f_id);
+        res.json({ success: true, tFriends: requestList });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 't_friend 데이터를 불러오는 중 오류가 발생했습니다.' });
+    }
+};

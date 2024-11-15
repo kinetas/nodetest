@@ -80,3 +80,6 @@ exports.voteAction = async (req, res) => {
         res.status(500).json({ success: false, message: "투표 업데이트 실패" });
     }
 };
+// 본인 투표율 주작할수 있는 문제 수정
+// 추후 아이디나 타이틀 같은 걸 누르면 안의 내용물이 뜨고 그안에서 good,bad를 올릴 수 있도록 수정
+// 인당 투표수 한번으로 제한

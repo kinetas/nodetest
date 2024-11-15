@@ -79,7 +79,7 @@ app.use('/api/rooms', roomRoutes);
 
 // 친구 리스트 라우트 추가
 app.use('/dashboard/friends', friendRoutes);
-//app.use('/votes', cVoteRoutes);
+app.use('/api/cVote', cVoteRoutes);
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
 });

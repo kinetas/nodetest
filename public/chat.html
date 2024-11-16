@@ -13,12 +13,13 @@
 
     
 
-    <h2>방 미션 목록</h2>
-    <ul id="roomMissionList">로딩 중...</ul>
-    <div class="form-container">
+    <h1>방 미션 출력</h1>
+    <div>
         <input type="text" id="u2_id_input" placeholder="상대방 ID 입력">
-        <button onclick="printRoomMission()">방 미션 출력</button> 
+        <button onclick="printRoomMission()">방 미션 출력</button>
     </div>
+    <h2>미션 목록</h2>
+    <ul id="roomMissionList"></ul>
     
 
     <script>
@@ -34,40 +35,58 @@
             socket.emit("joinRoom", { roomId });
         });
 
-        socket.on("message", (data) => {
+        socket.on("receiveMessage", (data) => {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-            messageElement.textContent = `${data.userId}: ${data.message}`;
+            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;
             chatMessages.appendChild(messageElement);
         });
 
         function sendMessage() {
             const message = document.getElementById("messageInput").value;
-            socket.emit("sendMessage", { roomId, message });
+            const u1_id = '현재 사용자 ID'; // 예: 로그인된 사용자 ID
+            const u2_id = '상대방 사용자 ID'; // 예: 대화 상대방의 사용자 ID
+            
+            socket.emit("sendMessage", { u1_id, u2_id, message });
             document.getElementById("messageInput").value = ""; // 메시지 입력란 비우기
         }
 
-        // 방 미션 출력
-        fetch('/rooms/printRoomMission')
-            .then(response => response.json())
-            .then(data => {
-                const roomMissionListElement = document.getElementById('roomMissionList');
-                roomMissionListElement.innerHTML = '';
+        //방미션출력
+        function printRoomMission() {
+            const u2_id = document.getElementById('u2_id_input').value;
 
-                if (data.printRoomMission && data.printRoomMission.length > 0) {
-                    data.printRoomMission.forEach(fId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `친구 아이디: ${fId}`;
-                        roomMissionListElement.appendChild(listItem);
-                    });
-                } else {
-                    roomMissionListElement.textContent = '해당 방에 미션이 없습니다.';
-                }
+            fetch('/api/missions/printRoomMission', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ u2_id }),
             })
-            .catch(error => {
-                console.error('Error fetching i_friend list:', error);
-                document.getElementById('roomMissionList').textContent = `방미션 목록을 불러오는 중 오류 (${error})가 발생했습니다.`;
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message); });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const roomMissionListElement = document.getElementById('roomMissionList');
+                    roomMissionListElement.innerHTML = '';
+
+                    if (data.missions && data.missions.length > 0) {
+                        data.missions.forEach(mission => {
+                            const listItem = document.createElement('li');
+                            listItem.textContent = `미션: ${mission.title}, 마감일: ${mission.deadline}, 수행자: ${mission.performer}`;
+                            roomMissionListElement.appendChild(listItem);
+                        });
+                    } else {
+                        roomMissionListElement.textContent = '해당 방에 미션이 없습니다.';
+                    }
+                })
+                .catch(error => {
+                    console.error('미션 출력 오류:', error);
+                    document.getElementById('roomMissionList').textContent = `오류 발생: ${error.message}`;
+                });
+        }
     </script>
 </body>
 </html>

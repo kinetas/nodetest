@@ -25,15 +25,13 @@ exports.joinRoom = (socket, { roomId, userId }) => {
   console.log(`User ${userId} joined room ${roomId}`);
 };
 
-exports.sendMessage = (io, socket, { roomId, message, u1_id, u2_id }) => {
-  io.to(roomId).emit('receiveMessage', message);
+exports.sendMessage = (io, socket, {message, u1_id, u2_id }) => {
 
-// 메시지를 r_message 테이블에 저장
 const message_num = Math.random().toString(36).substr(2, 9);  // 메시지 번호 생성
 const send_date = new Date().toISOString().slice(0, 19).replace('T', ' '); // 현재 시간
 
-db.query('INSERT INTO r_message (u1_id, u2_id, r_id, message_num, send_date, message_contents) VALUES (?, ?, ?, ?, ?, ?)',
-    [u1_id, u2_id, roomId, message_num, send_date, message], // 데이터 삽입
+db.query('INSERT INTO r_message (u1_id, u2_id, message_num, send_date, message_contents) VALUES (?, ?, ?, ?, ?)',
+    [u1_id, u2_id, message_num, send_date, message], // 데이터 삽입
     (err, result) => {
       if (err) {
         console.error('Error saving message:', err);
@@ -41,6 +39,7 @@ db.query('INSERT INTO r_message (u1_id, u2_id, r_id, message_num, send_date, mes
         console.log('Message saved to r_message:', result);
       }
   });
+  io.emit('receiveMessage', { u1_id, message, send_date }); // 메시지 전송
 };
 
 //메시지 불러오기

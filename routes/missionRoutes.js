@@ -17,7 +17,7 @@ router.delete('/missiondelete', requireAuth, deleteMission);
 router.post('/successMission', requireAuth, successMission);
 router.post('/failureMission', requireAuth, failureMission);
 
-// 방의 미션 출력 라우트
+// 방 미션 출력 라우트
 router.post('/printRoomMission', requireAuth, printRoomMission);
 
 module.exports = router;

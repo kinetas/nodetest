@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인스턴스를 models에서 가져옵니다.
 const CVote = require('../models/comunity_voteModel');
+const c_v_notdup = require('../models/c_v_not_dupModel'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 
@@ -56,7 +57,7 @@ exports.createVote = async (req, res) => {
 // 투표 액션 (좋아요/싫어요)
 exports.voteAction = async (req, res) => {
     const { c_number, action } = req.body;
-
+    const currentUserId = req.session.user.id;
     if (!c_number || !['good', 'bad'].includes(action)) {
         return res.status(400).json({ success: false, message: "잘못된 요청입니다." });
     }
@@ -66,7 +67,24 @@ exports.voteAction = async (req, res) => {
         if (!vote) {
             return res.status(404).json({ success: false, message: "투표를 찾을 수 없습니다." });
         }
-
+        if (vote.u_id === currentUserId) {
+            return res.status(403).json({ success: false, message: "자신이 생성한 투표에 좋아요/싫어요를 누를 수 없습니다." });
+        }
+        const existingVoteAction = await c_v_notdup.findOne({
+            where: {
+                u_id: vote.u_id ,       
+                c_number: vote.c_number,
+                vote_id: currentUserId,
+            },
+        });
+        if (existingVoteAction) {
+            return res.status(403).json({ success: false, message: "이미 투표하셨습니다." });
+        }
+        await c_v_notdup.create({
+            u_id: vote.u_id,            
+            c_number: vote.c_number,        // 투표 번호
+            vote_id: currentUserId, // 액션 (good 또는 bad)
+        });
         if (action === 'good') {
             vote.c_good += 1;
         } else if (action === 'bad') {
@@ -80,6 +98,3 @@ exports.voteAction = async (req, res) => {
         res.status(500).json({ success: false, message: "투표 업데이트 실패" });
     }
 };
-// 본인 투표율 주작할수 있는 문제 수정
-// 추후 아이디나 타이틀 같은 걸 누르면 안의 내용물이 뜨고 그안에서 good,bad를 올릴 수 있도록 수정
-// 인당 투표수 한번으로 제한

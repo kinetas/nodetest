@@ -35,6 +35,14 @@ const CVote = sequelize.define('CVote', {
 }, {
   tableName: 'comunity_vote',
   timestamps: false,
+  hooks: {
+    beforeUpdate: (vote, options) => {
+      const currentDate = new Date();
+      if (currentDate >= vote.c_deletedate) {
+        throw new Error("수정할 수 없는 투표입니다. 투표가 이미 종료되었습니다.");
+      }
+    }
+  }
 });
 
 module.exports = CVote;

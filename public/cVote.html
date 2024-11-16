@@ -14,6 +14,9 @@
     <h1>커뮤니티 투표</h1>
     <div id="voteList">Loading...</div>
 
+    <h2>내가 생성한 투표</h2>
+    <div id="myVoteList">Loading...</div>
+
     <h2>투표 생성</h2>
     <input type="text" id="c_title" placeholder="제목">
     <textarea id="c_contents" placeholder="내용"></textarea>
@@ -21,7 +24,7 @@
 
     <script>
         function loadVotes() {
-            fetch('/api/cVote')
+            fetch('/api/cVote') // 수정 가능한 투표 API 호출
                 .then(response => response.json())
                 .then(data => {
                     const voteList = document.getElementById('voteList');
@@ -42,6 +45,28 @@
                     }
                 })
                 .catch(error => console.error("Error loading votes:", error));
+        }
+        function loadMyVotes() {
+            fetch('/api/cVote/myVotes') // 내가 생성한 투표 API 호출
+                .then(response => response.json())
+                .then(data => {
+                    const myVoteList = document.getElementById('myVoteList'); // 새로 추가한 영역
+                    myVoteList.innerHTML = '';
+                    if (data.success && data.myVotes && Array.isArray(data.myVotes)) {
+                        data.myVotes.forEach((vote, index) => {
+                            const voteDiv = document.createElement('div');
+                            voteDiv.className = 'vote-item';
+                            voteDiv.innerHTML = `
+                                ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
+                                <p>${vote.c_contents}</p>
+                            `;
+                            myVoteList.appendChild(voteDiv);
+                        });
+                    } else {
+                        myVoteList.innerHTML = '내가 생성한 투표가 없습니다.';
+                    }
+                })
+                .catch(error => console.error("Error loading my votes:", error));
         }
 
         function createVote() {
@@ -81,6 +106,7 @@
         }
 
         loadVotes();
+        loadMyVotes();
     </script>
 </body>
 </html>

@@ -44,8 +44,8 @@
 
         function sendMessage() {
             const message = document.getElementById("messageInput").value;
-            const u1_id = '현재 사용자 ID'; // 예: 로그인된 사용자 ID
-            const u2_id = '상대방 사용자 ID'; // 예: 대화 상대방의 사용자 ID
+            const u1_id = sessionStorage.getItem('user_id'); // 로그인된 사용자 ID
+            const u2_id = document.getElementById("userIdInput").value; // 대화 상대방의 사용자 ID
             
             socket.emit("sendMessage", { u1_id, u2_id, message });
             document.getElementById("messageInput").value = ""; // 메시지 입력란 비우기

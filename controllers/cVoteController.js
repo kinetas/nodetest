@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인스턴스를 models에서 가져옵니다.
 const CVote = require('../models/comunity_voteModel');
+const cVNotDup = require('../models/c_v_notdup'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 
@@ -66,7 +67,24 @@ exports.voteAction = async (req, res) => {
         if (!vote) {
             return res.status(404).json({ success: false, message: "투표를 찾을 수 없습니다." });
         }
-
+        if (vote.u_id === req.session.user.id) {
+            return res.status(403).json({ success: false, message: "자신이 생성한 투표에 좋아요/싫어요를 누를 수 없습니다." });
+        }
+        const existingVoteAction = await cVNotDup.findOne({
+            where: {
+                u_id ,       
+                c_number,
+                vote_id: req.session.user.id,
+            },
+        });
+        if (existingVoteAction) {
+            return res.status(403).json({ success: false, message: "이미 투표하셨습니다." });
+        }
+        await cVNotDup.create({
+            u_id,            
+            c_number,        // 투표 번호
+            vote_id: req.session.user.id, // 액션 (good 또는 bad)
+        });
         if (action === 'good') {
             vote.c_good += 1;
         } else if (action === 'bad') {

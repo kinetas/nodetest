@@ -9,7 +9,6 @@ const cVoteRoutes = require('./routes/cVoteRoutes');
 const app = express();
 const PORT = 3000;
 
-
 const cors = require('cors');
 app.use(cors());  // 모든 출처의 요청을 허용
 
@@ -76,6 +75,8 @@ app.use('/api/auth', authRoutes);
 
 app.use('/dashboard', missionRoutes); // 誘몄뀡 �씪�슦�듃瑜� /dashboard濡� �꽕�젙
 app.use('/api/rooms', roomRoutes);
+
+app.use('/api/missions', missionRoutes); // 미션 관련 라우트 등록
 
 // 친구 리스트 라우트 추가
 app.use('/dashboard/friends', friendRoutes);

@@ -43,12 +43,37 @@
         });
 
         function sendMessage() {
-            const message = document.getElementById("messageInput").value;
-            const u1_id = sessionStorage.getItem('user_id'); // 로그인된 사용자 ID
-            const u2_id = document.getElementById("userIdInput").value; // 대화 상대방의 사용자 ID
-            
+            // 메시지 입력 필드를 불러오기
+            const messageInput = document.getElementById("messageInput");
+            if (!messageInput) {
+                console.error("Cannot find message input element.");
+                return;
+            }
+            const message = messageInput.value;
+        
+            // 대화 상대방의 사용자 ID 입력 필드 불러오기
+            const userIdInput = document.getElementById("userIdInput");
+            if (!userIdInput) {
+                console.error("Cannot find user ID input element.");
+                return;
+            }
+            const u2_id = userIdInput.value;
+        
+            // 로그인된 사용자 ID 가져오기
+            const u1_id = sessionStorage.getItem('user_id');
+            if (!u1_id) {
+                console.error("User ID not found in session storage.");
+                return;
+            }
+            // 메시지가 비어 있는지 확인
+            if (message.trim() === "") {
+                alert("메시지를 입력하세요.");
+                return;
+            }
+            // 메시지 전송
             socket.emit("sendMessage", { u1_id, u2_id, message });
-            document.getElementById("messageInput").value = ""; // 메시지 입력란 비우기
+            // 메시지 입력란 비우기
+            messageInput.value = "";
         }
 
         //방미션출력

@@ -4,6 +4,7 @@ const { sequelize } = require('../models/missionModel'); // sequelize 객체 불
 const Room = require('../models/roomModel'); // Room 모델 가져오기
 const resultController = require('./resultController'); // resultController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
+const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
@@ -21,13 +22,6 @@ exports.createMission = async (req, res) => {
         if (!roomExists) {
             return res.json({ success: false, message: '미션을 생성하기 전에 방이 존재해야 합니다.' });
         }
-
-        // // 현재 최대 m_id 조회
-        // const maxMission = await Mission.findOne({
-        //     attributes: [[sequelize.fn('MAX', sequelize.col('m_id')), 'max_m_id']]
-        // });
-        // const maxId = maxMission.dataValues.max_m_id || 0; // 현재 최대 m_id가 없으면 0으로 초기화
-        // const newMId = parseInt(maxId) + 1; // 새로운 m_id 값
 
         const missionId = uuidv4();
         if (!uuidValidate(missionId)) {
@@ -153,5 +147,41 @@ exports.failureMission = async (req, res) => {
     } catch (error) {
         console.error('미션 실패 처리 오류:', error);
         res.status(500).json({ success: false, message: '미션 인증 실패 처리 중 오류가 발생했습니다.' });
+    }
+};
+
+// 방미션 출력
+exports.printRoomMission = async (req, res) => {
+    const { u2_id } = req.body; // 클라이언트에서 전달된 u2_id
+    const u1_id = req.session.user.id; // 세션에서 로그인된 사용자 ID 가져오기
+
+    if (!u2_id) {
+        return res.status(400).json({ message: '대상 사용자 ID(u2_id)는 필수입니다.' });
+    }
+
+    try {
+        // Mission 테이블에서 두 사용자 간의 미션 조회
+        const missions = await Mission.findAll({
+            where: {
+                [Op.or]: [
+                    { u1_id, u2_id }, // 로그인 사용자가 u1_id이고 입력된 사용자가 u2_id인 경우
+                    { u1_id: u2_id, u2_id: u1_id }, // 반대로 로그인 사용자가 u2_id이고 입력된 사용자가 u1_id인 경우
+                ],
+            },
+            order: [
+                ['u1_id', 'ASC'], // u1_id로 정렬
+                ['m_deadline', 'ASC'], // 마감일로 정렬
+            ],
+        });
+
+        if (missions.length === 0) {
+            return res.status(404).json({ message: '해당 사용자 간의 미션이 없습니다.' });
+        }
+
+        // 미션 목록 반환
+        res.status(200).json({ missions });
+    } catch (error) {
+        console.error('미션 조회 오류:', error);
+        res.status(500).json({ message: '미션 조회 중 서버 오류가 발생했습니다.' });
     }
 };

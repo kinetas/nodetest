@@ -5,7 +5,8 @@ const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄뀡 �씪�슦�듃 遺덈윭�삤湲�
 const roomRoutes = require('./routes/roomRoutes');
 const friendRoutes = require('./routes/friendRoutes');
-const cVoteRoutes = require('./routes/cVoteRoutes'); 
+const cVoteRoutes = require('./routes/cVoteRoutes');
+const db = require('./config/db');
 const app = express();
 const PORT = 3000;
 
@@ -25,6 +26,30 @@ app.use(session({
 
 // Static folder to serve the HTML file
 app.use(express.static('public'));
+
+// 메시지 저장을 처리하는 API 엔드포인트 추가
+app.post('/api/messages', (req, res) => {
+    const { message, roomId, u1_id, u2_id } = req.body;
+    // DB에 메시지 저장 로직 추가
+    db.query(
+        'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
+        [u1_id, u2_id, roomId, message],
+        (err, result) => {
+            if (err) {
+                console.error('Error saving message to DB:', err);
+                return res.status(500).json({ message: 'Failed to save message' });
+            }
+
+            // DB에 성공적으로 저장된 경우
+            res.json({
+                roomId,
+                message,
+                send_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                u1_id,
+            });
+        }
+    );
+});
 
 // �꽭�뀡 �씤利� 誘몃뱾�썾�뼱
 const requireAuth = (req, res, next) => {

@@ -2,6 +2,7 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const axios = require('axios');
 //const https = require('https');
 //const fs = require('fs');
 const cors = require('cors');
@@ -47,17 +48,32 @@ io.on('connection', (socket) => {
     chatController.joinRoom(socket, data);
   });
 
-  socket.on('sendMessage', (data) => {
-    chatController.sendMessage(io, socket, data);
-  });
+  socket.on('sendMessage', async (data) => {
+    try {
+      // 2. 소켓 서버에서 API 서버로 HTTP 요청 전송
+      const response = await axios.post('http://localhost:3000/api/messages', {
+        message: data.message,
+        roomId: data.roomId,
+        u1_id: data.u1_id,
+        u2_id: data.u2_id,
+      });
 
-  socket.on('assignMission', (data) => {
+  /*socket.on('assignMission', (data) => {
     missionController.assignMission(io, socket, data);
   });
 
   socket.on('completeMission', (data) => {
     missionController.completeMission(io, socket, data);
   });
+  */
+
+ // 4. API 서버로부터의 응답을 소켓 서버가 받아 클라이언트로 전송
+  io.to(data.roomId).emit('receiveMessage', response.data);
+} catch (error) {
+  console.error('Error sending message to API server:', error);
+  socket.emit('errorMessage', 'Failed to send message');
+}
+});
 
   socket.on('disconnect', () => {
     console.log('User disconnected');

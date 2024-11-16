@@ -6,9 +6,13 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 
 // 투표 리스트 가져오기
+// 투표 리스트 가져오기 (수정 가능한 것만)
 exports.getVotes = async (req, res) => {
     try {
         const votes = await CVote.findAll({
+            where: {
+                c_deletedate: { [Op.gt]: new Date() } // 현재 시간보다 이후인 투표만
+            },
             order: [
                 [
                     sequelize.literal("DATEDIFF(c_deletedate, CURDATE())"),
@@ -20,6 +24,21 @@ exports.getVotes = async (req, res) => {
     } catch (error) {
         console.error("Error fetching votes:", error);
         res.status(500).json({ success: false, message: "투표 정보를 가져오는데 실패했습니다." });
+    }
+};
+exports.getMyVotes = async (req, res) => {
+    const u_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
+    try {
+        const myVotes = await CVote.findAll({
+            where: {
+                u_id
+            },
+            order: [["c_deletedate", "DESC"]]
+        });
+        res.json({ success: true, myVotes });
+    } catch (error) {
+        console.error("Error fetching my votes:", error);
+        res.status(500).json({ success: false, message: "내 투표 정보를 가져오는데 실패했습니다." });
     }
 };
 
@@ -66,6 +85,10 @@ exports.voteAction = async (req, res) => {
         const vote = await CVote.findOne({ where: { c_number } });
         if (!vote) {
             return res.status(404).json({ success: false, message: "투표를 찾을 수 없습니다." });
+        }
+        const currentDate = new Date();
+        if (currentDate >= vote.c_deletedate) {
+            return res.status(403).json({ success: false, message: "투표가 종료되었습니다." });
         }
         if (vote.u_id === currentUserId) {
             return res.status(403).json({ success: false, message: "자신이 생성한 투표에 좋아요/싫어요를 누를 수 없습니다." });

@@ -29,11 +29,11 @@ app.use(express.static('public'));
 
 // 메시지 저장을 처리하는 API 엔드포인트 추가
 app.post('/api/messages', (req, res) => {
-    const { message, roomId, u1_id, u2_id } = req.body;
+    const { u1_id, u2_id, r_id, message_contents } = req.body;
     // DB에 메시지 저장 로직 추가
     db.query(
         'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
-        [u1_id, u2_id, roomId, message],
+        [u1_id, u2_id, r_id, mmessage_contents],
         (err, result) => {
             if (err) {
                 console.error('Error saving message to DB:', err);

@@ -35,16 +35,19 @@
             socket.emit("joinRoom", { roomId });
         });
 
-        socket.on("message", (data) => {
+        socket.on("receiveMessage", (data) => {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-            messageElement.textContent = `${data.userId}: ${data.message}`;
+            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;
             chatMessages.appendChild(messageElement);
         });
 
         function sendMessage() {
             const message = document.getElementById("messageInput").value;
-            socket.emit("sendMessage", { roomId, message });
+            const u1_id = '현재 사용자 ID'; // 예: 로그인된 사용자 ID
+            const u2_id = '상대방 사용자 ID'; // 예: 대화 상대방의 사용자 ID
+            
+            socket.emit("sendMessage", { u1_id, u2_id, message });
             document.getElementById("messageInput").value = ""; // 메시지 입력란 비우기
         }
 

@@ -11,11 +11,6 @@ const RMessage = sequelize.define('RMessage', {
       primaryKey: true,
       allowNull: false,
     },
-    r_id: {
-      type: DataTypes.STRING(40),
-      primaryKey: true,
-      allowNull: false,
-    },
     message_num: {
       type: DataTypes.STRING(20),
       primaryKey: true,

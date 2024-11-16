@@ -112,10 +112,6 @@
     <!-- public/dashboard.html -->
     <button onclick="window.location.href='/rooms'">방</button>
 
-    <ul id="roomList">Loading rooms...</ul>
-    <input type="text" id="targetUserIdInput" placeholder="대상 사용자 ID 입력">
-    <button onclick="printRoomMissions()">미션 출력</button>
-
     <script>
         fetch('/user-info')
             .then(response => {
@@ -464,29 +460,6 @@
             .catch(error => console.error('Error:', error));
         }
 
-        async function printRoomMissions() {
-            const targetUserId = document.getElementById('targetUserIdInput').value;
-
-            if (!targetUserId) {
-                alert('대상 사용자 ID를 입력하세요.');
-                return;
-            }
-
-            const response = await fetch('/api/missions/printRoomMission', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ u2_id: targetUserId }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                console.log('미션 목록:', data.missions);
-                alert('미션이 콘솔에 출력되었습니다.'); // 결과를 콘솔에 출력
-            } else {
-                alert(data.message || '미션 조회 실패');
-            }
-        }
     </script>
 </body>
 </html>

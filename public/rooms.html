@@ -71,7 +71,7 @@
             });
           // 방 입장 함수
             function enterRoom(r_id) {
-            window.location.href = `/chat.html?room.r_Id=${r_Id}`; // 채팅방 페이지로 이동
+            window.location.href = `/chat.html?room.r_Id=${r_id}`; // 채팅방 페이지로 이동
         }
 
         // 방 추가 함수
@@ -118,7 +118,7 @@
 
         const response = await fetch('/api/missions/printRoomMission', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json' },    
             body: JSON.stringify({ u2_id: targetUserId }),
         });
 

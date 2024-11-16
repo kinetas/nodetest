@@ -33,7 +33,7 @@ app.post('/api/messages', (req, res) => {
     // DB에 메시지 저장 로직 추가
     db.query(
         'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
-        [u1_id, u2_id, r_id, mmessage_contents],
+        [u1_id, u2_id, r_id, message_contents],
         (err, result) => {
             if (err) {
                 console.error('Error saving message to DB:', err);

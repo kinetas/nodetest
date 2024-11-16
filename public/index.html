@@ -34,6 +34,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.message === 'Login successful') {
+                    sessionStorage.setItem('user_id', u_id);//로그인 성공시 사용자 ID sessionStorage에 저장
                     window.location.href = data.redirectUrl; // 대시보드 페이지로 리디렉션
                 } else {
                 document.getElementById('result').textContent = data.message; // 오류 메시지 출력

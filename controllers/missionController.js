@@ -150,7 +150,7 @@ exports.failureMission = async (req, res) => {
     }
 };
 
-// 방 미션 출력 함수
+//방미션출력
 exports.printRoomMission = async (req, res) => {
     const { u2_id } = req.body; // 클라이언트에서 상대방 ID 전달
     const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID (세션)
@@ -168,6 +168,7 @@ exports.printRoomMission = async (req, res) => {
                     { u1_id: u2_id, u2_id: u1_id } // 상대방이 u1_id
                 ],
             },
+            attributes: ['m_title', 'm_deadline', 'u2_id'], // 필요한 속성만 선택
             order: [['m_deadline', 'ASC']], // 마감일 순서대로 정렬
         });
 
@@ -175,8 +176,15 @@ exports.printRoomMission = async (req, res) => {
             return res.status(404).json({ success: false, message: '해당 방에 미션이 없습니다.' });
         }
 
-        // 미션 목록 반환
-        res.status(200).json({ success: true, missions });
+        // JSON 응답 반환
+        res.status(200).json({
+            success: true,
+            missions: missions.map(mission => ({
+                title: mission.m_title,
+                deadline: mission.m_deadline,
+                performer: mission.u2_id, // 미션 수행자
+            })),
+        });
     } catch (error) {
         console.error('미션 조회 오류:', error.message);
         res.status(500).json({ success: false, message: '미션 조회 중 오류가 발생했습니다.', error: error.message });

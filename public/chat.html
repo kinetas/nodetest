@@ -72,7 +72,7 @@
                     if (data.missions && data.missions.length > 0) {
                         data.missions.forEach(mission => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `미션: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                            listItem.textContent = `미션: ${mission.title}, 마감일: ${mission.deadline}, 수행자: ${mission.performer}`;
                             roomMissionListElement.appendChild(listItem);
                         });
                     } else {

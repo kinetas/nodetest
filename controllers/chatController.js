@@ -21,7 +21,7 @@ exports.createRoom = (socket, roomName) => {
 };
 
 exports.joinRoom = (socket, { r_id, u1_id }) => {
-  socket.join(roomId);
+  socket.join(r_id);
   console.log(`User ${u1_id} joined room ${r_id}`);
 };
 

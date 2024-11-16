@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인스턴스를 models에서 가져옵니다.
 const CVote = require('../models/comunity_voteModel');
-const cVNotDup = require('../models/c_v_notdup'); 
+const cVNotDup = require('../models/c_v_not_dupModel'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 

@@ -70,19 +70,19 @@ exports.voteAction = async (req, res) => {
         if (vote.u_id === req.session.user.id) {
             return res.status(403).json({ success: false, message: "자신이 생성한 투표에 좋아요/싫어요를 누를 수 없습니다." });
         }
-        const existingVoteAction = await cVNotDup.findOne({
+        const existingVoteAction = await c_v_notdup.findOne({
             where: {
-                u_id ,       
-                c_number,
+                u_id: vote.u_id ,       
+                c_number: vote.c_number,
                 vote_id: req.session.user.id,
             },
         });
         if (existingVoteAction) {
             return res.status(403).json({ success: false, message: "이미 투표하셨습니다." });
         }
-        await cVNotDup.create({
-            u_id,            
-            c_number,        // 투표 번호
+        await c_v_notdup.create({
+            u_id: vote.u_id,            
+            c_number: vote.c_number,        // 투표 번호
             vote_id: req.session.user.id, // 액션 (good 또는 bad)
         });
         if (action === 'good') {
@@ -98,6 +98,3 @@ exports.voteAction = async (req, res) => {
         res.status(500).json({ success: false, message: "투표 업데이트 실패" });
     }
 };
-// 본인 투표율 주작할수 있는 문제 수정
-// 추후 아이디나 타이틀 같은 걸 누르면 안의 내용물이 뜨고 그안에서 good,bad를 올릴 수 있도록 수정
-// 인당 투표수 한번으로 제한

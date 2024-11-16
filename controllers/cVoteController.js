@@ -6,13 +6,9 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 
 // 투표 리스트 가져오기
-// 투표 리스트 가져오기 (수정 가능한 것만)
 exports.getVotes = async (req, res) => {
     try {
         const votes = await CVote.findAll({
-            where: {
-                c_deletedate: { [Op.gt]: new Date() } // 현재 시간보다 이후인 투표만
-            },
             order: [
                 [
                     sequelize.literal("DATEDIFF(c_deletedate, CURDATE())"),

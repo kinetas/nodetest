@@ -45,7 +45,8 @@ app.post('/api/messages', (req, res) => {
                 roomId: r_id,
                 message: message_contents,
                 send_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
-                u1_id,
+                u1_id: u1_id,
+                u2_id: u2_id
             });
         }
     );

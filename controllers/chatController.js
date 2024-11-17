@@ -1,4 +1,6 @@
 const db = require('../config/db');
+const chatTable = require('../models/messageModel')
+const roomTable = require('../models/roomModel')
 
 exports.createRoom = (socket, roomName) => {
   const r_id = Math.random().toString(36).substr(2, 9);

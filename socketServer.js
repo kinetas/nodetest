@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
 
     try {
       //소켓 서버에서 API 서버로 HTTP 요청 전송
-      const response = await axios.post('http://localhost:3000/api/messages', {
+      const response = await axios.post('http://13.124.126.234:3000/api/messages', {
         message_contents: data.message_contents,
         r_id: data.r_id,
         u1_id: data.u1_id,

@@ -82,8 +82,8 @@
             fetch('/api/rooms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                //body: JSON.stringify({ u1_id: userId, u2_id })
-                body: JSON.stringify({ u1_id: userId, u2_id, r_type }) // r_type 추가 <!-- 수정 -->
+                body: JSON.stringify({ u1_id: userId, u2_id })
+                // body: JSON.stringify({ u1_id: userId, u2_id, r_type }) // r_type 추가 <!-- 수정 -->
             })
             .then(response => response.json())
             .then(data => {

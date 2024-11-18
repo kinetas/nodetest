@@ -12,10 +12,10 @@ exports.getRooms = async (req, res) => {
 
 exports.addRoom = async (req, res) => {
     const u1_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
-    //const { u2_id } = req.body;
-    //const type = "close";
-    const { u2_id, r_type } = req.body; // r_type 추가 <!-- 수정 -->
-    const type = r_type || "close"; // 기본값 "close" <!-- 수정 -->
+    const { u2_id } = req.body;
+    const type = "close";
+    // const { u2_id, r_type } = req.body; // r_type 추가 <!-- 수정 -->
+    // const type = r_type || "close"; // 기본값 "close" <!-- 수정 -->
 
     //==========if 오픈채팅방이면 type = "open"======================
     //==========     조건을 뭘로 할 것인지     ======================
@@ -36,7 +36,7 @@ exports.addRoom = async (req, res) => {
         }
 
         await Room.create({ u1_id, u2_id, r_id: roomId, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
-        
+
         //반대방 생성
         await Room.create({ u1_id: u2_id, u2_id:u1_id, r_id: roomId, r_title: `${u2_id}-${u1_id}`, r_type: `${type}` });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });

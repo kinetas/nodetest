@@ -12,8 +12,10 @@ exports.getRooms = async (req, res) => {
 
 exports.addRoom = async (req, res) => {
     const u1_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
-    const { u2_id } = req.body;
-    const type = "close";
+    //const { u2_id } = req.body;
+    //const type = "close";
+    const { u2_id, r_type } = req.body; // r_type 추가 <!-- 수정 -->
+    const type = r_type || "close"; // 기본값 "close" <!-- 수정 -->
 
     //==========if 오픈채팅방이면 type = "open"======================
     //==========     조건을 뭘로 할 것인지     ======================

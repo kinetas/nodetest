@@ -38,7 +38,7 @@ app.use(session({
 app.use(express.static('public'));
 
 // 메시지 저장을 처리하는 API 엔드포인트 추가
-/*app.post('/api/messages', (req, res) => {
+app.post('/api/messages', (req, res) => {
     const { message_contents, r_id, u1_id, u2_id } = req.body;
     // DB에 메시지 저장 로직 추가
     if (!u1_id || !u2_id || !r_id || !message_contents) {
@@ -47,7 +47,8 @@ app.use(express.static('public'));
     }
     db.query(
         //'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
-        [message_contents, r_id, u1_id, u2_id],
+        'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents) VALUES (?, ?, ?, ?)',
+        [u1_id, u2_id, r_id, message_contents,],
         (err, result) => {
             if (err) {
                 console.error('Error saving message to DB:', err);
@@ -56,16 +57,16 @@ app.use(express.static('public'));
 
             // DB에 성공적으로 저장된 경우
             res.json({
-                r_id: r_id,
+                //r_id: r_id,
                 message_contents: message_contents,
                 send_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 u1_id: u1_id,
-                u2_id: u2_id
+                //u2_id: u2_id
             });
         }
     );
 });
-*/
+
 // �꽭�뀡 �씤利� 誘몃뱾�썾�뼱
 const requireAuth = (req, res, next) => {
     if (!req.session.user) {

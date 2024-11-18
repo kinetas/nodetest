@@ -3,9 +3,9 @@ const Room = require('../models/roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 exports.getRooms = async (req, res) => {
-    const userId = req.session.user.id;
+    const u1_id = req.session.user.id;
     const rooms = await Room.findAll({
-        where: { u1_id: userId }
+        where: { u1_id }
     });
     res.json({ rooms });
 };

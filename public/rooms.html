@@ -36,8 +36,13 @@
         socket.on("connect", () => {
             console.log("서버에 연결되었습니다.");
         });
-        sessionStorage.setItem('u1_id', u1_id);
-        const u1_id = sessionStorage.getItem('u1_id');
+        // sessionStorage.setItem('u1_id', u1_id);
+        // const u1_id = sessionStorage.getItem('u1_id');
+        const u1_id = sessionStorage.getItem('u1_id'); // 먼저 u1_id를 선언하고 값을 가져옴
+        if (!u1_id) {
+            const sessionUserId = "세션에서 가져온 u1_id 값"; // 여기에 실제 세션 데이터 또는 기본값을 설정
+            sessionStorage.setItem('u1_id', sessionUserId); // sessionStorage에 값 설정
+        }
         // 페이지 로드 시 방 목록 가져오기
         fetch('/api/rooms')
             .then(response => response.json())

@@ -23,7 +23,7 @@ const server = http.createServer(/*{
 //socket.io 서버 초기화
 const io = socketIo(server, {
   cors: {
-    origin: ['http://43.203.233.135:3000', 'http://43.203.233.135:3001', 'http://localhost:3000', 'http://localhost:3001'],
+    origin: ['http://13.124.126.234:3000', 'http://13.124.126.234:3001', 'http://localhost:3000', 'http://localhost:3001'],
     methods: ['GET', 'POST'],
     credentials: true //세션 쿠키 관리
   },

@@ -60,7 +60,7 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
       console.log('Message saved:', newMessage);
 
       // 클라이언트에 메시지 전송
-      io.emit('receiveMessage', { u1_id, message, send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') });
+      socket.emit('receiveMessage', { u1_id, message, send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') });
   } catch (error) {
       console.error('Error saving message with Sequelize:', error);
   }

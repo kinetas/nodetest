@@ -16,7 +16,7 @@ exports.createRoom = (socket, roomName) => {
 exports.joinRoom = async (socket, { r_id, u1_id }) => {
   try {
     if (!r_id || !u1_id) {
-      console.error(`error : ${error} - Missing r_id or u1_id:`, { r_id, u1_id });
+      console.error(`sMissing r_id or u1_id:`, { r_id, u1_id });
       return;
     }
     // 사용자가 방에 들어갔을 때 방에 사용자 정보 업데이트 또는 추가

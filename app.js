@@ -10,6 +10,9 @@ const db = require('./config/db');
 const app = express();
 const PORT = 3000;
 
+// // ======== 수정 JWT ============
+// const requireAuth = require('./middleware/authMiddleware');
+
 const cors = require('cors');
 app.use(cors());  // 모든 출처의 요청을 허용
 
@@ -23,6 +26,13 @@ app.use(session({
     saveUninitialized: false, // 珥덇린�솕�릺吏� �븡��� �꽭�뀡�쓣 ����옣�븷吏� �뿬遺�
     cookie: { maxAge: 1000 * 60 * 60 * 24 } // 荑좏궎�쓽 �쑀�슚 湲곌컙 (�뿬湲곗꽌�뒗 �븯猷�)
 }));
+
+// // ======== 수정 JWT ============
+// app.use('/dashboard', requireAuth, missionRoutes); // JWT 인증 적용
+// app.use('/api/rooms', requireAuth, roomRoutes);
+// app.get('/user-info', requireAuth, (req, res) => {
+//     res.json({ user: req.user });
+// });
 
 // Static folder to serve the HTML file
 app.use(express.static('public'));
@@ -59,6 +69,8 @@ const requireAuth = (req, res, next) => {
     }
     next();
 };
+
+
 
 // �삁�떆: ����떆蹂대뱶 �씪�슦�듃 蹂댄샇
 app.get('/dashboard', requireAuth, (req, res) => {

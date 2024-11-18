@@ -5,7 +5,7 @@ const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 
 
 const roomController = require('./roomController'); // roomController 가져오기
 
-// 로그인 처리 함수
+// 로그인 처리 함수 - 쿠키
 exports.login = async (req, res) => {
     const { u_id, u_password } = req.body;
 
@@ -51,6 +51,48 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
     }
 };
+
+// // ======== 수정 JWT ============
+// const jwt = require('jsonwebtoken');
+// //로그인 함수 - JWT
+// exports.login = async (req, res) => {
+//     const { u_id, u_password } = req.body;
+
+//     try {
+//         const user = await User.findOne({ where: { u_id } });
+
+//         if (!user) {
+//             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
+//         }
+
+//         const isMatch = await comparePassword(u_password, user.u_password);
+//         if (!isMatch) {
+//             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+//         }
+
+//         // JWT 토큰 생성
+//         const token = jwt.sign(
+//             { id: user.u_id, nickname: user.u_nickname },
+//             process.env.JWT_SECRET,
+//             { expiresIn: process.env.JWT_EXPIRES_IN }
+//         );
+
+//         res.status(200).json({
+//             message: 'Login successful',
+//             token, // 토큰 반환
+//             user: {
+//                 nickname: user.u_nickname,
+//                 name: user.u_name,
+//                 birth: user.u_birth,
+//                 mail: user.u_mail,
+//             },
+//         });
+//     } catch (error) {
+//         console.error('로그인 오류:', error);
+//         res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
+//     }
+// };
+
 
 // 회원가입 함수
 exports.register = async (req, res) => {

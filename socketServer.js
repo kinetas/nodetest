@@ -48,35 +48,65 @@ io.on('connection', (socket) => {
     chatController.joinRoom(socket, data);
   });
 
-  socket.on('sendMessage', async (data) => {
-    const { message_contents, r_id, u1_id, u2_id } = data;
-    // if (!message_contents || !r_id || !u1_id || !u2_id) {
-    //   console.error(`소켓 서버에서 필수 값 누락 :`, data);
-    //   socket.emit('errorMessage', '필수 값이 누락되었습니다.');
-    //   return;
-    // }
+  // socket.on('sendMessage', async (data) => {
+  //   const { message_contents, r_id, u1_id, u2_id } = data;
+  //   // if (!message_contents || !r_id || !u1_id || !u2_id) {
+  //   //   console.error(`소켓 서버에서 필수 값 누락 :`, data);
+  //   //   socket.emit('errorMessage', '필수 값이 누락되었습니다.');
+  //   //   return;
+  //   // }
 
+  //   if (!message_contents || !r_id || !u1_id || !u2_id) {
+  //     let missingFields = [];
+      
+  //     if (!message_contents) missingFields.push('message_contents');
+  //     if (!r_id) missingFields.push('r_id');
+  //     if (!u1_id) missingFields.push('u1_id');
+  //     if (!u2_id) missingFields.push('u2_id');
+      
+  //     console.error(`소켓 서버에서 필수 값 누락: ${missingFields.join(', ')}`);
+  //     socket.emit('errorMessage', `필수 값이 누락되었습니다: ${missingFields.join(', ')}`);
+  //     return;
+  //   }
+
+  //   try {
+  //     //소켓 서버에서 API 서버로 HTTP 요청 전송
+  //     const response = await axios.post('http://13.124.126.234:3000/api/messages', {
+  //       message_contents: data.message_contents,
+  //       r_id: data.r_id,
+  //       u1_id: data.u1_id,
+  //       u2_id: data.u2_id,
+  //     });
+
+  socket.on('sendMessage', async (data) => {
+    console.log('Received data:', data);
+  
+    const { message_contents, r_id, u1_id, u2_id } = data;
+  
     if (!message_contents || !r_id || !u1_id || !u2_id) {
       let missingFields = [];
-      
+  
       if (!message_contents) missingFields.push('message_contents');
       if (!r_id) missingFields.push('r_id');
       if (!u1_id) missingFields.push('u1_id');
       if (!u2_id) missingFields.push('u2_id');
-      
-      console.error(`소켓 서버에서 필수 값 누락: ${missingFields.join(', ')}`);
-      socket.emit('errorMessage', `필수 값이 누락되었습니다: ${missingFields.join(', ')}`);
+  
+      console.error(`Missing fields: ${missingFields.join(', ')}`);
+      socket.emit('errorMessage', `Missing fields: ${missingFields.join(', ')}`);
       return;
     }
-
+  
     try {
-      //소켓 서버에서 API 서버로 HTTP 요청 전송
-      const response = await axios.post('http://13.124.126.234:3000/api/messages', {
-        message_contents: data.message_contents,
-        r_id: data.r_id,
-        u1_id: data.u1_id,
-        u2_id: data.u2_id,
-      });
+      const response = await axios.post('http://13.124.126.234:3000/api/messages', data);
+      console.log('API Response:', response.data);
+  
+      io.to(r_id).emit('receiveMessage', response.data);
+    } catch (error) {
+      console.error('Error:', error.response?.data || error.message);
+      socket.emit('errorMessage', 'Failed to process message');
+    }
+  });
+  
 
   /*socket.on('assignMission', (data) => {
     missionController.assignMission(io, socket, data);

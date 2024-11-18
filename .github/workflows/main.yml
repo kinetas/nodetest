@@ -16,9 +16,7 @@ env:
   DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
   REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
   REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
-  # # ============== 수정 JWT ===============
-  # JWT_SECRET: ${{ secrets.JWT_SECRET }}  # JWT 비밀 키
-  # JWT_EXPIRES_IN: 1d  # 토큰 만료 기간
+  # JWT_EXPIRES_IN: 1d  # JWT 만료 시간
 
 permissions:
   contents: read
@@ -51,6 +49,16 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
         aws-region: ${{ env.AWS_REGION }}
+
+# ============ 수정 JWT =======================
+    #  # Generate JWT_SECRET dynamically
+    # - name: Generate JWT_SECRET
+    #   id: generate_secret
+    #   run: |
+    #     JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
+    #     echo "JWT_SECRET=$JWT_SECRET" >> .env
+    #     echo "JWT_EXPIRES_IN=${{ env.JWT_EXPIRES_IN }}" >> .env
+
 
     # Upload code to AWS S3
     - name: Upload to AWS S3

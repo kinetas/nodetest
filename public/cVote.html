@@ -24,7 +24,7 @@
 
     <script>
         function loadVotes() {
-            fetch('/api/cVote') // 수정 가능한 투표 API 호출
+            fetch('/api/cVote')
                 .then(response => response.json())
                 .then(data => {
                     const voteList = document.getElementById('voteList');
@@ -46,11 +46,12 @@
                 })
                 .catch(error => console.error("Error loading votes:", error));
         }
+
         function loadMyVotes() {
-            fetch('/api/cVote/myVotes') // 내가 생성한 투표 API 호출
+            fetch('/api/cVote/myVotes')
                 .then(response => response.json())
                 .then(data => {
-                    const myVoteList = document.getElementById('myVoteList'); // 새로 추가한 영역
+                    const myVoteList = document.getElementById('myVoteList');
                     myVoteList.innerHTML = '';
                     if (data.success && data.myVotes && Array.isArray(data.myVotes)) {
                         data.myVotes.forEach((vote, index) => {
@@ -59,6 +60,7 @@
                             voteDiv.innerHTML = `
                                 ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
                                 <p>${vote.c_contents}</p>
+                                <button onclick="deleteVote('${vote.c_number}')">삭제</button>
                             `;
                             myVoteList.appendChild(voteDiv);
                         });
@@ -83,6 +85,7 @@
                     if (data.success) {
                         alert('투표가 생성되었습니다.');
                         loadVotes();
+                        loadMyVotes();
                     } else {
                         alert(data.message);
                     }
@@ -99,10 +102,25 @@
                 .then(data => {
                     if (data.success) {
                         loadVotes();
+                        loadMyVotes();
                     } else {
                         alert(data.message);
                     }
                 });
+        }
+
+        function deleteVote(c_number) {
+            fetch(`/api/cVote/delete/${c_number}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('투표가 삭제되었습니다.');
+                        loadMyVotes();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Error deleting vote:", error));
         }
 
         loadVotes();

@@ -117,3 +117,19 @@ exports.voteAction = async (req, res) => {
         res.status(500).json({ success: false, message: "투표 업데이트 실패" });
     }
 };
+exports.deleteVote = async (req, res) => {
+    const { c_number } = req.params;
+    const u_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
+
+    try {
+        const vote = await CVote.findOne({ where: { c_number, u_id } });
+        if (!vote) {
+            return res.status(404).json({ success: false, message: "삭제할 투표를 찾을 수 없습니다." });
+        }
+        await vote.destroy();
+        res.json({ success: true, message: "투표가 삭제되었습니다." });
+    } catch (error) {
+        console.error("Error deleting vote:", error);
+        res.status(500).json({ success: false, message: "투표 삭제 실패" });
+    }
+};

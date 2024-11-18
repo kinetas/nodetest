@@ -41,7 +41,7 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
   }
 };
 
-exports.sendMessage = async (io, socket, { message, u1_id, u2_id, r_id }) => {
+exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
   const send_date = new Date(); // 현재 시간
 

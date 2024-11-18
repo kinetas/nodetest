@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async (data) => {
-    const { u1_id, u2_id, r_id, message } = data;
+    const { message, r_id, u1_id, u2_id } = data;
     if (!data.message || !data.r_id || !data.u1_id || !data.u2_id) {
       console.error('Missing required fields:', data);
       socket.emit('errorMessage', 'Required fields are missing.');

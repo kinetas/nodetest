@@ -39,15 +39,15 @@ app.use(express.static('public'));
 
 // 메시지 저장을 처리하는 API 엔드포인트 추가
 app.post('/api/messages', (req, res) => {
-    const { u1_id, u2_id, r_id, message_contents } = req.body;
+    const { message_contents, r_id, u1_id, u2_id } = req.body;
     // DB에 메시지 저장 로직 추가
     if (!u1_id || !u2_id || !r_id || !message_contents) {
-        console.error('Missing required fields:', { u1_id, u2_id, r_id, message_contents });
+        console.error('Missing required fields:', { message_contents, r_id, u1_id, u2_id  });
         return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
     }
     db.query(
         'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
-        [u1_id, u2_id, r_id, message_contents],
+        [message_contents, r_id, u1_id, u2_id],
         (err, result) => {
             if (err) {
                 console.error('Error saving message to DB:', err);

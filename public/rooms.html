@@ -57,7 +57,7 @@
                         // 방 입장 버튼 추가
                         const enterButton = document.createElement('button');
                         enterButton.textContent = '입장';
-                        enterButton.onclick = () => enterRoom(room.r_id); // 방 ID를 전달
+                        enterButton.onclick = () => enterRoom(room.r_id, room.u2_id); // 방 ID를 전달
                         listItem.appendChild(enterButton);
 
                         roomListElement.appendChild(listItem);
@@ -71,8 +71,8 @@
                 document.getElementById('roomList').textContent = '방 목록을 불러오는 데 실패했습니다.';
             });
           // 방 입장 함수
-            function enterRoom(r_id) {
-            window.location.href = `/chat.html?r_Id=${r_id}`; // 채팅방 페이지로 이동
+          function enterRoom(r_id, u2_id) {
+            window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
         }
 
         // 방 추가 함수

@@ -53,6 +53,9 @@
 
             // 로그인된 사용자 ID 가져오기
             const u1_id = sessionStorage.getItem('user_id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const r_id = urlParams.get('r_id');
+            const u2_id = urlParams.get('u2_id');
             if (!u1_id) {
                 console.error("User ID not found in session storage.");
                 return;
@@ -63,7 +66,7 @@
                 return;
             }
             // 메시지 전송
-            socket.emit("sendMessage", { u1_id, message });
+            socket.emit("sendMessage", { message,u1_id,u2_id,r_id });
             // 메시지 입력란 비우기
             messageInput.value = "";
         }

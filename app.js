@@ -11,6 +11,7 @@ const app = express();
 const PORT = 3000;
 
 // // ======== 수정 JWT ============
+const jwt = require('jsonwebtoken'); // JWT 추가
 // const requireAuth = require('./middleware/authMiddleware');
 
 const cors = require('cors');
@@ -28,11 +29,10 @@ app.use(session({
 }));
 
 // // ======== 수정 JWT ============
-// app.use('/dashboard', requireAuth, missionRoutes); // JWT 인증 적용
-// app.use('/api/rooms', requireAuth, roomRoutes);
-// app.get('/user-info', requireAuth, (req, res) => {
-//     res.json({ user: req.user });
-// });
+// // JSON 파싱과 URL 인코딩 설정
+// app.use(cors());
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 // Static folder to serve the HTML file
 app.use(express.static('public'));
@@ -130,6 +130,13 @@ app.use('/api/missions', missionRoutes); // 미션 관련 라우트 등록
 // 친구 리스트 라우트 추가
 app.use('/dashboard/friends', friendRoutes);
 app.use('/api/cVote', cVoteRoutes);
+
+// // ======== 수정 JWT ============
+// // JWT 인증 미들웨어로 보호된 라우트
+// app.use('/dashboard', require('./middleware/authMiddleware'), missionRoutes);
+// app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
+// app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
+
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
 });

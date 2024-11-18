@@ -53,43 +53,25 @@ exports.login = async (req, res) => {
 };
 
 // // ======== 수정 JWT ============
-// const jwt = require('jsonwebtoken');
-// //로그인 함수 - JWT
 // exports.login = async (req, res) => {
 //     const { u_id, u_password } = req.body;
-
 //     try {
 //         const user = await User.findOne({ where: { u_id } });
-
-//         if (!user) {
-//             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
-//         }
-
-//         const isMatch = await comparePassword(u_password, user.u_password);
-//         if (!isMatch) {
-//             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+//         if (!user || !(await comparePassword(u_password, user.u_password))) {
+//             return res.status(401).json({ message: '아이디 또는 비밀번호가 일치하지 않습니다.' });
 //         }
 
 //         // JWT 토큰 생성
-//         const token = jwt.sign(
-//             { id: user.u_id, nickname: user.u_nickname },
-//             process.env.JWT_SECRET,
-//             { expiresIn: process.env.JWT_EXPIRES_IN }
-//         );
+//         const token = jwt.sign({ id: user.u_id, nickname: user.u_nickname }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
 //         res.status(200).json({
 //             message: 'Login successful',
-//             token, // 토큰 반환
-//             user: {
-//                 nickname: user.u_nickname,
-//                 name: user.u_name,
-//                 birth: user.u_birth,
-//                 mail: user.u_mail,
-//             },
+//             token,
+//             user: { id: user.u_id, nickname: user.u_nickname },
 //         });
 //     } catch (error) {
-//         console.error('로그인 오류:', error);
-//         res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
+//         console.error(error);
+//         res.status(500).json({ message: '서버 오류' });
 //     }
 // };
 
@@ -149,3 +131,9 @@ exports.logOut = (req, res) => {
         res.status(200).json({ success: true, message: '로그아웃 성공' });
     });
 };
+
+// // ======== 수정 JWT ============
+// // JWT는 로그아웃이 서버에서 필요하지 않음
+// exports.logOut = (req, res) => {
+//     res.status(200).json({ message: '로그아웃은 클라이언트에서 토큰 삭제로 처리됩니다.' });
+// };

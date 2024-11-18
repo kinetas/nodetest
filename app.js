@@ -46,7 +46,8 @@ app.post('/api/messages', (req, res) => {
         return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
     }
     db.query(
-        'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
+        //'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
+        'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents) VALUES (?, ?, ?, ?)',
         [message_contents, r_id, u1_id, u2_id],
         (err, result) => {
             if (err) {

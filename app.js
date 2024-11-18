@@ -38,7 +38,7 @@ app.use(session({
 app.use(express.static('public'));
 
 // 메시지 저장을 처리하는 API 엔드포인트 추가
-app.post('/api/messages', (req, res) => {
+/*app.post('/api/messages', (req, res) => {
     const { message_contents, r_id, u1_id, u2_id } = req.body;
     // DB에 메시지 저장 로직 추가
     if (!u1_id || !u2_id || !r_id || !message_contents) {
@@ -47,7 +47,6 @@ app.post('/api/messages', (req, res) => {
     }
     db.query(
         //'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
-        'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents) VALUES (?, ?, ?, ?)',
         [message_contents, r_id, u1_id, u2_id],
         (err, result) => {
             if (err) {
@@ -66,7 +65,7 @@ app.post('/api/messages', (req, res) => {
         }
     );
 });
-
+*/
 // �꽭�뀡 �씤利� 誘몃뱾�썾�뼱
 const requireAuth = (req, res, next) => {
     if (!req.session.user) {

@@ -48,7 +48,7 @@ app.post('/api/messages', (req, res) => {
     db.query(
         //'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
         'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents) VALUES (?, ?, ?, ?)',
-        [message_contents, r_id, u1_id, u2_id],
+        [u1_id, u2_id, r_id, message_contents,],
         (err, result) => {
             if (err) {
                 console.error('Error saving message to DB:', err);
@@ -57,11 +57,11 @@ app.post('/api/messages', (req, res) => {
 
             // DB에 성공적으로 저장된 경우
             res.json({
-                r_id: r_id,
+                //r_id: r_id,
                 message_contents: message_contents,
                 send_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 u1_id: u1_id,
-                u2_id: u2_id
+                //u2_id: u2_id
             });
         }
     );

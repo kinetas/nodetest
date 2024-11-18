@@ -101,7 +101,7 @@ exports.voteAction = async (req, res) => {
         }
         await c_v_notdup.create({
             u_id: vote.u_id,            
-            c_number: vote.c_number,        // 투표 번호
+            c_number: vote.c_number,       
             vote_id: currentUserId, // 액션 (good 또는 bad)
         });
         if (action === 'good') {

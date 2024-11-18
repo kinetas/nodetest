@@ -192,11 +192,6 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   }
 };
 
-// 서버 실행
-server.listen(3001, () => {
-  console.log('HTTP Server running on port 3001'); // 서버 실행 로그 출력
-});
-
 
 server.listen(3001, () => {
   console.log('HTTP Server running on port 3001');

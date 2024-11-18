@@ -22,7 +22,7 @@ const RMessage = sequelize.define('RMessage', {
       allowNull: false,
     },
     send_date: {
-      type: DataTypes.DATETIME,
+      type: DataTypes.DATE,
       allowNull: false,
     },
     message_contents: {

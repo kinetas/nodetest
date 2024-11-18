@@ -7,14 +7,6 @@ exports.findUid = async (req, res) => {
 
     try {
 
-        // // birthdate 변환: "010320" → "2020-03-01"
-        // const year = parseInt(birthdate.slice(0, 2), 10) >= 50 ? '19' : '20'; // 50 이전은 2000년대, 이후는 1900년대
-        // const month = birthdate.slice(2, 4);
-        // const day = birthdate.slice(4, 6);
-        // const formattedDate = `${year}${birthdate.slice(0, 2)}-${month}-${day}`;
-
-        // const birthDate = new Date(formattedDate); // 최종 Date 객체로 변환
-
         // DB에서 조건에 맞는 사용자 조회
         const user = await User.findOne({
             where: {

@@ -36,9 +36,8 @@
         socket.on("connect", () => {
             console.log("서버에 연결되었습니다.");
         });
-
-        const userId = ''; // 세션 ID에 따라 사용자 ID를 여기에 할당
-
+        sessionStorage.setItem('u1_id', u1_id);
+        const u1_id = sessionStorage.getItem('u1_id');
         // 페이지 로드 시 방 목록 가져오기
         fetch('/api/rooms')
             .then(response => response.json())
@@ -68,7 +67,7 @@
             });
           // 방 입장 함수
             function enterRoom(r_id) {
-            window.location.href = `/chat.html?room.r_Id=${r_id}`; // 채팅방 페이지로 이동
+            window.location.href = `/chat.html?r_Id=${r_id}`; // 채팅방 페이지로 이동
         }
 
         // 방 추가 함수
@@ -92,7 +91,9 @@
         function deleteRoom() {
             const u2_id = document.getElementById('userIdInput').value;
             fetch(`/api/rooms/${u2_id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ u1_id }) // u1_id 포함
             })
             .then(response => response.json())
             .then(data => {

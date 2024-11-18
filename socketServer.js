@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', async (data) => {
     try {
-      // 2. 소켓 서버에서 API 서버로 HTTP 요청 전송
+      //소켓 서버에서 API 서버로 HTTP 요청 전송
       const response = await axios.post('http://localhost:3000/api/messages', {
         message: data.message,
         roomId: data.roomId,

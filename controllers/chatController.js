@@ -8,7 +8,7 @@ exports.createRoom = (socket, roomName) => {
   const u2_id = socket.handshake.query.u2_id;
   const r_title = socket.handshake.query.r_title;
   
-  socket.join(roomId);
+  socket.join(r_id);
   
   socket.emit('roomCreated', r_id);
 };

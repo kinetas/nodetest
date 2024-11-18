@@ -16,6 +16,9 @@ env:
   DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
   REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
   REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
+  # # ============== 수정 JWT ===============
+  # JWT_SECRET: ${{ secrets.JWT_SECRET }}  # JWT 비밀 키
+  # JWT_EXPIRES_IN: 1d  # 토큰 만료 기간
 
 permissions:
   contents: read

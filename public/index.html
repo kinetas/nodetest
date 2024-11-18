@@ -32,6 +32,8 @@
                 body: JSON.stringify({ u_id, u_password }),
             })
             .then(response => response.json())
+
+            // 쿠키
             .then(data => {
                 if (data.message === 'Login successful') {
                     sessionStorage.setItem('user_id', u_id);//로그인 성공시 사용자 ID sessionStorage에 저장
@@ -40,6 +42,16 @@
                 document.getElementById('result').textContent = data.message; // 오류 메시지 출력
                 }
             })
+
+            // // ======== 수정 JWT ============
+            // .then(data => {
+            //     if (data.token) {
+            //         localStorage.setItem('token', data.token); // 토큰 저장
+            //         window.location.href = '/dashboard';
+            //     } else {
+            //         document.getElementById('result').textContent = data.message;
+            //     }
+            // })
             .catch((error) => {
                 console.error('Error:', error);
                 document.getElementById('result').textContent = `로그인 중 오류 (${error})가 발생했습니다.`;

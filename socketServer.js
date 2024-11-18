@@ -104,15 +104,21 @@ app.use('/mission', missionRoutes);
 
 // 소켓 연결 처리
 io.on('connection', (socket) => {
-  console.log('A user connected'); // 클라이언트가 연결되었을 때 로그 출력
+  console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
 
   socket.on('createRoom', (roomName) => {
     chatController.createRoom(socket, roomName); // 방 생성 처리
   });
 
   socket.on('joinRoom', (data) => {
-    chatController.joinRoom(socket, data); // 방 참가 처리
-  });
+    chatController.joinRoom(socket, data, (error, result) => {
+        if (error) {
+            console.error(`Failed to join room: ${error.message}`);
+        } else {
+            console.log(`User ${result.u1_id} successfully joined room ${result.r_id}`);
+        }
+    });
+});
 
   socket.on('sendMessage', async (data) => {
     console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)

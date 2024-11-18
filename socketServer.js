@@ -49,11 +49,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async (data) => {
+    if (!data.message || !data.r_id || !data.u1_id || !data.u2_id) {
+      console.error('Missing required fields:', data);
+      socket.emit('errorMessage', 'Required fields are missing.');
+      return;
+    }
     try {
       //소켓 서버에서 API 서버로 HTTP 요청 전송
       const response = await axios.post('http://localhost:3000/api/messages', {
         message: data.message,
-        roomId: data.roomId,
+        r_id: data.r_id,
         u1_id: data.u1_id,
         u2_id: data.u2_id,
       });
@@ -68,7 +73,7 @@ io.on('connection', (socket) => {
   */
 
  // 4. API 서버로부터의 응답을 소켓 서버가 받아 클라이언트로 전송
-  io.to(data.roomId).emit('receiveMessage', response.data);
+  io.to(data.r_id).emit('receiveMessage', response.data);
 } catch (error) {
   console.error('Error sending message to API server:', error);
   socket.emit('errorMessage', 'Failed to send message');

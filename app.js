@@ -41,6 +41,10 @@ app.use(express.static('public'));
 app.post('/api/messages', (req, res) => {
     const { u1_id, u2_id, r_id, message_contents } = req.body;
     // DB에 메시지 저장 로직 추가
+    if (!u1_id || !u2_id || !r_id || !message_contents) {
+        console.error('Missing required fields:', { u1_id, u2_id, r_id, message_contents });
+        return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
+    }
     db.query(
         'INSERT INTO r_message (u1_id, u2_id, r_id, message_contents, send_date) VALUES (?, ?, ?, ?, NOW())',
         [u1_id, u2_id, r_id, message_contents],
@@ -52,7 +56,7 @@ app.post('/api/messages', (req, res) => {
 
             // DB에 성공적으로 저장된 경우
             res.json({
-                roomId: r_id,
+                r_id: r_id,
                 message: message_contents,
                 send_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 u1_id: u1_id,

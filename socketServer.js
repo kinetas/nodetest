@@ -49,6 +49,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async (data) => {
+    const { u1_id, u2_id, r_id, message } = data;
     if (!data.message || !data.r_id || !data.u1_id || !data.u2_id) {
       console.error('Missing required fields:', data);
       socket.emit('errorMessage', 'Required fields are missing.');
@@ -73,11 +74,12 @@ io.on('connection', (socket) => {
   */
 
  // 4. API 서버로부터의 응답을 소켓 서버가 받아 클라이언트로 전송
-  io.to(data.r_id).emit('receiveMessage', response.data);
-} catch (error) {
-  console.error('Error sending message to API server:', error);
-  socket.emit('errorMessage', 'Failed to send message');
-}
+    io.to(data.r_id).emit('receiveMessage', response.data);
+    } 
+    catch (error) {
+      console.error('Error sending message to API server:', error);
+      socket.emit('errorMessage', 'Failed to send message');
+    }
 });
 
   socket.on('disconnect', () => {

@@ -57,7 +57,7 @@ app.post('/api/messages', (req, res) => {
             // DB에 성공적으로 저장된 경우
             res.json({
                 r_id: r_id,
-                message: message_contents,
+                message_contents: message_contents,
                 send_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
                 u1_id: u1_id,
                 u2_id: u2_id

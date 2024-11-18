@@ -49,16 +49,16 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async (data) => {
-    const { message, r_id, u1_id, u2_id } = data;
-    if (!data.message || !data.r_id || !data.u1_id || !data.u2_id) {
-      console.error('Missing required fields:', data);
-      socket.emit('errorMessage', 'Required fields are missing.');
+    const { message_contents, r_id, u1_id, u2_id } = data;
+    if (!message_contents || !r_id || !u1_id || !u2_id) {
+      console.error('소켓 서버에서 필수 값 누락:', data);
+      socket.emit('errorMessage', '필수 값이 누락되었습니다.');
       return;
     }
     try {
       //소켓 서버에서 API 서버로 HTTP 요청 전송
       const response = await axios.post('http://localhost:3000/api/messages', {
-        message: data.message,
+        message_contents: data.message_contents,
         r_id: data.r_id,
         u1_id: data.u1_id,
         u2_id: data.u2_id,

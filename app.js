@@ -37,6 +37,7 @@ app.use(session({
 // Static folder to serve the HTML file
 app.use(express.static('public'));
 
+/*
 // 메시지 저장을 처리하는 API 엔드포인트 추가
 app.post('/api/messages', (req, res) => {
     const { u1_id, u2_id, r_id, message_contents } = req.body;
@@ -66,6 +67,8 @@ app.post('/api/messages', (req, res) => {
         }
     );
 });
+*/
+
 
 // �꽭�뀡 �씤利� 誘몃뱾�썾�뼱
 const requireAuth = (req, res, next) => {

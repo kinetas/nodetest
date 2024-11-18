@@ -50,11 +50,25 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', async (data) => {
     const { message_contents, r_id, u1_id, u2_id } = data;
+    // if (!message_contents || !r_id || !u1_id || !u2_id) {
+    //   console.error(`소켓 서버에서 필수 값 누락 :`, data);
+    //   socket.emit('errorMessage', '필수 값이 누락되었습니다.');
+    //   return;
+    // }
+
     if (!message_contents || !r_id || !u1_id || !u2_id) {
-      console.error(`소켓 서버에서 필수 값 누락 :`, data);
-      socket.emit('errorMessage', '필수 값이 누락되었습니다.');
+      let missingFields = [];
+      
+      if (!message_contents) missingFields.push('message_contents');
+      if (!r_id) missingFields.push('r_id');
+      if (!u1_id) missingFields.push('u1_id');
+      if (!u2_id) missingFields.push('u2_id');
+      
+      console.error(`소켓 서버에서 필수 값 누락: ${missingFields.join(', ')}`);
+      socket.emit('errorMessage', `필수 값이 누락되었습니다: ${missingFields.join(', ')}`);
       return;
     }
+
     try {
       //소켓 서버에서 API 서버로 HTTP 요청 전송
       const response = await axios.post('http://localhost:3000/api/messages', {

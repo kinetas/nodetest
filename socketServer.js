@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', async (data) => {
     const { message_contents, r_id, u1_id, u2_id } = data;
     if (!message_contents || !r_id || !u1_id || !u2_id) {
-      console.error(`소켓 서버에서 필수 값 누락 (${error}):`, data);
+      console.error(`소켓 서버에서 필수 값 누락 :`, data);
       socket.emit('errorMessage', '필수 값이 누락되었습니다.');
       return;
     }

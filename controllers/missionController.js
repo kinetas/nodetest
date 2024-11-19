@@ -6,6 +6,8 @@ const resultController = require('./resultController'); // resultController 가�
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
+// const jwt = require('jsonwebtoken'); // JWT 추가
+
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
     const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
@@ -53,6 +55,40 @@ exports.createMission = async (req, res) => {
     }
 };
 
+// // 미션 생성 함수도 JWT 기반으로 변경
+// exports.createMission = async (req, res) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) {
+//         return res.status(401).json({ message: '로그인이 필요합니다.' });
+//     }
+
+//     try {
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         const u1_id = decoded.id; // 토큰에서 u1_id 추출
+//         const { u2_id, m_title, m_deadline, m_reword } = req.body;
+
+//         const missionId = uuidv4();
+//         if (!uuidValidate(missionId)) {
+//             return res.status(500).json({ message: '유효하지 않은 UUID 생성' });
+//         }
+
+//         await Mission.create({
+//             m_id: missionId,
+//             u1_id,
+//             u2_id,
+//             m_title,
+//             m_deadline,
+//             m_reword,
+//             m_status: '진행중',
+//         });
+
+//         res.json({ message: '미션이 성공적으로 생성되었습니다.' });
+//     } catch (error) {
+//         res.status(500).json({ message: '미션 생성 중 오류가 발생했습니다.' });
+//     }
+// };
+
+
 // 미션 삭제 함수
 exports.deleteMission = async (req, res) => {
     const { m_id } = req.body;
@@ -94,6 +130,28 @@ exports.getUserMissions = async (req, res) => {
         res.status(500).json({ message: '미션 리스트를 불러오는데 실패했습니다.' });
     }
 };
+
+// // ===== JWT 기반 미션 조회 =====
+// exports.getUserMissions = async (req, res) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) {
+//         return res.status(401).json({ message: '로그인이 필요합니다.' });
+//     }
+
+//     try {
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         const userId = decoded.id;
+
+//         const missions = await Mission.findAll({
+//             where: { u1_id: userId },
+//         });
+
+//         res.json({ missions });
+//     } catch (error) {
+//         return res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
+//     }
+// };
+
 
 // 미션 성공 처리 함수
 exports.successMission = async (req, res) => {

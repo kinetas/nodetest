@@ -1,6 +1,8 @@
 const IFriend = require('../models/i_friendModel'); // i_friend 모델
 const TFriend = require('../models/t_friendModel'); // t_friend 모델
 
+// const jwt = require('jsonwebtoken'); // JWT 추가
+
 // i_friend 테이블의 f_id 리스트 출력
 exports.printIFriend = async (req, res) => {
     try {
@@ -149,6 +151,25 @@ exports.friendRequestSend = async (req, res) => {
         res.status(500).json({ success: false, message: `친구 요청 전송 중 오류 (${error.message})가 발생했습니다.` });
     }
 };
+
+// // ===== JWT 기반 친구 요청 =====
+// exports.friendRequestSend = async (req, res) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) {
+//         return res.status(401).json({ message: '로그인이 필요합니다.' });
+//     }
+
+//     try {
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         const u_id = decoded.id;
+//         const { f_id } = req.body;
+
+//         // 친구 요청 로직
+//         res.json({ message: '친구 요청이 성공적으로 전송되었습니다.' });
+//     } catch (error) {
+//         res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
+//     }
+// };
 
 
 // 친구 요청 수락 함수

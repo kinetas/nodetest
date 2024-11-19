@@ -1,6 +1,8 @@
 const User = require('../models/userModel'); // User 모델 불러오기
 const { hashPassword } = require('../utils/passwordUtils'); // 비밀번호 해시 함수 불러오기
 
+// const jwt = require('jsonwebtoken'); // JWT 추가
+
 // 아이디 찾기 함수
 exports.findUid = async (req, res) => {
     const { name, nickname, birthdate, email } = req.body;
@@ -54,3 +56,22 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 };
+
+// // ===== JWT 기반 비밀번호 변경 =====
+// exports.changePassword = async (req, res) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) {
+//         return res.status(401).json({ message: '로그인이 필요합니다.' });
+//     }
+
+//     try {
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         const userId = decoded.id;
+//         const { newPassword } = req.body;
+
+//         // 비밀번호 변경 로직
+//         res.json({ message: '비밀번호가 성공적으로 변경되었습니다.' });
+//     } catch (error) {
+//         res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
+//     }
+// };

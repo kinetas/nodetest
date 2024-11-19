@@ -2,6 +2,8 @@ const db = require('../config/db');
 const RMessage = require('../models/messageModel');
 const Room = require('../models/roomModel');
 
+// const jwt = require('jsonwebtoken'); // JWT 추가
+
 exports.createRoom = (socket, roomName) => {
   const r_id = Math.random().toString(36).substr(2, 9);
   const u1_id = socket.handshake.query.u1_id;//클라이언트에서 전달된 user ID
@@ -40,6 +42,25 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
     console.error('Error joining room with Sequelize:', error);
   }
 };
+
+// // ===== JWT 기반 채팅방 참여 =====
+// exports.joinRoom = (req, res) => {
+//   const token = req.headers.authorization?.split(' ')[1];
+//   if (!token) {
+//       return res.status(401).json({ message: '로그인이 필요합니다.' });
+//   }
+
+//   try {
+//       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//       const userId = decoded.id;
+
+//       const { roomId } = req.body;
+//       // 참여 로직
+//       res.json({ message: `User ${userId} joined room ${roomId}` });
+//   } catch (error) {
+//       res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
+//   }
+// };
 
 exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성

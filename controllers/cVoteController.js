@@ -4,6 +4,8 @@ const CVote = require('../models/comunity_voteModel');
 const c_v_notdup = require('../models/c_v_not_dupModel'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
+// const jwt = require('jsonwebtoken'); // JWT 추가
+
 
 // 투표 리스트 가져오기
 exports.getVotes = async (req, res) => {
@@ -22,6 +24,23 @@ exports.getVotes = async (req, res) => {
         res.status(500).json({ success: false, message: "투표 정보를 가져오는데 실패했습니다." });
     }
 };
+
+// // ===== JWT 기반으로 변경 =====
+// exports.getVotes = async (req, res) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) {
+//         return res.status(401).json({ message: '로그인이 필요합니다.' });
+//     }
+
+//     try {
+//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//         // Fetch 투표 리스트
+//         res.json({ votes: [], user: decoded });
+//     } catch (error) {
+//         res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
+//     }
+// };
+
 exports.getMyVotes = async (req, res) => {
     const u_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
     try {

@@ -23,8 +23,23 @@
     <button onclick="createVote()">투표 생성</button>
 
     <script>
+
+        // // JWT 토큰 가져오기
+        // const token = localStorage.getItem('jwt');
+        // if (!token) {
+        //     alert("로그인이 필요합니다.");
+        //     window.location.href = '/';
+        // }
+
         function loadVotes() {
             fetch('/api/cVote')
+
+            // fetch('/api/cVote', {
+            //     method: 'GET',
+            //     headers: {
+            //         Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
+            //     }
+            // })
                 .then(response => response.json())
                 .then(data => {
                     const voteList = document.getElementById('voteList');
@@ -49,6 +64,13 @@
 
         function loadMyVotes() {
             fetch('/api/cVote/myVotes')
+
+            // fetch('/api/cVote/myVotes', {
+            //     method: 'GET',
+            //     headers: {
+            //         Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
+            //     }
+            // })
                 .then(response => response.json())
                 .then(data => {
                     const myVoteList = document.getElementById('myVoteList');
@@ -78,6 +100,12 @@
             fetch('/api/cVote/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+
+                // headers: {
+                //     'Content-Type': 'application/json',
+                //     Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
+                // },
+
                 body: JSON.stringify({ c_title, c_contents })
             })
                 .then(response => response.json())
@@ -96,6 +124,12 @@
             fetch('/api/cVote/action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+
+                // headers: {
+                //     'Content-Type': 'application/json',
+                //     Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
+                // },
+
                 body: JSON.stringify({ c_number, action })
             })
                 .then(response => response.json())
@@ -111,6 +145,14 @@
 
         function deleteVote(c_number) {
             fetch(`/api/cVote/delete/${c_number}`, { method: 'DELETE' })
+
+            // fetch(`/api/cVote/delete/${c_number}`, {
+            //     method: 'DELETE',
+            //     headers: {
+            //         Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
+            //     }
+            // })
+
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

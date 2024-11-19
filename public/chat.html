@@ -15,7 +15,7 @@
 
     <h1>방 미션 출력</h1>
     <div>
-        <input type="text" id="u2_id_input" placeholder="상대방 ID 입력">
+        <input type="text" id="u2_id_input" placeholder="상대방 ID 입력"    >
         <button onclick="printRoomMission()">방 미션 출력</button>
     </div>
     <h2>미션 목록</h2>
@@ -23,6 +23,14 @@
     
 
     <script>
+
+        // // JWT 기반 인증 수정: 토큰 가져오기
+        // const token = localStorage.getItem('jwt');
+        // if (!token) {
+        //     alert("로그인이 필요합니다.");
+        //     window.location.href = '/';
+        // }
+        
         // URL에서 roomId 가져오기
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('r_id'); // URL 파라미터에서 roomId 추출
@@ -35,13 +43,19 @@
             socket.emit("joinRoom", { r_id: roomId });
         });
 
+        // // =========== 수정 JWT =============
+        // socket.on("connect", () => {
+        //     console.log("서버에 연결되었습니다.");
+        //     socket.emit("joinRoom", { r_id: roomId }); // JWT 인증 후 방 입장
+        // });
+
         socket.on("receiveMessage", (data) => {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
             messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;
             chatMessages.appendChild(messageElement);
         });
-
+        
         function sendMessage() {
             // 메시지 입력 필드를 불러오기
             const messageInput = document.getElementById("messageInput");
@@ -52,7 +66,7 @@
             const message = messageInput.value;
 
             // 로그인된 사용자 ID 가져오기
-            const u1_id = sessionStorage.getItem('user_id');
+            const u1_id = sessionStorage.getItem('user_id'); // =========== 수정 JWT ui_id 제거 =============
             const urlParams = new URLSearchParams(window.location.search);
             const r_id = urlParams.get('r_id');
             const u2_id = urlParams.get('u2_id');
@@ -65,8 +79,22 @@
                 alert("메시지를 입력하세요.");
                 return;
             }
+
+            // // =========== 수정 JWT =============
+            // if (!message.trim()) {
+            //     alert("메시지를 입력하세요.");
+            //     return;
+            // }
+
             // 메시지 전송
             socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
+
+            // // =========== 수정 JWT =============
+            // if (!message.trim()) {
+            //     alert("메시지를 입력하세요.");
+            //     return;
+            // }
+
             // 메시지 입력란 비우기
             messageInput.value = "";
         }
@@ -79,6 +107,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    // Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
                 },
                 body: JSON.stringify({ u2_id }),
             })

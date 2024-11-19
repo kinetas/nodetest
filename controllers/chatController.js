@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const RMessage = require('../models/messageModel');
+const { sequelize } = require('../models/messageModel');
 const Room = require('../models/roomModel');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
@@ -65,7 +66,10 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
 exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
   const send_date = new Date(); // 현재 시간
-
+  if (!r_id || !u1_id ||!u2_id ||!message) {
+    console.error('Missing r_id or u1_id:', { r_id, u1_id,u2_id,message });
+    return;
+  }
   try {
       // 메시지 저장
       const newMessage = await RMessage.create({
@@ -73,8 +77,8 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
           u2_id,
           r_id,
           message_num,
-          message_contents: message,
-          send_date
+          send_date,
+          message_contents: message
       });
 
       // 성공적으로 저장된 경우 콘솔 로그

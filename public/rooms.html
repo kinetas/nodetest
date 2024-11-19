@@ -30,8 +30,17 @@
     <button onclick="deleteRoom()">방 삭제</button>
 
     <script>
+
+        // // JWT 토큰 가져오기
+        // const token = localStorage.getItem('jwt');
+        // if (!token) {
+        //     alert("로그인이 필요합니다.");
+        //     window.location.href = '/'; // 로그인 페이지로 리디렉션
+        // }
+
         const socket = io("http://13.124.126.234:3001",{
             path: '/socket.io'
+            // auth: { token }, // JWT 토큰을 소켓 인증에 추가
         });
         socket.on("connect", () => {
             console.log("서버에 연결되었습니다.");
@@ -45,6 +54,15 @@
         }
         // 페이지 로드 시 방 목록 가져오기
         fetch('/api/rooms')
+
+        // // 방 목록 가져오기
+        // fetch('/api/rooms', {
+        //     method: 'GET',
+        //     headers: {
+        //         Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+        //     },
+        // })
+
             .then(response => response.json())
             .then(data => {
                 const roomListElement = document.getElementById('roomList');
@@ -82,6 +100,12 @@
             fetch('/api/rooms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+
+                // headers: {
+                //     'Content-Type': 'application/json',
+                //     Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+                // },
+
                 body: JSON.stringify({ u1_id: userId, u2_id })
                 // body: JSON.stringify({ u1_id: userId, u2_id, r_type }) // r_type 추가 <!-- 수정 -->
             })
@@ -98,6 +122,12 @@
             fetch(`/api/rooms/${u2_id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
+
+                // headers: {
+                //     'Content-Type': 'application/json',
+                //     Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+                // },
+
                 body: JSON.stringify({ u1_id }) // u1_id 포함
             })
             .then(response => response.json())

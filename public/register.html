@@ -38,6 +38,24 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('result').textContent = data.message;
+
+                // if (data.success) {
+                //     // 회원가입 성공 시 JWT 저장 및 리디렉션
+                //     // 기존 메시지 출력만 주석 처리
+                //     // document.getElementById('result').textContent = data.message;
+
+                //     // ======== JWT 기반 인증 처리 추가 ============
+                //     if (data.token) {
+                //         localStorage.setItem('jwt', data.token); // JWT 저장
+                //         alert('회원가입이 성공적으로 완료되었습니다.');
+                //         window.location.href = '/dashboard'; // 대시보드로 리디렉션
+                //     } else {
+                //         document.getElementById('result').textContent = '회원가입은 성공했지만, 인증 토큰이 없습니다.';
+                //     }
+                // } else {
+                //     // 회원가입 실패 시 메시지 출력
+                //     document.getElementById('result').textContent = data.message;
+                // }
             })
             .catch((error) => {
                 console.error('Error:', error);

@@ -73,8 +73,8 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
           u2_id,
           r_id,
           message_num,
-          message_contents: message,
-          send_date
+          send_date,
+          message_contents: message
       });
 
       // 성공적으로 저장된 경우 콘솔 로그

@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const RMessage = require('../models/messageModel');
+const { sequelize } = require('../models/messageModel');
 const Room = require('../models/roomModel');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가

@@ -34,7 +34,7 @@
         // URL에서 roomId 가져오기
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('r_id'); // URL 파라미터에서 roomId 추출
-        const socket = io("http://13.124.126.234:3001",{
+        const socket = io("http://54.180.54.31:3001",{
             path: '/socket.io'
         });
 

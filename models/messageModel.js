@@ -58,9 +58,13 @@ const RMessage = sequelize.define('RMessage', {
     allowNull: true,
   },
   message_contents: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-    },
+    type: DataTypes.STRING(100),
+    allowNull: true,
+  },
+  image: {
+    type: DataTypes.BLOB,
+    allowNull: true,
+  },
 }, {
   tableName: 'r_message',
   timestamps: false,

@@ -6,6 +6,7 @@ const missionRoutes = require('./routes/missionRoutes'); // 誘몄뀡 �씪��
 const roomRoutes = require('./routes/roomRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const cVoteRoutes = require('./routes/cVoteRoutes');
+const cMissionRoutes = require('./routes/c_missionRoutes');
 const db = require('./config/db');
 const app = express();
 const PORT = 3000;
@@ -87,6 +88,9 @@ app.get('/dashboard', requireAuth, (req, res) => {
     // const userId = req.session.user.id;
     // res.json({ userId });
 });
+app.get('/community_missions', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'community_missions.html')); // community-missions.html 페이지 경로
+});
 
 // �쑀��� �젙蹂대�� 諛섑솚�븯�뒗 �씪�슦�듃 異붽��
 app.get('/user-info', requireAuth, (req, res) => {
@@ -130,6 +134,7 @@ app.use('/api/missions', missionRoutes); // 미션 관련 라우트 등록
 // 친구 리스트 라우트 추가
 app.use('/dashboard/friends', friendRoutes);
 app.use('/api/cVote', cVoteRoutes);
+app.use('/api/c_missions', cMissionRoutes);
 
 // // ======== 수정 JWT ============
 // // JWT 인증 미들웨어로 보호된 라우트

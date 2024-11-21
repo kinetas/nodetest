@@ -18,7 +18,7 @@
         // 미션 생성
         function createCommunityMission() {
             const cr_title = document.getElementById('cr_title').value;
-            fetch('/api/scomumunity_missions/create', {
+            fetch('/api/comumunity_missions/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cr_title })
@@ -30,7 +30,7 @@
 
         // 미션 수락
         function acceptCommunityMission(cr_num) {
-            fetch('/api/scomumunity_missions/accept', {
+            fetch('/api/comumunity_missions/accept', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ cr_num })

@@ -1,4 +1,4 @@
-const CRoom = require('../models/comunity_room'); // comunity_room 모델 가져오기
+const CRoom = require('../models/comunity_roomModel'); // comunity_room 모델 가져오기
 const Room = require('../models/roomModel'); // room 모델
 const Mission = require('../models/missionModel'); // mission 모델
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');

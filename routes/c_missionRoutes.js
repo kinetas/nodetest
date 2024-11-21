@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { createCommunityMission, acceptCommunityMission, deleteCommunityMission } = require('../controllers/c_missionController');
 const requireAuth = require('../middleware/authMiddleware'); // 인증 미들웨어
-const CRoom = require('../models/comunity_room');
+const CRoom = require('../models/comunity_roomModel');
 
 router.post('/create', requireAuth, createCommunityMission);
 router.post('/accept', requireAuth, acceptCommunityMission);

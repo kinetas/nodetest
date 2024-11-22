@@ -44,7 +44,7 @@ exports.acceptCommunityMission = async (req, res) => {
             u1_id: mission.u_id, 
             u2_id, 
             r_id: uuidv4(), 
-            r_title: `${mission.cr_num}-${u2_id}`, 
+            r_title: `${mission.u_id}-${u2_id}`, 
             r_type: 'open' 
         });
 
@@ -53,12 +53,15 @@ exports.acceptCommunityMission = async (req, res) => {
         const newMissionId2 = uuidv4();
         const missionTitle = mission.cr_title;
 
+        const currentDate = new Date();
+        const deadline = new Date(currentDate.setDate(currentDate.getDate() + 3));
+
         await Mission.create({
             m_id: newMissionId1,
             u1_id: mission.u_id,
             u2_id,
             m_title: missionTitle,
-            m_deadline: null,
+            m_deadline: deadline,
             m_reword: null,
             m_status: '진행중'
         });
@@ -68,7 +71,7 @@ exports.acceptCommunityMission = async (req, res) => {
             u1_id: u2_id,
             u2_id: mission.u_id,
             m_title: missionTitle,
-            m_deadline: null,
+            m_deadline: deadline,
             m_reword: null,
             m_status: '진행중'
         });
@@ -101,5 +104,55 @@ exports.deleteCommunityMission = async (req, res) => {
     } catch (error) {
         console.error('커뮤니티 미션 삭제 오류:', error);
         res.status(500).json({ success: false, message: '커뮤니티 미션 삭제 중 오류가 발생했습니다.' });
+    }
+};
+exports.checkMissionStatus = async () => {
+    try {
+        // 진행 중인 커뮤니티 미션 조회
+        const missions = await CRoom.findAll({
+            where: {
+                cr_status: 'acc',
+                [Sequelize.Op.or]: [
+                    { m1_status: 0 },
+                    { m2_status: 0 }
+                ]
+            }
+        });
+
+        for (const mission of missions) {
+            // 만든 사람의 미션 상태 확인
+            const creatorMission = await Mission.findOne({
+                where: { u1_id: mission.u_id, u2_id:mission.u2_id }
+            });
+            if (creatorMission.m_status === '성공' || creatorMission.m_status === '실패') {
+                await mission.update({ m1_status: 1 });
+            }
+
+            // 수락한 사람의 미션 상태 확인
+            const accepterMission = await Mission.findOne({
+                where: { u1_id: mission.u2_id, u2_id:mission.u_id }
+            });
+            if (accepterMission.m_status === '성공' || accepterMission.m_status === '실패') {
+                await mission.update({ m2_status: 1 });
+            }
+
+            // m1_status와 m2_status가 모두 1이면 처리
+            if (mission.m1_status === 1 && mission.m2_status === 1) {
+                // 관련 데이터 삭제
+                await Room.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
+                await Mission.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
+                await CRoom.destroy({ where: { cr_num: mission.cr_num } });
+
+                // 결과 기록
+                await MResult.create({
+                    m_id: mission.cr_num,
+                    u_id: mission.u_id,
+                    m_deadline: new Date(),
+                    m_status: creatorMission.m_status === '성공' && accepterMission.m_status === '성공' ? '성공' : '실패'
+                });
+            }
+        }
+    } catch (error) {
+        console.error('미션 상태 감지 및 처리 오류:', error);
     }
 };

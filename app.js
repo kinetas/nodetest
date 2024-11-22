@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session'); //�꽭�뀡異붽��
+const cron = require('node-cron');
 const path = require('path');
 const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��졇�삤湲�
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄뀡 �씪�슦�듃 遺덈윭�삤湲�
@@ -7,6 +8,7 @@ const roomRoutes = require('./routes/roomRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const cVoteRoutes = require('./routes/cVoteRoutes');
 const c_missionRoutes = require('./routes/c_missionRoutes');
+const { checkMissionStatus } = require('./controllers/c_missionController');
 const db = require('./config/db');
 const app = express();
 const PORT = 3000;
@@ -135,6 +137,10 @@ app.use('/api/missions', missionRoutes); // 미션 관련 라우트 등록
 app.use('/dashboard/friends', friendRoutes);
 app.use('/api/cVote', cVoteRoutes);
 app.use('/api/comumunity_missions', c_missionRoutes);
+cron.schedule('0 0 * * *', () => {
+    console.log('미션 상태 확인 및 처리 시작');
+    checkMissionStatus();
+});
 
 // // ======== 수정 JWT ============
 // // JWT 인증 미들웨어로 보호된 라우트

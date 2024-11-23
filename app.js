@@ -137,7 +137,7 @@ app.use('/api/missions', missionRoutes); // 미션 관련 라우트 등록
 app.use('/dashboard/friends', friendRoutes);
 app.use('/api/cVote', cVoteRoutes);
 app.use('/api/comumunity_missions', c_missionRoutes);
-cron.schedule('0 0 * * *', () => {
+cron.schedule('* * * * *', () => {
     console.log('미션 상태 확인 및 처리 시작');
     checkMissionStatus();
 });

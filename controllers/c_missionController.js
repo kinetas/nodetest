@@ -1,6 +1,8 @@
 const CRoom = require('../models/comunity_roomModel'); // comunity_room 모델 가져오기
 const Room = require('../models/roomModel'); // room 모델
 const Mission = require('../models/missionModel'); // mission 모델
+const Sequelize = require('sequelize');
+const { sequelize } = require('../models/comunity_roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 // 첫 번째 조건: 커뮤니티 미션 생성
@@ -34,6 +36,9 @@ exports.acceptCommunityMission = async (req, res) => {
 
         if (mission.u_id === u2_id) {
             return res.status(403).json({ success: false, message: '본인이 생성한 미션은 수락할 수 없습니다.' });
+        }
+        if(mission.cr_status == 'acc'){
+            return res.status(403).json({ success: false, message: '이미 수락된 미션입니다.' });
         }
 
         // 커뮤니티 미션 업데이트
@@ -140,7 +145,6 @@ exports.checkMissionStatus = async () => {
             if (mission.m1_status === 1 && mission.m2_status === 1) {
                 // 관련 데이터 삭제
                 await Room.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
-                await Mission.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
                 await CRoom.destroy({ where: { cr_num: mission.cr_num } });
 
                 // 결과 기록

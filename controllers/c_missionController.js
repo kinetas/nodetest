@@ -146,6 +146,7 @@ exports.checkMissionStatus = async () => {
             if (mission.m1_status === 1 && mission.m2_status === 1) {
                 // 관련 데이터 삭제
                 await Room.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
+                await Room.destroy({ where: { u1_id: mission.u_id, u2_id:mission.u2_id } });
                 await CRoom.destroy({ where: { cr_num: mission.cr_num } });
 
                 // 결과 기록

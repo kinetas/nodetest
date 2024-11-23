@@ -1,6 +1,7 @@
 const CRoom = require('../models/comunity_roomModel'); // comunity_room 모델 가져오기
 const Room = require('../models/roomModel'); // room 모델
 const Mission = require('../models/missionModel'); // mission 모델
+const MResult = require('../models/m_resultModel');
 const Sequelize = require('sequelize');
 const { sequelize } = require('../models/comunity_roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');

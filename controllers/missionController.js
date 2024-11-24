@@ -12,6 +12,7 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 exports.createMission = async (req, res) => {
     const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
 
+
     // 필수 값 검증
     if (!u2_id) {
         return res.json({ success: false, message: '받는 사용자 ID는 필수 항목입니다.' });
@@ -20,6 +21,7 @@ exports.createMission = async (req, res) => {
     try {
         // u1_id와 u2_id 조합의 Room이 존재하는지 확인
         const roomExists = await Room.findOne({ where: { u1_id, u2_id } });
+        
         
         if (!roomExists) {
             return res.json({ success: false, message: '미션을 생성하기 전에 방이 존재해야 합니다.' });

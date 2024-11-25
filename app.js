@@ -9,6 +9,7 @@ const friendRoutes = require('./routes/friendRoutes');
 const cVoteRoutes = require('./routes/cVoteRoutes');
 const c_missionRoutes = require('./routes/c_missionRoutes');
 const { checkMissionStatus } = require('./controllers/c_missionController');
+const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
 const app = express();
 const PORT = 3000;
@@ -140,6 +141,12 @@ app.use('/api/comumunity_missions', c_missionRoutes);
 cron.schedule('0 0 * * *', () => {
     console.log('미션 상태 확인 및 처리 시작');
     checkMissionStatus();
+});
+
+// 미션 마감기한 확인
+cron.schedule('0 0 * * *', () => { // 매일 자정 실행
+    console.log('마감 기한 확인 작업 시작');
+    checkMissionDeadline();
 });
 
 // // ======== 수정 JWT ============

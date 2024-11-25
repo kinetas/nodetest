@@ -250,3 +250,31 @@ exports.printRoomMission = async (req, res) => {
         res.status(500).json({ success: false, message: '미션 조회 중 오류가 발생했습니다.', error: error.message });
     }
 };
+
+
+// 마감 기한 확인 및 미션 상태 업데이트 함수
+exports.checkMissionDeadline = async () => {
+    try {
+        // 현재 시간 가져오기
+        const now = new Date();
+
+        // 마감 기한이 지난 미션 조회
+        const expiredMissions = await Mission.findAll({
+            where: {
+                m_deadline: {
+                    [Op.lt]: now, // 현재 시간보다 이전인 미션만 선택
+                },
+                m_status: '진행중', // 진행 중 상태인 미션만
+            },
+        });
+
+        // 각 미션의 상태를 '실패'로 업데이트
+        for (const mission of expiredMissions) {
+            await mission.update({ m_status: '실패' });
+        }
+
+        console.log(`마감 기한이 지난 ${expiredMissions.length}개의 미션 상태를 '실패'로 업데이트했습니다.`);
+    } catch (error) {
+        console.error('마감 기한 확인 및 상태 업데이트 오류:', error);
+    }
+};

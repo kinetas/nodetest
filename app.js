@@ -148,6 +148,7 @@ cron.schedule('0 0 * * *', () => {
 // app.use('/api/results', resultRoutes); // API 엔드포인트를 /api/results로 설정
 
 // 미션 마감기한 확인
+// cron.schedule('* * * * *', () => { // 매일 자정 실행
 cron.schedule('0 0 * * *', () => { // 매일 자정 실행
     console.log('마감 기한 확인 작업 시작');
     checkMissionDeadline();

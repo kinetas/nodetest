@@ -8,7 +8,7 @@ const roomRoutes = require('./routes/roomRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const cVoteRoutes = require('./routes/cVoteRoutes');
 const c_missionRoutes = require('./routes/c_missionRoutes');
-const resultRoutes = require('./routes/resultRoutes'); // resultRoute.js 가져오기
+// const resultRoutes = require('./routes/resultRoutes'); // resultRoutes.js 가져오기
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
@@ -145,7 +145,7 @@ cron.schedule('0 0 * * *', () => {
 });
 
 // 결과 관련 라우트 등록
-app.use('/api/results', resultRoutes); // API 엔드포인트를 /api/results로 설정
+// app.use('/api/results', resultRoutes); // API 엔드포인트를 /api/results로 설정
 
 // 미션 마감기한 확인
 cron.schedule('0 0 * * *', () => { // 매일 자정 실행

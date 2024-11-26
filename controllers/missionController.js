@@ -278,3 +278,8 @@ exports.checkMissionDeadline = async () => {
         console.error('마감 기한 확인 및 상태 업데이트 오류:', error);
     }
 };
+
+
+// 미션 상태 별 리스트 출력
+
+// 상태를 요청으로 변환

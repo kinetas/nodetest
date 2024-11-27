@@ -137,72 +137,20 @@ exports.getUserMissions = async (req, res) => {
 };
 
 //=====================================================================================
-// // 자신이 수행해야 할 미션 목록 (u2_id = userId)
-// exports.getAssignedMissions = async (req, res) => {
-//     try {
-//         const userId = req.session.user.id;
-
-//         const assignedMissions = await Mission.findAll({
-//             where: {
-//                 u2_id: userId, // 자신이 수행해야 할 미션
-//             },
-//         });
-
-//         res.json({ missions: assignedMissions });
-//     } catch (error) {
-//         console.error('자신이 수행해야 할 미션 조회 오류:', error);
-//         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
-//     }
-// };
-
-// // 자신이 부여한 미션 목록 (u1_id = userId)
-// exports.getCreatedMissions = async (req, res) => {
-//     try {
-//         const userId = req.session.user.id;
-
-//         const createdMissions = await Mission.findAll({
-//             where: {
-//                 u1_id: userId,
-//                 u2_id: {
-//                     [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
-//                 },
-//             },
-//         });
-
-//         res.json({ missions: createdMissions });
-//     } catch (error) {
-//         console.error('자신이 부여한 미션 조회 오류:', error);
-//         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
-//     }
-// };
-//=====================================================================================
-
 // 자신이 수행해야 할 미션 목록 (u2_id = userId)
 exports.getAssignedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
-        const assignedMissions = await sequelize.query(
-            `
-            SELECT m.m_title AS missionTitle, 
-                   m.m_deadline AS deadline, 
-                   m.m_status AS status, 
-                   r.r_title AS roomTitle, 
-                   cr.cr_title AS communityRoomTitle
-            FROM mission m
-            LEFT JOIN room r ON m.room_id = r.room_id
-            LEFT JOIN community_room cr ON m.community_room_id = cr.community_room_id
-            WHERE m.u2_id = :userId
-            `,
-            {
-                type: sequelize.QueryTypes.SELECT,
-                replacements: { userId },
-            }
-        );
+        const assignedMissions = await Mission.findAll({
+            where: {
+                u2_id: userId, // 자신이 수행해야 할 미션
+            },
+        });
 
         res.json({ missions: assignedMissions });
     } catch (error) {
-        console.error('수행해야 할 미션 조회 오류:', error);
+        console.error('자신이 수행해야 할 미션 조회 오류:', error);
         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
     }
 };
@@ -212,30 +160,82 @@ exports.getCreatedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
-        const createdMissions = await sequelize.query(
-            `
-            SELECT m.m_title AS missionTitle, 
-                   m.m_deadline AS deadline, 
-                   m.m_status AS status, 
-                   r.r_title AS roomTitle, 
-                   cr.cr_title AS communityRoomTitle
-            FROM mission m
-            LEFT JOIN room r ON m.room_id = r.room_id
-            LEFT JOIN community_room cr ON m.community_room_id = cr.community_room_id
-            WHERE m.u1_id = :userId
-            `,
-            {
-                type: sequelize.QueryTypes.SELECT,
-                replacements: { userId },
-            }
-        );
+        const createdMissions = await Mission.findAll({
+            where: {
+                u1_id: userId,
+                u2_id: {
+                    [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
+                },
+            },
+        });
 
         res.json({ missions: createdMissions });
     } catch (error) {
-        console.error('부여한 미션 조회 오류:', error);
+        console.error('자신이 부여한 미션 조회 오류:', error);
         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
     }
 };
+//=====================================================================================
+
+// // 자신이 수행해야 할 미션 목록 (u2_id = userId)
+// exports.getAssignedMissions = async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
+
+//         const assignedMissions = await sequelize.query(
+//             `
+//             SELECT m.m_title AS missionTitle, 
+//                    m.m_deadline AS deadline, 
+//                    m.m_status AS status, 
+//                    r.r_title AS roomTitle, 
+//                    cr.cr_title AS communityRoomTitle
+//             FROM mission m
+//             LEFT JOIN room r ON m.room_id = r.room_id
+//             LEFT JOIN community_room cr ON m.community_room_id = cr.community_room_id
+//             WHERE m.u2_id = :userId
+//             `,
+//             {
+//                 type: sequelize.QueryTypes.SELECT,
+//                 replacements: { userId },
+//             }
+//         );
+
+//         res.json({ missions: assignedMissions });
+//     } catch (error) {
+//         console.error('수행해야 할 미션 조회 오류:', error);
+//         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
+//     }
+// };
+
+// // 자신이 부여한 미션 목록 (u1_id = userId)
+// exports.getCreatedMissions = async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
+
+//         const createdMissions = await sequelize.query(
+//             `
+//             SELECT m.m_title AS missionTitle, 
+//                    m.m_deadline AS deadline, 
+//                    m.m_status AS status, 
+//                    r.r_title AS roomTitle, 
+//                    cr.cr_title AS communityRoomTitle
+//             FROM mission m
+//             LEFT JOIN room r ON m.room_id = r.room_id
+//             LEFT JOIN community_room cr ON m.community_room_id = cr.community_room_id
+//             WHERE m.u1_id = :userId
+//             `,
+//             {
+//                 type: sequelize.QueryTypes.SELECT,
+//                 replacements: { userId },
+//             }
+//         );
+
+//         res.json({ missions: createdMissions });
+//     } catch (error) {
+//         console.error('부여한 미션 조회 오류:', error);
+//         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+//     }
+// };
 
 
 

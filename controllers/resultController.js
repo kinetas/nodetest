@@ -1,5 +1,5 @@
 // controllers/resultController.js
-const Result = require('../models/m_resultModel'); // m_result 모델 가져오기
+const MResult = require('../models/m_resultModel'); // m_resultModel.js 연결
 const { Op } = require('sequelize');
 
 // m_result에 데이터 저장 함수
@@ -26,15 +26,15 @@ exports.getDailyAchievementRate = async (userId) => {
         const todayStart = new Date(now.setHours(0, 0, 0, 0));
         const todayEnd = new Date(now.setHours(23, 59, 59, 999));
 
-        const totalMissions = await db.models.Mission.count({
-            where: { userId },
+        const totalMissions = await MResult.count({
+            where: { u_id: userId },
         });
 
-        const completedMissions = await db.models.Mission.count({
+        const completedMissions = await MResult.count({
             where: {
-                userId,
-                status: 'completed',
-                deadline: { [Op.between]: [todayStart, todayEnd] },
+                u_id: userId,
+                m_status: 'completed',
+                m_deadline: { [Op.between]: [todayStart, todayEnd] },
             },
         });
 
@@ -55,15 +55,15 @@ exports.getWeeklyAchievementRate = async (userId) => {
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
 
-        const totalMissions = await db.models.Mission.count({
-            where: { userId },
+        const totalMissions = await MResult.count({
+            where: { u_id: userId },
         });
 
-        const completedMissions = await db.models.Mission.count({
+        const completedMissions = await MResult.count({
             where: {
-                userId,
-                status: 'completed',
-                deadline: { [Op.between]: [weekStart, weekEnd] },
+                u_id: userId,
+                m_status: 'completed',
+                m_deadline: { [Op.between]: [weekStart, weekEnd] },
             },
         });
 
@@ -81,15 +81,15 @@ exports.getMonthlyAchievementRate = async (userId) => {
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        const totalMissions = await db.models.Mission.count({
-            where: { userId },
+        const totalMissions = await MResult.count({
+            where: { u_id: userId },
         });
 
-        const completedMissions = await db.models.Mission.count({
+        const completedMissions = await MResult.count({
             where: {
-                userId,
-                status: 'completed',
-                deadline: { [Op.between]: [monthStart, monthEnd] },
+                u_id: userId,
+                m_status: 'completed',
+                m_deadline: { [Op.between]: [monthStart, monthEnd] },
             },
         });
 
@@ -107,15 +107,15 @@ exports.getYearlyAchievementRate = async (userId) => {
         const yearStart = new Date(now.getFullYear(), 0, 1);
         const yearEnd = new Date(now.getFullYear(), 11, 31);
 
-        const totalMissions = await db.models.Mission.count({
-            where: { userId },
+        const totalMissions = await MResult.count({
+            where: { u_id: userId },
         });
 
-        const completedMissions = await db.models.Mission.count({
+        const completedMissions = await MResult.count({
             where: {
-                userId,
-                status: 'completed',
-                deadline: { [Op.between]: [yearStart, yearEnd] },
+                u_id: userId,
+                m_status: 'completed',
+                m_deadline: { [Op.between]: [yearStart, yearEnd] },
             },
         });
 

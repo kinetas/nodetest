@@ -3,8 +3,6 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
-//const https = require('https');
-//const fs = require('fs');
 const cors = require('cors');
 
 const chatController = require('./controllers/chatController');
@@ -13,12 +11,10 @@ const authRoutes = require('./routes/authRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const missionRoutes = require('./routes/missionRoutes');
 const logger = require('./logger');
+const RMessage  = require('./models/messageModel');
 
 const app = express();
-const server = http.createServer(/*{
-  key: fs.readFileSync('/path/to/private-key.pem'),
-  cert: fs.readFileSync('/path/to/certificate.pem')
-},*/ app);
+const server = http.createServer(app);
 
 //socket.io 서버 초기화
 const io = socketIo(server, {
@@ -139,23 +135,23 @@ io.on('connection', (socket) => {
       return;
     }
 
-    try {
-      // 소켓 서버에서 API 서버로 HTTP 요청 전송
-      const response = await axios.post('http://54.180.54.31:3000/api/messages', {
-        message_contents,
-        r_id,
-        u1_id,
-        u2_id,
-      });
-      console.log('API Response:', response.data); // API 서버 응답 출력 (수정된 부분)
+//    try {
+//      // 소켓 서버에서 API 서버로 HTTP 요청 전송
+//      const response = await axios.post('http://54.180.54.31:3000/api/messages', {
+//        message_contents,
+//        r_id,
+//        u1_id,
+//        u2_id,
+//      });
+//      console.log('API Response:', response.data); // API 서버 응답 출력 (수정된 부분)
 
       // API 서버 응답을 해당 방에 있는 클라이언트들에게 전송
-      io.to(r_id).emit('receiveMessage', response.data); // io.to(r_id)를 사용하여 특정 방에 전송 (수정된 부분)
-    } catch (error) {
-      console.error('Axios Request Error:', error.response?.data || error.message); // 에러 로그 출력 (수정된 부분)
-      socket.emit('errorMessage', 'Failed to send message'); // 클라이언트로 에러 메시지 전송 (수정된 부분)
-    }
-  });
+//      io.to(r_id).emit('receiveMessage', response.data); // io.to(r_id)를 사용하여 특정 방에 전송 (수정된 부분)
+//    } catch (error) {
+//      console.error('Axios Request Error:', error.response?.data || error.message); // 에러 로그 출력 (수정된 부분)
+//      socket.emit('errorMessage', 'Failed to send message'); // 클라이언트로 에러 메시지 전송 (수정된 부분)
+//    }
+//  });
 
   /*socket.on('assignMission', (data) => {
     missionController.assignMission(io, socket, data); // 미션 할당 처리
@@ -166,39 +162,67 @@ io.on('connection', (socket) => {
   });*/
 
   // 클라이언트가 연결 해제되었을 때 처리
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
+//  socket.on('disconnect', () => {
+//    console.log('User disconnected');
+//  });
+//});
 
 // Sequelize를 사용하여 메시지 처리
-exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
-  const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
-  const send_date = new Date(); // 현재 시간
+//exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
+//  const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
+//  const send_date = new Date(); // 현재 시간
 
-  try {
-    // 메시지 저장
-    const newMessage = await RMessage.create({
-      u1_id,
-      u2_id,
-      r_id,
-      message_num,
-      message_contents: message,
-      send_date
-    });
-    console.log('Message saved to DB:', newMessage); // DB 저장 확인 로그 추가 (수정된 부분)
+//  try {
+//    // 메시지 저장
+//    const newMessage = await RMessage.create({
+//      u1_id,
+//      u2_id,
+//      r_id,
+//      message_num,
+//      message_contents: message,
+//      send_date
+//    });
+//    console.log('Message saved to DB:', newMessage); // DB 저장 확인 로그 추가 (수정된 부분)
 
     // 클라이언트에 메시지 전송
-    socket.emit('receiveMessage', { 
-      u1_id, 
-      message, 
-      send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') 
-    });
-  } catch (error) {
-    console.error('Error saving message to DB:', error.message); // DB 저장 실패 시 에러 로그 출력 (수정된 부분)
-  }
-};
+//    socket.emit('receiveMessage', { 
+//      u1_id, 
+//      message, 
+//      send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') 
+//    });
+//  } catch (error) {
+//    console.error('Error saving message to DB:', error.message); // DB 저장 실패 시 에러 로그 출력 (수정된 부분)
+//  }
+//};
 
+try {
+  // Sequelize를 사용하여 메시지 저장
+  const newMessage = await RMessage.create({
+    u1_id,
+    u2_id,
+    r_id,
+    message_contents,
+    send_date: new Date(), // 현재 시간 설정
+  });
+  console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
+
+  // 메시지를 해당 방에 있는 클라이언트들에게 전송
+  io.to(r_id).emit('receiveMessage', {
+    u1_id,
+    message_contents,
+    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' ')
+  });
+} catch (error) {
+  console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력
+  socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
+}
+});
+
+// 클라이언트가 연결 해제되었을 때 처리
+socket.on('disconnect', () => {
+console.log('User disconnected');
+});
+});
 
 server.listen(3001, () => {
   console.log('HTTP Server running on port 3001');

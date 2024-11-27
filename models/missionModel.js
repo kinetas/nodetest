@@ -34,10 +34,10 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
-  // r_id: {
-  //   type: DataTypes.INTEGER,
-  //   allowNull: true, // Room 연결이 선택적인 경우
-  // },
+  r_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true, // Room 연결이 선택적인 경우
+  },
   // cr_num: {
   //     type: DataTypes.INTEGER,
   //     allowNull: true, // CommunityRoom 연결이 선택적인 경우
@@ -49,7 +49,7 @@ const Mission = sequelize.define('Mission', {
 
 
 // // Room 관계
-// Mission.belongsTo(Room, { foreignKey: 'r_id', as: 'room' });
+Mission.belongsTo(Room, { foreignKey: 'r_id', as: 'room' });
 
 // // Community Room 관계
 // Mission.belongsTo(CRoom, { foreignKey: 'cr_num', as: 'communityRoom' });

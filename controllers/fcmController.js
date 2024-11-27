@@ -47,23 +47,33 @@ const sendFriendRejectNotification = async (token, senderId) => {
         body: `${senderId}님이 친구 요청을 거절했습니다.`,
     });
 };
+// 미션 생성 알림 함수
 const sendMissionCreateNotification = async (token, senderId) => {
     await sendNotification(token, {
-        title: '미션 성공',
-        body: `${senderId}님이 미션을 성공하였습니다.`,
+        title: '미션 생성 완료',
+        body: `${senderId}님이 미션을 생성하였습니다.`,
     });
 };
-
+// 미션 성공 알림 함수
 const sendMissionSuccessNotification = async (token, senderId) => {
     await sendNotification(token, {
         title: '미션 성공',
         body: `${senderId}님이 미션을 성공하였습니다.`,
     });
 };
-
+// 미션 실패 알림 함수
+const sendMissionFailureNotification = async (token, senderId) => {
+    await sendNotification(token, {
+        title: '미션 실패',
+        body: `${senderId}님이 미션을 실패하였습니다.`,
+    });
+};
 module.exports = {
     sendNotification,
     sendFriendRequestNotification,
     sendFriendAcceptNotification,
     sendFriendRejectNotification,
+    sendMissionCreateNotification,
+    sendMissionSuccessNotification,
+    sendMissionFailureNotification
 };

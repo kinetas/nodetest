@@ -2,11 +2,12 @@ const admin = require('firebase-admin');
 const path = require('path');
 
 // Firebase Admin 초기화 비밀키 발급받고 저장해야됨
-const serviceAccount = require(path.join(__dirname, 'path/to/serviceAccountKey.json'));
+//const serviceAccount = require(path.join(__dirname, 'path/to/serviceAccountKey.json'));
 
-admin.initializeApp({
+/*admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
+*/
 
 // 기본 알림 전송 함수
 const sendNotification = (token, payload) => {

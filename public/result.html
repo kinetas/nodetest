@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달성률</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>달성률</h1>
+    <div id="results">
+        <p>일일 달성률: <span id="dailyRate">로딩 중...</span>%</p>
+        <p>주간 달성률: <span id="weeklyRate">로딩 중...</span>%</p>
+        <p>월간 달성률: <span id="monthlyRate">로딩 중...</span>%</p>
+        <p>연간 달성률: <span id="yearlyRate">로딩 중...</span>%</p>
+    </div>
+    <script>
+        fetch('/result/daily')
+            .then(res => res.json())
+            .then(data => document.getElementById('dailyRate').textContent = data.dailyRate);
+
+        fetch('/result/weekly')
+            .then(res => res.json())
+            .then(data => document.getElementById('weeklyRate').textContent = data.weeklyRate);
+
+        fetch('/result/monthly')
+            .then(res => res.json())
+            .then(data => document.getElementById('monthlyRate').textContent = data.monthlyRate);
+
+        fetch('/result/yearly')
+            .then(res => res.json())
+            .then(data => document.getElementById('yearlyRate').textContent = data.yearlyRate);
+    </script>
+</body>
+</html>

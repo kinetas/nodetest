@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../SessionManager.dart'; // 세션 매니저 임포트
+import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저 임포트
 
 class AddFriendScreen extends StatefulWidget {
   @override
@@ -11,7 +11,7 @@ class AddFriendScreen extends StatefulWidget {
 class _AddFriendScreenState extends State<AddFriendScreen> {
   final TextEditingController friendIdController = TextEditingController();
   bool isLoading = false;
-  String? sessionId; // 세션 ID 저장
+  String? sessionCookie; // 세션 쿠키 저장
 
   @override
   void initState() {
@@ -20,27 +20,29 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   }
 
   Future<void> _initializeSession() async {
-    final sessionManager = SessionManager();
-    sessionId = await sessionManager.getSession(); // 세션 ID 가져오기
-
-    if (sessionId == null) {
+    sessionCookie = await SessionCookieManager.getSessionCookie(); // 세션 쿠키 가져오기
+    if (sessionCookie == null) {
       print("Session is invalid. Redirecting to login.");
-      Navigator.pushReplacementNamed(context, '/login'); // 로그인 화면으로 리디렉션
+      _redirectToLogin();
     } else {
-      print("Session initialized: $sessionId");
+      print("Session initialized: $sessionCookie");
     }
   }
 
+  void _redirectToLogin() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("세션이 유효하지 않습니다. 다시 로그인 해주세요.")),
+    );
+    Navigator.pushReplacementNamed(context, '/login'); // 로그인 화면으로 리디렉션
+  }
+
   Future<void> sendFriendRequest() async {
-    /*
-    if (sessionId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("세션이 유효하지 않습니다. 다시 로그인 해주세요.")),
-      );
-      Navigator.pushReplacementNamed(context, '/login');
+    if (sessionCookie == null) {
+      _redirectToLogin();
       return;
     }
 
+    final String friendId = friendIdController.text.trim();
     if (friendId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("친구의 ID를 입력해주세요.")),
@@ -52,18 +54,14 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       isLoading = true;
     });
 
-     */
-
-    final String friendId = friendIdController.text.trim();
-
     final headers = {
       'Content-Type': 'application/json',
-      'Cookie': 'connect.sid=s%3ARbcf1oQ3h5E2mVHT6ru8vBDpHW9fxhH2.x5xnHj7uGjCBduEn8xjFdzuLZdKCk1MkXWVuOEPUVQE; Path=/; HttpOnly; Expires=Wed, 20 Nov 2024 07:06:27 GMT;',
+      'Cookie': sessionCookie!,
     };
 
     try {
       final response = await http.post(
-        Uri.parse("http://13.124.126.234:3000/dashboard/friends/request"),
+        Uri.parse("http://54.180.54.31:3000/dashboard/friends/request"),
         headers: headers,
         body: jsonEncode({"f_id": friendId}),
       );

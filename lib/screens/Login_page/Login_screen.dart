@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'SignUp_screen.dart';
 import 'findAccount_screen.dart';
 import '../ScreenMain.dart';
+import '../../SessionCookieManager.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -24,15 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
     _checkAutoLogin(); // 자동 로그인 체크
   }
   Future<void> _checkAutoLogin() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool autoLogin = prefs.getBool('autoLogin') ?? false; // 자동 로그인 여부 확인
-    String? savedId = prefs.getString('savedId');
-    String? savedPassword = prefs.getString('savedPassword');
-
-    print("AutoLogin Check: autoLogin=$autoLogin, savedId=$savedId, savedPassword=$savedPassword");
-
-    if (autoLogin && savedId != null && savedPassword != null) {
-      _attemptLogin(savedId, savedPassword); // 저장된 정보로 로그인 시도
+    final sessionCookie = await SessionCookieManager.getSessionCookie();
+    if (sessionCookie != null) {
+      print("AutoLogin Check: sessionCookie=$sessionCookie");
+      _attemptLoginWithSession(sessionCookie); // 세션 쿠키로 로그인 시도
     } else {
       setState(() {
         _resultMessage = ''; // 자동 로그인 정보 없음
@@ -40,38 +36,21 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _attemptLoginWithSession(String sessionCookie) async {
+    try {
+      final headers = {'Cookie': sessionCookie};
+      final response = await http.get(
+        Uri.parse('http://54.180.54.31:3000/api/auth/validate-session'),
+        headers: headers,
+      );
 
-  Future<void> _attemptLogin([String? savedId, String? savedPassword]) async {
-    final String u_id = savedId ?? _idController.text;
-    final String u_password = savedPassword ?? _passwordController.text;
-    print("Attempting Login: u_id=$u_id, u_password=$u_password"); // 디버깅 메시지 추가
+      print('Session Validation Response status: ${response.statusCode}');
+      print('Session Validation Response body: ${response.body}');
 
-    final cookie = 'sessionId=abc123;';
-    final headers = {'Content-Type': 'application/json', 'Cookie': cookie,};
-    final response = await http.post(
-      Uri.parse('http://13.124.126.234:3000/api/auth/login'),
-      headers: headers,
-      body: jsonEncode({'u_id': u_id, 'u_password': u_password}),
-    );
-
-
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
-    final authCookie = response.headers['set-cookie'];
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final message = data['message'] as String? ?? '알 수 없는 오류 발생';
-
-      if (message == 'Login successful') {
+      if (response.statusCode == 200) {
         setState(() {
-          _resultMessage = '서버 연결 성공! 로그인 성공!';
+          _resultMessage = '자동 로그인 성공!';
         });
-        if (_autoLogin) {
-          _saveLoginInfo(u_id, u_password); // 자동 로그인 정보 저장
-        }
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MainScreen()),
@@ -79,44 +58,71 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         setState(() {
-          _resultMessage = message;
+          _resultMessage = '자동 로그인 실패: 세션 만료';
         });
-        _showErrorDialog('아이디 또는 비밀번호가 올바르지 않습니다.');
+        _showErrorDialog('세션이 만료되었습니다. 다시 로그인해주세요.');
       }
-    } else {
-      setState(() {
-        _resultMessage = '서버 연결 성공! 그러나 로그인 실패: ${response.statusCode}';
-      });
-      _showErrorDialog('서버와의 연결에 실패했습니다.');
-    }
-
-
-    try {
-
     } catch (e) {
       setState(() {
-        _resultMessage = '서버 연결 실패! 네트워크 오류 발생: $e';
+        _resultMessage = '자동 로그인 실패: 네트워크 오류 발생';
+      });
+      print('Error during session validation: $e');
+    }
+  }
+
+
+  Future<void> _attemptLogin() async {
+    final String u_id = _idController.text;
+    final String u_password = _passwordController.text;
+
+    print("Attempting Login: u_id=$u_id, u_password=$u_password");
+
+    try {
+      final headers = {'Content-Type': 'application/json'};
+      final response = await http.post(
+        Uri.parse('http://54.180.54.31:3000/api/auth/login'),
+        headers: headers,
+        body: jsonEncode({'u_id': u_id, 'u_password': u_password}),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final authCookie = response.headers['set-cookie'];
+        if (authCookie != null) {
+          await _saveSessionCookie(authCookie); // 세션 쿠키 저장
+          setState(() {
+            _resultMessage = '로그인 성공!';
+          });
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => MainScreen()),
+                (Route<dynamic> route) => false,
+          );
+        } else {
+          _showErrorDialog('세션 쿠키를 가져올 수 없습니다.');
+        }
+      } else {
+        setState(() {
+          _resultMessage = '로그인 실패: ${response.statusCode}';
+        });
+        _showErrorDialog('로그인 실패: 서버에서 인증을 거부했습니다.');
+      }
+    } catch (e) {
+      setState(() {
+        _resultMessage = '로그인 실패: 네트워크 오류 발생';
       });
       _showErrorDialog('네트워크 오류가 발생했습니다.');
       print('Error: $e');
     }
   }
 
-  Future<void> _saveLoginInfo(String id, String password) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('autoLogin', _autoLogin);
-    prefs.setString('savedId', id);
-    prefs.setString('savedPassword', password);
-    // 디버깅 메시지 추가
-    print("Login Info Saved: autoLogin=$_autoLogin, id=$id, password=$password");
+  
 
-  }
-
-  Future<void> _clearLoginInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('autoLogin');
-    prefs.remove('savedId');
-    prefs.remove('savedPassword');
+  Future<void> _saveSessionCookie(String cookie) async {
+    await SessionCookieManager.saveSessionCookie(cookie);
+    print("Auth Cookie Saved: $cookie");
   }
 
   void _showErrorDialog(String message) {

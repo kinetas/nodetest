@@ -64,7 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         'u_mail': _emailController.text,
       };
 
-      final url = Uri.parse('http://13.124.126.234:3000/api/auth/register');
+      final url = Uri.parse('http://54.180.54.31:3000/api/auth/register');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},

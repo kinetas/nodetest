@@ -15,7 +15,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool isUserIdVerified = false; // 아이디 확인 상태
 
   Future<void> _verifyUserId(BuildContext context) async {
-    final uri = Uri.parse("http://13.124.126.234:3000/api/auth/findUid");
+    final uri = Uri.parse("http://54.180.54.31:3000/api/auth/findUid");
 
     try {
       final requestData = {
@@ -62,7 +62,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   Future<void> _resetPassword(BuildContext context) async {
-    final uri = Uri.parse("http://13.124.126.234:3000/api/auth/changePassword");
+    final uri = Uri.parse("http://54.180.54.31:3000/api/auth/changePassword");
 
     if (newPasswordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(

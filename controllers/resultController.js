@@ -44,7 +44,9 @@ exports.getDailyAchievementRate = async (userId) => {
 
         console.log('완료된 미션 개수:', completedMissions);
 
-        return totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+        const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+
+        return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
     } catch (error) {
         console.error('일일 달성률 계산 오류:', error);
         throw error;
@@ -79,7 +81,9 @@ exports.getWeeklyAchievementRate = async (userId) => {
 
         console.log('완료된 미션 개수:', completedMissions);
 
-        return totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+        const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+
+        return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
     } catch (error) {
         console.error('주간 달성률 계산 오류:', error);
         throw error;
@@ -111,7 +115,9 @@ exports.getMonthlyAchievementRate = async (userId) => {
 
         console.log('완료된 미션 개수:', completedMissions);
 
-        return totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+        const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+
+        return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
     } catch (error) {
         console.error('월간 달성률 계산 오류:', error);
         throw error;
@@ -143,7 +149,9 @@ exports.getYearlyAchievementRate = async (userId) => {
 
         console.log('완료된 미션 개수:', completedMissions);
 
-        return totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+        const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
+
+        return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
     } catch (error) {
         console.error('연간 달성률 계산 오류:', error);
         throw error;

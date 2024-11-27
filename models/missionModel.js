@@ -34,7 +34,7 @@ const Mission = sequelize.define('Mission', {
   },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
-  timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
+  timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
 });
 
 module.exports = Mission;

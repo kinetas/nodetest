@@ -2,9 +2,12 @@
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
 //const { sequelize } = require('../models/missionModel'); // sequelize 객체 불러오기
 const Room = require('../models/roomModel'); // Room 모델 가져오기
+// const CRoom = require('../models/comunity_roomModel'); // Community Room 테이블
 const resultController = require('./resultController'); // resultController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
+
+// const sequelize = require('../config/db'); // 데이터베이스 연결
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
 
@@ -133,6 +136,7 @@ exports.getUserMissions = async (req, res) => {
     }
 };
 
+//=====================================================================================
 // 자신이 수행해야 할 미션 목록 (u2_id = userId)
 exports.getAssignedMissions = async (req, res) => {
     try {
@@ -171,6 +175,68 @@ exports.getCreatedMissions = async (req, res) => {
         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
     }
 };
+//=====================================================================================
+
+// // 자신이 수행해야 할 미션 목록 (u2_id = userId)
+// exports.getAssignedMissions = async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
+
+//         const assignedMissions = await sequelize.query(
+//             `
+//             SELECT m.m_title AS missionTitle, 
+//                    m.m_deadline AS deadline, 
+//                    m.m_status AS status, 
+//                    r.r_title AS roomTitle, 
+//                    cr.cr_title AS communityRoomTitle
+//             FROM mission m
+//             LEFT JOIN room r ON m.room_id = r.room_id
+//             LEFT JOIN community_room cr ON m.community_room_id = cr.community_room_id
+//             WHERE m.u2_id = :userId
+//             `,
+//             {
+//                 type: sequelize.QueryTypes.SELECT,
+//                 replacements: { userId },
+//             }
+//         );
+
+//         res.json({ missions: assignedMissions });
+//     } catch (error) {
+//         console.error('수행해야 할 미션 조회 오류:', error);
+//         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
+//     }
+// };
+
+// // 자신이 부여한 미션 목록 (u1_id = userId)
+// exports.getCreatedMissions = async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
+
+//         const createdMissions = await sequelize.query(
+//             `
+//             SELECT m.m_title AS missionTitle, 
+//                    m.m_deadline AS deadline, 
+//                    m.m_status AS status, 
+//                    r.r_title AS roomTitle, 
+//                    cr.cr_title AS communityRoomTitle
+//             FROM mission m
+//             LEFT JOIN room r ON m.room_id = r.room_id
+//             LEFT JOIN community_room cr ON m.community_room_id = cr.community_room_id
+//             WHERE m.u1_id = :userId
+//             `,
+//             {
+//                 type: sequelize.QueryTypes.SELECT,
+//                 replacements: { userId },
+//             }
+//         );
+
+//         res.json({ missions: createdMissions });
+//     } catch (error) {
+//         console.error('부여한 미션 조회 오류:', error);
+//         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+//     }
+// };
+
 
 
 // // ===== JWT 기반 미션 조회 =====

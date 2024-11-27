@@ -34,6 +34,14 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  r_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true, // Room 연결이 선택적인 경우
+  },
+  cr_num: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // CommunityRoom 연결이 선택적인 경우
+  },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����

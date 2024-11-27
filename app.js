@@ -128,6 +128,10 @@ app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'chat.html')); //채팅 페이지
 });
 
+app.get('/result', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'result.html')); // result.html 경로
+});
+
 app.use('/api/auth', authRoutes);
 
 app.use('/dashboard', missionRoutes); // 誘몄뀡 �씪�슦�듃瑜� /dashboard濡� �꽕�젙

@@ -132,6 +132,10 @@ app.get('/result', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'result.html')); // result.html 경로
 });
 
+app.get('/printmissionlist', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'printmissionlist.html')); // printmissionlist.html 경로
+});
+
 app.use('/api/auth', authRoutes);
 
 app.use('/dashboard', missionRoutes); // 誘몄뀡 �씪�슦�듃瑜� /dashboard濡� �꽕�젙

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미션 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>미션 목록</h1>
+    <h2>수행해야 할 미션</h2>
+    <ul id="assignedMissions">로딩 중...</ul>
+    <h2>부여한 미션</h2>
+    <ul id="createdMissions">로딩 중...</ul>
+    <button onclick="window.location.href='/dashboard'">대시보드로 돌아가기</button>
+
+    <script>
+        // 자신이 수행해야 할 미션 목록 가져오기
+        fetch('/dashboard/missions/assigned')
+            .then(response => response.json())
+            .then(data => {
+                const assignedList = document.getElementById('assignedMissions');
+                assignedList.innerHTML = ''; // 기존 내용 초기화
+
+                if (data.missions && data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
+                        assignedList.appendChild(listItem);
+                    });
+                } else {
+                    assignedList.textContent = '수행해야 할 미션이 없습니다.';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching assigned missions:', error);
+                document.getElementById('assignedMissions').textContent = '미션 데이터를 가져오는 중 오류가 발생했습니다.';
+            });
+
+        // 자신이 부여한 미션 목록 가져오기
+        fetch('/dashboard/missions/created')
+            .then(response => response.json())
+            .then(data => {
+                const createdList = document.getElementById('createdMissions');
+                createdList.innerHTML = ''; // 기존 내용 초기화
+
+                if (data.missions && data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
+                        createdList.appendChild(listItem);
+                    });
+                } else {
+                    createdList.textContent = '부여한 미션이 없습니다.';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching created missions:', error);
+                document.getElementById('createdMissions').textContent = '미션 데이터를 가져오는 중 오류가 발생했습니다.';
+            });
+    </script>
+</body>
+</html>

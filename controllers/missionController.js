@@ -137,79 +137,20 @@ exports.getUserMissions = async (req, res) => {
 };
 
 //=====================================================================================
-// 자신이 수행해야 할 미션 목록 (u2_id = userId)
-exports.getAssignedMissions = async (req, res) => {
-    try {
-        const userId = req.session.user.id;
-
-        const assignedMissions = await Mission.findAll({
-            where: {
-                u2_id: userId, // 자신이 수행해야 할 미션
-            },
-        });
-
-        res.json({ missions: assignedMissions });
-    } catch (error) {
-        console.error('자신이 수행해야 할 미션 조회 오류:', error);
-        res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
-    }
-};
-
-// 자신이 부여한 미션 목록 (u1_id = userId)
-exports.getCreatedMissions = async (req, res) => {
-    try {
-        const userId = req.session.user.id;
-
-        const createdMissions = await Mission.findAll({
-            where: {
-                u1_id: userId,
-                u2_id: {
-                    [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
-                },
-            },
-        });
-
-        res.json({ missions: createdMissions });
-    } catch (error) {
-        console.error('자신이 부여한 미션 조회 오류:', error);
-        res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
-    }
-};
-//=====================================================================================
-
-
 // // 자신이 수행해야 할 미션 목록 (u2_id = userId)
 // exports.getAssignedMissions = async (req, res) => {
 //     try {
 //         const userId = req.session.user.id;
 
 //         const assignedMissions = await Mission.findAll({
-//             where: { u2_id: userId },
-//             include: [
-//                 {
-//                     model: Room,
-//                     as: 'room', // Room 테이블
-//                     attributes: ['r_title'],
-//                 },
-//                 {
-//                     model: CRoom,
-//                     as: 'communityRoom', // Community Room 테이블
-//                     attributes: ['cr_title'],
-//                 },
-//             ],
+//             where: {
+//                 u2_id: userId, // 자신이 수행해야 할 미션
+//             },
 //         });
 
-//         const missions = assignedMissions.map((mission) => ({
-//             missionTitle: mission.m_title,
-//             deadline: mission.m_deadline,
-//             status: mission.m_status,
-//             roomTitle: mission.room ? mission.room.r_title : null,
-//             communityRoomTitle: mission.communityRoom ? mission.communityRoom.cr_title : null,
-//         }));
-
-//         res.json({ missions });
+//         res.json({ missions: assignedMissions });
 //     } catch (error) {
-//         console.error('수행해야 할 미션 조회 오류:', error);
+//         console.error('자신이 수행해야 할 미션 조회 오류:', error);
 //         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
 //     }
 // };
@@ -220,35 +161,94 @@ exports.getCreatedMissions = async (req, res) => {
 //         const userId = req.session.user.id;
 
 //         const createdMissions = await Mission.findAll({
-//             where: { u1_id: userId },
-//             include: [
-//                 {
-//                     model: Room,
-//                     as: 'room', // Room 테이블
-//                     attributes: ['r_title'],
+//             where: {
+//                 u1_id: userId,
+//                 u2_id: {
+//                     [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
 //                 },
-//                 {
-//                     model: CRoom,
-//                     as: 'communityRoom', // Community Room 테이블
-//                     attributes: ['cr_title'],
-//                 },
-//             ],
+//             },
 //         });
 
-//         const missions = createdMissions.map((mission) => ({
-//             missionTitle: mission.m_title,
-//             deadline: mission.m_deadline,
-//             status: mission.m_status,
-//             roomTitle: mission.room ? mission.room.r_title : null,
-//             communityRoomTitle: mission.communityRoom ? mission.communityRoom.cr_title : null,
-//         }));
-
-//         res.json({ missions });
+//         res.json({ missions: createdMissions });
 //     } catch (error) {
-//         console.error('부여한 미션 조회 오류:', error);
+//         console.error('자신이 부여한 미션 조회 오류:', error);
 //         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
 //     }
 // };
+//=====================================================================================
+
+
+// 자신이 수행해야 할 미션 목록 (u2_id = userId)
+exports.getAssignedMissions = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        const assignedMissions = await Mission.findAll({
+            where: { u2_id: userId },
+            include: [
+                {
+                    model: Room,
+                    as: 'room', // Room 테이블
+                    attributes: ['r_title'],
+                },
+                {
+                    model: CRoom,
+                    as: 'communityRoom', // Community Room 테이블
+                    attributes: ['cr_title'],
+                },
+            ],
+        });
+
+        const missions = assignedMissions.map((mission) => ({
+            missionTitle: mission.m_title,
+            deadline: mission.m_deadline,
+            status: mission.m_status,
+            roomTitle: mission.room ? mission.room.r_title : null,
+            communityRoomTitle: mission.communityRoom ? mission.communityRoom.cr_title : null,
+        }));
+
+        res.json({ missions });
+    } catch (error) {
+        console.error('수행해야 할 미션 조회 오류:', error);
+        res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
+    }
+};
+
+// 자신이 부여한 미션 목록 (u1_id = userId)
+exports.getCreatedMissions = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        const createdMissions = await Mission.findAll({
+            where: { u1_id: userId },
+            include: [
+                {
+                    model: Room,
+                    as: 'room', // Room 테이블
+                    attributes: ['r_title'],
+                },
+                {
+                    model: CRoom,
+                    as: 'communityRoom', // Community Room 테이블
+                    attributes: ['cr_title'],
+                },
+            ],
+        });
+
+        const missions = createdMissions.map((mission) => ({
+            missionTitle: mission.m_title,
+            deadline: mission.m_deadline,
+            status: mission.m_status,
+            roomTitle: mission.room ? mission.room.r_title : null,
+            communityRoomTitle: mission.communityRoom ? mission.communityRoom.cr_title : null,
+        }));
+
+        res.json({ missions });
+    } catch (error) {
+        console.error('부여한 미션 조회 오류:', error);
+        res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+    }
+};
 
 
 

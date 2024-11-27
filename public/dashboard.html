@@ -12,7 +12,7 @@
             padding: 20px;
         }
         .section {
-            margin-bottom: 30px; /* 섹션 간 간격 추가 */
+            margin-bottom: 30px; /* 각 섹션 사이 줄바꿈 효과 */
         }
         .section h2 {
             color: #333;
@@ -20,20 +20,14 @@
         }
         .form-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px; /* 버튼과 입력 필드 간격 추가 */
+            flex-direction: column; /* 입력 필드와 버튼을 세로 정렬 */
+            gap: 10px; /* 입력 필드와 버튼 간 간격 */
             margin-bottom: 10px;
-        }
-        .form-container input[type="text"],
-        .form-container input[type="date"],
-        .form-container button {
-            padding: 8px;
-            font-size: 14px;
         }
         .button-group {
             display: flex;
-            gap: 10px; /* 버튼 간 간격 추가 */
-            margin-top: 10px;
+            flex-direction: column; /* 버튼들을 세로 정렬 */
+            gap: 10px;
         }
         ul {
             list-style-type: none;
@@ -53,7 +47,7 @@
 
     <!-- 미션 관리 -->
     <div class="section">
-        <h2>미션 관리</h2>
+        <h2>미션 생성</h2>
         <div class="form-container">
             <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
             <input type="text" id="m_title" placeholder="미션 이름">
@@ -61,10 +55,16 @@
             <input type="text" id="m_reword" placeholder="보상">
             <button onclick="createMission()">미션 생성</button>
         </div>
+    </div>
+    <div class="section">
+        <h2>미션 삭제</h2>
         <div class="form-container">
             <input type="text" id="m_id" placeholder="미션 ID">
             <button onclick="deleteMission()">미션 삭제</button>
         </div>
+    </div>
+    <div class="section">
+        <h2>미션 인증</h2>
         <div class="form-container">
             <input type="text" id="m_id_input" placeholder="미션 ID 입력">
             <button onclick="successMission()">미션 인증 성공</button>
@@ -74,19 +74,19 @@
 
     <!-- 친구 관리 -->
     <div class="section">
-        <h2>친구 관리</h2>
-        <div>
-            <h3>i_friend 목록</h3>
-            <ul id="iFriendsList">로딩 중...</ul>
-        </div>
-        <div>
-            <h3>보낸 친구 요청</h3>
-            <ul id="sentRequestsList">로딩 중...</ul>
-        </div>
-        <div>
-            <h3>받은 친구 요청</h3>
-            <ul id="receivedRequestsList">로딩 중...</ul>
-        </div>
+        <h2>i_friend 목록</h2>
+        <ul id="iFriendsList">로딩 중...</ul>
+    </div>
+    <div class="section">
+        <h2>보낸 친구 요청</h2>
+        <ul id="sentRequestsList">로딩 중...</ul>
+    </div>
+    <div class="section">
+        <h2>받은 친구 요청</h2>
+        <ul id="receivedRequestsList">로딩 중...</ul>
+    </div>
+    <div class="section">
+        <h2>친구 요청 및 관리</h2>
         <div class="form-container">
             <input type="text" id="if_id_input" placeholder="친구 ID 입력">
             <button onclick="friendDelete()">친구 삭제</button>
@@ -101,8 +101,8 @@
 
     <!-- 기타 기능 -->
     <div class="section">
-        <h2>기타 기능</h2> <!-- "기타 기능" 섹션 추가 -->
-        <div class="button-group"> <!-- 버튼 그룹으로 정렬 -->
+        <h2>기타 기능</h2>
+        <div class="button-group">
             <button onclick="logout()">로그아웃</button>
             <button onclick="window.location.href='/cVote'">커뮤니티 투표</button>
             <button onclick="window.location.href='/community_missions'">커뮤니티 미션</button>

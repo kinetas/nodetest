@@ -1,5 +1,6 @@
 // controllers/resultController.js
 const Result = require('../models/m_resultModel'); // m_result 모델 가져오기
+const { Op } = require('sequelize');
 
 // m_result에 데이터 저장 함수
 exports.saveResult = async (m_id, u_id, m_deadline, m_status) => {

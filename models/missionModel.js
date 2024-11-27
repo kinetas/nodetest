@@ -34,7 +34,13 @@ const Mission = sequelize.define('Mission', {
   },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
-  timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
+  timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
 });
+
+// Room 관계
+Mission.belongsTo(Room, { foreignKey: 'room_id', as: 'room' });
+
+// Community Room 관계
+Mission.belongsTo(CRoom, { foreignKey: 'community_room_id', as: 'communityRoom' });
 
 module.exports = Mission;

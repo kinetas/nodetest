@@ -133,44 +133,44 @@ exports.getUserMissions = async (req, res) => {
     }
 };
 
-// 자신이 수행해야 할 미션 목록 (u2_id = userId)
-exports.getAssignedMissions = async (req, res) => {
-    try {
-        const userId = req.session.user.id;
+// // 자신이 수행해야 할 미션 목록 (u2_id = userId)
+// exports.getAssignedMissions = async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
 
-        const assignedMissions = await Mission.findAll({
-            where: {
-                u2_id: userId, // 자신이 수행해야 할 미션
-            },
-        });
+//         const assignedMissions = await Mission.findAll({
+//             where: {
+//                 u2_id: userId, // 자신이 수행해야 할 미션
+//             },
+//         });
 
-        res.json({ missions: assignedMissions });
-    } catch (error) {
-        console.error('자신이 수행해야 할 미션 조회 오류:', error);
-        res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
-    }
-};
+//         res.json({ missions: assignedMissions });
+//     } catch (error) {
+//         console.error('자신이 수행해야 할 미션 조회 오류:', error);
+//         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
+//     }
+// };
 
-// 자신이 부여한 미션 목록 (u1_id = userId)
-exports.getCreatedMissions = async (req, res) => {
-    try {
-        const userId = req.session.user.id;
+// // 자신이 부여한 미션 목록 (u1_id = userId)
+// exports.getCreatedMissions = async (req, res) => {
+//     try {
+//         const userId = req.session.user.id;
 
-        const createdMissions = await Mission.findAll({
-            where: {
-                u1_id: userId,
-                u2_id: {
-                    [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
-                },
-            },
-        });
+//         const createdMissions = await Mission.findAll({
+//             where: {
+//                 u1_id: userId,
+//                 u2_id: {
+//                     [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
+//                 },
+//             },
+//         });
 
-        res.json({ missions: createdMissions });
-    } catch (error) {
-        console.error('자신이 부여한 미션 조회 오류:', error);
-        res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
-    }
-};
+//         res.json({ missions: createdMissions });
+//     } catch (error) {
+//         console.error('자신이 부여한 미션 조회 오류:', error);
+//         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+//     }
+// };
 
 
 // // ===== JWT 기반 미션 조회 =====

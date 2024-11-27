@@ -8,7 +8,7 @@ const requireAuth = require('../middleware/authMiddleware'); // requireAuth 미�
 router.get('/missions', requireAuth, getUserMissions);
 
 // 자신이 수행해야 할 미션
-//router.get('/missions/assigned', requireAuth, getAssignedMissions);
+router.get('/missions/assigned', requireAuth, getAssignedMissions);
 
 // 자신이 부여한 미션
 router.get('/missions/created', requireAuth, getCreatedMissions);

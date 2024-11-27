@@ -8,101 +8,130 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
+            margin: 20px;
         }
         .section {
-            margin-bottom: 30px; /* 각 섹션 사이 줄바꿈 효과 */
+            margin-bottom: 40px;
         }
         .section h2 {
+            margin-bottom: 15px;
             color: #333;
-            margin-bottom: 10px;
         }
-        .form-container {
+        .flex-row {
             display: flex;
-            flex-direction: column; /* 입력 필드와 버튼을 세로 정렬 */
-            gap: 10px; /* 입력 필드와 버튼 간 간격 */
-            margin-bottom: 10px;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
         }
-        .button-group {
+        .flex-column {
             display: flex;
-            flex-direction: column; /* 버튼들을 세로 정렬 */
+            flex-direction: column;
             gap: 10px;
         }
         ul {
-            list-style-type: none;
+            list-style: none;
             padding: 0;
         }
         li {
             margin: 5px 0;
+        }
+        button, input {
+            padding: 10px;
+            font-size: 14px;
+        }
+        .button-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <!-- 미션 리스트 -->
     <div class="section">
-        <h2>미션 리스트</h2>
-        <ul id="missionList">Loading missions...</ul>
+        <h2>Hello, test1, 미션 리스트</h2>
+        <ul id="missionList">
+            <li>ID: 1, Title: Sample Mission, Status: 진행 중</li>
+            <li>ID: 2, Title: Another Mission, Status: 완료</li>
+            <li>ID: 3, Title: Example, Status: 대기 중</li>
+            <!-- 미션 리스트가 여기에 표시됨 -->
+        </ul>
     </div>
 
-    <!-- 미션 관리 -->
+    <!-- 미션 생성, 삭제, 인증 -->
     <div class="section">
-        <h2>미션 생성</h2>
-        <div class="form-container">
-            <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
-            <input type="text" id="m_title" placeholder="미션 이름">
-            <input type="date" id="m_deadline" placeholder="미션 마감일">
-            <input type="text" id="m_reword" placeholder="보상">
-            <button onclick="createMission()">미션 생성</button>
-        </div>
-    </div>
-    <div class="section">
-        <h2>미션 삭제</h2>
-        <div class="form-container">
-            <input type="text" id="m_id" placeholder="미션 ID">
-            <button onclick="deleteMission()">미션 삭제</button>
-        </div>
-    </div>
-    <div class="section">
-        <h2>미션 인증</h2>
-        <div class="form-container">
-            <input type="text" id="m_id_input" placeholder="미션 ID 입력">
-            <button onclick="successMission()">미션 인증 성공</button>
-            <button onclick="failureMission()">미션 인증 실패</button>
+        <div class="flex-row">
+            <!-- 미션 생성 -->
+            <div class="flex-column">
+                <h2>미션 생성</h2>
+                <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
+                <input type="text" id="m_title" placeholder="미션 이름">
+                <input type="date" id="m_deadline">
+                <input type="text" id="m_reword" placeholder="보상">
+                <button onclick="createMission()">미션 생성</button>
+            </div>
+            <!-- 미션 삭제 -->
+            <div class="flex-column">
+                <h2>미션 삭제</h2>
+                <input type="text" id="m_id" placeholder="미션 ID">
+                <button onclick="deleteMission()">미션 삭제</button>
+            </div>
+            <!-- 미션 인증 -->
+            <div class="flex-column">
+                <h2>미션 인증</h2>
+                <input type="text" id="m_id_input" placeholder="미션 ID 입력">
+                <button onclick="successMission()">미션 인증 성공</button>
+                <button onclick="failureMission()">미션 인증 실패</button>
+            </div>
         </div>
     </div>
 
     <!-- 친구 관리 -->
     <div class="section">
         <h2>i_friend 목록</h2>
-        <ul id="iFriendsList">로딩 중...</ul>
-    </div>
-    <div class="section">
-        <h2>보낸 친구 요청</h2>
-        <ul id="sentRequestsList">로딩 중...</ul>
-    </div>
-    <div class="section">
-        <h2>받은 친구 요청</h2>
-        <ul id="receivedRequestsList">로딩 중...</ul>
-    </div>
-    <div class="section">
-        <h2>친구 요청 및 관리</h2>
-        <div class="form-container">
-            <input type="text" id="if_id_input" placeholder="친구 ID 입력">
-            <button onclick="friendDelete()">친구 삭제</button>
+        <div class="flex-row">
+            <ul id="iFriendsList">
+                <li>친구 아이디: friend1</li>
+                <li>친구 아이디: friend2</li>
+                <li>친구 아이디: friend3</li>
+            </ul>
+            <div class="flex-column">
+                <input type="text" id="if_id_input" placeholder="친구 ID 입력">
+                <button onclick="friendDelete()">친구 삭제</button>
+            </div>
         </div>
-        <div class="form-container">
-            <input type="text" id="tf_id_input" placeholder="친구 ID 입력">
-            <button onclick="friendRequestSend()">요청 보내기</button>
-            <button onclick="friendRequestAccept()">요청 수락</button>
-            <button onclick="friendRequestReject()">요청 거절</button>
+    </div>
+
+    <!-- 친구 요청 -->
+    <div class="section">
+        <div class="flex-row">
+            <div class="flex-column">
+                <h2>보낸 친구 요청</h2>
+                <ul id="sentRequestsList">
+                    <li>아이디: friendA</li>
+                    <li>아이디: friendB</li>
+                </ul>
+            </div>
+            <div class="flex-column">
+                <h2>받은 친구 요청</h2>
+                <ul id="receivedRequestsList">
+                    <li>아이디: friendX</li>
+                    <li>아이디: friendY</li>
+                </ul>
+            </div>
+            <div class="flex-column">
+                <input type="text" id="tf_id_input" placeholder="친구 ID 입력">
+                <button onclick="friendRequestSend()">요청 보내기</button>
+                <button onclick="friendRequestAccept()">요청 수락</button>
+                <button onclick="friendRequestReject()">요청 거절</button>
+            </div>
         </div>
     </div>
 
     <!-- 기타 기능 -->
     <div class="section">
-        <h2>기타 기능</h2>
-        <div class="button-group">
+        <div class="button-row">
             <button onclick="logout()">로그아웃</button>
             <button onclick="window.location.href='/cVote'">커뮤니티 투표</button>
             <button onclick="window.location.href='/community_missions'">커뮤니티 미션</button>

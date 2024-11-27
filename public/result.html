@@ -25,19 +25,35 @@
     <script>
         fetch('/result/daily')
             .then(res => res.json())
-            .then(data => document.getElementById('dailyRate').textContent = data.dailyRate);
+            .then(data => {
+                console.log('일일 달성률:', data);
+                document.getElementById('dailyRate').textContent = data.dailyRate;
+            })
+            .catch(err => console.error('일일 달성률 API 호출 오류:', err));
 
         fetch('/result/weekly')
             .then(res => res.json())
-            .then(data => document.getElementById('weeklyRate').textContent = data.weeklyRate);
+            .then(data => {
+                console.log('주간 달성률:', data);
+                document.getElementById('weeklyRate').textContent = data.weeklyRate;
+            })
+            .catch(err => console.error('주간 달성률 API 호출 오류:', err));
 
         fetch('/result/monthly')
             .then(res => res.json())
-            .then(data => document.getElementById('monthlyRate').textContent = data.monthlyRate);
+            .then(data => {
+                console.log('월간 달성률:', data);
+                document.getElementById('monthlyRate').textContent = data.monthlyRate;
+            })
+            .catch(err => console.error('월간 달성률 API 호출 오류:', err));
 
         fetch('/result/yearly')
             .then(res => res.json())
-            .then(data => document.getElementById('yearlyRate').textContent = data.yearlyRate);
+            .then(data => {
+                console.log('연간 달성률:', data);
+                document.getElementById('yearlyRate').textContent = data.yearlyRate;
+            })
+            .catch(err => console.error('연간 달성률 API 호출 오류:', err));
     </script>
 </body>
 </html>

@@ -30,6 +30,7 @@ const io = socketIo(server, {
   path: '/socket.io'  // path 설정
 });
 
+
 app.use(cors());
 app.use(express.json());
 app.use('/auth', authRoutes);

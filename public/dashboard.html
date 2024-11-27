@@ -4,48 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>대시보드</title>
-    <!-- <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            margin: 5px 0;
-        }
-        .form-container {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 300px;
-        }
-        .form-container input[type="text"],
-        .form-container input[type="date"] {
-            margin: 5px 0;
-            padding: 8px;
-            width: 100%;
-            font-size: 16px;
-        }
-        .form-container button {
-            margin: 10px 0;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        .error {
-            color: red;
-        }
-    </style> -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -54,7 +12,7 @@
             padding: 20px;
         }
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 30px; /* 섹션 간 간격 추가 */
         }
         .section h2 {
             color: #333;
@@ -63,7 +21,7 @@
         .form-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 10px; /* 버튼과 입력 필드 간격 추가 */
             margin-bottom: 10px;
         }
         .form-container input[type="text"],
@@ -74,7 +32,7 @@
         }
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 10px; /* 버튼 간 간격 추가 */
             margin-top: 10px;
         }
         ul {
@@ -143,8 +101,8 @@
 
     <!-- 기타 기능 -->
     <div class="section">
-        <h2>기타 기능</h2>
-        <div class="button-group">
+        <h2>기타 기능</h2> <!-- "기타 기능" 섹션 추가 -->
+        <div class="button-group"> <!-- 버튼 그룹으로 정렬 -->
             <button onclick="logout()">로그아웃</button>
             <button onclick="window.location.href='/cVote'">커뮤니티 투표</button>
             <button onclick="window.location.href='/community_missions'">커뮤니티 미션</button>

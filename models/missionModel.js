@@ -39,9 +39,9 @@ const Mission = sequelize.define('Mission', {
 
 
 // Room 관계
-Mission.belongsTo(Room, { foreignKey: 'room_id', as: 'room' });
+Mission.belongsTo(Room, { foreignKey: 'r_id', as: 'room' });
 
 // Community Room 관계
-Mission.belongsTo(CRoom, { foreignKey: 'community_room_id', as: 'communityRoom' });
+Mission.belongsTo(CRoom, { foreignKey: 'cr_num', as: 'communityRoom' });
 
 module.exports = Mission;

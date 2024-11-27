@@ -106,7 +106,7 @@
                 //     Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
                 // },
 
-                body: JSON.stringify({ u1_id: userId, u2_id })
+                body: JSON.stringify({ u1_id: userId, u2_id, r_type })
                 // body: JSON.stringify({ u1_id: userId, u2_id, r_type }) // r_type 추가 <!-- 수정 -->
             })
             .then(response => response.json())

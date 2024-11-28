@@ -26,7 +26,11 @@ const User = sequelize.define('user', {
     u_mail: {
         type: DataTypes.STRING,
         allowNull: true
-    }
+    },
+    currentSessionId: {
+        type: DataTypes.STRING,
+        allowNull: true, // null 가능, 세션 ID를 저장
+    },
 }, {
     tableName: 'user',
     timestamps: false

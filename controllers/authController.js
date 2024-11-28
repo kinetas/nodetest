@@ -48,17 +48,17 @@ exports.login = async (req, res) => {
         // 사용자 테이블에 현재 세션 ID 저장
         await user.update({ currentSessionId: req.sessionID });
         
-        // // 로그인 성공 시 응답
-        // res.status(200).json({
-        //     message: '로그인 성공 (기존 세션이 만료되었습니다.)',
-        //     user: {
-        //         nickname: user.u_nickname,
-        //         name: user.u_name,
-        //         birth: user.u_birth,
-        //         mail: user.u_mail,
-        //     },
-        //     // redirectUrl: '/dashboard', // 리디렉션할 URL
-        // });
+        // 로그인 성공 시 응답
+        res.status(200).json({
+            message: '로그인 성공 (기존 세션이 만료되었습니다.)',
+            user: {
+                nickname: user.u_nickname,
+                name: user.u_name,
+                birth: user.u_birth,
+                mail: user.u_mail,
+            },
+            // redirectUrl: '/dashboard', // 리디렉션할 URL
+        });
 
         // 서버에서 직접 리디렉션 처리
         return res.redirect('/dashboard');

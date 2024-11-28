@@ -85,6 +85,15 @@ exports.friendRequestSend = async (req, res) => {
     const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
 
     try {
+
+        // 자기 자신에게 요청을 보내는지 확인
+        if (u_id === f_id) {
+            return res.status(400).json({
+                success: false,
+                message: '자기 자신에게는 친구 요청을 보낼 수 없습니다.',
+            });
+        }
+
         // 기존 친구 요청 확인
         const existingRequest = await TFriend.findOne({
             where: { u_id, f_id },

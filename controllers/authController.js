@@ -36,6 +36,9 @@ exports.login = async (req, res) => {
                     console.error('기존 세션 무효화 오류:', err);
                 }
             });
+
+            // A기기에 로그아웃 메시지 전송 (실제 구현 시 WebSocket이나 Push Notification 활용 가능)
+            console.log(`사용자 ${u_id}의 기존 세션이 만료되었습니다.`);
         }
 
         // 로그인 성공 시 세션에 사용자 정보 저장
@@ -50,7 +53,7 @@ exports.login = async (req, res) => {
         
         // 로그인 성공 시 응답
         return res.status(200).json({
-            message: 'Login successful',
+            message: '로그인 성공 (기존 세션이 만료되었습니다.)',
             user: {
                 nickname: user.u_nickname,
                 name: user.u_name,
@@ -148,7 +151,8 @@ exports.logOut = (req, res) => {
             await User.update({ currentSessionId: null }, { where: { u_id: userId } });
         }
 
-        res.status(200).json({ success: true, message: '로그아웃 성공' });
+        console.log(`사용자 ${userId}가 로그아웃되었습니다. 세션 만료 처리 완료.`);
+        res.status(200).json({ success: true, message: '로그아웃 성공 (세션 만료)' });
     });
 };
 

@@ -19,6 +19,7 @@
         const c_number = new URLSearchParams(window.location.search).get('c_number');
 
         function loadVoteDetails() {
+            console.log('c_number:', c_number);
             if (!c_number) {
                 console.error("c_number 값이 유효하지 않습니다.");
                 return;

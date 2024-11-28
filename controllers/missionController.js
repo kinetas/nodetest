@@ -13,31 +13,24 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
-    const { u1_id, u2_id, m_title, m_deadline, m_reword, r_id } = req.body;
-
-
-    // 필수 값 검증
-    if (!u2_id) {
-        return res.json({ success: false, message: '받는 사용자 ID는 필수 항목입니다.' });
-    }
-
+    const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body; // r_id 추가 제거
     try {
-        // u1_id와 u2_id 조합의 Room이 존재하는지 확인
-        const roomExists = await Room.findOne({ where: { u1_id, u2_id } });
-        
-        if (!roomExists) {
-            return res.json({ success: false, message: '미션을 생성하기 전에 방이 존재해야 합니다.' });
+        // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
+        const room = await Room.findOne({
+            where: {
+                u1_id,
+                u2_id
+            }
+        });
+
+        if (!room) {
+            return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
         }
 
         const missionId = uuidv4();
-        if (!uuidValidate(missionId)) {
-            console.error("생성된 UUID가 유효하지 않습니다.");
-            res.status(500).json({ success: false, message: `생성된 UUID가 유효하지 않습니다.` });
-            return; // 또는 throw new Error("유효하지 않은 UUID 생성");
-        }
-        
         let stat = "진행중";
-        // 미션 생성 및 DB 저장
+
+        // 미션 생성
         await Mission.create({
             m_id: missionId,
             u1_id,
@@ -46,17 +39,13 @@ exports.createMission = async (req, res) => {
             m_deadline,
             m_reword,
             m_status: stat,
-            r_id
+            r_id: room.r_id // Room ID를 저장
         });
 
-        // m_result 테이블에 데이터 저장
-        const u_id = u1_id; // 세션에서 로그인한 유저 ID 가져오기
-        const result = await resultController.saveResult(missionId, u_id, m_deadline, stat);
-
-        res.json({ success: true, message: '미션이 성공적으로 생성되었습니다.' });
+        res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
     } catch (error) {
         console.error('미션 생성 오류:', error);
-        res.status(500).json({ success: false, message: `미션 생성 중 ${error}오류1가 발생했습니다.` });
+        res.status(500).json({ success: false, message: '미션 생성 중 오류가 발생했습니다.' });
     }
 };
 

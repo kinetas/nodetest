@@ -174,11 +174,26 @@
         // }
         document.getElementById('createVoteForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            const c_title = document.getElementById('c_title').value.trim();
+            const c_contents = document.getElementById('c_contents').value.trim();
+            const c_image = document.getElementById('c_image').files[0];
+
+            if (!c_title || !c_contents) {
+                alert("제목과 내용을 입력해주세요.");
+                return;
+            }
+
+            if (c_image && c_image.size > 5 * 1024 * 1024) { // 5MB 제한
+                alert("이미지 파일 크기는 5MB를 초과할 수 없습니다.");
+                return;
+            }
 
             const formData = new FormData();
-            formData.append('c_title', document.getElementById('c_title').value);
-            formData.append('c_contents', document.getElementById('c_contents').value);
-            formData.append('c_image', document.getElementById('c_image').files[0]);
+            formData.append('c_title', c_title);
+            formData.append('c_contents', c_contents);
+            if (c_image) {
+                formData.append('c_image', c_image);
+            }
 
             fetch('/api/cVote/create', {
                 method: 'POST',

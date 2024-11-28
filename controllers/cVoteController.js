@@ -3,11 +3,11 @@ const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인�
 const CVote = require('../models/comunity_voteModel');
 const c_v_notdup = require('../models/c_v_not_dupModel'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
-const multer = require('multer');
+//const multer = require('multer');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage });
 
 // 투표 리스트 가져오기
 exports.getVotes = async (req, res) => {
@@ -61,6 +61,9 @@ exports.getMyVotes = async (req, res) => {
 
 // 투표 생성
 exports.createVote = async (req, res) => {
+    console.log("Request Body:", req.body);
+    console.log("Uploaded File:", req.file);
+
     const { c_title, c_contents } = req.body;
     const u_id = req.session.user.id; // 세션에서 u_id 가져오기, 기본 값 설정
     const c_image = req.file ? req.file.buffer : null; // 이미지 데이터를 Buffer로 저장

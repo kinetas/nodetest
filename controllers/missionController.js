@@ -269,12 +269,24 @@ exports.getCreatedMissions = async (req, res) => {
 // 미션 인증 요청 함수
 exports.requestMissionApproval = async (req, res) => {
     const { m_id } = req.body; // 클라이언트에서 미션 ID 전달
+    const userId = req.session?.user?.id; // 세션에서 로그인된 사용자 ID 가져오기
+
     try {
         // 미션이 존재하는지 확인
         const mission = await Mission.findOne({ where: { m_id } });
 
         if (!mission) {
             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        // 미션 상태가 "진행중"인지 확인
+        if (mission.m_status !== '진행중') {
+            return res.status(400).json({ success: false, message: '현재 상태에서는 미션 요청이 불가능합니다.' });
+        }
+
+        // 미션 수행자만 요청 가능하도록 확인
+        if (mission.u2_id !== userId) {
+            return res.status(403).json({ success: false, message: '미션 수행자만 요청할 수 있습니다.' });
         }
 
         // 미션 상태를 "요청"으로 변경

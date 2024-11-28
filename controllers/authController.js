@@ -136,11 +136,18 @@ exports.register = async (req, res) => {
 
 // 로그아웃 함수
 exports.logOut = (req, res) => {
-    req.session.destroy((err) => {
+    const userId = req.session?.user?.id;
+    req.session.destroy(async (err) => {
         if (err) {
             console.error('세션 삭제 오류:', err);
             return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
         }
+
+        if (userId) {
+            // 데이터베이스에서 currentSessionId 초기화
+            await User.update({ currentSessionId: null }, { where: { u_id: userId } });
+        }
+
         res.status(200).json({ success: true, message: '로그아웃 성공' });
     });
 };

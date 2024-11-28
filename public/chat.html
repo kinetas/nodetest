@@ -11,7 +11,7 @@
     <input type="text" id="messageInput" placeholder="메시지를 입력하세요">
     <input type="file" id="fileInput">
     <button onclick="sendMessage()">전송</button>
-
+    <button onclick="goBackToRoomList()">나가기</button> 
     
 
     <h1>방 미션 출력</h1>
@@ -134,8 +134,11 @@
         // 메시지 입력란 비우기
             messageInput.value = "";
         }
-
-        //방미션출력
+        // 방 목록으로 나가기 함수
+        function goBackToRoomList() {
+            window.location.href = '/roomL.html';
+        }
+            //방미션출력
         function printRoomMission() {
             const u2_id = document.getElementById('u2_id_input').value;
 

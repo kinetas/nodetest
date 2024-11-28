@@ -13,7 +13,7 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
-    const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body;
+    const { u1_id, u2_id, m_title, m_deadline, m_reword, r_id } = req.body;
 
 
     // 필수 값 검증
@@ -46,7 +46,7 @@ exports.createMission = async (req, res) => {
             m_deadline,
             m_reword,
             m_status: stat,
-            r_id: Room.r_id
+            r_id
         });
 
         // m_result 테이블에 데이터 저장

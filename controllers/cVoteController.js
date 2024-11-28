@@ -3,9 +3,11 @@ const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인�
 const CVote = require('../models/comunity_voteModel');
 const c_v_notdup = require('../models/c_v_not_dupModel'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
+const multer = require('multer');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
-
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // 투표 리스트 가져오기
 exports.getVotes = async (req, res) => {
@@ -61,6 +63,8 @@ exports.getMyVotes = async (req, res) => {
 exports.createVote = async (req, res) => {
     const { c_title, c_contents } = req.body;
     const u_id = req.session.user.id; // 세션에서 u_id 가져오기, 기본 값 설정
+    const c_image = req.file ? req.file.buffer : null; // 이미지 데이터를 Buffer로 저장
+
 
     if (!u_id || !c_title || !c_contents) {
         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
@@ -79,7 +83,8 @@ exports.createVote = async (req, res) => {
             c_contents,
             c_good: 0,
             c_bad: 0,
-            c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 현재 날짜 + 3일
+            c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 현재 날짜 + 3일
+            c_image
         });
         res.json({ success: true, vote: newVote });
     } catch (error) {
@@ -150,5 +155,31 @@ exports.deleteVote = async (req, res) => {
     } catch (error) {
         console.error("Error deleting vote:", error);
         res.status(500).json({ success: false, message: "투표 삭제 실패" });
+    }
+};
+exports.getVoteDetails = async (req, res) => {
+    const { c_number } = req.params;
+
+    try {
+        const vote = await CVote.findOne({ where: { c_number } });
+        if (!vote) {
+            return res.status(404).json({ success: false, message: "투표를 찾을 수 없습니다." });
+        }
+
+        res.json({
+            success: true,
+            vote: {
+                c_title: vote.c_title,
+                c_contents: vote.c_contents,
+                u_id: vote.u_id,
+                c_good: vote.c_good,
+                c_bad: vote.c_bad,
+                c_deletedate: vote.c_deletedate,
+                c_image: vote.c_image ? vote.c_image.toString('base64') : null,
+            },
+        });
+    } catch (error) {
+        console.error("Error fetching vote details:", error);
+        res.status(500).json({ success: false, message: "투표 정보를 가져오는데 실패했습니다." });
     }
 };

@@ -92,6 +92,42 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   }
 };
 
+
+exports.sendMessageWithFile = async (req, res) => {
+  const { u1_id, u2_id, r_id, message_contents } = req.body;
+  const file = req.file;
+
+  if (!u1_id || !u2_id || !r_id || (!message_contents && !file)) {
+      return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
+  }
+
+  try {
+      let fileBuffer = null;
+      let fileType = null;
+
+      if (file) {
+          fileBuffer = file.buffer;
+          fileType = file.mimetype;
+      }
+
+      // 데이터베이스에 메시지 및 파일 저장
+      await RMessage.create({
+          u1_id,
+          u2_id,
+          r_id,
+          message_contents,
+          send_date: new Date(),
+          image: fileBuffer,
+          image_type: fileType
+      });
+
+      res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.' });
+  } catch (error) {
+      console.error('Error saving message to DB:', error);
+      res.status(500).json({ message: '메시지 저장 실패' });
+  }
+};
+
 //메시지 불러오기
 exports.getMessages = async (r_id) => {
   try {

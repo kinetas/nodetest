@@ -9,6 +9,7 @@
     <h1>채팅방</h1>
     <div id="chatMessages">메시지 목록</div>
     <input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+    <input type="file" id="fileInput">
     <button onclick="sendMessage()">전송</button>
 
     
@@ -54,11 +55,25 @@
             const messageElement = document.createElement("div");
             messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;
             chatMessages.appendChild(messageElement);
+
+
+             // 이미지가 포함된 경우 이미지를 표시
+            if (data.image) {
+                const imageElement = document.createElement("img");
+                imageElement.src = `data:image/jpeg;base64,${arrayBufferToBase64(data.image.data)}`;
+                imageElement.style.maxWidth = "200px";
+                messageElement.appendChild(imageElement);
+            }
+            chatMessages.appendChild(messageElement);
+
         });
         
         function sendMessage() {
             // 메시지 입력 필드를 불러오기
             const messageInput = document.getElementById("messageInput");
+            const fileInput = document.getElementById("fileInput"); // 파일 입력 필드 가져오기
+            const file = fileInput.files[0]; // 선택된 파일 가져오기
+
             if (!messageInput) {
                 console.error("Cannot find message input element.");
                 return;
@@ -87,15 +102,36 @@
             // }
 
             // 메시지 전송
-            socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
+            //socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
+
 
             // // =========== 수정 JWT =============
             // if (!message.trim()) {
             //     alert("메시지를 입력하세요.");
             //     return;
             // }
+        // FormData를 사용하여 메시지와 파일을 함께 전송
+            const formData = new FormData();
+            formData.append('message_contents', message);
+            formData.append('u1_id', u1_id);
+            formData.append('u2_id', u2_id);
+            formData.append('r_id', r_id);
+            if (file) {
+                formData.append('file', file);
+            }
 
-            // 메시지 입력란 비우기
+            fetch('/chat/send-message', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    console.log(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        // 메시지 입력란 비우기
             messageInput.value = "";
         }
 

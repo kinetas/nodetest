@@ -185,10 +185,10 @@ io.on('connection', (socket) => {
 //    console.log('Message saved to DB:', newMessage); // DB 저장 확인 로그 추가 (수정된 부분)
 
     // 클라이언트에 메시지 전송
-//    socket.emit('receiveMessage', { 
-//      u1_id, 
-//      message, 
-//      send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') 
+//    socket.emit('receiveMessage', {
+//      u1_id,
+//      message,
+//      send_date: send_date.toISOString().slice(0, 19).replace('T', ' ')
 //    });
 //  } catch (error) {
 //    console.error('Error saving message to DB:', error.message); // DB 저장 실패 시 에러 로그 출력 (수정된 부분)

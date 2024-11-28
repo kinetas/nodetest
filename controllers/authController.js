@@ -28,15 +28,15 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // 이미 로그인된 세션이 있는지 확인
-        if (user.currentSessionId) {
-            // 기존 세션 무효화
-            req.sessionStore.destroy(user.currentSessionId, (err) => {
-                if (err) {
-                    console.error('기존 세션 무효화 오류:', err);
-                }
-            });
-        }
+        // // 이미 로그인된 세션이 있는지 확인
+        // if (user.currentSessionId) {
+        //     // 기존 세션 무효화
+        //     req.sessionStore.destroy(user.currentSessionId, (err) => {
+        //         if (err) {
+        //             console.error('기존 세션 무효화 오류:', err);
+        //         }
+        //     });
+        // }
 
         // 로그인 성공 시 세션에 사용자 정보 저장
         req.session.user = {
@@ -45,8 +45,8 @@ exports.login = async (req, res) => {
             name: user.u_name,
         };
 
-        // 사용자 테이블에 현재 세션 ID 저장
-        await user.update({ currentSessionId: req.sessionID });
+        // // 사용자 테이블에 현재 세션 ID 저장
+        // await user.update({ currentSessionId: req.sessionID });
         
         // 로그인 성공 시 응답
         res.status(200).json({
@@ -139,17 +139,17 @@ exports.register = async (req, res) => {
 
 // 로그아웃 함수
 exports.logOut = (req, res) => {
-    const userId = req.session?.user?.id;
+    // const userId = req.session?.user?.id;
     req.session.destroy(async (err) => {
         if (err) {
             console.error('세션 삭제 오류:', err);
             return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
         }
 
-        if (userId) {
-            // 데이터베이스에서 currentSessionId 초기화
-            await User.update({ currentSessionId: null }, { where: { u_id: userId } });
-        }
+        // if (userId) {
+        //     // 데이터베이스에서 currentSessionId 초기화
+        //     await User.update({ currentSessionId: null }, { where: { u_id: userId } });
+        // }
 
         res.status(200).json({ success: true, message: '로그아웃 성공' });
     });

@@ -27,9 +27,46 @@
     <ul id="assignedMissions">로딩 중...</ul>
     <h2>부여한 미션</h2>
     <ul id="createdMissions">로딩 중...</ul>
+
+    <!-- 미션 요청 폼 추가 -->
+    <h2>미션 요청</h2>
+    <div>
+        <input type="text" id="missionIdInput" placeholder="미션 ID 입력">
+        <button onclick="requestMissionApproval()">미션 요청</button>
+    </div>
+
     <button onclick="window.location.href='/dashboard'">대시보드로 돌아가기</button>
 
     <script>
+
+        // 미션 요청 함수
+        function requestMissionApproval() {
+            const m_id = document.getElementById('missionIdInput').value;
+
+            if (!m_id) {
+                alert("미션 ID를 입력하세요.");
+                return;
+            }
+
+            fetch('/dashboard/missionRequest', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('미션 요청 중 오류가 발생했습니다.');
+            });
+        }
+
         //===================================================================================================================
         // 자신이 수행해야 할 미션 목록 가져오기
         fetch('/dashboard/missions/assigned')

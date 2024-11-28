@@ -266,6 +266,27 @@ exports.getCreatedMissions = async (req, res) => {
 // };
 
 
+// 미션 인증 요청 함수
+exports.requestMissionApproval = async (req, res) => {
+    const { m_id } = req.body; // 클라이언트에서 미션 ID 전달
+    try {
+        // 미션이 존재하는지 확인
+        const mission = await Mission.findOne({ where: { m_id } });
+
+        if (!mission) {
+            return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        // 미션 상태를 "요청"으로 변경
+        await mission.update({ m_status: '요청' });
+        res.json({ success: true, message: '미션 상태가 "요청"으로 변경되었습니다.' });
+    } catch (error) {
+        console.error('미션 요청 처리 오류:', error);
+        res.status(500).json({ success: false, message: '미션 요청 처리 중 오류가 발생했습니다.' });
+    }
+};
+
+
 // 미션 성공 처리 함수
 exports.successMission = async (req, res) => {
     const { m_id } = req.body;

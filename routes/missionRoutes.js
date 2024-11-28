@@ -1,7 +1,7 @@
 // routes/missionRoutes.js
 const express = require('express');
 const router = express.Router();
-const { getUserMissions, getAssignedMissions, getCreatedMissions, createMission, deleteMission, successMission, failureMission, printRoomMission  } = require('../controllers/missionController');
+const { getUserMissions, getAssignedMissions, getCreatedMissions, requestMissionApproval, createMission, deleteMission, successMission, failureMission, printRoomMission  } = require('../controllers/missionController');
 const requireAuth = require('../middleware/authMiddleware'); // requireAuth 미들웨어 경로 확인
 
 // 미션 리스트 반환 라우트
@@ -25,5 +25,8 @@ router.post('/failureMission', requireAuth, failureMission);
 
 // 방 미션 출력 라우트
 router.post('/printRoomMission', requireAuth, printRoomMission);
+
+// 인증 요청 라우트
+router.post('/missionRequest', requireAuth, requestMissionApproval); 
 
 module.exports = router;

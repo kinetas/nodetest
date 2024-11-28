@@ -25,7 +25,6 @@ exports.createMission = async (req, res) => {
         // u1_id와 u2_id 조합의 Room이 존재하는지 확인
         const roomExists = await Room.findOne({ where: { u1_id, u2_id } });
         
-        
         if (!roomExists) {
             return res.json({ success: false, message: '미션을 생성하기 전에 방이 존재해야 합니다.' });
         }
@@ -46,7 +45,8 @@ exports.createMission = async (req, res) => {
             m_title,
             m_deadline,
             m_reword,
-            m_status: stat
+            m_status: stat,
+            r_id: Room.r_id
         });
 
         // m_result 테이블에 데이터 저장

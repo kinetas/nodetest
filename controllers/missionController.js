@@ -289,8 +289,16 @@ exports.requestMissionApproval = async (req, res) => {
             return res.status(403).json({ success: false, message: '미션 수행자만 요청할 수 있습니다.' });
         }
 
-        // 미션 상태를 "요청"으로 변경
-        await mission.update({ m_status: '요청' });
+        // 정확히 해당 미션만 상태를 "요청"으로 변경
+        const updated = await Mission.update(
+            { m_status: '요청' },
+            { where: { m_id, u2_id: userId } } // 정확히 조건 추가
+        );
+
+        if (updated[0] === 0) {
+            return res.status(400).json({ success: false, message: '미션 상태를 변경할 수 없습니다.' });
+        }
+
         res.json({ success: true, message: '미션 상태가 "요청"으로 변경되었습니다.' });
     } catch (error) {
         console.error('미션 요청 처리 오류:', error);

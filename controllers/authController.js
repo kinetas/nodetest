@@ -28,16 +28,6 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // // 이미 로그인된 세션이 있는지 확인
-        // if (user.currentSessionId) {
-        //     // 기존 세션 무효화
-        //     req.sessionStore.destroy(user.currentSessionId, (err) => {
-        //         if (err) {
-        //             console.error('기존 세션 무효화 오류:', err);
-        //         }
-        //     });
-        // }
-
         // 로그인 성공 시 세션에 사용자 정보 저장
         req.session.user = {
             id: user.u_id,
@@ -45,23 +35,17 @@ exports.login = async (req, res) => {
             name: user.u_name,
         };
 
-        // // 사용자 테이블에 현재 세션 ID 저장
-        // await user.update({ currentSessionId: req.sessionID });
-        
         // 로그인 성공 시 응답
-        res.status(200).json({
-            message: '로그인 성공 (기존 세션이 만료되었습니다.)',
+        return res.status(200).json({
+            message: 'Login successful',
             user: {
                 nickname: user.u_nickname,
                 name: user.u_name,
                 birth: user.u_birth,
                 mail: user.u_mail,
             },
-            // redirectUrl: '/dashboard', // 리디렉션할 URL
+            redirectUrl: '/dashboard' // 리디렉션할 URL
         });
-
-        // 서버에서 직접 리디렉션 처리
-        return res.redirect('/dashboard');
     } catch (error) {
         console.error('로그인 오류:', error);
         res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
@@ -139,18 +123,11 @@ exports.register = async (req, res) => {
 
 // 로그아웃 함수
 exports.logOut = (req, res) => {
-    // const userId = req.session?.user?.id;
-    req.session.destroy(async (err) => {
+    req.session.destroy((err) => {
         if (err) {
             console.error('세션 삭제 오류:', err);
             return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
         }
-
-        // if (userId) {
-        //     // 데이터베이스에서 currentSessionId 초기화
-        //     await User.update({ currentSessionId: null }, { where: { u_id: userId } });
-        // }
-
         res.status(200).json({ success: true, message: '로그아웃 성공' });
     });
 };

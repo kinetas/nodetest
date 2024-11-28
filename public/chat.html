@@ -89,11 +89,11 @@
                 console.error("User ID not found in session storage.");
                 return;
             }
-          // 메시지나 파일이 비어 있는지 확인
-        if (message.trim() === "" && !file) {
-            alert("메시지나 파일을 입력하세요.");
-            return;
-        }
+            // 메시지가 비어 있는지 확인
+            if (message.trim() === "") {
+                alert("메시지를 입력하세요.");
+                return;
+            }
 
             // // =========== 수정 JWT =============
             // if (!message.trim()) {
@@ -102,28 +102,37 @@
             // }
 
             // 메시지 전송
-            // 메시지와 파일을 소켓을 통해 전송
-            const reader = new FileReader();
-            reader.onload = function () {
-                const fileData = file ? reader.result.split(',')[1] : null; // base64 인코딩
-                socket.emit("sendMessage", {
-                    message_contents: message,
-                    r_id: r_id,
-                    u1_id: u1_id,
-                    u2_id: u2_id,
-                    file: fileData ? { data: fileData } : null
-                });
-            };
+            socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
+
 
             // // =========== 수정 JWT =============
             // if (!message.trim()) {
             //     alert("메시지를 입력하세요.");
             //     return;
             // }
-        
+        // FormData를 사용하여 메시지와 파일을 함께 전송
+            const formData = new FormData();
+            formData.append('message_contents', message);
+            formData.append('u1_id', u1_id);
+            formData.append('u2_id', u2_id);
+            formData.append('r_id', r_id);
+            if (file) {
+                formData.append('file', file);
+            }
+
+            fetch('/chat/send-message', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    console.log(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
         // 메시지 입력란 비우기
             messageInput.value = "";
-            fileInput.value = "";
         }
 
         //방미션출력

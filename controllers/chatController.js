@@ -63,41 +63,30 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
 //   }
 // };
 
-exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id, file }) => {
+exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
   const send_date = new Date(); // 현재 시간
-  if (!r_id || !u1_id ||!u2_id ||(!message && !file)) {
-    console.error('Missing r_id or u1_id:', { r_id, u1_id,u2_id,message, file });
+  if (!r_id || !u1_id ||!u2_id ||!message) {
+    console.error('Missing r_id or u1_id:', { r_id, u1_id,u2_id,message });
     return;
   }
   console.log('Debugging variables:', { r_id, u1_id, u2_id, message,message_num,send_date });
   try {
-    // 파일 처리
-    let fileBuffer = null;
-    if (file) {
-        fileBuffer = file.buffer; // multer를 통해 파일 버퍼 사용
-    }
-    
-    // 메시지 저장
+      // 메시지 저장
       const newMessage = await RMessage.create({
           u1_id,
           u2_id,
           r_id,
           message_num,
           send_date,
-          message_contents: message,
-          image: fileBuffer
+          message_contents: message
       });
 
       // 성공적으로 저장된 경우 콘솔 로그
       console.log('Message saved:', newMessage);
 
       // 클라이언트에 메시지 전송
-      socket.emit('receiveMessage', { 
-        u1_id,
-        message,
-        send_date: send_date.toISOString().slice(0, 19).replace('T', ' '),
-        image: fileBuffer ? { data: fileBuffer } : null });
+      socket.emit('receiveMessage', { u1_id, message, send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') });
   } catch (error) {
       console.error('Error saving message with Sequelize:', error);
   }

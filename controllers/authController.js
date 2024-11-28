@@ -37,8 +37,8 @@ exports.login = async (req, res) => {
                 }
             });
 
-            // // A기기에 로그아웃 메시지 전송 (실제 구현 시 WebSocket이나 Push Notification 활용 가능)
-            // console.log(`사용자 ${u_id}의 기존 세션이 만료되었습니다.`);
+            // A기기에 로그아웃 메시지 전송 (실제 구현 시 WebSocket이나 Push Notification 활용 가능)
+            console.log(`사용자 ${u_id}의 기존 세션이 만료되었습니다.`);
         }
 
         // 로그인 성공 시 세션에 사용자 정보 저장

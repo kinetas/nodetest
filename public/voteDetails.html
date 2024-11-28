@@ -17,16 +17,17 @@
 
     <script>
         const c_number = new URLSearchParams(window.location.search).get('c_number');
+
         if (!c_number) {
             console.error("c_number 값이 유효하지 않습니다.");
             alert("URL에 유효한 c_number 값이 포함되어 있지 않습니다.");
             window.location.href = "/cVote"; // 투표 목록 페이지로 리다이렉트
         } else {
-            console.log(`c_number 값: ${c_number}`); // 디버깅용
-            loadVoteDetails(c_number); // 데이터 로드 함수 호출
+            console.log(`c_number 값: ${c_number}`);
+            loadVoteDetails(c_number);
         }
         function loadVoteDetails() {
-            fetch(`/api/cVote/details/${c_number}`)
+            fetch(`/api/cVote/details?c_number=${c_number}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

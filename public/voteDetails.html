@@ -19,6 +19,10 @@
         const c_number = new URLSearchParams(window.location.search).get('c_number');
 
         function loadVoteDetails() {
+            if (!c_number) {
+                console.error("c_number 값이 유효하지 않습니다.");
+                return;
+            }
             fetch(`/api/cVote/details/${c_number}`)
                 .then(response => response.json())
                 .then(data => {

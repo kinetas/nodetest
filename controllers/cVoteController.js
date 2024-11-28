@@ -161,7 +161,10 @@ exports.deleteVote = async (req, res) => {
     }
 };
 exports.getVoteDetails = async (req, res) => {
-    const { c_number } = req.params;
+    const { c_number } = req.query;
+    if (!c_number) {
+        return res.status(400).json({ success: false, message: "유효하지 않은 c_number 값입니다." });
+    }
 
     try {
         const vote = await CVote.findOne({ where: { c_number } });

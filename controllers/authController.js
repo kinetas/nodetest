@@ -6,23 +6,24 @@ const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 
 const roomController = require('./roomController'); // roomController 가져오기
 
 // 로그인 처리 함수 - 쿠키
-// 
-
 exports.login = async (req, res) => {
     const { u_id, u_password } = req.body;
 
     try {
-        console.log('로그인 요청:', u_id);
+
+        console.log('Received login request:', u_id, u_password);
 
         // 사용자 조회
         const user = await User.findOne({ where: { u_id } });
 
+        // 사용자가 없거나 비밀번호가 일치하지 않는 경우
         if (!user) {
             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
         }
 
-        // 비밀번호 확인
-        const isMatch = await comparePassword(u_password, user.u_password);
+        // 비밀번호 일치 여부 확인 (bcrypt 사용) // 수정
+        // 입력받은 PW를 동일한 방식으로 암호화 후 비교
+        const isMatch = await comparePassword(u_password, user.u_password); // 수정
         if (!isMatch) {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
@@ -35,9 +36,12 @@ exports.login = async (req, res) => {
                     console.error('기존 세션 무효화 오류:', err);
                 }
             });
+
+            // A기기에 로그아웃 메시지 전송 (실제 구현 시 WebSocket이나 Push Notification 활용 가능)
+            console.log(`사용자 ${u_id}의 기존 세션이 만료되었습니다.`);
         }
 
-        // 세션 저장
+        // 로그인 성공 시 세션에 사용자 정보 저장
         req.session.user = {
             id: user.u_id,
             nickname: user.u_nickname,
@@ -46,24 +50,24 @@ exports.login = async (req, res) => {
 
         // 사용자 테이블에 현재 세션 ID 저장
         await user.update({ currentSessionId: req.sessionID });
-
-        // 로그인 성공 응답
-        return res.status(200).json({
-            message: '로그인 성공',
+        
+        // 로그인 성공 시 응답
+        res.status(200).json({
+            message: '로그인 성공 (기존 세션이 만료되었습니다.)',
             user: {
                 nickname: user.u_nickname,
                 name: user.u_name,
                 birth: user.u_birth,
                 mail: user.u_mail,
             },
-            redirectUrl: '/dashboard',
+            // redirectUrl: '/dashboard' // 리디렉션할 URL
         });
+        return res.redirect('/dashboard');
     } catch (error) {
         console.error('로그인 오류:', error);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+        res.status(500).json({ message: `서버 ${error}오류가 발생했습니다.` });
     }
 };
-
 
 // // ======== 수정 JWT ============
 // exports.login = async (req, res) => {

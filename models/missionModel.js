@@ -47,8 +47,8 @@ const Mission = sequelize.define('Mission', {
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
 });
 
-
-// // Room 관계
+ 
+// // Room 관계 
 Mission.belongsTo(Room, { foreignKey: 'r_id', as: 'room' });
 
 // // Community Room 관계

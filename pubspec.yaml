@@ -43,6 +43,8 @@ dependencies:
   image_picker: ^0.8.7+3
   provider: ^6.0.5
   socket_io_client: ^2.0.0
+  badges: ^2.0.3
+  
   flutter_localizations: # 로컬라이제이션 패키지 추가
     sdk: flutter
 

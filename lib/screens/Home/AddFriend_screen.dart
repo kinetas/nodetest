@@ -10,15 +10,19 @@ class AddFriendScreen extends StatefulWidget {
 
 class _AddFriendScreenState extends State<AddFriendScreen> {
   final TextEditingController friendIdController = TextEditingController();
-  bool isLoading = false;
+  List<String> sentRequests = []; // 보낸 요청 목록
+  bool isLoading = false; // 요청 중 상태
+  bool isLoadingRequests = true; // 보낸 요청 목록 로딩 상태
   String? sessionCookie; // 세션 쿠키 저장
 
   @override
   void initState() {
     super.initState();
     _initializeSession(); // 세션 초기화
+    _fetchSentRequests(); // 보낸 요청 목록 가져오기
   }
 
+  // 세션 초기화
   Future<void> _initializeSession() async {
     sessionCookie = await SessionCookieManager.getSessionCookie(); // 세션 쿠키 가져오기
     if (sessionCookie == null) {
@@ -36,6 +40,37 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     Navigator.pushReplacementNamed(context, '/login'); // 로그인 화면으로 리디렉션
   }
 
+  // 보낸 요청 목록 가져오기
+  Future<void> _fetchSentRequests() async {
+    try {
+      final response = await SessionCookieManager.get(
+        'http://54.180.54.31:3000/dashboard/friends/tfriends',
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        setState(() {
+          sentRequests = responseData['sentRequests'] != null
+              ? List<String>.from(responseData['sentRequests'])
+              : [];
+          isLoadingRequests = false;
+        });
+      } else {
+        setState(() => isLoadingRequests = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('보낸 요청 목록을 가져오는데 실패했습니다.')),
+        );
+      }
+    } catch (e) {
+      setState(() => isLoadingRequests = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('네트워크 오류: $e')),
+      );
+    }
+  }
+
+  // 친구 요청 보내기
   Future<void> sendFriendRequest() async {
     if (sessionCookie == null) {
       _redirectToLogin();
@@ -72,6 +107,9 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("친구 요청이 성공적으로 전송되었습니다.")),
         );
+        setState(() {
+          sentRequests.add(friendId); // 보낸 요청 목록에 추가
+        });
         friendIdController.clear();
       } else {
         final errorMessage = responseData['message'] ?? "친구 요청을 보낼 수 없습니다.";
@@ -95,13 +133,13 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('친구 추가'),
+        title: Text('친구 추가 및 보낸 요청'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // 친구 요청 보내기 입력 필드 및 버튼
             TextField(
               controller: friendIdController,
               decoration: InputDecoration(
@@ -115,6 +153,30 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                 : ElevatedButton(
               onPressed: sendFriendRequest,
               child: Text("친구 요청 보내기"),
+            ),
+            SizedBox(height: 30),
+            Divider(),
+            // 보낸 요청 목록 표시
+            Expanded(
+              child: isLoadingRequests
+                  ? Center(child: CircularProgressIndicator())
+                  : sentRequests.isEmpty
+                  ? Center(child: Text('보낸 요청이 없습니다.'))
+                  : ListView.builder(
+                itemCount: sentRequests.length,
+                itemBuilder: (context, index) {
+                  final friendId = sentRequests[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        child: Text(friendId[0]), // 요청 ID 첫 글자
+                      ),
+                      title: Text('요청 ID: $friendId'),
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),

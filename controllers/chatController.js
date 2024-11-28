@@ -62,7 +62,7 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
 //       res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
 //   }
 // };
-/*
+
 exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
   const send_date = new Date(); // 현재 시간
@@ -91,8 +91,8 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
       console.error('Error saving message with Sequelize:', error);
   }
 };
-*/
 
+/*
 exports.sendMessageWithFile = async (req, res) => {
   const { u1_id, u2_id, r_id, message_contents } = req.body;
   const file = req.file;
@@ -127,6 +127,7 @@ exports.sendMessageWithFile = async (req, res) => {
       res.status(500).json({ message: '메시지 저장 실패' });
   }
 };
+*/
 
 //메시지 불러오기
 exports.getMessages = async (r_id) => {

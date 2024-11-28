@@ -35,7 +35,7 @@ const Mission = sequelize.define('Mission', {
     allowNull: false,
   },
   r_id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING(40),
     allowNull: true, // Room 연결이 선택적인 경우
   },
   // cr_num: {

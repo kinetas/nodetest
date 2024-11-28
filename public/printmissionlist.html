@@ -32,7 +32,7 @@
     <h2>미션 요청</h2>
     <div>
         <input type="text" id="missionIdInput" placeholder="미션 ID 입력">
-        <button onclick="requestMissionApproval()">미션 요청</button>
+        <button onclick="requestMissionApproval()">미션 인증 요청</button>
     </div>
 
     <button onclick="window.location.href='/dashboard'">대시보드로 돌아가기</button>
@@ -78,7 +78,7 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
+                        listItem.textContent = `미션 ID: ${mission.m_id}, 방 ID: ${mission.r_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
                         assignedList.appendChild(listItem);
                     });
                 } else {
@@ -100,7 +100,7 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
+                        listItem.textContent = `미션 ID: ${mission.m_id}, 방 ID: ${mission.r_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
                         createdList.appendChild(listItem);
                     });
                 } else {

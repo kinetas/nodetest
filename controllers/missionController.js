@@ -251,6 +251,9 @@ exports.getCreatedMissions = async (req, res) => {
 // };
 
 
+// 방이름 추가 - 유저 아이디/닉네임으로 
+
+
 
 // // ===== JWT 기반 미션 조회 =====
 // exports.getUserMissions = async (req, res) => {

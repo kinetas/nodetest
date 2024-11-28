@@ -135,7 +135,14 @@ app.get('/result', (req, res) => {
 app.get('/printmissionlist', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'printmissionlist.html')); // printmissionlist.html 경로
 });
-app.get('/cVote/details/:c_number', (req, res) => {
+app.get('/cVote/details/', (req, res) => {
+    const { c_number } = req.query;
+
+    if (!c_number) {
+        console.error("c_number 값이 요청에 포함되지 않았습니다.");
+        res.status(400).send("c_number가 필요합니다.");
+        return;
+    }
     res.sendFile(path.join(__dirname, 'public', 'voteDetails.html'));
 });
 

@@ -79,7 +79,7 @@
                             voteDiv.className = 'vote-item';
                             voteDiv.innerHTML = `
                                 ${index + 1}. 
-                                <a href="/cVote/details/${vote.c_number}" target="_blank">${vote.c_title}</a>
+                                <a href="/cVote/details?c_number=${vote.c_number}" target="_blank">${vote.c_title}</a>
                                 - 작성자: ${vote.u_id}
                                 (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
                             `;

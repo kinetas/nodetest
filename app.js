@@ -193,7 +193,7 @@ const Room = require('./models/roomModel');
 const Mission = require('./models/missionModel');
 
 // 관계 설정 호출
-Room.hasMany(Mission, { foreignKey: 'r_id', as: 'mission' });
+Room.hasMany(Mission, { foreignKey: 'r_id', as: 'misson' });
 Mission.belongsTo(Room, { foreignKey: 'r_id', as: 'room' }); // 수정된 부분: 관계를 app.js에서 호출
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -188,6 +188,7 @@ exports.getCreatedMissions = async (req, res) => {
             m_id: mission.m_id,
             m_title: mission.m_title,
             m_deadline: mission.m_deadline,
+            
             m_status: mission.m_status,
             r_id: mission.r_id,
             r_title: mission.room ? mission.room.r_title : '없음',

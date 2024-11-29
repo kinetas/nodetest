@@ -3,7 +3,7 @@ const path = require('path');
 const NotificationLog = require('../models/notificationModel');
 
 // 서비스 계정 키 파일 경로
-const serviceAccount = require(path.join(__dirname, '../config/capdesign-d9d41-firebase-adminsdk-b83nr-9d02a2d120.json'));
+//const serviceAccount = require(path.join(__dirname, '../config/capdesign-d9d41-firebase-adminsdk-b83nr-9d02a2d120.json'));
 
 // Firebase Admin SDK 초기화
 admin.initializeApp({

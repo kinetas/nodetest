@@ -1,8 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-const Mission = require('../models/missionModel');
-
 const Room = sequelize.define('Room', {
   u1_id: {
     type: DataTypes.STRING(20),
@@ -32,6 +30,6 @@ const Room = sequelize.define('Room', {
   timestamps: false,
 });
 
-Room.hasMany(Mission, { foreignKey: 'r_id', as: 'misson' });
+Room.hasMany(require('./missionModel'), { foreignKey: 'r_id', as: 'missions' }); // 수정된 부분: Mission과 연결
 
 module.exports = Room;

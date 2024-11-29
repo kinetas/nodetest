@@ -139,7 +139,7 @@ exports.getAssignedMissions = async (req, res) => {
                 {
                     model: Room,
                     as: 'room',
-                    attributes: ['r_title'], // 방 이름만 가져오기
+                    attributes: ['r_id', 'r_title'], // 방 이름만 가져오기
                 },
             ],
         });
@@ -179,7 +179,7 @@ exports.getCreatedMissions = async (req, res) => {
                 {
                     model: Room,
                     as: 'room',
-                    attributes: ['r_title'], // 방 이름만 가져오기
+                    attributes: ['r_id', 'r_title'], // 방 이름만 가져오기
                 },
             ],
         });

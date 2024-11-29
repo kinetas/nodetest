@@ -362,11 +362,15 @@ exports.successMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        // 현재 시간 저장
+        const currentTime = new Date();
+
         // resultController를 통해 결과 저장
         const saveResultResponse = await resultController.saveResult(
             m_id,
             u1_id,
-            mission.m_deadline,
+            // mission.m_deadline,
+            currentTime, // 현재 시간 전달
             '성공'
         );
 
@@ -407,11 +411,15 @@ exports.failureMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        // 현재 시간 저장
+        const currentTime = new Date();
+
         // resultController를 통해 결과 저장
         const saveResultResponse = await resultController.saveResult(
             m_id,
             u1_id,
-            mission.m_deadline,
+            // mission.m_deadline,
+            currentTime, // 현재 시간 전달
             '실패'
         );
 

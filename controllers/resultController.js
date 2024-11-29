@@ -56,47 +56,7 @@ exports.getDailyAchievementRate = async (userId) => {
     }
 };
 
-// // 주간 달성률 계산
-// exports.getWeeklyAchievementRate = async (userId) => {
-//     try {
-//         const now = new Date();
-//         const today = new Date(now.setHours(0, 0, 0, 0));
-//         const weekStart = new Date(today);
-//         weekStart.setDate(today.getDate() - today.getDay());
-//         const weekEnd = new Date(weekStart);
-//         weekEnd.setDate(weekEnd.getDate() + 6);
-//         weekEnd.setHours(23, 59, 59, 999); //추가
-
-//         console.log('주간 달성률 - 시작:', weekStart, '종료:', weekEnd);
-
-//         const totalMissions = await MResult.count({
-//             where: { 
-//                 u_id: userId,
-//                 m_deadline: { [Op.between]: [weekStart, weekEnd] }, //추가
-//              },
-//         });
-
-//         console.log('전체 미션 개수:', totalMissions);
-
-//         const completedMissions = await MResult.count({
-//             where: {
-//                 u_id: userId,
-//                 m_status: '성공', // 필터 조건 수정
-//                 m_deadline: { [Op.between]: [weekStart, weekEnd] },
-//             },
-//         });
-
-//         console.log('완료된 미션 개수:', completedMissions);
-
-//         const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
-
-//         return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
-//     } catch (error) {
-//         console.error('주간 달성률 계산 오류:', error);
-//         throw error;
-//     }
-// };
-
+// 주간 달성률 계산
 exports.getWeeklyAchievementRate = async (userId) => {
     try {
         const now = new Date();
@@ -135,44 +95,7 @@ exports.getWeeklyAchievementRate = async (userId) => {
     }
 };
 
-// // 월간 달성률 계산
-// exports.getMonthlyAchievementRate = async (userId) => {
-//     try {
-//         const now = new Date();
-//         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-//         const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-//         monthEnd.setHours(23, 59, 59, 999);//추가
-
-//         console.log('월간 달성률 - 시작:', monthStart, '종료:', monthEnd);
-
-//         const totalMissions = await MResult.count({
-//             where: { 
-//                 u_id: userId,
-//                 m_deadline: { [Op.between]: [monthStart, monthEnd] },
-//              },
-//         });
-
-//         console.log('전체 미션 개수:', totalMissions);
-
-//         const completedMissions = await MResult.count({
-//             where: {
-//                 u_id: userId,
-//                 m_status: '성공', // 필터 조건 수정
-//                 m_deadline: { [Op.between]: [monthStart, monthEnd] },
-//             },
-//         });
-
-//         console.log('완료된 미션 개수:', completedMissions);
-
-//         const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
-
-//         return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
-//     } catch (error) {
-//         console.error('월간 달성률 계산 오류:', error);
-//         throw error;
-//     }
-// };
-
+// 월간 달성률 계산
 exports.getMonthlyAchievementRate = async (userId) => {
     try {
         const now = new Date();
@@ -208,44 +131,7 @@ exports.getMonthlyAchievementRate = async (userId) => {
     }
 };
 
-// // 연간 달성률 계산
-// exports.getYearlyAchievementRate = async (userId) => {
-//     try {
-//         const now = new Date();
-//         const yearStart = new Date(now.getFullYear(), 0, 1);
-//         const yearEnd = new Date(now.getFullYear(), 11, 31);
-//         yearEnd.setHours(23, 59, 59, 999); //추가
-
-//         console.log('연간 달성률 - 시작:', yearStart, '종료:', yearEnd);
-
-//         const totalMissions = await MResult.count({
-//             where: { 
-//                 u_id: userId,
-//                 m_deadline: { [Op.between]: [yearStart, yearEnd] }, //추가
-//              },
-//         });
-
-//         console.log('전체 미션 개수:', totalMissions);
-
-//         const completedMissions = await MResult.count({
-//             where: {
-//                 u_id: userId,
-//                 m_status: '성공', // 필터 조건 수정
-//                 m_deadline: { [Op.between]: [yearStart, yearEnd] },
-//             },
-//         });
-
-//         console.log('완료된 미션 개수:', completedMissions);
-
-//         const rate = totalMissions ? (completedMissions / totalMissions) * 100 : 0;
-
-//         return Math.round(rate * 10) / 10; // 소수 첫 번째 자리 반올림
-//     } catch (error) {
-//         console.error('연간 달성률 계산 오류:', error);
-//         throw error;
-//     }
-// };
-
+// 연간 달성률 계산
 exports.getYearlyAchievementRate = async (userId) => {
     try {
         const now = new Date();

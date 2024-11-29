@@ -1,7 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
-const Room = require('../models/roomModel');
-const CRoom = require('../models/comunity_roomModel');
 
 const Mission = sequelize.define('Mission', {
   m_id: {
@@ -38,20 +36,9 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(40),
     allowNull: true, // Room 연결이 선택적인 경우
   },
-  // cr_num: {
-  //     type: DataTypes.INTEGER,
-  //     allowNull: true, // CommunityRoom 연결이 선택적인 경우
-  // },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����
 });
-
- 
-// // Room 관계 
-Mission.belongsTo(Room, { foreignKey: 'r_id', as: 'room' });
-
-// // Community Room 관계
-// Mission.belongsTo(CRoom, { foreignKey: 'cr_num', as: 'communityRoom' });
 
 module.exports = Mission;

@@ -30,6 +30,4 @@ const Room = sequelize.define('Room', {
   timestamps: false,
 });
 
-Room.hasMany(require('./missionModel'), { foreignKey: 'r_id', as: 'misson' }); // 수정된 부분: Mission과 연결
-
 module.exports = Room;

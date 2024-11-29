@@ -16,13 +16,17 @@
 const User = require('../models/userModel'); // User 모델 가져오기
 const requireAuth = async (req, res, next) => {
     if (!req.session || !req.session.user) {
+        console.log('[DEBUG] 세션이 없습니다.');
         return res.status(401).json({ message: '로그인이 필요합니다.' });
     }
 
     try {
         const user = await User.findOne({ where: { u_id: req.session.user.id } });
+        console.log('[DEBUG] 세션 사용자:', req.session.user);
+        console.log('[DEBUG] DB 사용자:', user);
 
         if (!user || user.session_id !== req.session.id) {
+            console.log('[DEBUG] 다른 기기에서 로그인되었습니다.');
             req.session.destroy();
             return res.status(401).json({ message: '다른 기기에서 로그인되었습니다. 다시 로그인해주세요.' });
         }

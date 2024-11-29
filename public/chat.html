@@ -73,12 +73,6 @@
             const fileInput = document.getElementById("fileInput"); // 파일 입력 필드 가져오기
             const file = fileInput.files[0]; // 선택된 파일 가져오기
 
-            if (!messageInput) {
-                console.error("Cannot find message input element.");
-                return;
-            }
-            const message = messageInput.value;
-
             // 로그인된 사용자 ID 가져오기
             const u1_id = sessionStorage.getItem('user_id'); // =========== 수정 JWT ui_id 제거 =============
             const urlParams = new URLSearchParams(window.location.search);
@@ -88,21 +82,55 @@
                 console.error("User ID not found in session storage.");
                 return;
             }
+
+            if (!messageInput) {
+                console.error("Cannot find message input element.");
+                return;
+            }
+            const message = messageInput.value;
+
+            
             // 메시지가 비어 있는지 확인
             if (message.trim() === "") {
                 alert("메시지를 입력하세요.");
                 return;
             }
-            // 방 목록으로 나가기 함수
-            function goBackToRoomList() {
-                window.location.href = '/rooms.html';
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                  const base64Image = event.target.result.split(',')[1]; // 이미지 파일을 Base64로 인코딩
+            
+                  // 소켓으로 메시지와 이미지 전송
+                  socket.emit('sendMessage', {
+                    message_contents: messageContents,
+                    r_id,
+                    u1_id,
+                    u2_id,
+                    image: base64Image,
+                    image_type: fileInput.files[0].type
+                  });
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+              } else {
+                // 파일이 없을 경우 메시지만 전송
+                socket.emit('sendMessage', {
+                  message_contents: messageContents,
+                  r_id,
+                  u1_id,
+                  u2_id
+                });
+              }
             }
+            
             // // =========== 수정 JWT =============
             // if (!message.trim()) {
             //     alert("메시지를 입력하세요.");
             //     return;
             // }
 
+            // 방 목록으로 나가기 함수
+            function goBackToRoomList() {
+                window.location.href = '/rooms.html';
             // 메시지 전송
             socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
 
@@ -122,10 +150,6 @@
             
 
             fetch('/chat/send-message', {
-                method: 'POST',
-                body: formData
-            })
-            fetch('/upload-image', {
                 method: 'POST',
                 body: formData
             })

@@ -124,7 +124,7 @@ io.on('connection', (socket) => {
   socket.on('sendMessage', async (data) => {
     console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 
-    const { message_contents, r_id, u1_id, u2_id } = data;
+    const { message_contents, r_id, u1_id, u2_id, image, image_type } = data;
 
     // 필수 값 검증
     if (!message_contents || !r_id || !u1_id || !u2_id) {
@@ -140,6 +140,12 @@ io.on('connection', (socket) => {
     }
 
 try {
+  let fileBuffer = null;
+
+  // 이미지 데이터가 있는 경우 처리
+  if (image) {
+    fileBuffer = Buffer.from(image, 'base64'); // Base64를 Buffer로 변환
+  }
   // Sequelize를 사용하여 메시지 저장
   const newMessage = await RMessage.create({
     u1_id,
@@ -147,6 +153,8 @@ try {
     r_id,
     message_contents,
     send_date: new Date(), // 현재 시간 설정
+    image: fileBuffer,
+    image_type: image_type || null
   });
   console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
 
@@ -154,7 +162,8 @@ try {
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' ')
+    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+    image: fileBuffer ? fileBuffer.toString('base64') : null // Base64로 인코딩하여 클라이언트에 전송
   });
 } catch (error) {
   console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력

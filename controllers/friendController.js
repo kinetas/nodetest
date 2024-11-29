@@ -157,8 +157,8 @@ exports.friendRequestSend = async (req, res) => {
             return res.json({ success: true, message: '친구 요청이 성공적으로 전송되었습니다.' });
         }
 
-        // 요청이 비정상적으로 처리되지 않은 경우
-        return res.status(500).json({ success: false, message: `친구 요청 처리 중 예상치 못한 오류(${error.message})가 발생했습니다.` });
+        // // 요청이 비정상적으로 처리되지 않은 경우
+        // return res.status(500).json({ success: false, message: `친구 요청 처리 중 예상치 못한 오류(${error.message})가 발생했습니다.` });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: `친구 요청 전송 중 오류 (${error.message})가 발생했습니다.` });

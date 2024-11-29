@@ -166,40 +166,8 @@
         // 메시지 입력란 비우기
             messageInput.value = "";
         }
-        function printRoomMission() {
-            fetch('/api/missions/printRoomMission', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ r_id: roomId })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.message); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                const roomMissionListElement = document.getElementById('roomMissionList');
-                roomMissionListElement.innerHTML = '';
 
-                if (data.missions && data.missions.length > 0) {
-                    data.missions.forEach(mission => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `미션: ${mission.title}, 마감일: ${mission.deadline}, 수행자: ${mission.performer}`;
-                        roomMissionListElement.appendChild(listItem);
-                    });
-                } else {
-                    roomMissionListElement.textContent = '해당 방에 미션이 없습니다.';
-                }
-            })
-            .catch(error => {
-                console.error('미션 출력 오류:', error);
-                document.getElementById('roomMissionList').textContent = `오류 발생: ${error.message}`;
-            });
-        }
-        /*
+        
             //방미션출력
         function printRoomMission() {
             const u2_id = document.getElementById('u2_id_input').value;
@@ -236,7 +204,7 @@
                     console.error('미션 출력 오류:', error);
                     document.getElementById('roomMissionList').textContent = `오류 발생: ${error.message}`;
                 });
-        }*/
+        }
     </script>
 </body>
 </html>

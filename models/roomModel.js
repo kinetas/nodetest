@@ -1,6 +1,8 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
+const Mission = require('../models/missionModel');
+
 const Room = sequelize.define('Room', {
   u1_id: {
     type: DataTypes.STRING(20),

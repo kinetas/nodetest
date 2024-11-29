@@ -351,15 +351,29 @@ exports.successMission = async (req, res) => {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
         }
         
-         // m_status가 "진행중"일 때만 상태 변경 가능
-         if (mission.m_status !== '진행중') {
-            return res.json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
+        // m_status가 "요청"일 때만 상태 변경 가능
+        if (mission.m_status !== '요청') {
+            return res.status(400).json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
         }
 
+        // m_status를 "완료"로 업데이트
         await Mission.update(
-            { m_status: '성공' },
+            { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+
+        // resultController를 통해 결과 저장
+        const saveResultResponse = await resultController.saveResult(
+            m_id,
+            u1_id,
+            mission.m_deadline,
+            '성공'
+        );
+
+        if (!saveResultResponse.success) {
+            return res.status(500).json({ success: false, message: '결과 저장 중 오류가 발생했습니다.' });
+        }
+
         res.json({ success: true, message: '미션이 성공으로 갱신되었습니다.' });
     } catch (error) {
         console.error('미션 성공 처리 오류:', error);
@@ -378,15 +392,27 @@ exports.failureMission = async (req, res) => {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
         }
 
-        // m_status가 "진행중"일 때만 상태 변경 가능
-        if (mission.m_status !== '진행중') {
+        // m_status가 "요청"일 때만 상태 변경 가능
+        if (mission.m_status !== '요청') {
             return res.json({ success: false, message: '현재 상태에서는 미션을 성공으로 변경할 수 없습니다.' });
         }
 
         await Mission.update(
-            { m_status: '실패' },
+            { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+
+        // resultController를 통해 결과 저장
+        const saveResultResponse = await resultController.saveResult(
+            m_id,
+            u1_id,
+            mission.m_deadline,
+            '실패'
+        );
+
+        if (!saveResultResponse.success) {
+            return res.status(500).json({ success: false, message: '결과 저장 중 오류가 발생했습니다.' });
+        }
 
         res.json({ success: true, message: '미션이 실패로 갱신되었습니다.' });
     } catch (error) {

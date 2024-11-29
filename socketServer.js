@@ -12,6 +12,7 @@ const chatRoutes = require('./routes/chatRoutes');
 const missionRoutes = require('./routes/missionRoutes');
 const logger = require('./logger');
 const RMessage  = require('./models/messageModel');
+const multer = require('multer');
 
 const app = express();
 const server = http.createServer(app);
@@ -32,6 +33,9 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/chat', chatRoutes);
 app.use('/mission', missionRoutes);
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // //소켓 연결 처리
 // io.on('connection', (socket) => {
@@ -135,66 +139,6 @@ io.on('connection', (socket) => {
       return;
     }
 
-//    try {
-//      // 소켓 서버에서 API 서버로 HTTP 요청 전송
-//      const response = await axios.post('http://54.180.54.31:3000/api/messages', {
-//        message_contents,
-//        r_id,
-//        u1_id,
-//        u2_id,
-//      });
-//      console.log('API Response:', response.data); // API 서버 응답 출력 (수정된 부분)
-
-      // API 서버 응답을 해당 방에 있는 클라이언트들에게 전송
-//      io.to(r_id).emit('receiveMessage', response.data); // io.to(r_id)를 사용하여 특정 방에 전송 (수정된 부분)
-//    } catch (error) {
-//      console.error('Axios Request Error:', error.response?.data || error.message); // 에러 로그 출력 (수정된 부분)
-//      socket.emit('errorMessage', 'Failed to send message'); // 클라이언트로 에러 메시지 전송 (수정된 부분)
-//    }
-//  });
-
-  /*socket.on('assignMission', (data) => {
-    missionController.assignMission(io, socket, data); // 미션 할당 처리
-  });
-
-  socket.on('completeMission', (data) => {
-    missionController.completeMission(io, socket, data); // 미션 완료 처리
-  });*/
-
-  // 클라이언트가 연결 해제되었을 때 처리
-//  socket.on('disconnect', () => {
-//    console.log('User disconnected');
-//  });
-//});
-
-// Sequelize를 사용하여 메시지 처리
-//exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
-//  const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
-//  const send_date = new Date(); // 현재 시간
-
-//  try {
-//    // 메시지 저장
-//    const newMessage = await RMessage.create({
-//      u1_id,
-//      u2_id,
-//      r_id,
-//      message_num,
-//      message_contents: message,
-//      send_date
-//    });
-//    console.log('Message saved to DB:', newMessage); // DB 저장 확인 로그 추가 (수정된 부분)
-
-    // 클라이언트에 메시지 전송
-//    socket.emit('receiveMessage', {
-//      u1_id,
-//      message,
-//      send_date: send_date.toISOString().slice(0, 19).replace('T', ' ')
-//    });
-//  } catch (error) {
-//    console.error('Error saving message to DB:', error.message); // DB 저장 실패 시 에러 로그 출력 (수정된 부분)
-//  }
-//};
-
 try {
   // Sequelize를 사용하여 메시지 저장
   const newMessage = await RMessage.create({
@@ -217,6 +161,49 @@ try {
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
 }
 });
+
+app.post('/upload-image', upload.single('file'), async (req, res) => {
+  const { u1_id, u2_id, r_id, message_contents } = req.body;
+  const file = req.file;
+
+  if (!u1_id || !u2_id || !r_id || (!message_contents && !file)) {
+      return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
+  }
+
+  try {
+      let fileBuffer = null;
+      let fileType = null;
+
+      if (file) {
+          fileBuffer = file.buffer;
+          fileType = file.mimetype;
+      }
+
+      const newMessage = await RMessage.create({
+          u1_id,
+          u2_id,
+          r_id,
+          message_contents,
+          send_date: new Date(),
+          image: fileBuffer,
+          image_type: fileType
+      });
+
+      res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.', newMessage });
+    
+      // 메시지와 이미지 정보를 소켓을 통해 방에 있는 클라이언트들에게 전송
+      io.to(r_id).emit('receiveMessage', {
+        u1_id,
+        message_contents,
+        send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+        image: fileBuffer ? fileBuffer.toString('base64') : null
+      });
+  } catch (error) {
+      console.error('Error saving message to DB:', error);
+      res.status(500).json({ message: '메시지 저장 실패' });
+  }
+});
+
 
 // 클라이언트가 연결 해제되었을 때 처리
 socket.on('disconnect', () => {

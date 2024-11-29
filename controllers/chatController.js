@@ -92,7 +92,6 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   }
 };
 
-/*
 exports.sendMessageWithFile = async (req, res) => {
   const { u1_id, u2_id, r_id, message_contents } = req.body;
   const file = req.file;
@@ -106,12 +105,11 @@ exports.sendMessageWithFile = async (req, res) => {
       let fileType = null;
 
       if (file) {
-          fileBuffer = file.buffer;
+          fileBuffer = file.buffer; // 변경된 부분 - 파일 처리 로직 추가
           fileType = file.mimetype;
       }
 
-      // 데이터베이스에 메시지 및 파일 저장
-      await RMessage.create({
+      const newMessage = await RMessage.create({
           u1_id,
           u2_id,
           r_id,
@@ -119,15 +117,14 @@ exports.sendMessageWithFile = async (req, res) => {
           send_date: new Date(),
           image: fileBuffer,
           image_type: fileType
-      });
+      }); // 변경된 부분 - 메시지와 파일을 DB에 저장
 
-      res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.' });
+      res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.', newMessage });
   } catch (error) {
       console.error('Error saving message to DB:', error);
       res.status(500).json({ message: '메시지 저장 실패' });
   }
 };
-*/
 
 //메시지 불러오기
 exports.getMessages = async (r_id) => {

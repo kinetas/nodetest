@@ -28,15 +28,15 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // 기존 세션 처리 - ====================추가=============================
-        if (user.session_id) {
-            console.log('[DEBUG] 기존 세션 삭제 요청:', user.session_id);
-            req.sessionStore.destroy(user.session_id, (err) => {
-                if (err) {
-                    console.error('기존 세션 삭제 오류:', err);
-                }
-            });
-        }
+        // // 기존 세션 처리 - ====================추가=============================
+        // if (user.session_id) {
+        //     console.log('[DEBUG] 기존 세션 삭제 요청:', user.session_id);
+        //     req.sessionStore.destroy(user.session_id, (err) => {
+        //         if (err) {
+        //             console.error('기존 세션 삭제 오류:', err);
+        //         }
+        //     });
+        // }
 
         // 로그인 성공 시 세션에 사용자 정보 저장
         req.session.user = {
@@ -44,7 +44,7 @@ exports.login = async (req, res) => {
             nickname: user.u_nickname,
             name: user.u_name,
         };
-        console.log('[DEBUG] 새로운 세션 설정:', req.session); // 추가
+        // console.log('[DEBUG] 새로운 세션 설정:', req.session); // 추가
 
         // 로그인 성공 시 응답
         return res.status(200).json({
@@ -135,39 +135,39 @@ exports.register = async (req, res) => {
 // 로그아웃 함수
 exports.logOut = (req, res) => {
     
-    // req.session.destroy((err) => {
-    //     if (err) {
-    //         console.error('세션 삭제 오류:', err);
-    //         return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
-    //     }
-    //     res.status(200).json({ success: true, message: '로그아웃 성공' });
-    // });
-
-    //========================추가=======================================
-    const userId = req.session.user?.id;
-
-    if (!userId) {
-        return res.status(401).json({ message: '로그인이 필요합니다.' });
-    }
-
-    req.session.destroy(async (err) => {
+    req.session.destroy((err) => {
         if (err) {
             console.error('세션 삭제 오류:', err);
             return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
         }
-
-        try {
-            const user = await User.findOne({ where: { u_id: userId } });
-            if (user) {
-                user.session_id = null;
-                await user.save();
-            }
-            res.status(200).json({ success: true, message: '로그아웃 성공' });
-        } catch (error) {
-            console.error('로그아웃 처리 중 오류:', error);
-            res.status(500).json({ message: '로그아웃 처리 중 서버 오류가 발생했습니다.' });
-        }
+        res.status(200).json({ success: true, message: '로그아웃 성공' });
     });
+
+    // //========================추가=======================================
+    // const userId = req.session.user?.id;
+
+    // if (!userId) {
+    //     return res.status(401).json({ message: '로그인이 필요합니다.' });
+    // }
+
+    // req.session.destroy(async (err) => {
+    //     if (err) {
+    //         console.error('세션 삭제 오류:', err);
+    //         return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
+    //     }
+
+    //     try {
+    //         const user = await User.findOne({ where: { u_id: userId } });
+    //         if (user) {
+    //             user.session_id = null;
+    //             await user.save();
+    //         }
+    //         res.status(200).json({ success: true, message: '로그아웃 성공' });
+    //     } catch (error) {
+    //         console.error('로그아웃 처리 중 오류:', error);
+    //         res.status(500).json({ message: '로그아웃 처리 중 서버 오류가 발생했습니다.' });
+    //     }
+    // });
 };
 
 // // ======== 수정 JWT ============

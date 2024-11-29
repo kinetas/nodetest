@@ -3,11 +3,8 @@ const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인�
 const CVote = require('../models/comunity_voteModel');
 const c_v_notdup = require('../models/c_v_not_dupModel'); 
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
-//const multer = require('multer');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
-// const storage = multer.memoryStorage();
-// const upload = multer({ storage });
 
 // 투표 리스트 가져오기
 exports.getVotes = async (req, res) => {

@@ -123,55 +123,6 @@
                 .catch(error => console.error("Error loading my votes:", error));
         }
 
-        // function createVote() {
-        //     const c_title = document.getElementById('c_title').value;
-        //     const c_contents = document.getElementById('c_contents').value;
-
-        //     fetch('/api/cVote/create', {
-        //         method: 'POST',
-        //         headers: { 'Content-Type': 'application/json' },
-
-        //         // headers: {
-        //         //     'Content-Type': 'application/json',
-        //         //     Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
-        //         // },
-
-        //         body: JSON.stringify({ c_title, c_contents })
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 alert('투표가 생성되었습니다.');
-        //                 loadVotes();
-        //                 loadMyVotes();
-        //             } else {
-        //                 alert(data.message);
-        //             }
-        //         });
-        // }
-
-        // function voteAction(c_number, action) {
-        //     fetch('/api/cVote/action', {
-        //         method: 'POST',
-        //         headers: { 'Content-Type': 'application/json' },
-
-        //         // headers: {
-        //         //     'Content-Type': 'application/json',
-        //         //     Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
-        //         // },
-
-        //         body: JSON.stringify({ c_number, action })
-        //     })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success) {
-        //                 loadVotes();
-        //                 loadMyVotes();
-        //             } else {
-        //                 alert(data.message);
-        //             }
-        //         });
-        // }
         document.getElementById('createVoteForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const c_title = document.getElementById('c_title').value.trim();
@@ -183,8 +134,8 @@
                 return;
             }
 
-            if (c_image && c_image.size > 5 * 1024 * 1024) { // 5MB 제한
-                alert("이미지 파일 크기는 5MB를 초과할 수 없습니다.");
+            if (c_image && c_image.size > 64 * 1024) { // 64KB 제한
+                alert("이미지 파일 크기는 64KB를 초과할 수 없습니다.");
                 return;
             }
 

@@ -30,6 +30,7 @@ exports.login = async (req, res) => {
 
         // 기존 세션 처리 - ====================추가=============================
         if (user.session_id) {
+            console.log('[DEBUG] 기존 세션 삭제 요청:', user.session_id);
             req.sessionStore.destroy(user.session_id, (err) => {
                 if (err) {
                     console.error('기존 세션 삭제 오류:', err);
@@ -43,6 +44,7 @@ exports.login = async (req, res) => {
             nickname: user.u_nickname,
             name: user.u_name,
         };
+        console.log('[DEBUG] 새로운 세션 설정:', req.session); // 추가
 
         // 로그인 성공 시 응답
         return res.status(200).json({

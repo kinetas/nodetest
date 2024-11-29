@@ -15,6 +15,9 @@ const db = require('./config/db');
 const app = express();
 const PORT = 3000;
 
+//=====================추가========================
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+
 // // ======== ?��?�� JWT ============
 const jwt = require('jsonwebtoken'); // JWT 추�??
 // const requireAuth = require('./middleware/authMiddleware');
@@ -30,7 +33,15 @@ app.use(session({
     secret: 'your_secret_key', // �꽭��?? �븫�샇�솕�뿉 �궗�슜�븷 �궎
     resave: false, // �꽭��?��?�� �빆�긽 ����?���븷吏� �뿬?���?
     saveUninitialized: false, // ?��?��린�?���릺吏� �븡���? �꽭��?��?�� ����?���븷吏� �뿬?���?
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?��좏궎�쓽 ��??�슚 湲곌�? (�뿬湲곗꽌�?�� �븯?���?)
+    store: new SequelizeStore({
+        db: sequelize, // Sequelize 인스턴스와 연결
+    }),
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000, // 1일
+        httpOnly: true,
+        secure: false, // HTTPS 사용 시 true로 설정
+    }
+    // cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?��좏궎�쓽 ��??�슚 湲곌�? (�뿬湲곗꽌�?�� �븯?���?)
 }));
 
 // // ======== ?��?�� JWT ============

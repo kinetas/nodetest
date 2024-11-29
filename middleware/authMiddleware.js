@@ -16,7 +16,7 @@
 const User = require('../models/userModel'); // User 모델 가져오기
 const requireAuth = async (req, res, next) => {
     if (!req.session || !req.session.user) {
-        console.log('[DEBUG] 세션이 없습니다.');
+        console.log('[DEBUG] 세션이 없습니다. req.session:', req.session);
         return res.status(401).json({ message: '로그인이 필요합니다.' });
     }
 

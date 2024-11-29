@@ -21,11 +21,20 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
         }
 
-        // 비밀번호 일치 여부 확인 (bcrypt 사용) // 수정
+        // 비밀번호 일치 여부 확인 (bcrypt 사용)
         // 입력받은 PW를 동일한 방식으로 암호화 후 비교
-        const isMatch = await comparePassword(u_password, user.u_password); // 수정
+        const isMatch = await comparePassword(u_password, user.u_password);
         if (!isMatch) {
             return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+        }
+
+        // 기존 세션 처리 - ====================추가=============================
+        if (user.session_id) {
+            req.sessionStore.destroy(user.session_id, (err) => {
+                if (err) {
+                    console.error('기존 세션 삭제 오류:', err);
+                }
+            });
         }
 
         // 로그인 성공 시 세션에 사용자 정보 저장
@@ -123,12 +132,39 @@ exports.register = async (req, res) => {
 
 // 로그아웃 함수
 exports.logOut = (req, res) => {
-    req.session.destroy((err) => {
+    
+    // req.session.destroy((err) => {
+    //     if (err) {
+    //         console.error('세션 삭제 오류:', err);
+    //         return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
+    //     }
+    //     res.status(200).json({ success: true, message: '로그아웃 성공' });
+    // });
+
+    //========================추가=======================================
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+        return res.status(401).json({ message: '로그인이 필요합니다.' });
+    }
+
+    req.session.destroy(async (err) => {
         if (err) {
             console.error('세션 삭제 오류:', err);
             return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
         }
-        res.status(200).json({ success: true, message: '로그아웃 성공' });
+
+        try {
+            const user = await User.findOne({ where: { u_id: userId } });
+            if (user) {
+                user.session_id = null;
+                await user.save();
+            }
+            res.status(200).json({ success: true, message: '로그아웃 성공' });
+        } catch (error) {
+            console.error('로그아웃 처리 중 오류:', error);
+            res.status(500).json({ message: '로그아웃 처리 중 서버 오류가 발생했습니다.' });
+        }
     });
 };
 

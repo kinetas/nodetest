@@ -26,6 +26,10 @@ const User = sequelize.define('user', {
     u_mail: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    session_id: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'user',

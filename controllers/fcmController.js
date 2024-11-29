@@ -2,13 +2,14 @@ const admin = require('firebase-admin');
 const path = require('path');
 const NotificationLog = require('../models/notificationModel');
 
-// Firebase Admin 초기화 비밀키 발급받고 저장해야됨
-//const serviceAccount = require(path.join(__dirname, 'path/to/serviceAccountKey.json'));
+// 서비스 계정 키 파일 경로
+const serviceAccount = require(path.join(__dirname, '../config/capdesign-d9d41-firebase-adminsdk-b83nr-9d02a2d120.json'));
 
-/*admin.initializeApp({
+// Firebase Admin SDK 초기화
+admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
-*/
+
 
 // 기본 알림 전송 함수
 const sendNotification = async (token, payload, userId) => {

@@ -29,15 +29,95 @@
     <ul id="createdMissions">로딩 중...</ul>
 
     <!-- 미션 요청 폼 추가 -->
-    <h2>미션 요청</h2>
+    <!-- <h2>미션 요청</h2>
     <div>
         <input type="text" id="missionIdInput" placeholder="미션 ID 입력">
         <button onclick="requestMissionApproval()">미션 인증 요청</button>
+    </div> -->
+
+    <!-- 미션 작업 UI -->
+    <h2>미션 작업</h2>
+    <div class="form-container">
+        <input type="text" id="m_id" placeholder="미션 ID 입력">
+        <button onclick="deleteMission()">미션 삭제</button>
+        <button onclick="successMission()">미션 성공</button>
+        <button onclick="failureMission()">미션 실패</button>
+        <button onclick="requestMissionApproval()">미션 요청</button>
     </div>
 
     <button onclick="window.location.href='/dashboard'">대시보드로 돌아가기</button>
 
     <script>
+
+        // 미션 삭제
+        function deleteMission() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) {
+                alert("미션 ID를 입력하세요.");
+                return;
+            }
+            fetch('/dashboard/missiondelete', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('미션 삭제 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 미션 성공
+        function successMission() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) {
+                alert("미션 ID를 입력하세요.");
+                return;
+            }
+            fetch('/dashboard/successMission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('미션 성공 처리 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 미션 실패
+        function failureMission() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) {
+                alert("미션 ID를 입력하세요.");
+                return;
+            }
+            fetch('/dashboard/failureMission', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('미션 실패 처리 중 오류가 발생했습니다.');
+            });
+        }
+
 
         // 미션 요청 함수
         function requestMissionApproval() {

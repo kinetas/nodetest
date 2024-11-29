@@ -142,7 +142,7 @@ exports.friendRequestSend = async (req, res) => {
                     { f_status: 0, f_create: new Date() }, // 상태를 요청으로 변경
                     { where: { u_id, f_id } }
                 );
-                return res.json({ success: true, message: '친구 요청이 성공적으로 전송되었습니다.' });
+                return res.json({ success: true, message: '친구 요청이 성공적으로 다시 전송되었습니다.' });
             }
         }
 

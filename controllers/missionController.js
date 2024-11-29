@@ -362,23 +362,23 @@ exports.successMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        // 현재 시간 저장
+        const currentTime = new Date();
+
         // resultController를 통해 결과 저장
         const saveResultResponse = await resultController.saveResult(
             m_id,
             u1_id,
-            mission.m_deadline,
+            // mission.m_deadline,
+            currentTime, // 현재 시간 전달
             '성공'
         );
-
-        // if (!saveResultResponse.success) {
-        //     return res.status(500).json({ success: false, message: '결과 저장 중 오류가 발생했습니다.' });
-        // }
 
         // saveResultResponse가 성공하지 않은 경우
         if (!saveResultResponse.success) {
             return res.status(500).json({
                 success: false,
-                message: `결과 저장 중 오류가 발생했습니다.`,
+                message: `결과 저장 중 오류가 발생했습니다. controller: ${saveResultResponse.error || '알 수 없는 오류'}`,
                 error: saveResultResponse.error || '알 수 없는 오류',
             });
         }
@@ -411,17 +411,26 @@ exports.failureMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        // 현재 시간 저장
+        const currentTime = new Date();
+
         // resultController를 통해 결과 저장
         const saveResultResponse = await resultController.saveResult(
             m_id,
             u1_id,
-            mission.m_deadline,
+            // mission.m_deadline,
+            currentTime, // 현재 시간 전달
             '실패'
         );
 
-        // if (!saveResultResponse.success) {
-        //     return res.status(500).json({ success: false, message: `결과 저장 중 오류가 발생했습니다.` });
-        // }
+        // saveResultResponse가 성공하지 않은 경우
+        if (!saveResultResponse.success) {
+            return res.status(500).json({
+                success: false,
+                message: `결과 저장 중 오류가 발생했습니다. controller: ${saveResultResponse.error || '알 수 없는 오류'}`,
+                error: saveResultResponse.error || '알 수 없는 오류',
+            });
+        }
 
         // saveResultResponse가 성공하지 않은 경우
         if (!saveResultResponse.success) {

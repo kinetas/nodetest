@@ -5,7 +5,7 @@ const { Op } = require('sequelize');
 // m_result에 데이터 저장 함수
 exports.saveResult = async (m_id, u_id, m_deadline, m_status) => {
     try {
-        await Result.create({
+        await MResult.create({
             m_id,
             u_id,
             m_deadline,

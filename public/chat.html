@@ -72,12 +72,15 @@
             const messageInput = document.getElementById("messageInput");
             const fileInput = document.getElementById("fileInput"); // 파일 입력 필드 가져오기
             const file = fileInput.files[0]; // 선택된 파일 가져오기
+            const message = messageInput.value;
+
 
             // 로그인된 사용자 ID 가져오기
             const u1_id = sessionStorage.getItem('user_id'); // =========== 수정 JWT ui_id 제거 =============
             const urlParams = new URLSearchParams(window.location.search);
             const r_id = urlParams.get('r_id');
             const u2_id = urlParams.get('u2_id');
+            
             if (!u1_id) {
                 console.error("User ID not found in session storage.");
                 return;
@@ -87,7 +90,7 @@
                 console.error("Cannot find message input element.");
                 return;
             }
-            const message = messageInput.value;
+            
 
             
             // 메시지가 비어 있는지 확인
@@ -102,7 +105,7 @@
             
                   // 소켓으로 메시지와 이미지 전송
                   socket.emit('sendMessage', {
-                    message_contents: messageContents,
+                    message_contents: message,
                     r_id,
                     u1_id,
                     u2_id,
@@ -114,7 +117,7 @@
               } else {
                 // 파일이 없을 경우 메시지만 전송
                 socket.emit('sendMessage', {
-                  message_contents: messageContents,
+                  message_contents: message,
                   r_id,
                   u1_id,
                   u2_id

@@ -30,4 +30,6 @@ const Room = sequelize.define('Room', {
   timestamps: false,
 });
 
+Room.hasMany(Mission, { foreignKey: 'r_id', as: 'missions' });
+
 module.exports = Room;

@@ -85,6 +85,15 @@ exports.friendRequestSend = async (req, res) => {
     const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
 
     try {
+
+        // 자기 자신에게 요청을 보내는지 확인
+        if (u_id === f_id) {
+            return res.status(400).json({
+                success: false,
+                message: '자기 자신에게는 친구 요청을 보낼 수 없습니다.',
+            });
+        }
+
         // 기존 친구 요청 확인
         const existingRequest = await TFriend.findOne({
             where: { u_id, f_id },
@@ -172,13 +181,106 @@ exports.friendRequestSend = async (req, res) => {
 // };
 
 
-// 친구 요청 수락 함수
+//===========================================================================================================
+// // 친구 요청 수락 함수
+// exports.friendRequestAccept = async (req, res) => {
+//     const { f_id } = req.body; // 친구 요청한 ID
+//     const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
+
+//     try {
+//         // t_friend 테이블에서 유효한 친구 요청 확인
+//         const existingRequest = await TFriend.findOne({
+//             where: { u_id: f_id, f_id: u_id, f_status: 0 },
+//         });
+
+//         if (!existingRequest) {
+//             return res.status(404).json({ success: false, message: '친구 요청을 찾을 수 없습니다.' });
+//         }
+
+//         // i_friend 테이블에서 기존 친구 관계 확인
+//         const isFriend = await IFriend.findOne({
+//             where: { u_id, f_id },
+//         });
+
+//         const isFriendReverse = await IFriend.findOne({
+//             where: { u_id: f_id, f_id: u_id },
+//         });
+
+//         if (isFriend || isFriendReverse) {
+//             return res.status(400).json({ success: false, message: '이미 친구 관계가 존재합니다.' });
+//         }
+
+//         // i_friend 테이블에 양방향 친구 관계 추가
+//         await IFriend.create({
+//             u_id,
+//             f_id,
+//         });
+
+//         await IFriend.create({
+//             u_id: f_id,
+//             f_id: u_id,
+//         });
+
+//         // t_friend 테이블 상태 업데이트 (수락 상태)
+//         await TFriend.update(
+//             { f_status: 1 },
+//             {
+//                 where: {
+//                     u_id: f_id,
+//                     f_id: u_id,
+//                 },
+//             }
+//         );
+
+//         res.json({ success: true, message: '친구 요청이 수락되었습니다.' });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ success: false, message: `친구 요청 수락 중 오류 (${error})가 발생했습니다.` });
+//     }
+// };
+
+// // 친구 요청 거절 함수
+// exports.friendRequestReject = async (req, res) => {
+//     const { f_id } = req.body; // 친구 요청한 ID
+//     try {
+//         const result = await TFriend.update(
+//             { f_status: 2 }, // 2 = 거절
+//             {
+//                 where: {
+//                     u_id: f_id,
+//                     f_id: req.session.user.id,
+//                 },
+//             }
+//         );
+
+//         if (result[0] > 0) {
+//             res.json({ success: true, message: '친구 요청이 거절되었습니다.' });
+//         } else {
+//             res.status(404).json({ success: false, message: '친구 요청을 찾을 수 없습니다.' });
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ success: false, message: '친구 요청 거절 중 오류가 발생했습니다.' });
+//     }
+// };
+
+//===========================================================================================================
+
+
 exports.friendRequestAccept = async (req, res) => {
-    const { f_id } = req.body; // 친구 요청한 ID
-    const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
+    const { f_id } = req.body;
+    const u_id = req.session?.user?.id;
+
+    console.log('Accept Request:', { f_id, u_id }); // 디버깅용 로그
+
+    if (!u_id) {
+        return res.status(401).json({
+            success: false,
+            message: '세션이 유효하지 않습니다. 다시 로그인하세요.',
+        });
+    }
 
     try {
-        // t_friend 테이블에서 유효한 친구 요청 확인
         const existingRequest = await TFriend.findOne({
             where: { u_id: f_id, f_id: u_id, f_status: 0 },
         });
@@ -187,60 +289,45 @@ exports.friendRequestAccept = async (req, res) => {
             return res.status(404).json({ success: false, message: '친구 요청을 찾을 수 없습니다.' });
         }
 
-        // i_friend 테이블에서 기존 친구 관계 확인
-        const isFriend = await IFriend.findOne({
-            where: { u_id, f_id },
-        });
-
-        const isFriendReverse = await IFriend.findOne({
-            where: { u_id: f_id, f_id: u_id },
-        });
+        const isFriend = await IFriend.findOne({ where: { u_id, f_id } });
+        const isFriendReverse = await IFriend.findOne({ where: { u_id: f_id, f_id: u_id } });
 
         if (isFriend || isFriendReverse) {
             return res.status(400).json({ success: false, message: '이미 친구 관계가 존재합니다.' });
         }
 
-        // i_friend 테이블에 양방향 친구 관계 추가
-        await IFriend.create({
-            u_id,
-            f_id,
-        });
+        await IFriend.create({ u_id, f_id });
+        await IFriend.create({ u_id: f_id, f_id: u_id });
 
-        await IFriend.create({
-            u_id: f_id,
-            f_id: u_id,
-        });
-
-        // t_friend 테이블 상태 업데이트 (수락 상태)
         await TFriend.update(
             { f_status: 1 },
-            {
-                where: {
-                    u_id: f_id,
-                    f_id: u_id,
-                },
-            }
+            { where: { u_id: f_id, f_id: u_id } }
         );
 
         res.json({ success: true, message: '친구 요청이 수락되었습니다.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: `친구 요청 수락 중 오류 (${error})가 발생했습니다.` });
+        res.status(500).json({ success: false, message: `친구 요청 수락 중 오류 (${error.message})` });
     }
 };
 
-// 친구 요청 거절 함수
 exports.friendRequestReject = async (req, res) => {
-    const { f_id } = req.body; // 친구 요청한 ID
+    const { f_id } = req.body;
+    const u_id = req.session?.user?.id;
+
+    console.log('Reject Request:', { f_id, u_id }); // 디버깅용 로그
+
+    if (!u_id) {
+        return res.status(401).json({
+            success: false,
+            message: '세션이 유효하지 않습니다. 다시 로그인하세요.',
+        });
+    }
+
     try {
         const result = await TFriend.update(
-            { f_status: 2 }, // 2 = 거절
-            {
-                where: {
-                    u_id: f_id,
-                    f_id: req.session.user.id,
-                },
-            }
+            { f_status: 2 },
+            { where: { u_id: f_id, f_id: u_id } }
         );
 
         if (result[0] > 0) {
@@ -250,6 +337,6 @@ exports.friendRequestReject = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: '친구 요청 거절 중 오류가 발생했습니다.' });
+        res.status(500).json({ success: false, message: `친구 요청 거절 중 오류 (${error.message})` });
     }
 };

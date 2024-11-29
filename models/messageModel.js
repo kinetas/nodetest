@@ -62,7 +62,7 @@ const RMessage = sequelize.define('RMessage', {
     allowNull: true,
   },
   image: {
-    type: DataTypes.BLOB,
+    type: DataTypes.BLOB('long'),
     allowNull: true,
   },
 }, {

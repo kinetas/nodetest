@@ -126,7 +126,7 @@ exports.getUserMissions = async (req, res) => {
 };
 
 //=====================================================================================
-// 자신이 수행해야 할 미션 목록 (u2_id = userId)
+// 자신이 수행해야 할 미션 목록 (u2_id = userId)(방 이름 포함)
 exports.getAssignedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -135,16 +135,32 @@ exports.getAssignedMissions = async (req, res) => {
             where: {
                 u2_id: userId, // 자신이 수행해야 할 미션
             },
+            include: [
+                {
+                    model: Room,
+                    as: 'room',
+                    attributes: ['r_title'], // 방 이름만 가져오기
+                },
+            ],
         });
 
-        res.json({ missions: assignedMissions });
+        const missions = assignedMissions.map(mission => ({
+            m_id: mission.m_id,
+            m_title: mission.m_title,
+            m_deadline: mission.m_deadline,
+            m_status: mission.m_status,
+            r_id: mission.r_id,
+            r_title: mission.room ? mission.room.r_title : '없음',
+        }));
+
+        res.json({ missions });
     } catch (error) {
         console.error('자신이 수행해야 할 미션 조회 오류:', error);
         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
     }
 };
 
-// 자신이 부여한 미션 목록 (u1_id = userId)
+// 자신이 부여한 미션 목록 (u1_id = userId)(방 이름 포함)
 exports.getCreatedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -156,9 +172,26 @@ exports.getCreatedMissions = async (req, res) => {
                     [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
                 },
             },
+
+            include: [
+                {
+                    model: Room,
+                    as: 'room',
+                    attributes: ['r_title'], // 방 이름만 가져오기
+                },
+            ],
         });
 
-        res.json({ missions: createdMissions });
+        const missions = createdMissions.map(mission => ({
+            m_id: mission.m_id,
+            m_title: mission.m_title,
+            m_deadline: mission.m_deadline,
+            m_status: mission.m_status,
+            r_id: mission.r_id,
+            r_title: mission.room ? mission.room.r_title : '없음',
+        }));
+
+        res.json({ missions });
     } catch (error) {
         console.error('자신이 부여한 미션 조회 오류:', error);
         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });

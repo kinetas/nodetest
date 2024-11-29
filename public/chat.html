@@ -118,11 +118,14 @@
             formData.append('u1_id', u1_id);
             formData.append('u2_id', u2_id);
             formData.append('r_id', r_id);
-            if (file) {
-                formData.append('file', file);
-            }
+            formData.append('file', file);
+            
 
             fetch('/chat/send-message', {
+                method: 'POST',
+                body: formData
+            })
+            fetch('/upload-image', {
                 method: 'POST',
                 body: formData
             })

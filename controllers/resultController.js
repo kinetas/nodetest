@@ -29,7 +29,10 @@ exports.getDailyAchievementRate = async (userId) => {
         console.log('일일 달성률 - 시작:', todayStart, '종료:', todayEnd);
 
         const totalMissions = await MResult.count({
-            where: { u_id: userId },
+            where: { 
+                u_id: userId,
+                m_deadline: { [Op.between]: [todayStart, todayEnd] }    //추가
+             },
         });
 
         console.log('전체 미션 개수:', totalMissions);
@@ -62,11 +65,15 @@ exports.getWeeklyAchievementRate = async (userId) => {
         weekStart.setDate(today.getDate() - today.getDay());
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
+        weekEnd.setHours(23, 59, 59, 999); //추가
 
         console.log('주간 달성률 - 시작:', weekStart, '종료:', weekEnd);
 
         const totalMissions = await MResult.count({
-            where: { u_id: userId },
+            where: { 
+                u_id: userId,
+                m_deadline: { [Op.between]: [weekStart, weekEnd] }, //추가
+             },
         });
 
         console.log('전체 미션 개수:', totalMissions);
@@ -96,11 +103,15 @@ exports.getMonthlyAchievementRate = async (userId) => {
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        monthEnd.setHours(23, 59, 59, 999);//추가
 
         console.log('월간 달성률 - 시작:', monthStart, '종료:', monthEnd);
 
         const totalMissions = await MResult.count({
-            where: { u_id: userId },
+            where: { 
+                u_id: userId,
+                m_deadline: { [Op.between]: [monthStart, monthEnd] },
+             },
         });
 
         console.log('전체 미션 개수:', totalMissions);
@@ -130,11 +141,15 @@ exports.getYearlyAchievementRate = async (userId) => {
         const now = new Date();
         const yearStart = new Date(now.getFullYear(), 0, 1);
         const yearEnd = new Date(now.getFullYear(), 11, 31);
+        yearEnd.setHours(23, 59, 59, 999); //추가
 
         console.log('연간 달성률 - 시작:', yearStart, '종료:', yearEnd);
 
         const totalMissions = await MResult.count({
-            where: { u_id: userId },
+            where: { 
+                u_id: userId,
+                m_deadline: { [Op.between]: [yearStart, yearEnd] }, //추가
+             },
         });
 
         console.log('전체 미션 개수:', totalMissions);

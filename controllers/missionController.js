@@ -144,6 +144,8 @@ exports.getAssignedMissions = async (req, res) => {
             ],
         });
 
+        console.log('[DEBUG] Assigned Missions:', assignedMissions); // 디버깅 로그 추가
+
         const missions = assignedMissions.map(mission => ({
             m_id: mission.m_id,
             m_title: mission.m_title,

@@ -166,6 +166,8 @@ app.post('/upload-image', upload.single('file'), async (req, res) => {
   const { u1_id, u2_id, r_id, message_contents } = req.body;
   const file = req.file;
 
+  console.log('Uploaded file:', req.file);
+
   if (!u1_id || !u2_id || !r_id || (!message_contents && !file)) {
       return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
   }

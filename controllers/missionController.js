@@ -378,7 +378,7 @@ exports.successMission = async (req, res) => {
         if (!saveResultResponse.success) {
             return res.status(500).json({
                 success: false,
-                message: `결과 저장 중 오류가 발생했습니다.`,
+                message: `결과 저장 중 오류가 발생했습니다. controller`,
                 error: saveResultResponse.error || '알 수 없는 오류',
             });
         }

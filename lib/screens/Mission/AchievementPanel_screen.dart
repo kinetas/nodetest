@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert'; // JSON 파싱용
+import '../../SessionCookieManager.dart';
 
 class AchievementPanel extends StatefulWidget {
   final VoidCallback onClose;
@@ -11,13 +13,14 @@ class AchievementPanel extends StatefulWidget {
 
 class _AchievementPanelState extends State<AchievementPanel> {
   String _currentAchievementPeriod = "주간"; // Default period
-  final Map<String, double> achievementRates = {
-    '일일': 0.2, // 20%
-    '주간': 0.5, // 50%
-    '월간': 0.7, // 70%
-    '연간': 0.9, // 90%
-  };
   final List<String> achievementPeriods = ['일일', '주간', '월간', '연간'];
+  Map<String, double> achievementRates = {
+    '일일': 0.0,
+    '주간': 0.0,
+    '월간': 0.0,
+    '연간': 0.0,
+  };
+  bool isLoading = true;
 
   double get _currentAchievementRate => achievementRates[_currentAchievementPeriod] ?? 0.0;
 
@@ -27,6 +30,50 @@ class _AchievementPanelState extends State<AchievementPanel> {
     if (rate < 0.7) return '😊';
     if (rate < 0.9) return '🥰';
     return '😎';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAchievementRates();
+  }
+
+  Future<void> _fetchAchievementRates() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      Map<String, String> urls = {
+        '일일': 'http://54.180.54.31:3000/result/daily',
+        '주간': 'http://54.180.54.31:3000/result/weekly',
+        '월간': 'http://54.180.54.31:3000/result/monthly',
+        '연간': 'http://54.180.54.31:3000/result/yearly',
+      };
+
+      for (var period in achievementPeriods) {
+        final response = await SessionCookieManager.get(urls[period]!);
+
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+
+          // 디버깅 로그 추가
+          print('[$period] 응답 데이터: $responseData');
+
+          setState(() {
+            achievementRates[period] = responseData['rate']?.toDouble() ?? 0.0;
+          });
+        } else {
+          print('[$period] 데이터 가져오기 실패: ${response.statusCode}');
+        }
+      }
+    } catch (e) {
+      print('달성률 데이터 가져오기 오류: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _changeAchievementPeriod(bool isNext) {
@@ -40,7 +87,9 @@ class _AchievementPanelState extends State<AchievementPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Container(
       height: MediaQuery.of(context).size.height / 3,
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -109,20 +158,26 @@ class _AchievementPanelState extends State<AchievementPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     LinearProgressIndicator(
-                      value: _currentAchievementRate,
+                      value: _currentAchievementRate / 100,
                       backgroundColor: Colors.grey[300],
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                     ),
                     SizedBox(height: 5),
-                    Text('${(_currentAchievementRate * 100).toInt()}%', style: TextStyle(fontSize: 16)),
+                    Text('${_currentAchievementRate.toStringAsFixed(1)}%', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),
               Column(
                 children: [
-                  Text('00/${(_currentAchievementRate * 100).toInt()}', style: TextStyle(fontSize: 16)),
+                  Text(
+                    '${_currentAchievementRate.toInt()}%',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   SizedBox(height: 8),
-                  Text(getAchievementEmoji(_currentAchievementRate), style: TextStyle(fontSize: 24)),
+                  Text(
+                    getAchievementEmoji(_currentAchievementRate / 100),
+                    style: TextStyle(fontSize: 24),
+                  ),
                 ],
               ),
             ],

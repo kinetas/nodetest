@@ -370,8 +370,17 @@ exports.successMission = async (req, res) => {
             '성공'
         );
 
+        // if (!saveResultResponse.success) {
+        //     return res.status(500).json({ success: false, message: '결과 저장 중 오류가 발생했습니다.' });
+        // }
+
+        // saveResultResponse가 성공하지 않은 경우
         if (!saveResultResponse.success) {
-            return res.status(500).json({ success: false, message: '결과 저장 중 오류가 발생했습니다.' });
+            return res.status(500).json({
+                success: false,
+                message: `결과 저장 중 오류가 발생했습니다.`,
+                error: saveResultResponse.error || '알 수 없는 오류',
+            });
         }
 
         res.json({ success: true, message: '미션이 성공으로 갱신되었습니다.' });
@@ -410,8 +419,17 @@ exports.failureMission = async (req, res) => {
             '실패'
         );
 
+        // if (!saveResultResponse.success) {
+        //     return res.status(500).json({ success: false, message: `결과 저장 중 오류가 발생했습니다.` });
+        // }
+
+        // saveResultResponse가 성공하지 않은 경우
         if (!saveResultResponse.success) {
-            return res.status(500).json({ success: false, message: '결과 저장 중 오류가 발생했습니다.' });
+            return res.status(500).json({
+                success: false,
+                message: `결과 저장 중 오류가 발생했습니다.`,
+                error: saveResultResponse.error || '알 수 없는 오류',
+            });
         }
 
         res.json({ success: true, message: '미션이 실패로 갱신되었습니다.' });

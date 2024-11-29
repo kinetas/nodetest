@@ -13,6 +13,7 @@
 // };
 
 //=================추가===============================
+const User = require('../models/userModel'); // User 모델 가져오기
 const requireAuth = async (req, res, next) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({ message: '로그인이 필요합니다.' });

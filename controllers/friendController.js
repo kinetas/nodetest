@@ -137,7 +137,15 @@ exports.friendRequestSend = async (req, res) => {
                 }
             } else if (existingRequest.f_status === 2) {
                 // case 3: 거절 상태
-                return res.status(400).json({ success: false, message: `${f_id} 님이 요청을 거절한 상태입니다.` });
+                // return res.status(400).json({ success: false, message: `${f_id} 님이 요청을 거절한 상태입니다.` });
+                const request = await TFriend.create({
+                    u_id,
+                    f_id,
+                    f_create: new Date(),
+                    f_status: 0, // 0 = 요청
+                });
+    
+                return res.json({ success: true, message: '친구 요청이 성공적으로 전송되었습니다.' });
             }
         }
 

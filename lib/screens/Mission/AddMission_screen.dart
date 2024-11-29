@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // Provider 사용
-import 'MissionProvider.dart'; // MissionProvider 추가
+import 'package:provider/provider.dart';
+import 'MissionProvider.dart';
 import 'TimeSetting_screen.dart';
 
 class AddMissionScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
   DateTime? selectedDate;
   int? selectedHour;
   int? selectedMinute;
-  bool isRoomSelected = false; // Flag to track room selection
+  bool isRoomSelected = false;
 
   void saveMission() {
     String errorMessage = '';
@@ -37,9 +37,7 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
             content: Text(errorMessage),
             actions: [
               TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
                 child: Text('확인'),
               ),
             ],
@@ -49,7 +47,6 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
       return;
     }
 
-    // 오류가 없을 때만 미션 저장
     final missionData = {
       'title': missionNameController.text,
       'dueDate': selectedDate,
@@ -59,7 +56,6 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
       'isPersonalMission': isPersonalMission,
     };
 
-    // Provider를 통해 미션 데이터 저장
     Provider.of<MissionProvider>(context, listen: false).addMission(missionData);
 
     Navigator.pop(context);
@@ -83,6 +79,10 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Color primaryColor = Colors.lightBlue[300]!;
+    final Color backgroundColor = Colors.white;
+    final Color accentColor = Colors.lightBlue[50]!;
+
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.5),
       body: Center(
@@ -91,11 +91,11 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
             width: MediaQuery.of(context).size.width * 0.9,
             padding: EdgeInsets.all(20.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(15),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.grey.withOpacity(0.2),
                   blurRadius: 10,
                   offset: Offset(0, 5),
                 ),
@@ -110,10 +110,10 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
                   children: [
                     Text(
                       "미션 설정",
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryColor),
                     ),
                     IconButton(
-                      icon: Icon(Icons.close),
+                      icon: Icon(Icons.close, color: Colors.grey),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
@@ -121,38 +121,29 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
                 Divider(),
 
                 // Mission Name
-                Text(
-                  "미션 이름",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                ),
-                TextField(
-                  controller: missionNameController,
-                  decoration: InputDecoration(
-                    hintText: "미션 이름을 입력하세요",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  ),
-                ),
+                _buildTextInput(label: "미션 이름", hint: "미션 이름을 입력하세요"),
+
                 SizedBox(height: 15),
 
                 // Time Setting
                 Text(
                   "시간 설정",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
                 ),
+                SizedBox(height: 10),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white, // primary 대신 backgroundColor 사용
+                    backgroundColor: accentColor,
+                    foregroundColor: primaryColor,
                   ),
                   onPressed: _openTimeSettingScreen,
-                  icon: Icon(Icons.timer),
+                  icon: Icon(Icons.timer, color: primaryColor),
                   label: Text(
                     selectedDate != null
                         ? "${selectedDate!.year}년 ${selectedDate!.month}월 ${selectedDate!.day}일 " +
                         (isAllDay ? "" : "${selectedHour.toString().padLeft(2, '0')}시 ${selectedMinute.toString().padLeft(2, '0')}분")
                         : "⏱️ 시간 설정",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
                 Row(
@@ -165,15 +156,15 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
                         });
                       },
                     ),
-                    Text("알람 설정"),
+                    Text("알람 설정", style: TextStyle(color: primaryColor)),
                   ],
                 ),
                 Divider(),
 
-                // Personal Mission and Room Selection
+                // Sharing Settings
                 Text(
                   "공유 설정",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
                 ),
                 Row(
                   children: [
@@ -188,7 +179,7 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
                         });
                       },
                     ),
-                    Text("개인 미션"),
+                    Text("개인 미션", style: TextStyle(color: primaryColor)),
                   ],
                 ),
                 if (!isPersonalMission)
@@ -198,20 +189,28 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
                         isRoomSelected = true;
                       });
                     },
-                    child: Text("공유할 방 선택"),
+                    child: Text("공유할 방 선택", style: TextStyle(color: primaryColor)),
                   ),
                 Divider(),
 
                 // Additional Settings
                 Text(
                   "추가 설정",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
                 ),
                 Row(
                   children: [
-                    OutlinedButton(onPressed: () {}, child: Text("카테고리 설정")),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(side: BorderSide(color: primaryColor)),
+                      child: Text("카테고리 설정", style: TextStyle(color: primaryColor)),
+                    ),
                     SizedBox(width: 10),
-                    OutlinedButton(onPressed: () {}, child: Text("리워드 설정")),
+                    OutlinedButton(
+                      onPressed: () {},
+                      style: OutlinedButton.styleFrom(side: BorderSide(color: primaryColor)),
+                      child: Text("리워드 설정", style: TextStyle(color: primaryColor)),
+                    ),
                   ],
                 ),
                 Divider(),
@@ -222,10 +221,15 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
                   children: [
                     OutlinedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text("취소"),
+                      style: OutlinedButton.styleFrom(side: BorderSide(color: primaryColor)),
+                      child: Text("취소", style: TextStyle(color: primaryColor)),
                     ),
                     ElevatedButton(
                       onPressed: saveMission,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
                       child: Text("저장"),
                     ),
                   ],
@@ -235,6 +239,34 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextInput({required String label, required String hint}) {
+    final Color primaryColor = Colors.lightBlue[300]!;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
+        ),
+        SizedBox(height: 5),
+        TextField(
+          controller: missionNameController,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.lightBlue[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 10),
+          ),
+        ),
+      ],
     );
   }
 }

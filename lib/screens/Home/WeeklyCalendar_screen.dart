@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'MonthlyCalendar_screen.dart';
 
 class WeeklyCalendar extends StatelessWidget {
   final VoidCallback onAddPressed;
@@ -18,7 +17,7 @@ class WeeklyCalendar extends StatelessWidget {
       weekData.add({
         'day': daysOfWeek[currentDay.weekday % 7],
         'date': DateFormat('MM/dd').format(currentDay),
-        'tasks': _getTasksForDay(currentDay), // 할 일 개수를 반환하는 함수
+        'tasks': _getTasksForDay(currentDay),
       });
     }
     return weekData;
@@ -30,44 +29,104 @@ class WeeklyCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color primaryColor = Colors.lightBlue[300]!;
+    final Color backgroundColor = Colors.white;
+    final Color accentColor = Colors.lightBlue[100]!;
+
     List<Map<String, dynamic>> weekData = _generateWeeklyData();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('주간 캘린더', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.bar_chart),
-                  onPressed: onGraphPressed, // 달성률 버튼을 눌렀을 때 패널 토글
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 8,
+            spreadRadius: 2,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '주간 캘린더',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
                 ),
-                IconButton(
-                  icon: Icon(Icons.add),
-                  onPressed: onAddPressed,
-                ),
-              ],
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: weekData.map((dayData) {
-            return Column(
-              children: [
-                Text(dayData['day'], style: TextStyle(fontSize: 16)),
-                Text(dayData['date'], style: TextStyle(fontSize: 14, color: Colors.grey)),
-                SizedBox(height: 5),
-                Text('${dayData['tasks']} 개', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ],
-            );
-          }).toList(),
-        ),
-      ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.bar_chart, color: primaryColor),
+                    onPressed: onGraphPressed,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.add, color: primaryColor),
+                    onPressed: onAddPressed,
+                  ),
+                ],
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekData.map((dayData) {
+              return Column(
+                children: [
+                  Text(
+                    dayData['day'],
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                  Text(
+                    dayData['date'],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    decoration: BoxDecoration(
+                      color: accentColor,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          blurRadius: 4,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      '${dayData['tasks']} 개',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
-

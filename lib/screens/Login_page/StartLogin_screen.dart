@@ -1,115 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:url_launcher/url_launcher.dart';
-// import 'signUp_screen.dart';
-// import 'Login_screen.dart';
-// import 'findAccount_screen.dart';
-//
-// class StartLoginScreen extends StatelessWidget {
-//   const StartLoginScreen({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.lightBlue[50],
-//       body: LayoutBuilder(
-//         builder: (context, constraints) {
-//           final screenHeight = constraints.maxHeight;
-//           return Column(
-//             children: [
-//               SizedBox(height: screenHeight * 0.33),
-//               Center(
-//                 child: Text(
-//                   '밥 먹었니?',
-//                   style: TextStyle(
-//                     fontSize: 30,
-//                     fontWeight: FontWeight.bold,
-//                     color: Colors.blue[800],
-//                   ),
-//                 ),
-//               ),
-//               SizedBox(height: screenHeight * 0.33 - 40),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   ElevatedButton(
-//                     onPressed: () {
-//                       Navigator.push(
-//                         context,
-//                         MaterialPageRoute(builder: (context) => LoginScreen()),
-//                       );
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.blue[700],
-//                       foregroundColor: Colors.white,
-//                       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(8),
-//                       ),
-//                     ),
-//                     child: Text('로그인', style: TextStyle(fontSize: 16)),
-//                   ),
-//                   SizedBox(width: 10),
-//                   ElevatedButton(
-//                     onPressed: () {
-//                       Navigator.push(
-//                         context,
-//                         MaterialPageRoute(builder: (context) => SignUpScreen()),
-//                       );
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.blue[700],
-//                       foregroundColor: Colors.white,
-//                       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(8),
-//                       ),
-//                     ),
-//                     child: Text('회원가입', style: TextStyle(fontSize: 16)),
-//                   ),
-//                 ],
-//               ),
-//               SizedBox(height: 10),
-//               TextButton(
-//                 onPressed: () {
-//                   Navigator.push(
-//                     context,
-//                     MaterialPageRoute(builder: (context) => FindAccountScreen()),
-//                   );
-//                 },
-//                 child: Text(
-//                   '아이디/비밀번호 찾기',
-//                   style: TextStyle(color: Colors.blue[700], fontSize: 14),
-//                 ),
-//               ),
-//               Spacer(),
-//               GestureDetector(
-//                 onTap: () async {
-//                   final url = Uri.parse('https://www.instagram.com/');
-//                   if (await canLaunchUrl(url)) {
-//                     await launchUrl(url, mode: LaunchMode.externalApplication);
-//                   } else {
-//                     print('Could not launch $url');
-//                   }
-//                 },
-//                 child: Text(
-//                   'Instagram',
-//                   style: TextStyle(
-//                     fontSize: 16,
-//                     fontWeight: FontWeight.bold,
-//                     decoration: TextDecoration.underline,
-//                     color: Colors.blue[700],
-//                   ),
-//                 ),
-//               ),
-//               SizedBox(height: 20),
-//             ],
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'signUp_screen.dart';
@@ -127,28 +15,32 @@ class StartLoginScreen extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenHeight = constraints.maxHeight;
+          final primaryColor = Colors.blue[800];
+          final buttonColor = Colors.lightBlueAccent;
+
           return Column(
             children: [
-              SizedBox(height: screenHeight * 0.33),
+              SizedBox(height: screenHeight * 0.3),
               Center(
                 child: GestureDetector(
                   onTap: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => MainScreen()), // Replace the current screen
+                      MaterialPageRoute(builder: (context) => MainScreen()),
                     );
                   },
                   child: Text(
                     '밥 먹었니?',
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 36,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue[800],
+                      color: primaryColor,
+                      letterSpacing: 2.0,
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: screenHeight * 0.33 - 40),
+              SizedBox(height: screenHeight * 0.25),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -160,16 +52,19 @@ class StartLoginScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text('로그인', style: TextStyle(fontSize: 16)),
+                    child: Text(
+                      '로그인',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(width: 20),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -178,18 +73,21 @@ class StartLoginScreen extends StatelessWidget {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[700],
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: Text('회원가입', style: TextStyle(fontSize: 16)),
+                    child: Text(
+                      '회원가입',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 15),
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -199,7 +97,11 @@ class StartLoginScreen extends StatelessWidget {
                 },
                 child: Text(
                   '아이디/비밀번호 찾기',
-                  style: TextStyle(color: Colors.blue[700], fontSize: 14),
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               Spacer(),
@@ -215,10 +117,10 @@ class StartLoginScreen extends StatelessWidget {
                 child: Text(
                   'Instagram',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     decoration: TextDecoration.underline,
-                    color: Colors.blue[700],
+                    color: primaryColor,
                   ),
                 ),
               ),

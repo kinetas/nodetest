@@ -13,6 +13,7 @@ exports.getRooms = async (req, res) => {
     res.json({ rooms });
 };
 
+
 // // ===== JWT 기반 인증 =====
 // exports.getRooms = async (req, res) => {
 //     const token = req.headers.authorization?.split(' ')[1];

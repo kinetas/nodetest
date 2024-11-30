@@ -97,7 +97,8 @@
                 reader.onload = function(event) {
                     const base64Image = event.target.result.split(',')[1]; // Base64 인코딩
                     console.log("Sending data to server:", {
-                        message_contents: message,
+                        //message_contents: message,
+                        message_contents: message || "", // 메시지가 없으면 빈 문자열로 처리
                         r_id,
                         u1_id,
                         u2_id,

@@ -134,6 +134,7 @@ exports.getAssignedMissions = async (req, res) => {
         const assignedMissions = await Mission.findAll({
             where: {
                 u2_id: userId, // 자신이 수행해야 할 미션
+                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 //==========추가==============
             },
             include: [
                 {
@@ -173,6 +174,7 @@ exports.getCreatedMissions = async (req, res) => {
                 u2_id: {
                     [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
                 },
+                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 //==========추가==============
             },
 
             include: [
@@ -200,6 +202,47 @@ exports.getCreatedMissions = async (req, res) => {
         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
     }
 };
+
+// 자신이 완료한 미션 목록 //==========추가==============
+exports.getCompletedMissions = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        const completedMissions = await Mission.findAll({
+            where: {
+                u2_id: userId,
+                m_status: '완료', // "완료" 상태의 미션만
+            },
+        });
+
+        res.json({ missions: completedMissions });
+    } catch (error) {
+        console.error('Completed missions error:', error);
+        res.status(500).json({ message: 'Completed missions fetch failed.' });
+    }
+};
+
+
+// 자신이 부여한 미션 중 상대가 완료한 미션 목록 //==========추가==============
+exports.getGivenCompletedMissions = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        const givenCompletedMissions = await Mission.findAll({
+            where: {
+                u1_id: userId,
+                u2_id: { [Op.ne]: userId }, // 상대방이 수행한 미션만
+                m_status: '완료', // "완료" 상태의 미션만
+            },
+        });
+
+        res.json({ missions: givenCompletedMissions });
+    } catch (error) {
+        console.error('Given completed missions error:', error);
+        res.status(500).json({ message: 'Given completed missions fetch failed.' });
+    }
+};
+
 //=====================================================================================
 
 

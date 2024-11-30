@@ -13,6 +13,13 @@ router.get('/missions/assigned', requireAuth, getAssignedMissions);
 // 자신이 부여한 미션
 router.get('/missions/created', requireAuth, getCreatedMissions);
 
+// 자신이 완료한 미션 //==========추가==============
+router.get('/missions/completed', requireAuth, getCompletedMissions);
+
+// 자신이 부여한 미션 중 상대가 완료한 미션 //==========추가==============
+router.get('/missions/givenCompleted', requireAuth, getGivenCompletedMissions);
+
+
 // 미션 생성 요청 처리
 router.post('/missioncreate', requireAuth, createMission);
 

@@ -28,12 +28,13 @@
     <h2>부여한 미션</h2>
     <ul id="createdMissions">로딩 중...</ul>
 
-    <!-- 미션 요청 폼 추가 -->
-    <!-- <h2>미션 요청</h2>
-    <div>
-        <input type="text" id="missionIdInput" placeholder="미션 ID 입력">
-        <button onclick="requestMissionApproval()">미션 인증 요청</button>
-    </div> -->
+    <!-- ===========================추가========================= -->
+    <h2>완료한 미션</h2>
+    <ul id="completedMissions">로딩 중...</ul>
+
+    <h2>상대가 완료한 미션</h2>
+    <ul id="givenCompletedMissions">로딩 중...</ul>
+    <!-- ===========================추가========================= -->
 
     <!-- 미션 작업 UI -->
     <h2>미션 작업</h2>
@@ -192,6 +193,44 @@
                 console.error('Error fetching created missions:', error);
                 document.getElementById('createdMissions').textContent = '미션 데이터를 가져오는 중 오류가 발생했습니다.';
             });
+
+        // =======================추가==============================
+        // 완료한 미션 목록 가져오기
+        fetch('/dashboard/missions/completed')
+            .then(response => response.json())
+            .then(data => {
+                const completedList = document.getElementById('completedMissions');
+                completedList.innerHTML = ''; // 기존 내용 초기화
+
+                if (data.missions && data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `미션 ID: ${mission.m_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                        completedList.appendChild(listItem);
+                    });
+                } else {
+                    completedList.textContent = '완료한 미션이 없습니다.';
+                }
+            });
+
+        // 상대가 완료한 미션 목록 가져오기
+        fetch('/dashboard/missions/givenCompleted')
+            .then(response => response.json())
+            .then(data => {
+                const givenCompletedList = document.getElementById('givenCompletedMissions');
+                givenCompletedList.innerHTML = ''; // 기존 내용 초기화
+
+                if (data.missions && data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `미션 ID: ${mission.m_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                        givenCompletedList.appendChild(listItem);
+                    });
+                } else {
+                    givenCompletedList.textContent = '상대가 완료한 미션이 없습니다.';
+                }
+            });
+
         //===================================================================================================================
 
         // // 자신이 수행해야 할 미션 목록 가져오기

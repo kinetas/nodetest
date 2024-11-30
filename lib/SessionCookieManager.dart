@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-//쿠키 값 받아오는 클래스 shared_preferences.dart를 통해서 로컬에도 저장하는 클래스
+// 쿠키 값 받아오는 클래스 shared_preferences.dart를 통해 로컬에도 저장하는 클래스
 class SessionCookieManager {
   static const String _cookieKey = 'sessionCookie';
 
@@ -57,5 +57,25 @@ class SessionCookieManager {
     }
 
     return response;
+  }
+
+  // HTTP DELETE 요청
+  static Future<http.Response> delete(String url,
+      {Map<String, String>? headers, Object? body}) async {
+    String? cookie = await getSessionCookie();
+
+    final request = http.Request('DELETE', Uri.parse(url))
+      ..headers.addAll({
+        if (cookie != null) 'Cookie': cookie,
+        if (headers != null) ...headers,
+      });
+
+    // Body가 있을 경우 설정
+    if (body != null) {
+      request.body = body.toString();
+    }
+
+    final streamedResponse = await request.send();
+    return await http.Response.fromStream(streamedResponse);
   }
 }

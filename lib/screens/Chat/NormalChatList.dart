@@ -10,43 +10,94 @@ class NormalChatList extends StatefulWidget {
 
 class _NormalChatListState extends State<NormalChatList> {
   List<Map<String, dynamic>> chatList = []; // 일반 채팅방 데이터
+  String? userId; // 로그인된 사용자 ID
   bool isLoading = true; // 로딩 상태
 
   @override
   void initState() {
     super.initState();
-    _fetchNormalChats();
+    _fetchUserIdAndChats();
   }
 
-  Future<void> _fetchNormalChats() async {
-    const String apiUrl = 'http://54.180.54.31:3000/api/rooms'; // 방 목록 가져오기 API 주소
-
+  Future<void> _fetchUserIdAndChats() async {
     try {
-      final response = await SessionCookieManager.get(apiUrl);
+      // 사용자 ID 가져오기
+      final userResponse = await SessionCookieManager.get(
+          'http://54.180.54.31:3000/api/getUserInfo');
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        print('Response data: ${response.body}'); // 디버깅용 로그 추가
+      if (userResponse.statusCode == 200) {
+        final userData = json.decode(userResponse.body);
+        setState(() {
+          userId = userData['userId']; // 사용자 ID 저장
+        });
+      } else {
+        print('사용자 정보 가져오기 실패: ${userResponse.statusCode}');
+      }
+
+      // 채팅방 목록 가져오기
+      const String apiUrl = 'http://54.180.54.31:3000/api/rooms';
+      final chatResponse = await SessionCookieManager.get(apiUrl);
+
+      if (chatResponse.statusCode == 200) {
+        final chatData = json.decode(chatResponse.body);
+        print('Response data: ${chatResponse.body}'); // 디버깅용 로그 추가
 
         setState(() {
           // `r_type`이 'general'인 항목만 필터링하여 저장
-          chatList = responseData['rooms'] != null
+          chatList = chatData['rooms'] != null
               ? List<Map<String, dynamic>>.from(
-              responseData['rooms'].where((room) => room['r_type'] == 'general'))
+            chatData['rooms']
+                .where((room) => room['r_type'] == 'general'),
+          )
               : [];
           isLoading = false;
         });
       } else {
-        print('일반 채팅방 목록 가져오기 실패: ${response.statusCode}');
+        print('일반 채팅방 목록 가져오기 실패: ${chatResponse.statusCode}');
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      print('일반 채팅방 목록 가져오기 오류: $e');
+      print('데이터 가져오기 오류: $e');
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  Future<void> _joinRoomAndNavigate(BuildContext context, Map<String, dynamic> chat) async {
+    final String apiUrl = 'http://54.180.54.31:3000/api/rooms/join';
+
+    try {
+      final response = await SessionCookieManager.post(
+        apiUrl,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'r_id': chat['r_id'], 'u1_id': userId}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['message'] == "방에 성공적으로 입장했습니다.") {
+          final room = responseData['room'];
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatRoomScreen(
+                chatId: room['r_id'].toString(), // 방 ID
+                chatTitle: room['r_title'] ?? '제목 없음', // 방 제목
+                userId: userId ?? 'Unknown', // 세션에서 가져온 사용자 ID
+              ),
+            ),
+          );
+        } else {
+          print('방 입장 실패: ${responseData['message']}');
+        }
+      } else {
+        print('방 입장 실패: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('방 입장 오류: $e');
     }
   }
 
@@ -71,16 +122,7 @@ class _NormalChatListState extends State<NormalChatList> {
           title: Text(chat['r_title'] ?? '제목 없음'),
           subtitle: Text('참여자: ${chat['u1_id']} - ${chat['u2_id']}'),
           trailing: Text(chat['r_id'] ?? ''),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatRoomScreen(
-                  chatId: chat['r_id'].toString(), // String 변환
-                ),
-              ),
-            );
-          },
+          onTap: () => _joinRoomAndNavigate(context, chat),
         );
       },
     );

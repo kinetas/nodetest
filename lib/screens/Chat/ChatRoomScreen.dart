@@ -220,8 +220,10 @@ import '../Mission/MissionCertification_screen.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final String chatId; // 방 ID
+  final String chatTitle; // 방 제목
+  final String userId; // 사용자 ID
 
-  ChatRoomScreen({required this.chatId});
+  ChatRoomScreen({required this.chatId, required this.chatTitle, required this.userId});
 
   @override
   _ChatRoomScreenState createState() => _ChatRoomScreenState();
@@ -252,7 +254,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         setState(() {
-          messages = List<Map<String, dynamic>>.from(responseData);
+          messages = List<Map<String, dynamic>>.from(responseData['messages']);
           isLoading = false;
         });
       } else {
@@ -278,7 +280,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'r_id': widget.chatId,
-          'u1_id': 'your-user-id', // 현재 사용자 ID
+          'u1_id': widget.userId, // 현재 사용자 ID
           'u2_id': 'recipient-id', // 상대방 사용자 ID
           'message': message,
         }),
@@ -307,7 +309,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     return Scaffold(
       backgroundColor: Colors.white, // 배경색 흰색
       appBar: AppBar(
-        title: Text('채팅방 ${widget.chatId}'),
+        title: Text(widget.chatTitle),
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -349,20 +351,17 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 message['message'] ?? '',
-                                style: TextStyle(
-                                    color: Colors.white),
+                                style: TextStyle(color: Colors.white),
                               ),
                               SizedBox(height: 4),
                               Text(
                                 message['send_date'] ?? '',
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10),
+                                    color: Colors.white, fontSize: 10),
                               ),
                             ],
                           ),
@@ -438,13 +437,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _buildCircleButton(
-                              context, Icons.add, '미션생성', () => _openMissionCreateScreen()),
+                              context, Icons.add, '미션생성', _openMissionCreateScreen),
                           _buildCircleButton(
-                              context, Icons.check_circle, '미션인증', () => _openMissionVerifyScreen()),
+                              context, Icons.check_circle, '미션인증', _openMissionVerifyScreen),
                           _buildCircleButton(
-                              context, Icons.request_page, '미션요청', () => _openMissionRequestScreen()),
+                              context, Icons.request_page, '미션요청', _openMissionRequestScreen),
                           _buildCircleButton(
-                              context, Icons.card_giftcard, '리워드요청', () => _openRewardRequestScreen()),
+                              context, Icons.card_giftcard, '리워드요청', _openRewardRequestScreen),
                         ],
                       ),
                     ],

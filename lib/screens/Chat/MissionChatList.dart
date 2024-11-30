@@ -11,39 +11,55 @@ class MissionChatList extends StatefulWidget {
 class _MissionChatListState extends State<MissionChatList> {
   List<Map<String, dynamic>> chatList = []; // 미션 채팅방 데이터
   bool isLoading = true; // 로딩 상태
+  String? userId; // 세션에서 가져온 로그인 사용자 ID
 
   @override
   void initState() {
     super.initState();
-    _fetchMissionChats();
+    _fetchUserIdAndChats();
   }
 
-  Future<void> _fetchMissionChats() async {
-    const String apiUrl = 'http://54.180.54.31:3000/api/rooms'; // 방 목록 가져오기 API 주소
-
+  Future<void> _fetchUserIdAndChats() async {
     try {
-      final response = await SessionCookieManager.get(apiUrl);
+      // 사용자 ID 가져오기
+      final userResponse = await SessionCookieManager.get(
+          'http://54.180.54.31:3000/api/getUserInfo');
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        print('Response data: ${response.body}'); // 디버깅용 로그 추가
+      if (userResponse.statusCode == 200) {
+        final userData = json.decode(userResponse.body);
+        setState(() {
+          userId = userData['userId'];
+        });
+      } else {
+        print('사용자 정보 가져오기 실패: ${userResponse.statusCode}');
+      }
+
+      // 채팅방 목록 가져오기
+      const String apiUrl = 'http://54.180.54.31:3000/api/rooms';
+      final chatResponse = await SessionCookieManager.get(apiUrl);
+
+      if (chatResponse.statusCode == 200) {
+        final chatData = json.decode(chatResponse.body);
+        print('Response data: ${chatResponse.body}'); // 디버깅용 로그 추가
 
         setState(() {
           // `r_type`이 'open'인 항목만 필터링하여 저장
-          chatList = responseData['rooms'] != null
+          chatList = chatData['rooms'] != null
               ? List<Map<String, dynamic>>.from(
-              responseData['rooms'].where((room) => room['r_type'] == 'open'))
+            chatData['rooms']
+                .where((room) => room['r_type'] == 'open'),
+          )
               : [];
           isLoading = false;
         });
       } else {
-        print('미션 채팅방 목록 가져오기 실패: ${response.statusCode}');
+        print('미션 채팅방 목록 가져오기 실패: ${chatResponse.statusCode}');
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      print('미션 채팅방 목록 가져오기 오류: $e');
+      print('데이터 가져오기 오류: $e');
       setState(() {
         isLoading = false;
       });
@@ -76,7 +92,9 @@ class _MissionChatListState extends State<MissionChatList> {
               context,
               MaterialPageRoute(
                 builder: (context) => ChatRoomScreen(
-                  chatId: chat['r_id'].toString(), // String 변환
+                  chatId: chat['r_id'].toString(), // 방 ID
+                  chatTitle: chat['r_title'] ?? '제목 없음', // 방 제목
+                  userId: userId ?? 'Unknown', // 세션에서 가져온 사용자 ID
                 ),
               ),
             );

@@ -115,6 +115,16 @@ exports.register = async (req, res) => {
         // 회원가입 성공 후 방 생성
         await roomController.initAddRoom({ body: { u1_id: u_id } }, res);
 
+        console.log(JSON.stringify({
+            message: '회원가입이 완료되었습니다.',
+            user: {
+                id: newUser.u_id,
+                nickname: newUser.u_nickname,
+                name: newUser.u_name,
+                birth: newUser.u_birth,
+                mail: newUser.u_mail
+            },
+        }));
         // 성공 응답
         res.status(201).json({
             message: '회원가입이 완료되었습니다.',

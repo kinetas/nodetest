@@ -89,9 +89,27 @@
                 document.getElementById('roomList').textContent = '방 목록을 불러오는 데 실패했습니다.';
             });
           // 방 입장 함수
-          function enterRoom(r_id, u2_id) {
-            window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
-        }
+      //  function enterRoom(r_id, u2_id) {
+      //      window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+      //  }
+        function enterRoom(r_id, u2_id) {
+        fetch('/api/rooms/enter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ r_id, u2_id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('방 입장 중 오류가 발생했습니다.');
+        });
+    }
 
         // 방 추가 함수
         function addRoom() {

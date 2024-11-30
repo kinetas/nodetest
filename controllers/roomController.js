@@ -132,7 +132,7 @@ exports.deleteRoom = async (req, res) => {
 };
 
 //방 입장함수
-exports.enterRoom = async (req, res) => {
+/*exports.enterRoom = async (req, res) => {
     const { r_id, u2_id } = req.body; // 클라이언트에서 방 ID와 유저 ID를 받아옴
     const u1_id = req.session.user.id;
 
@@ -154,6 +154,7 @@ exports.enterRoom = async (req, res) => {
         res.status(500).json({ message: `방 입장 중 ${error} 오류가 발생했습니다.` });
     }
 };
+*/
 // // ===== JWT 기반 방 삭제 함수 =====
 // exports.deleteRoom = async (req, res) => {
 //     const token = req.headers.authorization?.split(' ')[1];

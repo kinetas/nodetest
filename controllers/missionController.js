@@ -13,7 +13,7 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
-    const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body; // r_id 추가 제거
+    const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body; 
     try {
         // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
         const room = await Room.findOne({
@@ -509,12 +509,32 @@ exports.checkMissionDeadline = async () => {
             },
         });
 
-        // 각 미션의 상태를 '실패'로 업데이트
+        // // 각 미션의 상태를 '실패'로 업데이트
+        // for (const mission of expiredMissions) {
+        //     await mission.update({ m_status: '실패' });
+        // }
+
+        // 각 미션의 상태를 확인하여 조건에 따라 처리
         for (const mission of expiredMissions) {
-            await mission.update({ m_status: '실패' });
+            const deadline = new Date(mission.m_deadline); // 마감 기한 가져오기
+            const extendedDeadline = new Date(deadline.getTime() + 10 * 60 * 1000); // 마감 기한에 10분 추가
+
+            // 날짜가 변하지 않을 경우 10분 추가
+            if (deadline.getDate() === extendedDeadline.getDate() &&
+                deadline.getMonth() === extendedDeadline.getMonth() &&
+                deadline.getFullYear() === extendedDeadline.getFullYear()) {
+                // 10분 연장
+                await mission.update({ m_deadline: extendedDeadline });
+                console.log(`미션 ${mission.m_id}의 마감 기한이 10분 연장되었습니다.`);
+            } else {
+                // 날짜가 변하면 상태를 실패로 업데이트
+                await mission.update({ m_status: '실패' });
+                console.log(`미션 ${mission.m_id}의 상태가 '실패'로 업데이트되었습니다.`);
+            }
         }
 
-        console.log(`마감 기한이 지난 ${expiredMissions.length}개의 미션 상태를 '실패'로 업데이트했습니다.`);
+        // console.log(`마감 기한이 지난 ${expiredMissions.length}개의 미션 상태를 '실패'로 업데이트했습니다.`);
+        console.log(`총 ${expiredMissions.length}개의 미션을 처리했습니다.`);
     } catch (error) {
         console.error('마감 기한 확인 및 상태 업데이트 오류:', error);
     }

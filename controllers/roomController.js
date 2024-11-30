@@ -39,8 +39,8 @@ exports.addRoom = async (req, res) => {
     const u1_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
     // const { u2_id } = req.body;
     // const type = "close";
-    const { u2_id, r_type } = req.body; // r_type 추가 <!-- 수정 -->
-    const type = r_type || "general"; // 기본값 "close" <!-- 수정 -->
+    const { u2_id, roomName, r_type } = req.body; // roomName 추가 <!-- 수정 -->
+    const type = r_type || "general"; // 기본값 "general"
 
     //==========if 오픈채팅방이면 type = "open"======================
     //==========     조건을 뭘로 할 것인지     ======================
@@ -60,10 +60,19 @@ exports.addRoom = async (req, res) => {
             return; // 또는 throw new Error("유효하지 않은 UUID 생성");
         }
 
-        await Room.create({ u1_id, u2_id, r_id: roomId, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
+        // 방 이름 처리: 입력된 이름이 없으면 기본값 설정
+        const r_title = roomName && roomName.trim() ? roomName.trim() : `${u1_id}-${u2_id}`;
 
-        //반대방 생성
-        await Room.create({ u1_id: u2_id, u2_id:u1_id, r_id: roomId, r_title: `${u2_id}-${u1_id}`, r_type: `${type}` });
+        // await Room.create({ u1_id, u2_id, r_id: roomId, r_title: `${u1_id}-${u2_id}`, r_type: `${type}` });
+
+        // //반대방 생성
+        // await Room.create({ u1_id: u2_id, u2_id:u1_id, r_id: roomId, r_title: `${u2_id}-${u1_id}`, r_type: `${type}` });
+
+        // 방 생성
+        await Room.create({ u1_id, u2_id, r_id: roomId, r_title, r_type: type });
+        // 반대방 생성
+        await Room.create({ u1_id: u2_id, u2_id: u1_id, r_id: roomId, r_title, r_type: type });
+
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

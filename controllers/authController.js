@@ -213,6 +213,6 @@ exports.deleteAccount = async (req, res) => { // 추가
         }
     } catch (error) {
         console.error('계정 삭제 오류:', error);
-        return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+        return res.status(500).json({ success: false, message: `서버 오류(${error})가 발생했습니다. controller` });
     }
 };

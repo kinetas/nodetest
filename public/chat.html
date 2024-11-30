@@ -39,7 +39,7 @@
         });
          // 페이지 로드 시 기존 메시지 불러오기
         window.onload = function() {
-            fetch(`/chat/get-messages?r_id=${roomId}`)
+            fetch(`/chat/messages?r_id=${roomId}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

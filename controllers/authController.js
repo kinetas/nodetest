@@ -115,7 +115,7 @@ exports.register = async (req, res) => {
         // // 회원가입 성공 후 방 생성
         // await roomController.initAddRoom({ body: { u1_id: u_id } }, res);
         // 방 생성 (응답 처리 없이 결과만 확인)
-        await roomController.initAddRoom({ body: { u1_id: u_id } });
+        const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
         if (!roomResult.success) {
             console.error('방 생성 실패:', roomResult.error);
             return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });

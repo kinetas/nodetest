@@ -131,6 +131,28 @@ exports.deleteRoom = async (req, res) => {
     }
 };
 
+//방 입장함수
+exports.enterRoom = async (req, res) => {
+    const { r_id, u2_id } = req.body; // 클라이언트에서 방 ID와 유저 ID를 받아옴
+    const u1_id = req.session.user.id;
+
+    try {
+        // 방이 존재하는지 확인
+        const room = await Room.findOne({
+            where: { r_id, u1_id, u2_id }
+        });
+
+        if (!room) {
+            return res.status(404).json({ message: '해당 방을 찾을 수 없습니다.' });
+        }
+
+        // 방 입장에 필요한 다른 로직 추가 (예: 로그 기록)
+        res.json({ message: '방에 성공적으로 입장했습니다.', room });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: `방 입장 중 ${error} 오류가 발생했습니다.` });
+    }
+};
 // // ===== JWT 기반 방 삭제 함수 =====
 // exports.deleteRoom = async (req, res) => {
 //     const token = req.headers.authorization?.split(' ')[1];

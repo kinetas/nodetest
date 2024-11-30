@@ -66,8 +66,74 @@
             chatMessages.appendChild(messageElement);
 
         });
-        
         function sendMessage() {
+            // 메시지 입력 필드와 파일 입력 필드 가져오기
+            const messageInput = document.getElementById("messageInput");
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0]; // 선택된 파일 가져오기
+            const message = messageInput.value.trim(); // 메시지 내용 가져오기
+        
+            // 로그인된 사용자 ID 및 URL 파라미터 가져오기
+            const u1_id = sessionStorage.getItem('user_id');
+            const urlParams = new URLSearchParams(window.location.search);
+            const r_id = urlParams.get('r_id');
+            const u2_id = urlParams.get('u2_id');
+        
+            // 사용자 ID 확인
+            if (!u1_id) {
+                console.error("User ID not found in session storage.");
+                return;
+            }
+        
+            // 메시지가 비어 있는지 확인
+            if (!message && !file) {
+                alert("메시지나 파일을 입력하세요.");
+                return;
+            }
+        
+            // 파일이 있는 경우 파일을 읽고 소켓으로 전송
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64Image = event.target.result.split(',')[1]; // Base64 인코딩
+                    console.log("Sending data to server:", {
+                        message_contents: message,
+                        r_id,
+                        u1_id,
+                        u2_id,
+                        image: base64Image,
+                        image_type: file.type
+                    });
+        
+                    // 소켓으로 메시지와 이미지 전송
+                    socket.emit('sendMessage', {
+                        message_contents: message,
+                        r_id,
+                        u1_id,
+                        u2_id,
+                        image: base64Image,
+                        image_type: file.type
+                    });
+        
+                    // 입력 필드 초기화
+                    messageInput.value = "";
+                    fileInput.value = null; // 파일 입력 필드 초기화
+                };
+                reader.readAsDataURL(file); // 파일 읽기 시작
+            } else {
+                // 파일이 없는 경우 메시지만 전송
+                socket.emit('sendMessage', {
+                    message_contents: message,
+                    r_id,
+                    u1_id,
+                    u2_id
+                });
+        
+                // 메시지 입력란 초기화
+                messageInput.value = "";
+            }
+        }
+        /*function sendMessage() {
             // 메시지 입력 필드를 불러오기
             const messageInput = document.getElementById("messageInput");
             const fileInput = document.getElementById("fileInput"); // 파일 입력 필드 가져오기
@@ -127,8 +193,7 @@
                 });
                 }
             messageInput.value = "";
-            //fileInput.value = null;
-            }
+            }*/
             
             // // =========== 수정 JWT =============
             // if (!message.trim()) {

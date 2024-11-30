@@ -309,6 +309,7 @@ exports.friendRequestAccept = async (req, res) => {
             { where: { u_id: f_id, f_id: u_id } }
         );
 
+        console.log(JSON.stringify({ success: true, message: '친구 요청이 수락되었습니다.' }));
         res.json({ success: true, message: '친구 요청이 수락되었습니다.' });
     } catch (error) {
         console.error(error);
@@ -336,6 +337,7 @@ exports.friendRequestReject = async (req, res) => {
         );
 
         if (result[0] > 0) {
+            console.log(JSON.stringify({ success: true, message: '친구 요청이 거절되었습니다.' }));
             res.json({ success: true, message: '친구 요청이 거절되었습니다.' });
         } else {
             res.status(404).json({ success: false, message: '친구 요청을 찾을 수 없습니다.' });

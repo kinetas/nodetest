@@ -131,7 +131,7 @@ exports.initAddRoom = async (req) => {
             u2_id: u1_id, // 본인의 방 생성
             r_id: roomId,
             r_title: `${u1_id}의 방`,
-            r_type: '개인',
+            r_type: 'general',
         });
 
         console.log(`방이 성공적으로 생성되었습니다: ${roomId}`);

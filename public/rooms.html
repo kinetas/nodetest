@@ -25,6 +25,7 @@
     <h1>방 목록</h1>
     <ul id="roomList">Loading rooms...</ul> <!-- 방 목록을 표시할 요소 -->
     <input type="text" id="userIdInput" placeholder="추가/삭제할 유저 ID 입력">
+    <input type="text" id="roomNameInput" placeholder="방 이름 입력"> <!-- 방 이름 입력 추가 -->
     <input type="text" id="roomTypeInput" placeholder="방 타입 입력"> <!-- 수정 -->
     <button onclick="addRoom()">방 추가</button>
     <button onclick="deleteRoom()">방 삭제</button>
@@ -114,7 +115,8 @@
         // 방 추가 함수
         function addRoom() {
             const u2_id = document.getElementById('userIdInput').value;
-            const r_type = document.getElementById('roomTypeInput').value; // 방 타입 값 가져오기 <!-- 수정 -->
+            const roomName = document.getElementById('roomNameInput').value; // 입력된 방 이름
+            const r_type = document.getElementById('roomTypeInput').value; // 방 타입 값 가져오기
             fetch('/api/rooms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -125,8 +127,8 @@
                 // },
 
                 // body: JSON.stringify({ u1_id: userId, u2_id })
-                // body: JSON.stringify({ u1_id: userId, u2_id, r_type }) // r_type 추가 <!-- 수정 -->
-                body: JSON.stringify({ u2_id, r_type }) // r_type 추가 <!-- 수정 -->
+                // body: JSON.stringify({ u1_id: userId, u2_id, r_type }) 
+                body: JSON.stringify({ u2_id, roomName, r_type }) // roomName 추가 <!-- 수정 -->
             })
             .then(response => response.json())
             .then(data => {

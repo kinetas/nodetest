@@ -9,7 +9,7 @@ exports.getRooms = async (req, res) => {
     const rooms = await Room.findAll({
         where: { u1_id }
     });
-    console.log(rooms);
+    console.log({ rooms });
     res.json({ rooms });
 };
 

@@ -76,7 +76,7 @@
                         // 방 입장 버튼 추가
                         const enterButton = document.createElement('button');
                         enterButton.textContent = '입장';
-                        enterButton.onclick = () => enterRoom(room.r_id); // 방 ID를 전달
+                        enterButton.onclick = () => enterRoom(room.r_id, room.u2_id); // 방 ID를 전달
                         listItem.appendChild(enterButton);
 
                         roomListElement.appendChild(listItem);

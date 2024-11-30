@@ -172,7 +172,7 @@ exports.enterRoom = async (req, res) => {
     try {
         // 방이 존재하는지 확인
         const room = await Room.findOne({
-            where: { r_id}
+            where: { r_id, u1_id, u2_id}
         });
 
         if (!room) {

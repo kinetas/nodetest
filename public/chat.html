@@ -84,6 +84,8 @@
         // });
 
         socket.on("receiveMessage", (data) => {
+            console.log("Received message from server:", data); // 수신 확인 로그
+
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
             messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;

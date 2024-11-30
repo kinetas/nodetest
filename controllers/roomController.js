@@ -100,21 +100,44 @@ exports.addRoom = async (req, res) => {
 // };
 
 
-exports.initAddRoom = async (req, res) => {
+// exports.initAddRoom = async (req, res) => {
+//     const { u1_id } = req.body;
+
+//     const roomId = uuidv4();
+//     if (!uuidValidate(roomId)) {
+//         console.error("생성된 UUID가 유효하지 않습니다.");
+//         return; // 또는 throw new Error("유효하지 않은 UUID 생성");
+//     }
+
+//     try {
+//         await Room.create({ u1_id, u2_id:u1_id, r_id:roomId, r_title: `${u1_id}`, r_type:"general" });
+//         res.json({ message: '방이 성공적으로 추가되었습니다.' });
+//     } catch (error) {
+//         console.error(error); // 추가로 오류 로깅
+//         res.status(500).json({ message: `방 추가 중 ${error}오류가 발생했습니다.` });
+//     }
+// };
+
+// 방 생성 함수 ================추가=========================
+exports.initAddRoom = async (req) => {
     const { u1_id } = req.body;
 
-    const roomId = uuidv4();
-    if (!uuidValidate(roomId)) {
-        console.error("생성된 UUID가 유효하지 않습니다.");
-        return; // 또는 throw new Error("유효하지 않은 UUID 생성");
-    }
-
     try {
-        await Room.create({ u1_id, u2_id:u1_id, r_id:roomId, r_title: `${u1_id}`, r_type:"general" });
-        res.json({ message: '방이 성공적으로 추가되었습니다.' });
+        // 방 생성 로직
+        const roomId = uuidv4();
+        await Room.create({
+            u1_id,
+            u2_id: u1_id, // 본인의 방 생성
+            r_id: roomId,
+            r_title: `${u1_id}의 방`,
+            r_type: '개인',
+        });
+
+        console.log(`방이 성공적으로 생성되었습니다: ${roomId}`);
+        return { success: true, message: '방 생성 완료' }; // 결과만 반환
     } catch (error) {
-        console.error(error); // 추가로 오류 로깅
-        res.status(500).json({ message: `방 추가 중 ${error}오류가 발생했습니다.` });
+        console.error('방 생성 오류:', error);
+        return { success: false, error: '방 생성 실패' }; // 오류 반환
     }
 };
 

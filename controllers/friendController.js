@@ -69,6 +69,7 @@ exports.friendDelete = async (req, res) => {
         });
 
         if (result1 > 0 && result2 > 0) {
+            console.log(JSON.stringify({ success: true, message: '친구가 성공적으로 삭제되었습니다.' }));
             res.json({ success: true, message: '친구가 성공적으로 삭제되었습니다.' });
         } else {
             res.status(404).json({ success: false, message: '삭제할 친구를 찾을 수 없습니다.' });

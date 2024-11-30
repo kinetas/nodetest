@@ -15,7 +15,7 @@ const db = require('./config/db');
 const app = express();
 const PORT = 3000;
 const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
-
+const roomController = require('./controllers/roomController');
 //=====================추가========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
@@ -85,7 +85,7 @@ app.post('/api/messages', (req, res) => {
     );
 });
 */
-
+app.post('/api/rooms/enter', roomController.enterRoom);
 
 
 // �꽭��?? �씤利� 誘몃뱾�?���뼱

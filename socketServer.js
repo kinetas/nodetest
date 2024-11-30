@@ -165,6 +165,12 @@ try {
     send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
     image: fileBuffer ? fileBuffer.toString('base64') : null // Base64로 인코딩하여 클라이언트에 전송
   });
+  console.log(`Sending message to room ${r_id}:`, {
+    u1_id,
+    message_contents,
+    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+    image: fileBuffer ? fileBuffer.toString('base64') : null
+  });
 } catch (error) {
   console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송

@@ -15,11 +15,11 @@ exports.createRoom = (socket, roomName) => {
   
   socket.emit('roomCreated', r_id);
 };
-
+/*
 exports.joinRoom = async (socket, { r_id, u1_id }) => {
   try {
     if (!r_id || !u1_id) {
-      console.error(`sMissing r_id or u1_id:`, { r_id, u1_id });
+      console.error(`Missing r_id or u1_id:`, { r_id, u1_id });
       return;
     }
     // 사용자가 방에 들어갔을 때 방에 사용자 정보 업데이트 또는 추가
@@ -29,10 +29,22 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
       console.error(`Room with ID ${r_id} not found.`);
       return;
     }
+*/exports.joinRoom = async (socket, {r_id}) => {
+  try {
+    if (!r_id) {
+      console.error(`Missing r_id :`, { r_id });
+      return;
+    }
+    // 사용자가 방에 들어갔을 때 방에 사용자 정보 업데이트 또는 추가
+    const room = await Room.findOne({ where: { r_id } });
 
+    if (!room) {
+      console.error(`Room with ID ${r_id} not found.`);
+      return;
+    }
     // 방에 사용자를 추가하거나 관련 작업을 수행할 수 있음
     await Room.update(
-      { u2_id: u1_id },  // 사용자가 방에 참여했다고 업데이트
+      //{ u2_id: u1_id },  // 사용자가 방에 참여했다고 업데이트
       { where: { r_id } }
     );
 

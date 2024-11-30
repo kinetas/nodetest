@@ -147,6 +147,7 @@ exports.enterRoom = async (req, res) => {
         }
 
         // 방 입장에 필요한 다른 로직 추가 (예: 로그 기록)
+        console.log(JSON.stringify({ message: '방에 성공적으로 입장했습니다.', room }));
         res.json({ message: '방에 성공적으로 입장했습니다.', room });
     } catch (error) {
         console.error(error);

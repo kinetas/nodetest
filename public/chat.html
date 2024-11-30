@@ -103,26 +103,28 @@
                 reader.onload = function(event) {
                   const base64Image = event.target.result.split(',')[1]; // 이미지 파일을 Base64로 인코딩
             
-                  // 소켓으로 메시지와 이미지 전송
-                  socket.emit('sendMessage', {
-                    message_contents: message,
-                    r_id,
-                    u1_id,
-                    u2_id,
-                    image: base64Image,
-                    image_type: fileInput.files[0].type
-                  });
+            // 소켓으로 메시지와 이미지 전송
+            socket.emit('sendMessage', {
+                message_contents: message,
+                r_id,
+                u1_id,
+                u2_id,
+                image: base64Image,
+                image_type: fileInput.files[0].type
+                    });
                 };
-                reader.readAsDataURL(fileInput.files[0]);
-              } else {
+            reader.readAsDataURL(fileInput.files[0]);
+                } else {
                 // 파일이 없을 경우 메시지만 전송
-                socket.emit('sendMessage', {
-                  message_contents: message,
-                  r_id,
-                  u1_id,
-                  u2_id
+            socket.emit('sendMessage', {
+                message_contents: message,
+                r_id,
+                u1_id,
+                u2_id
                 });
-              }
+                }
+            messageInput.value = "";
+            fileInput.value = null;
             }
             
             // // =========== 수정 JWT =============

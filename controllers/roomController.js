@@ -38,7 +38,7 @@ exports.addRoom = async (req, res) => {
     // const { u2_id } = req.body;
     // const type = "close";
     const { u2_id, r_type } = req.body; // r_type 추가 <!-- 수정 -->
-    const type = r_type || "close"; // 기본값 "close" <!-- 수정 -->
+    const type = r_type || "general"; // 기본값 "close" <!-- 수정 -->
 
     //==========if 오픈채팅방이면 type = "open"======================
     //==========     조건을 뭘로 할 것인지     ======================
@@ -109,7 +109,7 @@ exports.initAddRoom = async (req, res) => {
     }
 
     try {
-        await Room.create({ u1_id, u2_id:u1_id, r_id:roomId, r_title: `${u1_id}`, r_type:"close" });
+        await Room.create({ u1_id, u2_id:u1_id, r_id:roomId, r_title: `${u1_id}`, r_type:"general" });
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
     } catch (error) {
         console.error(error); // 추가로 오류 로깅

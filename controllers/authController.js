@@ -2,6 +2,7 @@
 const User = require('../models/userModel'); // 경로를 확인하세요
 const Mission = require('../models/missionModel');
 const Room = require('../models/roomModel');
+const RMessage = require('../models/messageModel'); // r_message 모델 가져오기
 const { Op } = require('sequelize'); // 추가: Sequelize의 Op 객체 가져오기
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
@@ -206,13 +207,16 @@ exports.deleteAccount = async (req, res) => { // 추가
 
     try {
 
-        // 1. mission 데이터 삭제
+        // 1. r_message 데이터 삭제 (u1_id 또는 u2_id가 해당 사용자와 일치)
+        await RMessage.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+
+        // 2. mission 데이터 삭제
         await Mission.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
 
-        // 2. room 데이터 삭제
+        // 3. room 데이터 삭제
         await Room.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
 
-        // 3. user 데이터 삭제
+        // 4. user 데이터 삭제
         const deleted = await User.destroy({ where: { u_id: userId } });
 
         if (deleted) {

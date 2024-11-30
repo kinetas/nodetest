@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../SessionCookieManager.dart';
+import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저
 
-// 나에게 온 친구 요청 목록을 출력해주고 수락할 수 있는 클래스
+// 나에게 온 친구 요청 목록을 출력하고 수락할 수 있는 클래스
 class FriendRequestScreen extends StatefulWidget {
   @override
   _FriendRequestScreenState createState() => _FriendRequestScreenState();
@@ -30,7 +30,6 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
         final responseData = json.decode(response.body);
 
         setState(() {
-          // 받은 요청 데이터 저장
           receivedRequests = responseData['receivedRequests'] != null
               ? List<String>.from(responseData['receivedRequests'])
               : [];
@@ -59,7 +58,8 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
     try {
       final response = await SessionCookieManager.post(
         url,
-        body: json.encode({'f_id': friendId}),
+        headers: {'Content-Type': 'application/json'}, // 헤더 추가
+        body: json.encode({'f_id': friendId}), // friendId 전달
       );
 
       final responseData = json.decode(response.body);

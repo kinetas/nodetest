@@ -14,7 +14,6 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ChatProvider()), // ChatProvider 등록
         ChangeNotifierProvider(create: (_) => MissionProvider()), // MissionProvider 등록
       ],
       child: MyApp(isLoggedIn: isLoggedIn),

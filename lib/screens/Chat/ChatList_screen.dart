@@ -24,7 +24,7 @@ class ChatList extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ChatRoomScreen(
-                  chatId: index, // chatList의 인덱스를 ID로 전달
+                  chatId: chat['id'].toString(), // int -> String 변환
                 ),
               ),
             );

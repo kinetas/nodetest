@@ -37,12 +37,46 @@
         const socket = io("http://54.180.54.31:3001",{
             path: '/socket.io'
         });
+         // 페이지 로드 시 기존 메시지 불러오기
+        window.onload = function() {
+            fetch(`/chat/get-messages?r_id=${roomId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(messages => {
+                    const chatMessages = document.getElementById("chatMessages");
+                    if (messages.length === 0) {
+                        chatMessages.textContent = "이 방에 메시지가 없습니다.";
+                    } else {
+                        messages.forEach(data => {
+                            const messageElement = document.createElement("div");
+                            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+                            chatMessages.appendChild(messageElement);
+
+                            if (data.image) {
+                                const imageElement = document.createElement("img");
+                                imageElement.src = `data:image/jpeg;base64,${data.image}`;
+                                imageElement.style.maxWidth = "200px";
+                                messageElement.appendChild(imageElement);
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading messages:', error);
+                    const chatMessages = document.getElementById("chatMessages");
+                    chatMessages.textContent = "메시지를 불러오는 중 오류가 발생했습니다.";
+                });
+        };
 
         socket.on("connect", () => {
             console.log("서버에 연결되었습니다.");
             socket.emit("joinRoom", { r_id: roomId });
         });
-
+        
         // // =========== 수정 JWT =============
         // socket.on("connect", () => {
         //     console.log("서버에 연결되었습니다.");

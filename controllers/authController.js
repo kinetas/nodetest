@@ -191,3 +191,28 @@ exports.logOut = (req, res) => {
 // exports.logOut = (req, res) => {
 //     res.status(200).json({ message: '로그아웃은 클라이언트에서 토큰 삭제로 처리됩니다.' });
 // };
+
+
+// 계정 탈퇴 함수
+exports.deleteAccount = async (req, res) => { // 추가
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    }
+
+    try {
+        // 사용자 삭제
+        const deleted = await User.destroy({ where: { u_id: userId } });
+        if (deleted) {
+            req.session.destroy(); // 세션 제거
+            console.log(JSON.stringify({ success: true, message: '계정이 성공적으로 삭제되었습니다.' }));
+            return res.status(200).json({ success: true, message: '계정이 성공적으로 삭제되었습니다.' });
+        } else {
+            return res.status(404).json({ success: false, message: '사용자를 찾을 수 없습니다.' });
+        }
+    } catch (error) {
+        console.error('계정 삭제 오류:', error);
+        return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+    }
+};

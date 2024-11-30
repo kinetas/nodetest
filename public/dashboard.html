@@ -111,13 +111,14 @@
     <button onclick="window.location.href='/cVote'">커뮤니티 투표</button>
     <button onclick="window.location.href='/community_missions'">커뮤니티 미션</button>
 
-
     <!-- public/dashboard.html -->
     <button onclick="window.location.href='/rooms'">방</button>
 
     <button onclick="window.location.href='/result'">달성률 보기</button>
 
     <button onclick="window.location.href='/printmissionlist'">미션 목록 보기</button>
+
+    <button onclick="deleteAccount()">계정 탈퇴</button> <!-- 추가: 계정 탈퇴 버튼 -->
 
     <script>
 
@@ -596,6 +597,29 @@
             .catch(error => console.error('Error:', error));
         }
 
+
+        // 계정 탈퇴 함수
+        function deleteAccount() {
+            if (confirm("정말 계정을 탈퇴하시겠습니까?")) { // 사용자 확인
+                fetch('/api/auth/deleteAccount', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = '/'; // 로그인 화면으로 리디렉션
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('계정 탈퇴 중 오류:', error);
+                    alert('계정 탈퇴 중 오류가 발생했습니다.');
+                });
+            }
+        }
     </script>
 </body>
 </html>

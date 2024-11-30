@@ -2,6 +2,7 @@
 const User = require('../models/userModel'); // 경로를 확인하세요
 const Mission = require('../models/missionModel');
 const Room = require('../models/roomModel');
+const { Op } = require('sequelize'); // 추가: Sequelize의 Op 객체 가져오기
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
 
@@ -213,7 +214,7 @@ exports.deleteAccount = async (req, res) => { // 추가
 
         // 3. user 데이터 삭제
         const deleted = await User.destroy({ where: { u_id: userId } });
-        
+
         if (deleted) {
             req.session.destroy(); // 세션 제거
             console.log(JSON.stringify({ success: true, message: '계정이 성공적으로 삭제되었습니다.' }));

@@ -571,8 +571,8 @@ exports.checkMissionDeadline = async () => {
                 console.log(`미션 ${mission.m_id}의 마감 기한이 10분 연장되었습니다.`);
             } else {
                 // 날짜가 변하면 상태를 실패로 업데이트
-                await mission.update({ m_status: '실패' });
-                console.log(`미션 ${mission.m_id}의 상태가 '실패'로 업데이트되었습니다.`);
+                await mission.update({ m_status: '완료' });
+                console.log(`미션 ${mission.m_id}의 상태가 '완료'로 업데이트되었습니다.`);
             }
         }
 

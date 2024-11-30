@@ -82,10 +82,11 @@ exports.acceptCommunityMission = async (req, res) => {
             m_status: '진행중'
         });
 
+        
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 수락 오류:', error);
-        res.status(500).json({ success: false, message: '커뮤니티 미션 수락 중 오류가 발생했습니다.' });
+        res.status(500).json({ success: false, message: `커뮤니티 미션 수락 중 오류(${error})가 발생했습니다.` });
     }
 };
 

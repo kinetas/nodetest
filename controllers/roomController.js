@@ -208,3 +208,26 @@ exports.enterRoom = async (req, res) => {
 //         res.status(500).json({ message: '방 삭제 중 오류가 발생했습니다.' });
 //     }
 // };
+
+
+// 방 이름 변경 함수 추가
+exports.updateRoomName = async (req, res) => {
+    const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
+    const { u2_id, newRoomName } = req.body; // 입력받은 유저 ID와 새로운 방 이름
+
+    try {
+        const updated = await Room.update(
+            { r_title: newRoomName },
+            { where: { u1_id, u2_id } }
+        );
+
+        if (updated[0] === 0) {
+            return res.status(404).json({ message: "해당 방을 찾을 수 없습니다." });
+        }
+
+        return res.json({ message: "방 이름이 성공적으로 변경되었습니다." });
+    } catch (error) {
+        console.error("방 이름 변경 중 오류:", error);
+        res.status(500).json({ message: "방 이름 변경 중 오류가 발생했습니다." });
+    }
+};

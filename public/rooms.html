@@ -29,6 +29,7 @@
     <input type="text" id="roomTypeInput" placeholder="방 타입 입력"> <!-- 수정 -->
     <button onclick="addRoom()">방 추가</button>
     <button onclick="deleteRoom()">방 삭제</button>
+    <button onclick="updateRoomName()">방 이름 변경</button>
 
     <script>
 
@@ -157,6 +158,28 @@
                 location.reload();
             });
         }
+
+        //방 이름 변경
+        function updateRoomName() {
+            const u2_id = document.getElementById('userIdInput').value;
+            const newRoomName = document.getElementById('roomNameInput').value;
+
+            fetch('/api/rooms/update', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ u2_id, newRoomName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('방 이름 변경 중 오류가 발생했습니다.');
+            });
+        }
+
 
         // 실시간으로 방 목록 업데이트 (예: 방이 추가되거나 삭제되었을 때)
         socket.on("roomUpdated", () => {

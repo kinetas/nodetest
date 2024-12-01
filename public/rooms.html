@@ -72,7 +72,8 @@
                 if (data.rooms && data.rooms.length > 0) {
                     data.rooms.forEach(room => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${room.u1_id} - ${room.u2_id}`;
+                        // listItem.textContent = `${room.u1_id} - ${room.u2_id}`;
+                        listItem.textContent = room.r_title; // r_title로 방 이름 출력
                         
                         // 방 입장 버튼 추가
                         const enterButton = document.createElement('button');

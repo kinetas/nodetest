@@ -166,7 +166,7 @@ exports.deleteRoom = async (req, res) => {
 
 //방 입장함수
 exports.enterRoom = async (req, res) => {
-    const { r_id} = req.body; // 클라이언트에서 방 ID와 유저 ID를 받아옴
+    const { r_id, u2_id} = req.body; // 클라이언트에서 방 ID와 유저 ID를 받아옴
     const u1_id = req.session.user.id;
 
     try {

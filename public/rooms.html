@@ -97,7 +97,7 @@
         fetch('/api/rooms/enter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ r_id})
+            body: JSON.stringify({r_id, u2_id})
         })
         .then(response => response.json())
         .then(data => {

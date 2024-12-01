@@ -104,7 +104,7 @@ exports.register = async (req, res) => {
         }
 
         // 이메일 중복 검사
-        const existingMail = await User.findOne({where: { mail } });
+        const existingMail = await User.findOne({where: { u_mail } });
         if (existingMail) {
             return res.status(400).json({ message: '이미 사용 중인 이메일입니다.' });
         }

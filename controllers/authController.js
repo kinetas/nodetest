@@ -107,7 +107,7 @@ exports.register = async (req, res) => {
         const birthDate = new Date(u_birth);
         const now = new Date();
         if (birthDate > now) {
-            return res.status(400).json({ message: '올바른 생년월일 날짜를 입력하세요.' });
+            return res.status(400).json({ message: '생년월일을 올바르게 입력하세요.' });
         }
 
         // 이메일 중복 검사

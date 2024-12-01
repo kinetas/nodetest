@@ -53,7 +53,17 @@
                     } else {
                         messages.forEach(data => {
                             const messageElement = document.createElement("div");
-                            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+
+                            // 서버에서 받은 시간을 KST로 되돌림
+                            const utcDate = new Date(data.send_date); // 서버에서 UTC로 처리됨
+                            const kstDate = new Date(utcDate.getTime() - (9 * 60 * 60 * 1000)); // UTC - 9시간
+
+                            // 시간 형식으로 변환
+                            const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
+
+                            messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
+
+                            // messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
                             chatMessages.appendChild(messageElement);
 
                             if (data.image) {

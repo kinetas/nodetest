@@ -497,12 +497,11 @@ exports.failureMission = async (req, res) => {
 
 //방미션출력
 exports.printRoomMission = async (req, res) => {
-    const { r_id } = req.body;
     const { u2_id } = req.body; // 클라이언트에서 상대방 ID 전달
     const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID (세션)
 
-    if (!r_id) {
-        return res.status(400).json({ success: false, message: '방 ID(r_id)는 필수입니다.' });
+    if (!u2_id) {
+        return res.status(400).json({ success: false, message: '상대방 ID(u2_id)는 필수입니다.' });
     }
 
     try {

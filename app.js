@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session'); //�꽭��?�異붽��?
 const cron = require('node-cron');
 const path = require('path');
+const chatRoutes = require('/routes/chatRoutes');
 const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��졇�삤湲�
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄??? �씪�슦�듃 ?��?��?���삤湲�
 const roomRoutes = require('./routes/roomRoutes');
@@ -151,6 +152,8 @@ app.get('/cVote/details/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'voteDetails.html'));
 });
 
+app.use('/chat', chatRoutes);
+
 app.use('/api/auth', authRoutes);
 
 app.use('/dashboard', missionRoutes); // 誘몄??? �씪�슦�듃?���? /dashboard濡� �꽕�젙
@@ -170,11 +173,12 @@ cron.schedule('0 0 * * *', () => {
 });
 
 
-
+/*
 // 미션 마감기한 확인 (매 분마다 실행)
 cron.schedule('* * * * *', () => { // 매 분 실행
+*/
 // // 미션 마감기한 확인 (매일 마다 실행)
-// cron.schedule('0 0 * * *', () => { // 매일 실행
+ cron.schedule('0 0 * * *', () => { // 매일 실행
     console.log('마감 기한 확인 및 상태 업데이트 실행');
     checkMissionDeadline();
 });

@@ -62,7 +62,7 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
 //   }
 // };
 
-/*exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
+exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
   const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
   const send_date = new Date(); // 현재 시간
   if (!r_id || !u1_id ||!u2_id ||!message) {
@@ -90,7 +90,6 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
       console.error('Error saving message with Sequelize:', error);
   }
 };
-
 
 exports.sendMessageWithFile = async (req, res) => {
   const { u1_id, u2_id, r_id, message_contents } = req.body;
@@ -125,51 +124,7 @@ exports.sendMessageWithFile = async (req, res) => {
       res.status(500).json({ message: '메시지 저장 실패' });
   }
 };
-*/
-exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id, file }) => {
-  const message_num = Math.random().toString(36).substr(2, 9); // 메시지 번호 생성
-  const send_date = new Date(); // 현재 시간
 
-  if (!r_id || !u1_id || !u2_id || !message) {
-    console.error('Missing required fields:', { r_id, u1_id, u2_id, message });
-    socket.emit('errorMessage', 'Missing required fields');
-    return;
-  }
-
-  try {
-    let fileBuffer = null;
-    let fileType = null;
-
-    if (file) {
-      fileBuffer = file.buffer; // 파일 처리
-      fileType = file.mimetype;
-    }
-
-    const newMessage = await RMessage.create({
-      u1_id,
-      u2_id,
-      r_id,
-      message_num,
-      send_date,
-      message_contents: message,
-      image: fileBuffer,
-      image_type: fileType
-    });
-
-    console.log('Message saved:', newMessage);
-
-    // 클라이언트에 메시지 전송
-    io.to(r_id).emit('receiveMessage', {
-      u1_id,
-      message,
-      send_date: send_date.toISOString().slice(0, 19).replace('T', ' '),
-      image: fileBuffer ? fileBuffer.toString('base64') : null
-    });
-  } catch (error) {
-    console.error('Error saving message with Sequelize:', error);
-    socket.emit('errorMessage', 'Failed to save message to DB');
-  }
-};
 //메시지 불러오기
 exports.getMessages = async (r_id) => {
   try {

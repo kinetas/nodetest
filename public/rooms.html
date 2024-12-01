@@ -93,7 +93,7 @@
       //  function enterRoom(r_id, u2_id) {
       //      window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
       //  }
-        function enterRoom(r_id) {
+        function enterRoom(r_id, u2_id) {
         fetch('/api/rooms/enter', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -103,7 +103,7 @@
         .then(data => {
             if (data.message) {
                 alert(data.message);
-                window.location.href = `/chat.html?r_id=${r_id}`;
+                window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
             }
         })
         .catch(error => {

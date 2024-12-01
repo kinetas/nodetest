@@ -103,6 +103,13 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: '이미 사용 중인 아이디입니다.' });
         }
 
+        // 생년월일이 현재 시간보다 미래인 경우 에러 반환
+        const birthDate = new Date(u_birth);
+        const now = new Date();
+        if (birthDate > now) {
+            return res.status(400).json({ message: '올바른 생년월일 날짜를 입력하세요.' });
+        }
+
         // 이메일 중복 검사
         const existingMail = await User.findOne({where: { u_mail } });
         if (existingMail) {

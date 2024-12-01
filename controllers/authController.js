@@ -102,6 +102,12 @@ exports.register = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: '이미 사용 중인 아이디입니다.' });
         }
+
+        // 이메일 중복 검사
+        const existingMail = await User.findOne({where: { mail } });
+        if (existingMail) {
+            return res.status(400).json({ message: '이미 사용 중인 이메일입니다.' });
+        }
     
         // 비밀번호 암호화 // 수정
         const hashedPassword = await hashPassword(u_password); // 수정

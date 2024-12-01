@@ -133,9 +133,9 @@ io.on('connection', (socket) => {
       if (!r_id) missingFields.push('r_id');
       if (!u1_id) missingFields.push('u1_id');
       if (!u2_id) missingFields.push('u2_id');
-      
-      console.error(`Missing fields: ${missingFields.join(', ')}`); // 누락된 필드 로그 출력 (수정된 부분)
-      socket.emit('errorMessage', `Missing fields: ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)
+      if (missingFields.length > 0) {
+      console.error(`누락된 필드: ${missingFields.join(', ')}`); // 누락된 필드 로그 출력 (수정된 부분)
+      socket.emit('errorMessage', `필수 필드 누락: ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)
       return;
     }
 
@@ -144,7 +144,13 @@ try {
 
   // 이미지 데이터가 있는 경우 처리
   if (image) {
-    fileBuffer = Buffer.from(image, 'base64'); // Base64를 Buffer로 변환
+    try {
+      fileBuffer = Buffer.from(image, 'base64');
+    } catch (bufferError) {
+      console.error('이미지를 버퍼로 변환 중 오류:', bufferError);
+      socket.emit('errorMessage', '잘못된 이미지 데이터');
+      return;
+    }
   }
   // Sequelize를 사용하여 메시지 저장
   const newMessage = await RMessage.create({
@@ -158,7 +164,7 @@ try {
   });
   console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
 
-  // 메시지를 해당 방에 있는 클라이언트들에게 전송
+   // 메시지 브로드캐스트,  안전성 검사
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     message_contents,
@@ -174,7 +180,7 @@ try {
 } catch (error) {
   console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
-}
+}}
 });
 
 app.post('/upload-image', upload.single('file'), async (req, res) => {

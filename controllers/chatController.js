@@ -134,9 +134,13 @@ exports.getMessages = async (r_id) => {
       order: [['send_date', 'ASC']],
     });
 
-    // 메시지 반환
-    console.log(JSON.stringify(messages));
-    return messages;
+    // // 메시지 반환
+    // console.log(JSON.stringify(messages));
+    // return messages;
+    // Sequelize 객체를 JSON으로 변환
+    const jsonMessages = messages.map(msg => msg.toJSON());
+    console.log(JSON.stringify(jsonMessages));
+    return jsonMessages; // JSON 데이터 반환
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);
     throw error; // 오류가 발생하면 throw하여 호출한 쪽에서 처리

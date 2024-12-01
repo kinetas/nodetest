@@ -545,10 +545,8 @@ exports.checkMissionDeadline = async () => {
         // 마감 기한이 지난 미션 조회
         const expiredMissions = await Mission.findAll({
             where: {
-                m_deadline: {
-                    [Op.lt]: now, // 현재 시간보다 이전인 미션만 선택
-                },
-                m_status: '진행중', // 진행 중 상태인 미션만
+                m_deadline: { [Op.lte]: now }, // 마감 기한이 현재 시간과 같거나 이전
+                m_status: { [Op.or]: ['진행중', '요청'] }, // 상태가 "진행중" 또는 "요청"
             },
         });
 
@@ -560,22 +558,57 @@ exports.checkMissionDeadline = async () => {
         // 각 미션의 상태를 확인하여 조건에 따라 처리
         for (const mission of expiredMissions) {
             const deadline = new Date(mission.m_deadline); // 마감 기한 가져오기
-            const extendedDeadline = new Date(deadline.getTime() + 10 * 60 * 1000); // 마감 기한에 10분 추가
+            const originalDeadline = new Date(deadline); // 원래 마감 기한 저장
+            const extendedDeadline = new Date(deadline.getTime() + 10 * 60 * 1000); // 10분 추가된 기한
 
-            // 날짜가 변하지 않을 경우 10분 추가
-            if (deadline.getDate() === extendedDeadline.getDate() &&
-                deadline.getMonth() === extendedDeadline.getMonth() &&
-                deadline.getFullYear() === extendedDeadline.getFullYear()) {
-                // 10분 연장
-                await mission.update({ m_deadline: extendedDeadline });
-                console.log(`미션 ${mission.m_id}의 마감 기한이 10분 연장되었습니다.`);
-            } else {
-                // 날짜가 변하면 상태를 실패로 업데이트
+            if (mission.m_extended === true) {
+                // 1. m_extended === true
+                await mission.update({
+                    m_status: '완료',
+                    m_deadline: new Date(deadline.getTime() - 10 * 60 * 1000), // 마감 기한을 10분 줄임
+                });
+
+                await MResult.create({
+                    m_id: mission.m_id,
+                    u_id: mission.u2_id,
+                    m_deadline: originalDeadline, // 원래 마감 기한 저장
+                    m_status: '실패',
+                });
+
+                console.log(
+                    `미션 ${mission.m_id}이 완료 처리되고, m_result에 저장되었습니다.`
+                );
+            } else if (
+                deadline.getDate() !== extendedDeadline.getDate() ||
+                deadline.getMonth() !== extendedDeadline.getMonth() ||
+                deadline.getFullYear() !== extendedDeadline.getFullYear()
+            ) {
+                // 2. 날짜가 변함
                 await mission.update({ m_status: '완료' });
-                console.log(`미션 ${mission.m_id}의 상태가 '완료'로 업데이트되었습니다.`);
-            }
-        }
 
+                await MResult.create({
+                    m_id: mission.m_id,
+                    u_id: mission.u2_id,
+                    m_deadline: originalDeadline, // 원래 마감 기한 저장
+                    m_status: '실패',
+                });
+
+                console.log(
+                    `미션 ${mission.m_id}의 마감 기한이 지났고 날짜가 변경되었으므로 완료 처리되었습니다.`
+                );
+            } else {
+                // 3. 날짜가 변하지 않음
+                await mission.update({
+                    m_deadline: extendedDeadline, // 마감 기한을 10분 연장
+                    m_extended: true, // 추가 시간 플래그를 true로 설정
+                });
+
+                console.log(
+                    `미션 ${mission.m_id}의 마감 기한이 10분 연장되었습니다.`
+                );
+            }
+
+        }
         // console.log(`마감 기한이 지난 ${expiredMissions.length}개의 미션 상태를 '실패'로 업데이트했습니다.`);
         console.log(`총 ${expiredMissions.length}개의 미션을 처리했습니다.`);
     } catch (error) {

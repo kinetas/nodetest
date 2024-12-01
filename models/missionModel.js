@@ -36,6 +36,10 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(40),
     allowNull: true, // Room 연결이 선택적인 경우
   },
+  m_extended: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false, // 기본값은 false
+  },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����

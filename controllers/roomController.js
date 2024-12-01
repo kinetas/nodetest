@@ -130,16 +130,19 @@ exports.addRoom = async (req, res) => {
 
 // 방 생성 함수 ================추가=========================
 exports.initAddRoom = async (req) => {
-    const { u1_id } = req.body;
+    const { u1_id, roomName } = req.body;
 
     try {
         // 방 생성 로직
         const roomId = uuidv4();
+        // 방 이름 처리: 입력된 이름이 없으면 기본값 설정
+        const r_title = roomName && roomName.trim() ? roomName.trim() : `${u1_id}의 방`;
         await Room.create({
             u1_id,
             u2_id: u1_id, // 본인의 방 생성
             r_id: roomId,
-            r_title: `${u1_id}의 방`,
+            // r_title: `${u1_id}의 방`,
+            r_title: r_title,
             r_type: 'general',
         });
 

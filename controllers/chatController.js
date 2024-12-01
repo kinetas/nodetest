@@ -135,6 +135,7 @@ exports.getMessages = async (r_id) => {
     });
 
     // 메시지 반환
+    console.log(JSON.stringify(messages));
     return messages;
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);

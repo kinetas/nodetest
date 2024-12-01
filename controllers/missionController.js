@@ -2,6 +2,7 @@
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
 // const { sequelize } = require('../models/missionModel'); // sequelize 객체 불러오기
 const Room = require('../models/roomModel'); // Room 모델 가져오기
+const MResult = requier('../models/m_resultModel.js'); //MResult 모델 가져오기
 const CRoom = require('../models/comunity_roomModel'); // Community Room 테이블
 const resultController = require('./resultController'); // resultController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');

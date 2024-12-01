@@ -47,7 +47,7 @@ exports.addRoom = async (req, res) => {
 
     // u1_id와 u2_id가 같으면 initAddRoom 호출
     if (u1_id === u2_id) {
-        await exports.initAddRoom({ body: { u1_id } }, res); // initAddRoom 호출
+        await exports.initAddRoom({ body: { u1_id, roomName } }, res); // initAddRoom 호출
         return; // initAddRoom 호출 후 함수 종료
     }
 

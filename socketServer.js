@@ -138,7 +138,7 @@ io.on('connection', (socket) => {
       socket.emit('errorMessage', `필수 필드 누락: ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)
       return;
     }
-
+  }
 try {
   let fileBuffer = null;
 
@@ -180,9 +180,9 @@ try {
 } catch (error) {
   console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
-}}
+}
 });
-
+/*
 app.post('/upload-image', upload.single('file'), async (req, res) => {
   const { u1_id, u2_id, r_id, message_contents } = req.body;
   const file = req.file;
@@ -226,7 +226,7 @@ app.post('/upload-image', upload.single('file'), async (req, res) => {
       res.status(500).json({ message: '메시지 저장 실패' });
   }
 });
-
+*/
 
 // 클라이언트가 연결 해제되었을 때 처리
 socket.on('disconnect', () => {

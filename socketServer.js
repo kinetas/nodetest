@@ -102,7 +102,7 @@ const upload = multer({ storage });
 //   });
 // });
 
-
+/*
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
@@ -177,55 +177,34 @@ try {
 }
 });
 
-app.post('/upload-image', upload.single('file'), async (req, res) => {
-  const { u1_id, u2_id, r_id, message_contents } = req.body;
-  const file = req.file;
-
-  console.log('Uploaded file:', req.file);
-
-  if (!u1_id || !u2_id || !r_id || (!message_contents && !file)) {
-      return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
-  }
-
-  try {
-      let fileBuffer = null;
-      let fileType = null;
-
-      if (file) {
-          fileBuffer = file.buffer;
-          fileType = file.mimetype;
-      }
-
-      const newMessage = await RMessage.create({
-          u1_id,
-          u2_id,
-          r_id,
-          message_contents,
-          send_date: new Date(),
-          image: fileBuffer,
-          image_type: fileType
-      });
-
-      res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.', newMessage });
-    
-      // 메시지와 이미지 정보를 소켓을 통해 방에 있는 클라이언트들에게 전송
-      io.to(r_id).emit('receiveMessage', {
-        u1_id,
-        message_contents,
-        send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
-        image: fileBuffer ? fileBuffer.toString('base64') : null
-      });
-  } catch (error) {
-      console.error('Error saving message to DB:', error);
-      res.status(500).json({ message: '메시지 저장 실패' });
-  }
-});
-
-
 // 클라이언트가 연결 해제되었을 때 처리
 socket.on('disconnect', () => {
 console.log('User disconnected');
 });
+});
+
+server.listen(3001, () => {
+  console.log('HTTP Server running on port 3001');
+});
+*/
+io.on('connection', (socket) => {
+  console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
+
+  socket.on('createRoom', (roomName) => {
+    chatController.createRoom(socket, roomName);
+  });
+
+  socket.on('joinRoom', (data) => {
+    chatController.joinRoom(socket, data);
+  });
+
+  socket.on('sendMessage', (data) => {
+    chatController.sendMessage(io, socket, data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 });
 
 server.listen(3001, () => {

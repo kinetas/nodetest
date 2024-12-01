@@ -22,29 +22,28 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
-  late IO.Socket socket; // Socket.IO 클라이언트
-  TextEditingController _messageController = TextEditingController(); // 메시지 입력 필드
-  bool _showPlusOptions = false; // + 버튼 옵션 표시 여부
+  late IO.Socket socket;
+  TextEditingController _messageController = TextEditingController();
+  bool _showPlusOptions = false;
+  final GlobalKey<ChatContentState> _chatContentKey = GlobalKey<ChatContentState>(); // ChatContent 상태 접근용 Key
 
   @override
   void initState() {
     super.initState();
-    _initializeSocket(); // 소켓 초기화
+    _initializeSocket();
   }
 
-  /// 소켓 초기화
   void _initializeSocket() {
     socket = IO.io(
       'http://54.180.54.31:3001',
       IO.OptionBuilder()
-          .setTransports(['websocket']) // 웹소켓 연결 사용
-          .disableAutoConnect() // 자동 연결 비활성화
+          .setTransports(['websocket'])
+          .disableAutoConnect()
           .build(),
     );
 
     socket.onConnect((_) {
       print('Socket connected');
-      // 채팅방에 참가 메시지
       socket.emit('joinRoom', {
         'r_id': widget.chatId,
         'u1_id': widget.userId,
@@ -57,32 +56,31 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     socket.on('receiveMessage', (data) {
       print('Message received: $data');
-      // 받은 메시지를 UI에 업데이트
-      setState(() {
-        // 여기에서 ChatContent에 메시지를 전달하거나 업데이트합니다.
-      });
+      _chatContentKey.currentState?.addMessage(data); // 메시지 업데이트
     });
 
-    socket.connect(); // 소켓 연결
+    socket.connect();
   }
 
-  /// 메시지 전송
   void _sendMessage() {
     if (_messageController.text.isEmpty) return;
 
-    // 메시지 전송
-    socket.emit('sendMessage', {
+    final messageData = {
       'r_id': widget.chatId,
       'u1_id': widget.userId,
       'u2_id': widget.otherUserId,
       'message_contents': _messageController.text,
-    });
+      'send_date': DateTime.now().toString(), // 임시로 현재 시간 추가
+    };
 
+    socket.emit('sendMessage', messageData);
     print('Message sent: ${_messageController.text}');
-    _messageController.clear(); // 입력 필드 초기화
+    _messageController.clear();
+
+    // 메시지를 ChatContent에도 바로 추가
+    _chatContentKey.currentState?.addMessage(messageData);
   }
 
-  /// + 버튼 눌렀을 때 옵션 표시/숨김
   void _togglePlusOptions() {
     setState(() {
       _showPlusOptions = !_showPlusOptions;
@@ -93,15 +91,20 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.chatTitle), // 채팅방 제목
+        title: Text(widget.chatTitle),
       ),
       body: Column(
         children: [
           Expanded(
-            child: ChatContent(chatId: widget.chatId), // ChatContent 위젯 호출
+            child: ChatContent(
+              key: _chatContentKey, // GlobalKey를 ChatContent에 전달
+              chatId: widget.chatId,
+              userId: widget.userId,
+              otherUserId: widget.otherUserId,
+            ),
           ),
           if (_showPlusOptions)
-            ChatPlusButton( // ChatPlusButton을 현재 화면에 표시
+            ChatPlusButton(
               context: context,
             ),
           Padding(
@@ -109,8 +112,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.add), // + 버튼
-                  onPressed: _togglePlusOptions, // 옵션 표시/숨김 토글
+                  icon: Icon(Icons.add),
+                  onPressed: _togglePlusOptions,
                 ),
                 Expanded(
                   child: TextField(
@@ -123,7 +126,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 ),
                 IconButton(
                   icon: Icon(Icons.send),
-                  onPressed: _sendMessage, // 메시지 전송
+                  onPressed: _sendMessage,
                 ),
               ],
             ),
@@ -135,9 +138,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   void dispose() {
-    socket.disconnect(); // 소켓 연결 해제
-    socket.dispose(); // 소켓 리소스 정리
-    _messageController.dispose(); // 입력 필드 해제
+    socket.disconnect();
+    socket.dispose();
+    _messageController.dispose();
     super.dispose();
   }
 }

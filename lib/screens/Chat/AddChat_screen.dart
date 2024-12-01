@@ -1,68 +1,103 @@
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart'; // WebSocket 사용
+import 'dart:convert';
+import '../../SessionCookieManager.dart';
 
-class AddChatScreen extends StatelessWidget {
-  final String chatType;
-  final WebSocketChannel channel;
+class AddChatScreen extends StatefulWidget {
+  final String chatType; // 파라미터로 채팅방 유형 전달
 
-  AddChatScreen({required this.chatType, required this.channel});
+  const AddChatScreen({required this.chatType, Key? key}) : super(key: key);
+
+  @override
+  _AddChatScreenState createState() => _AddChatScreenState();
+}
+
+class _AddChatScreenState extends State<AddChatScreen> {
+  final TextEditingController _u2IdController = TextEditingController();
+  final TextEditingController _roomNameController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> _createChatRoom() async {
+    const String apiUrl = 'http://54.180.54.31:3000/api/rooms';
+
+    try {
+      setState(() => _isLoading = true);
+
+      final response = await SessionCookieManager.post(
+        apiUrl,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'u2_id': _u2IdController.text,
+          'roomName': _roomNameController.text.isEmpty ? null : _roomNameController.text,
+          'r_type': widget.chatType, // 부모 위젯에서 전달된 chatType 사용
+        }),
+      );
+
+      setState(() => _isLoading = false);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('채팅방이 성공적으로 생성되었습니다!')),
+          );
+          Navigator.pop(context); // 이전 화면으로 돌아감
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(responseData['message'] ?? '채팅방 생성 실패')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('채팅방 생성 요청 실패: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('네트워크 오류: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
-    final title = chatType == 'general' ? '일반 채팅방 추가' : '미션 채팅방 추가';
-
-    void _createRoom() {
-      final roomName = _controller.text.trim();
-      if (roomName.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('채팅방 이름을 입력하세요.')),
-        );
-        return;
-      }
-
-      // WebSocket으로 방 생성 요청 전송
-      final request = {
-        'event': 'createRoom',
-        'u1_id': '사용자1_ID', // 사용자 ID (필요에 따라 변경)
-        'u2_id': '사용자2_ID', // 상대방 ID (필요에 따라 변경)
-        'r_title': roomName,
-      };
-
-      channel.sink.add(request);
-
-      // WebSocket 응답 처리
-      channel.stream.listen((response) {
-        final responseData = response.toString();
-        if (responseData.contains('roomCreated')) {
-          final roomId = responseData.split(':').last.trim(); // 생성된 방 ID 추출
-          Navigator.pop(context, {'roomId': roomId, 'title': roomName}); // 결과 반환
-        }
-      }, onError: (error) {
-        print('방 생성 오류: $error');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('방 생성에 실패했습니다. 다시 시도하세요.')),
-        );
-      });
-    }
+    final title = widget.chatType == 'general' ? '일반 채팅방 생성' : '미션 채팅방 생성';
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: _controller,
+              controller: _u2IdController,
               decoration: InputDecoration(
-                labelText: '채팅방 이름',
+                labelText: '상대방 사용자 ID',
                 border: OutlineInputBorder(),
               ),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _createRoom,
-              child: Text('생성'),
+            TextField(
+              controller: _roomNameController,
+              decoration: InputDecoration(
+                labelText: '채팅방 이름 (선택사항)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 32),
+            _isLoading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
+              onPressed: _createChatRoom,
+              child: Text('채팅방 생성'),
             ),
           ],
         ),

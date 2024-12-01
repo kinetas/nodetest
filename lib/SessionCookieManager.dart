@@ -15,6 +15,7 @@ class SessionCookieManager {
   // 세션 쿠키 불러오기
   static Future<String?> getSessionCookie() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+
     return prefs.getString(_cookieKey);
   }
 

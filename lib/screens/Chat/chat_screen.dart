@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'AddChat_screen.dart';
-import 'NormalChatList.dart';
-import 'MissionChatList.dart';
+import 'NormalChatList.dart'; // 일반 채팅 리스트
+import 'MissionChatList.dart'; // 미션 채팅 리스트
+import 'AddChat_screen.dart'; // AddChat 화면
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -15,13 +14,24 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 2, vsync: this); // 두 개의 탭
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController.dispose(); // 탭 컨트롤러 해제
     super.dispose();
+  }
+
+  void _navigateToAddChat() {
+    // 현재 선택된 탭에 따라 채팅 타입 설정
+    String chatType = _tabController.index == 0 ? 'general' : 'open';
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddChatScreen(chatType: chatType), // AddChatScreen에 chatType 전달
+      ),
+    );
   }
 
   @override
@@ -30,22 +40,9 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       appBar: AppBar(
         title: Text('채팅'),
         actions: [
-          // "+" 버튼을 눌렀을 때 실행
           IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddChatScreen(
-                    chatType: _tabController.index == 0 ? 'general' : 'mission', // 현재 탭에 따라 타입 설정
-                    channel: WebSocketChannel.connect(
-                      Uri.parse('ws://54.180.54.31:3000'), // WebSocket 연결
-                    ),
-                  ),
-                ),
-              );
-            },
+            icon: Icon(Icons.add), // + 버튼
+            onPressed: _navigateToAddChat, // AddChat으로 이동
           ),
         ],
         bottom: TabBar(
@@ -59,8 +56,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _tabController,
         children: [
-          NormalChatList(), // 일반 채팅 리스트
-          MissionChatList(), // 미션 채팅 리스트
+          NormalChatList(), // 일반 채팅 리스트 화면
+          MissionChatList(), // 미션 채팅 리스트 화면
         ],
       ),
     );

@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
 });
 
   socket.on('sendMessage', async (data) => {
-    console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
+    //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 
     const { message_contents, r_id, u1_id, u2_id, image, image_type } = data;
 

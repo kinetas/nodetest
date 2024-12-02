@@ -162,7 +162,7 @@ try {
     image: fileBuffer,
     image_type: image_type || null
   });
-  console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
+  //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
 
    // 메시지 브로드캐스트,  안전성 검사
   io.to(r_id).emit('receiveMessage', {

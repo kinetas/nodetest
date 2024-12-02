@@ -44,6 +44,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     socket.onConnect((_) {
       print('Socket connected');
+      debugPrint('joinRoom: ${{
+        'r_id': widget.chatId,
+        'u1_id': widget.userId,
+      }}');
       socket.emit('joinRoom', {
         'r_id': widget.chatId,
         'u1_id': widget.userId,

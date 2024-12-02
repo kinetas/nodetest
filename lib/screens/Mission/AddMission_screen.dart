@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'MissionProvider.dart';
 import 'TimeSetting_screen.dart';
 
 class AddMissionScreen extends StatefulWidget {
@@ -56,7 +55,7 @@ class _AddMissionScreenState extends State<AddMissionScreen> {
       'isPersonalMission': isPersonalMission,
     };
 
-    Provider.of<MissionProvider>(context, listen: false).addMission(missionData);
+    //Provider.of<MissionProvider>(context, listen: false).addMission(missionData);
 
     Navigator.pop(context);
   }

@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart'; // Provider 추가
 import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 추가
 import 'screens/Login_page/StartLogin_screen.dart';
 import 'screens/ScreenMain.dart';
 import 'screens/Login_page/findAccount_screen.dart';
-import 'screens/Mission/MissionProvider.dart'; // MissionProvider 추가
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화
   final bool isLoggedIn = await checkLoginStatus(); // 로그인 상태 확인
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => MissionProvider()), // MissionProvider 등록
-      ],
-      child: MyApp(isLoggedIn: isLoggedIn),
-    ),
-  );
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 // 로그인 상태 확인 함수

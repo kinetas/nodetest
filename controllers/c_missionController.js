@@ -217,14 +217,19 @@ exports.checkMissionStatus = async () => {
             // [변경됨] 만든 사람의 모든 미션 상태 확인
             const creatorMissions = await Mission.findAll({
                 where: {
-                    u1_id: mission.u_id,
-                    u2_id: mission.u2_id,
+                    u1_id: mission.u_id, // Mission 테이블의 u1_id = community_room의 u_id
+                    u2_id: mission.u2_id, // Mission 테이블의 u2_id = community_room의 u2_id
                 },
                 include: [
                     {
                         model: Room,
-                        where: { r_type: 'open' }, // Room 테이블의 r_type 조건
-                        attributes: [] // Room 데이터를 반환하지 않음
+                        where: {
+                            u1_id: mission.u_id, // Room 테이블의 u1_id = community_room의 u_id
+                            u2_id: mission.u2_id, // Room 테이블의 u2_id = community_room의 u2_id
+                            r_type: 'open' // Room 테이블의 r_type = "open"
+                        },
+                        attributes: ['r_id'], // Room 테이블의 r_id만 필요
+                        required: true // 반드시 조건에 맞는 Room이 있어야 함
                     }
                 ]
             });

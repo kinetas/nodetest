@@ -39,7 +39,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
                 child: Text('추천', style: TextStyle(color: Colors.black)),
               ),
               IconButton(
-                icon: Icon(Icons.flight_takeoff), // 비행기 모양 버튼
+                icon: Icon(Icons.send), // 비행기 모양 버튼
                 onPressed: () {
                   Navigator.push(
                     context,

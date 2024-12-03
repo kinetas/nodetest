@@ -80,9 +80,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     socket.emit('sendMessage', messageData);
     print('Message sent: ${_messageController.text}');
     _messageController.clear();
-
-    // 메시지를 ChatContent에도 바로 추가
-    _chatContentKey.currentState?.addMessage(messageData);
   }
 
   void _togglePlusOptions() {

@@ -13,6 +13,7 @@ const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
+const FCM = require('/config/FCM');
 const app = express();
 const PORT = 3000;
 const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
@@ -172,7 +173,7 @@ cron.schedule('0 0 * * *', () => {
     console.log('미션 ?��?�� ?��?�� �? 처리 ?��?��');
     checkMissionStatus();
 });
- 
+
 
 /*
 // 미션 마감기한 확인 (매 분마다 실행)
@@ -190,36 +191,12 @@ cron.schedule('* * * * *', () => { // 매 분 실행
 // app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
 // app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
-/*
-const { initializeApp } = require('firebase-admin/app');
-const admin = require('firebase-admin');
+const { sendNotificationController } = require('./controllers/notificationController');
 
-//private key를 amin에 초기화
-const serviceAccount = require("path/to/privateKey.json");
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
 
-//FCM에 메시징 요청
-let token = "fcmToken"   // 디바이스 토큰 넣어야됨
+// FCM 알림 전송 API 엔드포인트
+app.post('/api/send-notification', sendNotificationController);
 
-var pushNotification = {
-    notification: {
-    title: messageTitle, // 푸쉬알림 타이틀
-    body: messageBody    // 푸쉬알림 내용
-    },
-    token: token
-};
-
-admin.messaging().send(pushNotification)
-    .then(function(response) {
-    console.log(' success')
-    })
-    .catch(function(error) {
-    console.log(' fail' + error)
-    });
-
-*/
 
 app.use((req, res) => {
     res.status(404).send('404 Not Found');

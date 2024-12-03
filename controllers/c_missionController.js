@@ -245,37 +245,86 @@ exports.checkMissionStatus = async () => {
                 await mission.update({ m2_status: 1 });
             }
 
-            const getRidAtRoom = await Room.findOne({
-                where: {
-                    u1_id: mission.u_id,
-                    u2_id: mission.u2_id,
-                    r_type: "open",
-                },
-            });
+            // const getRidAtRoom = await Room.findOne({
+            //     where: {
+            //         u1_id: mission.u_id,
+            //         u2_id: mission.u2_id,
+            //         r_type: "open",
+            //     },
+            // });
             
-            const r_id = getRidAtRoom ? getRidAtRoom.r_id : null;
+            // const r_id = getRidAtRoom ? getRidAtRoom.r_id : null;
             
-            const getRidAtRoom2 = await Room.findOne({
-                where: {
-                    u1_id: mission.u2_id,
-                    u2_id: mission.u_id,
-                    r_type: "open",
-                },
-            });
+            // const getRidAtRoom2 = await Room.findOne({
+            //     where: {
+            //         u1_id: mission.u2_id,
+            //         u2_id: mission.u_id,
+            //         r_type: "open",
+            //     },
+            // });
             
-            const r_id2 = getRidAtRoom2 ? getRidAtRoom2.r_id : null;
+            // const r_id2 = getRidAtRoom2 ? getRidAtRoom2.r_id : null;
 
 
-            // [유지됨] m1_status와 m2_status가 모두 1이면 데이터 삭제
-            if (mission.m1_status === 1 && mission.m2_status === 1) {
-                // 관련 데이터 삭제
-                if (r_id && r_id2) {
-                    await Mission.destroy({ where: { u1_id: mission.u2_id, u2_id: mission.u_id, r_id: r_id2 } });
-                    await Mission.destroy({ where: { u1_id: mission.u_id, u2_id: mission.u2_id, r_id: r_id } });
+            // // [유지됨] m1_status와 m2_status가 모두 1이면 데이터 삭제
+            // if (mission.m1_status === 1 && mission.m2_status === 1) {
+            //     // 관련 데이터 삭제
+            //     if (r_id && r_id2) {
+            //         await Mission.destroy({ where: { u1_id: mission.u2_id, u2_id: mission.u_id, r_id: r_id2 } });
+            //         await Mission.destroy({ where: { u1_id: mission.u_id, u2_id: mission.u2_id, r_id: r_id } });
                     
-                    await Room.destroy({ where: { u1_id: mission.u2_id, u2_id: mission.u_id } });
-                    await Room.destroy({ where: { u1_id: mission.u_id, u2_id: mission.u2_id } });
-                    await CRoom.destroy({ where: { cr_num: mission.cr_num } });
+            //         await Room.destroy({ where: { u1_id: mission.u2_id, u2_id: mission.u_id } });
+            //         await Room.destroy({ where: { u1_id: mission.u_id, u2_id: mission.u2_id } });
+            //         await CRoom.destroy({ where: { cr_num: mission.cr_num } });
+            //     }
+            // }
+
+            // [추가됨] 같은 사용자 간 여러 커뮤니티 방 상태 확인
+            const relatedRooms = await CRoom.findAll({
+                where: {
+                    [Op.or]: [
+                        { u_id: mission.u_id, u2_id: mission.u2_id },
+                        { u_id: mission.u2_id, u2_id: mission.u_id }
+                    ],
+                    cr_status: 'acc'
+                }
+            });
+
+            const allRoomsCompleted = relatedRooms.every(
+                (room) => room.m1_status === '1' && room.m2_status === '1'
+            );
+
+            if (allRoomsCompleted) {
+                // 관련 데이터 삭제
+                for (const room of relatedRooms) {
+                    const getRidAtRoom = await Room.findOne({
+                        where: {
+                            u1_id: room.u_id,
+                            u2_id: room.u2_id,
+                            r_type: "open",
+                        },
+                    });
+
+                    const r_id = getRidAtRoom ? getRidAtRoom.r_id : null;
+
+                    const getRidAtRoom2 = await Room.findOne({
+                        where: {
+                            u1_id: room.u2_id,
+                            u2_id: room.u_id,
+                            r_type: "open",
+                        },
+                    });
+
+                    const r_id2 = getRidAtRoom2 ? getRidAtRoom2.r_id : null;
+
+                    if (r_id && r_id2) {
+                        await Mission.destroy({ where: { u1_id: room.u2_id, u2_id: room.u_id, r_id: r_id2 } });
+                        await Mission.destroy({ where: { u1_id: room.u_id, u2_id: room.u2_id, r_id: r_id } });
+
+                        await Room.destroy({ where: { u1_id: room.u2_id, u2_id: room.u_id } });
+                        await Room.destroy({ where: { u1_id: room.u_id, u2_id: room.u2_id } });
+                        await CRoom.destroy({ where: { cr_num: room.cr_num } });
+                    }
                 }
             }
         }

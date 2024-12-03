@@ -13,7 +13,7 @@ const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
-const FCM = require('/config/FCM');
+
 const app = express();
 const PORT = 3000;
 const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기

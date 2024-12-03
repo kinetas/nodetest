@@ -5,6 +5,7 @@ const MResult = require('../models/m_resultModel');
 const Sequelize = require('sequelize');
 const { sequelize } = require('../models/comunity_roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
+const { Op } = require('sequelize'); // [추가됨]
 
 // 첫 번째 조건: 커뮤니티 미션 생성
 exports.createCommunityMission = async (req, res) => {
@@ -43,29 +44,65 @@ exports.acceptCommunityMission = async (req, res) => {
             return res.status(403).json({ success: false, message: '이미 수락된 미션입니다.' });
         }
 
-        // 커뮤니티 미션 업데이트
-        await mission.update({ u2_id, cr_status: 'acc' });
+        // [추가됨] 방 존재 여부 확인
+        const rooms = await Room.findAll({
+            where: {
+                r_type: 'open', // 방 타입 조건
+                [Op.or]: [
+                    { u1_id: mission.u_id, u2_id }, // 첫 번째 조합
+                    { u1_id: u2_id, u2_id: mission.u_id } // 반대 조합
+                ]
+            }
+        });
 
         const rid_u1_u2 = uuidv4();
         const rid_u2_u1 = uuidv4();
 
-        // Room 테이블에 데이터 생성
-        await Room.create({ 
-            u1_id: mission.u_id, 
-            u2_id, 
-            r_id: rid_u1_u2, 
-            r_title: `${mission.u_id}-${u2_id}`, 
-            r_type: 'open' 
-        });
+        if (rooms.length === 0) {
+            // [추가됨] 방 생성
+            roomId = uuidv4();
+            await Room.create({ 
+                u1_id: mission.u_id, 
+                u2_id, 
+                r_id: rid_u1_u2, 
+                r_title: `${mission.u_id}-${u2_id}`, 
+                r_type: 'open' 
+            });
 
-        // 반대 Room 테이블에 데이터 생성
-        await Room.create({ 
-            u1_id: u2_id, 
-            u2_id: mission.u_id, 
-            r_id: rid_u2_u1, 
-            r_title: `${u2_id}-${mission.u_id}`, 
-            r_type: 'open' 
-        });
+            await Room.create({ 
+                u1_id: u2_id, 
+                u2_id: mission.u_id, 
+                r_id: rid_u2_u1, 
+                r_title: `${u2_id}-${mission.u_id}`, 
+                r_type: 'open' 
+            });
+        } else {
+            // [변경됨] 기존 방 ID 사용
+            rid_u1_u2 = rooms.find(r => r.u1_id === mission.u_id && r.u2_id === u2_id)?.r_id || uuidv4();
+            rid_u2_u1 = rooms.find(r => r.u1_id === u2_id && r.u2_id === mission.u_id)?.r_id || uuidv4();
+        }
+
+        // 커뮤니티 미션 업데이트
+        await mission.update({ u2_id, cr_status: 'acc' });
+
+
+        // // Room 테이블에 데이터 생성
+        // await Room.create({ 
+        //     u1_id: mission.u_id, 
+        //     u2_id, 
+        //     r_id: rid_u1_u2, 
+        //     r_title: `${mission.u_id}-${u2_id}`, 
+        //     r_type: 'open' 
+        // });
+
+        // // 반대 Room 테이블에 데이터 생성
+        // await Room.create({ 
+        //     u1_id: u2_id, 
+        //     u2_id: mission.u_id, 
+        //     r_id: rid_u2_u1, 
+        //     r_title: `${u2_id}-${mission.u_id}`, 
+        //     r_type: 'open' 
+        // });
 
         // Mission 테이블에 미션 생성
         const newMissionId1 = uuidv4();

@@ -214,9 +214,19 @@ exports.checkMissionStatus = async () => {
         //     }
         // }
 
-        // [변경됨] 만든 사람의 모든 미션 상태 확인
+            // [변경됨] 만든 사람의 모든 미션 상태 확인
             const creatorMissions = await Mission.findAll({
-                where: { u1_id: mission.u_id }
+                where: {
+                    u1_id: mission.u_id,
+                    u2_id: mission.u2_id,
+                },
+                include: [
+                    {
+                        model: Room,
+                        where: { r_type: 'open' }, // Room 테이블의 r_type 조건
+                        attributes: [] // Room 데이터를 반환하지 않음
+                    }
+                ]
             });
             const allCreatorMissionsCompleted = creatorMissions.every(
                 (m) => m.m_status === '완료'

@@ -54,7 +54,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 ]
             }
         });
- 
+
         const rid_u1_u2 = uuidv4();
         const rid_u2_u1 = uuidv4();
 

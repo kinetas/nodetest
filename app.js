@@ -190,7 +190,7 @@ cron.schedule('* * * * *', () => { // 매 분 실행
 // app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
 // app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
-
+/*
 const { initializeApp } = require('firebase-admin/app');
 const admin = require('firebase-admin');
 
@@ -219,7 +219,7 @@ admin.messaging().send(pushNotification)
     console.log(' fail' + error)
     });
 
-
+*/
 
 app.use((req, res) => {
     res.status(404).send('404 Not Found');

@@ -245,12 +245,11 @@ exports.checkMissionStatus = async () => {
                 await mission.update({ m2_status: 1 });
             }
 
-            
             const getRidAtRoom = await Room.findAll({
                 where: {
                     u1_id: mission.u_id, // Mission 테이블의 u1_id = community_room의 u_id
                     u2_id: mission.u2_id, // Mission 테이블의 u2_id = community_room의 u2_id
-                    // r_typt: "open",
+                    r_typt: "open",
                 },
             })
 

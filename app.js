@@ -190,6 +190,37 @@ cron.schedule('* * * * *', () => { // 매 분 실행
 // app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
 // app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
+
+const { initializeApp } = require('firebase-admin/app');
+const admin = require('firebase-admin');
+
+//private key를 amin에 초기화
+const serviceAccount = require("path/to/privateKey.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+//FCM에 메시징 요청
+let token = "fcmToken"   // 디바이스 토큰 넣어야됨
+
+var pushNotification = {
+    notification: {
+    title: messageTitle, // 푸쉬알림 타이틀
+    body: messageBody    // 푸쉬알림 내용
+    },
+    token: token
+};
+
+admin.messaging().send(pushNotification)
+    .then(function(response) {
+    console.log(' success')
+    })
+    .catch(function(error) {
+    console.log(' fail' + error)
+    });
+
+
+
 app.use((req, res) => {
     res.status(404).send('404 Not Found');
 });

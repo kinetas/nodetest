@@ -4,18 +4,13 @@ const notificationsController = require('../controllers/notificationsController'
 const NotificationLog = require('../models/notificationModel');
 const authenticateToken = require('../auth');
 
-router.get('/unread', authenticateToken, notificationsController.getUnreadNotifications);
+const admin = require('firebase-admin')
 
-// 알림 읽음 처리 라우트 추가
-router.post('/notifications/read/:id', async (req, res) => {
-    try {
-    const notificationId = req.params.id;
-    await NotificationLog.update({ readStatus: true }, { where: { id: notificationId } });
+//비밀키 경로 설정
 
-    res.status(200).json({ message: '알림이 읽음 처리되었습니다.' });
-    } catch (error) {
-    console.error('Error updating notification read status:', error);
-    res.status(500).json({ message: '알림 읽음 처리 중 오류가 발생했습니다.' });
-    }
-});
-module.exports = router;
+let serAccount = require('../서버 키 이름.json') 
+
+admin.initializeApp({
+    credential: admin.credential.cert(serAccount),
+})
+

@@ -31,6 +31,7 @@ exports.acceptCommunityMission = async (req, res) => {
 
     try {
         const mission = await CRoom.findOne({ where: { cr_num } });
+        const room = await Room.findOne({ where: { u1_id, u2_id } });
         if (!mission) {
             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
         }
@@ -45,14 +46,28 @@ exports.acceptCommunityMission = async (req, res) => {
         // 커뮤니티 미션 업데이트
         await mission.update({ u2_id, cr_status: 'acc' });
 
+        const rid_u1_u2 = uuidv4();
+        const rid_u2_u1 = uuidv4();
+
         // Room 테이블에 데이터 생성
         await Room.create({ 
             u1_id: mission.u_id, 
             u2_id, 
-            r_id: uuidv4(), 
+            r_id: rid_u1_u2(), 
             r_title: `${mission.u_id}-${u2_id}`, 
             r_type: 'open' 
         });
+
+        // 반대 Room 테이블에 데이터 생성
+        await Room.create({ 
+            u1_id: u2_id, 
+            u2_id: mission.u_id, 
+            r_id: rid_u2_u1(), 
+            r_title: `${u2_id}-${mission.u_id}`, 
+            r_type: 'open' 
+        });
+
+        room = await Room.findOne({ where: { u1_id, u2_id } });
 
         // Mission 테이블에 미션 생성
         const newMissionId1 = uuidv4();
@@ -69,7 +84,9 @@ exports.acceptCommunityMission = async (req, res) => {
             m_title: missionTitle,
             m_deadline: deadline,
             m_reword: null,
-            m_status: '진행중'
+            m_status: '진행중',
+            r_id: rid_u1_u2,
+            m_extended: false
         });
 
         await Mission.create({
@@ -79,7 +96,9 @@ exports.acceptCommunityMission = async (req, res) => {
             m_title: missionTitle,
             m_deadline: deadline,
             m_reword: null,
-            m_status: '진행중'
+            m_status: '진행중',
+            r_id: rid_u2_u1,
+            m_extended: false
         });
 
         

@@ -213,17 +213,6 @@ exports.checkMissionStatus = async () => {
         //         });
         //     }
         // }
-
-
-            const getRidAtRoom = await Room.findAll({
-                where: {
-                    u1_id: mission.u_id, // Mission 테이블의 u1_id = community_room의 u_id
-                    u2_id: mission.u2_id, // Mission 테이블의 u2_id = community_room의 u2_id
-                    // r_typt: "open",
-                },
-            })
-
-            let r_id = getRidAtRoom.r_id;
             
             // [변경됨] 만든 사람의 모든 미션 상태 확인
             const creatorMissions = await Mission.findAll({
@@ -240,17 +229,6 @@ exports.checkMissionStatus = async () => {
                 await mission.update({ m1_status: 1 });
             }
 
-
-            const getRidAtRoom2 = await Room.findAll({
-                where: {
-                    u1_id: mission.u2_id, // Mission 테이블의 u1_id = community_room의 u2_id
-                    u2_id: mission.u_id, // Mission 테이블의 u2_id = community_room의 u_id
-                    r_typt: "open",
-                },
-            })
-
-            let r_id2 = getRidAtRoom2.r_id;
-
             // [변경됨] 수락한 사람의 모든 미션 상태 확인
             const accepterMissions = await Mission.findAll({
                 where: { 
@@ -266,6 +244,28 @@ exports.checkMissionStatus = async () => {
             if (allAccepterMissionsCompleted) {
                 await mission.update({ m2_status: 1 });
             }
+
+            
+            const getRidAtRoom = await Room.findAll({
+                where: {
+                    u1_id: mission.u_id, // Mission 테이블의 u1_id = community_room의 u_id
+                    u2_id: mission.u2_id, // Mission 테이블의 u2_id = community_room의 u2_id
+                    // r_typt: "open",
+                },
+            })
+
+            let r_id = getRidAtRoom.r_id;
+
+            const getRidAtRoom2 = await Room.findAll({
+                where: {
+                    u1_id: mission.u2_id, // Mission 테이블의 u1_id = community_room의 u2_id
+                    u2_id: mission.u_id, // Mission 테이블의 u2_id = community_room의 u_id
+                    r_typt: "open",
+                },
+            })
+
+            let r_id2 = getRidAtRoom2.r_id;
+
 
             // [유지됨] m1_status와 m2_status가 모두 1이면 데이터 삭제
             if (mission.m1_status === 1 && mission.m2_status === 1) {

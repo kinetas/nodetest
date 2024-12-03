@@ -78,15 +78,20 @@ jobs:
         echo "DATABASE_USER=${{ secrets.DATABASE_USERNAME }}" >> .env
         echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
         echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
-        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+        echo "SECRET_KEY='${{ secrets.SECRET_KEY }}'" >> .env
 
     # Copy .env to EC2
     - name: Copy .env to EC2
       run: |
+        # echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
+        # chmod 600 my-key.pem
+        # scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
+        # rm my-key.pem  # 키 파일을 삭제하여 보안 유지
+        echo "${{ secrets.SECRET_KEY }}" > firebase-key.json
         echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
         chmod 600 my-key.pem
-        scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
-        rm my-key.pem  # 키 파일을 삭제하여 보안 유지
+        scp -o StrictHostKeyChecking=no -i my-key.pem firebase-key.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/firebase-key.json
+        rm my-key.pem firebase-key.json  # 키 파일을 삭제하여 보안 유지
 
     # Deploy to AWS EC2 from S3
     - name: Deploy to AWS EC2 from S3

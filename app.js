@@ -167,7 +167,8 @@ app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?��
 app.use('/dashboard/friends', friendRoutes);
 app.use('/api/cVote', cVoteRoutes);
 app.use('/api/comumunity_missions', c_missionRoutes);
-cron.schedule('0 0 * * *', () => {
+cron.schedule('* * * * *', () => { // 매 분 실행
+// cron.schedule('0 0 * * *', () => {
     console.log('미션 ?��?�� ?��?�� �? 처리 ?��?��');
     checkMissionStatus();
 });

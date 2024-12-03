@@ -181,36 +181,69 @@ exports.checkMissionStatus = async () => {
         });
 
         for (const mission of missions) {
-            // 만든 사람의 미션 상태 확인
-            const creatorMission = await Mission.findOne({
-                where: { u1_id: mission.u_id, u2_id:mission.u2_id }
+        //     // 만든 사람의 미션 상태 확인
+        //     const creatorMission = await Mission.findOne({
+        //         where: { u1_id: mission.u_id, u2_id:mission.u2_id }
+        //     });
+        //     if (creatorMission.m_status === '성공' || creatorMission.m_status === '실패') {
+        //         await mission.update({ m1_status: 1 });
+        //     }
+
+        //     // 수락한 사람의 미션 상태 확인
+        //     const accepterMission = await Mission.findOne({
+        //         where: { u1_id: mission.u2_id, u2_id:mission.u_id }
+        //     });
+        //     if (accepterMission.m_status === '성공' || accepterMission.m_status === '실패') {
+        //         await mission.update({ m2_status: 1 });
+        //     }
+
+        //     // m1_status와 m2_status가 모두 1이면 처리
+        //     if (mission.m1_status === 1 && mission.m2_status === 1) {
+        //         // 관련 데이터 삭제
+        //         await Room.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
+        //         await Room.destroy({ where: { u1_id: mission.u_id, u2_id:mission.u2_id } });
+        //         await CRoom.destroy({ where: { cr_num: mission.cr_num } });
+
+        //         // 결과 기록
+        //         await MResult.create({
+        //             m_id: mission.cr_num,
+        //             u_id: mission.u_id,
+        //             m_deadline: new Date(),
+        //             m_status: creatorMission.m_status === '성공' && accepterMission.m_status === '성공' ? '성공' : '실패'
+        //         });
+        //     }
+        // }
+
+        // [변경됨] 만든 사람의 모든 미션 상태 확인
+            const creatorMissions = await Mission.findAll({
+                where: { u1_id: mission.u_id }
             });
-            if (creatorMission.m_status === '성공' || creatorMission.m_status === '실패') {
+            const allCreatorMissionsCompleted = creatorMissions.every(
+                (m) => m.m_status === '완료'
+            );
+
+            if (allCreatorMissionsCompleted) {
                 await mission.update({ m1_status: 1 });
             }
 
-            // 수락한 사람의 미션 상태 확인
-            const accepterMission = await Mission.findOne({
-                where: { u1_id: mission.u2_id, u2_id:mission.u_id }
+            // [변경됨] 수락한 사람의 모든 미션 상태 확인
+            const accepterMissions = await Mission.findAll({
+                where: { u1_id: mission.u2_id }
             });
-            if (accepterMission.m_status === '성공' || accepterMission.m_status === '실패') {
+            const allAccepterMissionsCompleted = accepterMissions.every(
+                (m) => m.m_status === '완료'
+            );
+
+            if (allAccepterMissionsCompleted) {
                 await mission.update({ m2_status: 1 });
             }
 
-            // m1_status와 m2_status가 모두 1이면 처리
+            // [유지됨] m1_status와 m2_status가 모두 1이면 데이터 삭제
             if (mission.m1_status === 1 && mission.m2_status === 1) {
                 // 관련 데이터 삭제
-                await Room.destroy({ where: { u1_id: mission.u2_id, u2_id:mission.u_id } });
-                await Room.destroy({ where: { u1_id: mission.u_id, u2_id:mission.u2_id } });
+                await Room.destroy({ where: { u1_id: mission.u2_id, u2_id: mission.u_id } });
+                await Room.destroy({ where: { u1_id: mission.u_id, u2_id: mission.u2_id } });
                 await CRoom.destroy({ where: { cr_num: mission.cr_num } });
-
-                // 결과 기록
-                await MResult.create({
-                    m_id: mission.cr_num,
-                    u_id: mission.u_id,
-                    m_deadline: new Date(),
-                    m_status: creatorMission.m_status === '성공' && accepterMission.m_status === '성공' ? '성공' : '실패'
-                });
             }
         }
     } catch (error) {

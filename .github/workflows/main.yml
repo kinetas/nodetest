@@ -68,13 +68,6 @@ jobs:
     #     JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
     #     echo "JWT_SECRET=$JWT_SECRET" >> .env
     #     echo "JWT_EXPIRES_IN=${{ env.JWT_EXPIRES_IN }}" >> .env
-    - name: create-json
-      id: create-json
-      uses: jsdaniell/create-json@1.1.2
-      with:
-        name: "SECRET_KEY.json"
-        json: ${{ secrets.SECERT_KEY }}
-        dir: 'ubuntu/nodetest/'
 
 
     # Upload code to AWS S3

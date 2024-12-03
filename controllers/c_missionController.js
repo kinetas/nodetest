@@ -214,24 +214,23 @@ exports.checkMissionStatus = async () => {
         //     }
         // }
 
+
+            const getRidAtRoom = await Room.findAll({
+                where: {
+                    u1_id: mission.u_id, // Mission 테이블의 u1_id = community_room의 u_id
+                    u2_id: mission.u2_id, // Mission 테이블의 u2_id = community_room의 u2_id
+                    r_typt: "open",
+                },
+            })
+
+            let r_id = getRidAtRoom.r_id;
             // [변경됨] 만든 사람의 모든 미션 상태 확인
             const creatorMissions = await Mission.findAll({
                 where: {
                     u1_id: mission.u_id, // Mission 테이블의 u1_id = community_room의 u_id
                     u2_id: mission.u2_id, // Mission 테이블의 u2_id = community_room의 u2_id
-                },
-                include: [
-                    {
-                        model: Room,
-                        where: {
-                            u1_id: mission.u_id, // Room 테이블의 u1_id = community_room의 u_id
-                            u2_id: mission.u2_id, // Room 테이블의 u2_id = community_room의 u2_id
-                            r_type: 'open' // Room 테이블의 r_type = "open"
-                        },
-                        attributes: ['r_id'], // Room 테이블의 r_id만 필요
-                        required: true // 반드시 조건에 맞는 Room이 있어야 함
-                    }
-                ]
+                    r_id: r_id,
+                }
             });
             const allCreatorMissionsCompleted = creatorMissions.every(
                 (m) => m.m_status === '완료'
@@ -241,9 +240,24 @@ exports.checkMissionStatus = async () => {
                 await mission.update({ m1_status: 1 });
             }
 
+
+            const getRidAtRoom2 = await Room.findAll({
+                where: {
+                    u1_id: mission.u2_id, // Mission 테이블의 u1_id = community_room의 u2_id
+                    u2_id: mission.u_id, // Mission 테이블의 u2_id = community_room의 u_id
+                    r_typt: "open",
+                },
+            })
+
+            let r_id2 = getRidAtRoom2.r_id;
+
             // [변경됨] 수락한 사람의 모든 미션 상태 확인
             const accepterMissions = await Mission.findAll({
-                where: { u1_id: mission.u2_id }
+                where: { 
+                    u1_id: mission.u2_id, 
+                    u2_id: mission.u_id,
+                    r_id: r_id2,    
+                }
             });
             const allAccepterMissionsCompleted = accepterMissions.every(
                 (m) => m.m_status === '완료'

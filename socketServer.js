@@ -122,7 +122,7 @@ io.on('connection', (socket) => {
 });
 
   socket.on('sendMessage', async (data) => {
-    console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
+    //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 
     const { message_contents, r_id, u1_id, u2_id, image, image_type } = data;
 
@@ -162,7 +162,7 @@ try {
     image: fileBuffer,
     image_type: image_type || null
   });
-  console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
+  //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
 
    // 메시지 브로드캐스트,  안전성 검사
   io.to(r_id).emit('receiveMessage', {

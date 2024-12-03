@@ -31,7 +31,7 @@ exports.acceptCommunityMission = async (req, res) => {
 
     try {
         const mission = await CRoom.findOne({ where: { cr_num } });
-        const room = await Room.findOne({ where: { u1_id, u2_id } });
+        // const room = await Room.findOne({ where: { u1_id, u2_id } });
         if (!mission) {
             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
         }

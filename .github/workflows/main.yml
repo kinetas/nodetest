@@ -88,7 +88,7 @@ jobs:
         # scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
         # rm my-key.pem  # 키 파일을 삭제하여 보안 유지
         echo "${{ secrets.SECRET_KEY }}" > firebase-key.json
-        sed -i 's/\\\\n/\\n/g' firebase-key.json
+        # sed -i 's/\\\\n/\\n/g' firebase-key.json
         echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
         chmod 600 my-key.pem
         scp -o StrictHostKeyChecking=no -i my-key.pem firebase-key.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/firebase-key.json

@@ -10,7 +10,7 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
 
-// FCM 알림 전송 함수
+// FCM 메시지 전송 로직
 const sendNotification = async (token, title, body) => {
     const message = {
         notification: { title, body },

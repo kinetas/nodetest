@@ -323,7 +323,9 @@ exports.checkMissionStatus = async () => {
 
                         await Room.destroy({ where: { u1_id: room.u2_id, u2_id: room.u_id } });
                         await Room.destroy({ where: { u1_id: room.u_id, u2_id: room.u2_id } });
-                        await CRoom.destroy({ where: { cr_num: room.cr_num } });
+                        // await CRoom.destroy({ where: { cr_num: room.cr_num } });
+                        await CRoom.destroy({ where: { u1_id: room.u2_id, u2_id: room.u_id } });
+                        await CRoom.destroy({ where: { u1_id: room.u_id, u2_id: room.u2_id } });
                     }
                 }
             }

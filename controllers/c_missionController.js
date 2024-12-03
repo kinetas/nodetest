@@ -53,7 +53,7 @@ exports.acceptCommunityMission = async (req, res) => {
         await Room.create({ 
             u1_id: mission.u_id, 
             u2_id, 
-            r_id: rid_u1_u2(), 
+            r_id: rid_u1_u2, 
             r_title: `${mission.u_id}-${u2_id}`, 
             r_type: 'open' 
         });
@@ -62,7 +62,7 @@ exports.acceptCommunityMission = async (req, res) => {
         await Room.create({ 
             u1_id: u2_id, 
             u2_id: mission.u_id, 
-            r_id: rid_u2_u1(), 
+            r_id: rid_u2_u1, 
             r_title: `${u2_id}-${mission.u_id}`, 
             r_type: 'open' 
         });

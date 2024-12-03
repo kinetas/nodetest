@@ -1,4 +1,4 @@
-const { sendNotification } = require('./config/FCM');
+const { sendNotification } = require('../config/FCM');
 
 // Express 요청을 처리하고 sendNotification 호출
 const sendNotificationController = async (req, res) => {

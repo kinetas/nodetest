@@ -87,12 +87,15 @@ jobs:
         # chmod 600 my-key.pem
         # scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
         # rm my-key.pem  # 키 파일을 삭제하여 보안 유지
-        echo "${{ secrets.SECRET_KEY }}" > firebase-key.json
-        sed -i 's/\\\\n/\\n/g' firebase-key.json
+        echo "Creating PEM file..."
         echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
         chmod 600 my-key.pem
-        scp -o StrictHostKeyChecking=no -i my-key.pem firebase-key.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/firebase-key.json
-        rm my-key.pem firebase-key.json  # 키 파일을 삭제하여 보안 유지
+        echo "Creating Firebase JSON file..."
+        echo '${{ secrets.SECRET_KEY }}' > firebase-key.json
+        sed -i 's/\\\\n/\\n/g' firebase-key.json
+        echo "Transferring files to EC2..."
+        scp -o StrictHostKeyChecking=no -i my-key.pem firebase-key.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/
+        rm my-key.pem firebase-key.json  # Delete keys after transfer
 
     # Deploy to AWS EC2 from S3
     - name: Deploy to AWS EC2 from S3

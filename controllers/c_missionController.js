@@ -67,8 +67,6 @@ exports.acceptCommunityMission = async (req, res) => {
             r_type: 'open' 
         });
 
-        room = await Room.findOne({ where: { u1_id, u2_id } });
-
         // Mission 테이블에 미션 생성
         const newMissionId1 = uuidv4();
         const newMissionId2 = uuidv4();

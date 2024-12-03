@@ -16,7 +16,7 @@ env:
   DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
   REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
   REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
-  SECRET_KEY: ${{ screts.SECRET_KEY }} firebase
+  SECRET_KEY: ${{ secrets.SECRET_KEY }} firebase
   # JWT_EXPIRES_IN: 1d  # JWT 만료 시간
 
 permissions:

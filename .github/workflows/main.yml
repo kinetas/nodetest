@@ -90,10 +90,16 @@ jobs:
         # rm my-key.pem  # 키 파일을 삭제하여 보안 유지
         echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
         chmod 600 my-key.pem
+        
+        # JSON 형식의 SECRET_KEY 복원 (Firebase Admin SDK 서비스 계정 키 파일 생성)
         echo "${{ secrets.SECRET_KEY }}" | sed 's/\\n/\n/g' > firebase-key.json
+        
+        # .env 파일과 Firebase 키 파일을 EC2로 전송
         scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
         scp -o StrictHostKeyChecking=no -i my-key.pem firebase-key.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/firebase-key.json
-        rm my-key.pem firebase-key.json  # 키 파일을 삭제하여 보안 유지
+        
+        # 보안 유지 위해 사용한 파일 삭제
+        rm my-key.pem firebase-key.json
 
     # Deploy to AWS EC2 from S3
     - name: Deploy to AWS EC2 from S3

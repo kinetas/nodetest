@@ -23,10 +23,10 @@ admin.initializeApp({
 });
 
 // FCM 메시지 전송 로직
-const sendNotification = async (title, body) => {
+const sendNotification = async (token, title, body) => {
     const message = {
         notification: { title, body },
-        //token,
+        token,
     };
 
     try {

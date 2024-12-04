@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const admin = require('firebase-admin');
 
 dotenv.config();
-////
+//
 // Firebase Admin SDK 초기화
 const serviceAccount = {
     type: process.env.FIREBASE_TYPE,

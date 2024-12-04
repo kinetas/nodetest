@@ -196,16 +196,18 @@ server.listen(3001, () => {
 
 //=======================================================
 
-// sendMessage 함수 내보내기
+// ===== 추가된 부분 =====
+// sendMessage 함수 정의 및 내보내기
 const sendMessage = (data) => {
   const { r_id, message_contents, u1_id, u2_id } = data;
 
   io.to(r_id).emit('receiveMessage', {
-      u1_id,
-      u2_id,
-      message_contents,
-      send_date: new Date(),
+    u1_id,
+    u2_id,
+    message_contents,
+    send_date: new Date(),
   });
 };
 
-module.exports = { io, sendMessage  };
+// io, sendMessage, server 내보내기
+module.exports = { io, sendMessage, server };

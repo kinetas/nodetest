@@ -14,6 +14,10 @@ const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
 
+//========================================================================================================
+const { server } = require('./socketServer'); // ===== 변경된 부분: socketServer.js에서 server 가져오기 =====
+//========================================================================================================
+
 const app = express();
 const PORT = 3000;
 const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
@@ -205,3 +209,12 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
+
+
+//====================================================================================
+// ===== 추가된 부분: 서버 실행 =====
+// socketServer.js에서 내보낸 server 사용
+server.listen(3001, () => {
+    console.log('Socket and HTTP server running on port 3001');
+  });
+  //====================================================================================

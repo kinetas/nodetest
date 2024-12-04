@@ -140,32 +140,32 @@ exports.getAssignedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
+        // 1. 자신이 수행해야 할 미션 가져오기
         const assignedMissions = await Mission.findAll({
             where: {
                 u2_id: userId, // 자신이 수행해야 할 미션
-                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 
+                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만
             },
-            include: [
-                {
-                    model: Room,
-                    as: 'room',
-                    attributes: ['r_id', 'r_title'], // 방 이름만 가져오기
-                },
-            ],
         });
 
-        console.log('[DEBUG] Assigned Missions:', JSON.stringify(assignedMissions, null, 2)); // 디버깅 로그 추가
+        // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
+        const missionsWithRoomTitle = await Promise.all(
+            assignedMissions.map(async (mission) => {
+                // Room 테이블에서 r_title 가져오기
+                const room = await Room.findOne({
+                    where: { r_id: mission.r_id },
+                });
 
-        const missions = assignedMissions.map(mission => ({
-            m_id: mission.m_id,
-            m_title: mission.m_title,
-            m_deadline: mission.m_deadline,
-            m_status: mission.m_status,
-            r_id: mission.r_id,
-            r_title: mission.room ? mission.room.r_title : '없음',
-        }));
-
-        console.log('[DEBUG] Processed Missions:', JSON.stringify(missions, null, 2));
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: mission.m_status,
+                    r_id: mission.r_id,
+                    r_title: room ? room.r_title : '없음', // r_title 설정
+                };
+            })
+        );
 
         res.json({ missions });
     } catch (error) {

@@ -194,20 +194,20 @@ server.listen(3001, () => {
 });
 
 
-//=======================================================
+// //=======================================================
 
-// ===== 추가된 부분 =====
-// sendMessage 함수 정의 및 내보내기
-const sendMessage = (data) => {
-  const { r_id, message_contents, u1_id, u2_id } = data;
+// // ===== 추가된 부분 =====
+// // sendMessage 함수 정의 및 내보내기
+// const sendMessage = (data) => {
+//   const { r_id, message_contents, u1_id, u2_id } = data;
 
-  io.to(r_id).emit('receiveMessage', {
-    u1_id,
-    u2_id,
-    message_contents,
-    send_date: new Date(),
-  });
-};
+//   io.to(r_id).emit('receiveMessage', {
+//     u1_id,
+//     u2_id,
+//     message_contents,
+//     send_date: new Date(),
+//   });
+// };
 
-// io, sendMessage, server 내보내기
-module.exports = { io, sendMessage, server };
+// // io, sendMessage, server 내보내기
+// module.exports = { io, sendMessage, server };

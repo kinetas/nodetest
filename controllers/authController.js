@@ -103,6 +103,12 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: '이미 사용 중인 아이디입니다.' });
         }
 
+        // 이미 존재하는 사용자 확인 (닉네임)
+        const existingNickname = await User.findOne({ where: { u_nickname } });
+        if (existingNickname) {
+            return res.status(400).json({ message: '이미 사용 중인 닉네임입니다.' });
+        }
+
         // 생년월일이 현재 시간보다 미래인 경우 에러 반환
         const birthDate = new Date(u_birth);
         const now = new Date();

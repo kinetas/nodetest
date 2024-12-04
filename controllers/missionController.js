@@ -151,7 +151,6 @@ exports.getAssignedMissions = async (req, res) => {
         // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
         const missionsWithRoomTitle = await Promise.all(
             assignedMissions.map(async (mission) => {
-                // Room 테이블에서 r_title 가져오기
                 const room = await Room.findOne({
                     where: { r_id: mission.r_id },
                 });
@@ -162,7 +161,9 @@ exports.getAssignedMissions = async (req, res) => {
                     m_deadline: mission.m_deadline,
                     m_status: mission.m_status,
                     r_id: mission.r_id,
-                    r_title: room ? room.r_title : '없음', // r_title 설정
+                    r_title: room ? room.r_title : '없음',
+                    u1_id: mission.u1_id,
+                    u2_id: mission.u2_id,
                 };
             })
         );
@@ -191,7 +192,6 @@ exports.getCreatedMissions = async (req, res) => {
         // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
         const missionsWithRoomTitle = await Promise.all(
             createdMissions.map(async (mission) => {
-                // Room 테이블에서 r_title 가져오기
                 const room = await Room.findOne({
                     where: { r_id: mission.r_id },
                 });
@@ -202,7 +202,9 @@ exports.getCreatedMissions = async (req, res) => {
                     m_deadline: mission.m_deadline,
                     m_status: mission.m_status,
                     r_id: mission.r_id,
-                    r_title: room ? room.r_title : '없음', // r_title 설정
+                    r_title: room ? room.r_title : '없음',
+                    u1_id: mission.u1_id,
+                    u2_id: mission.u2_id,
                 };
             })
         );

@@ -160,7 +160,15 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 ID: ${mission.m_id}, 방 ID: ${mission.r_id}, 방 이름: ${mission.r_title}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
+                        listItem.textContent = `
+                            미션 ID: ${mission.m_id},
+                            방 이름: ${mission.r_title},
+                            미션 이름: ${mission.m_title},
+                            미션 부여자: ${mission.u1_id},
+                            미션 수행자: ${mission.u2_id},
+                            마감일: ${mission.m_deadline},
+                            상태: ${mission.m_status}
+                        `;
                         assignedList.appendChild(listItem);
                     });
                 } else {
@@ -182,7 +190,15 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 ID: ${mission.m_id}, 방 ID: ${mission.r_id}, 방 이름: ${mission.r_title}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}, 상태: ${mission.m_status}`;
+                        listItem.textContent = `
+                            미션 ID: ${mission.m_id},
+                            방 이름: ${mission.r_title},
+                            미션 이름: ${mission.m_title},
+                            미션 부여자: ${mission.u1_id},
+                            미션 수행자: ${mission.u2_id},
+                            마감일: ${mission.m_deadline},
+                            상태: ${mission.m_status}
+                        `;
                         createdList.appendChild(listItem);
                     });
                 } else {

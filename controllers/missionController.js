@@ -145,13 +145,9 @@ exports.getAssignedMissions = async (req, res) => {
                 u2_id: userId, // 자신이 수행해야 할 미션
                 m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 
             },
-            include: [
-                {
-                    model: Room,
-                    as: 'room',
-                    attributes: ['r_id', 'r_title'], // 방 이름만 가져오기
-                },
-            ],
+        });
+        const missionRoom = await Room.findOne({
+            where: { r_id: assignedMissions.r_id }
         });
 
         console.log('[DEBUG] Assigned Missions:', assignedMissions); // 디버깅 로그 추가
@@ -162,7 +158,7 @@ exports.getAssignedMissions = async (req, res) => {
             m_deadline: mission.m_deadline,
             m_status: mission.m_status,
             r_id: mission.r_id,
-            r_title: mission.room ? mission.room.r_title : '없음',
+            r_title: missionRoom ? missionRoom.r_title : '없음',
         }));
 
         res.json({ missions });

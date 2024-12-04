@@ -17,11 +17,11 @@ const serviceAccount = {
     client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
     universe_domain:process.env.FIREBASE_UNIVERSE_DOMAIN
 };
-
+/*
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
-
+*/
 // FCM 메시지 전송 로직
 const sendNotification = async (token, title, body) => {
     const message = {

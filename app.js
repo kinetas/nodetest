@@ -14,9 +14,8 @@ const userInfoRoutes = require('./routes/userInfoRoutes');
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 
-const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
-
 const db = require('./config/db');
+const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
 
 
 const app = express();

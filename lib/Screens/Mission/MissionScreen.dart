@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'AddMission_screen.dart';
+import 'MissionCreateScreen.dart';
 import 'AchievementPanel_screen.dart';
 import 'MyMissionList.dart';
 import 'MyCompleteMissionList.dart';
 import 'OtherMission.dart';
-//a
+
 class MissionScreen extends StatefulWidget {
   @override
   _MissionScreenState createState() => _MissionScreenState();
@@ -55,7 +55,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddMissionScreen(),
+                      builder: (context) => MissionCreateScreen(),
                     ),
                   );
                 },
@@ -86,6 +86,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
             ),
           ),
         ),
+
         // 달성률 패널 처리
         // if (missionProvider.isAchievementPanelOpen)
         //   GestureDetector(
@@ -101,6 +102,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
         //       onClose: missionProvider.toggleAchievementPanel,
         //     ),
         //   ),
+
       ],
     );
   }

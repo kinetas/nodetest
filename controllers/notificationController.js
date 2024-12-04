@@ -4,11 +4,16 @@ const { sendNotification } = require('../config/FCM');
 const sendNotificationController = async (req, res) => {
     const { token, title, body } = req.body;
 
+/*
     if (!token || !title || !body) {
         return res.status(400).json({ message: 'FCM 토큰, 제목, 내용이 필요합니다.' });
         console.log('Request received:', req.body);
     }
-
+*/
+if (!title || !body) {
+    return res.status(400).json({ message: 'FCM 토큰, 제목, 내용이 필요합니다.' });
+    console.log('Request received:', req.body);
+}
     try {
         const response = await sendNotification(token, title, body);
         res.status(200).json({ message: 'Notification sent successfully', response });

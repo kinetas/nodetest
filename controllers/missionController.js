@@ -166,6 +166,8 @@ exports.getAssignedMissions = async (req, res) => {
             r_title: mission.room ? mission.room.r_title : '없음',
         }));
 
+        console.log('[DEBUG] Processed Missions:', JSON.stringify(missions, null, 2));
+
         res.json({ missions });
     } catch (error) {
         console.error('자신이 수행해야 할 미션 조회 오류:', error);

@@ -8,9 +8,9 @@ const resultController = require('./resultController'); // resultController 가�
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
-// const RMessage = require('../models/messageModel'); // 메시지 모델 추가
-// const io = require('socket.io-client'); // Socket.io 클라이언트 추가
-// const socket = io('http://localhost:3001'); // 소켓 서버 연결 (필요에 따라 URL 수정)
+const { io } = require('../socketServer');
+const RMessage = require('../models/messageModel'); // 메시지 모델 가져오기
+
 
 // const sequelize = require('../config/db'); // 데이터베이스 연결
 
@@ -384,25 +384,27 @@ exports.requestMissionApproval = async (req, res) => {
         }
 
 
-        // // 추가된 코드: 메시지 생성 및 전송
-        // const roomId = mission.r_id; // 미션에 연결된 Room ID
-        // const messageContents = `사용자 ${mission.u1_id}가 미션 "${mission.m_title}"을(를) 요청했습니다.`;
-        // // 메시지 DB 저장
-        // await RMessage.create({
-        //     u1_id: mission.u1_id,
-        //     u2_id: mission.u2_id,
-        //     r_id: roomId,
-        //     message_contents: messageContents,
-        //     send_date: new Date()
-        // });
+        // 메시지 생성
+        const roomId = mission.r_id;
+        const messageContents = `사용자 ${mission.u1_id}가 미션 "${mission.m_title}"을(를) 요청했습니다.`;
 
-        // // 소켓을 통해 메시지 전송
-        // socket.emit('sendMessage', {
-        //     u1_id: mission.u1_id,
-        //     u2_id: mission.u2_id,
-        //     r_id: roomId,
-        //     message_contents: messageContents
-        // });
+        // DB에 메시지 저장
+        await RMessage.create({
+            u1_id: mission.u1_id,
+            u2_id: mission.u2_id,
+            r_id: roomId,
+            message_contents: messageContents,
+            send_date: new Date()
+        });
+
+        // 소켓을 통해 메시지 전송
+        io.to(roomId).emit('receiveMessage', {
+            u1_id: mission.u1_id,
+            u2_id: mission.u2_id,
+            r_id: roomId,
+            message_contents: messageContents
+        });
+
 
         res.json({ success: true, message: '미션 상태가 "요청"으로 변경되었습니다.' });
     } catch (error) {

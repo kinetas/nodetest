@@ -192,3 +192,5 @@ console.log('User disconnected');
 server.listen(3001, () => {
   console.log('HTTP Server running on port 3001');
 });
+
+module.exports = { io };

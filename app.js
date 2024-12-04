@@ -10,6 +10,7 @@ const friendRoutes = require('./routes/friendRoutes');
 const cVoteRoutes = require('./routes/cVoteRoutes');
 const c_missionRoutes = require('./routes/c_missionRoutes');
 const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?�� 추�??
+const userInfoRoutes = require('./routes/userInfoRoutes');
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
@@ -164,6 +165,9 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/missions', missionRoutes); // 미션 �??�� ?��?��?�� ?���?
 
 app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?�� ?���?
+
+// userInfoRoutes 등록
+app.use('/api/user-info', userInfoRoutes);
 
 // 친구 리스?�� ?��?��?�� 추�??
 app.use('/dashboard/friends', friendRoutes);

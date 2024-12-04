@@ -18,8 +18,6 @@ router.post('/logout', authController.logOut); // 로그아웃 경로 추가
 
 router.delete('/deleteAccount', authController.deleteAccount); // 추가: 계정 탈퇴 경로
 
-router.get('/user-id', authController.uesrInfo); // 로그인한 사용자 ID 반환 경로 추가
-
 // // JWT 기반에서는 로그아웃 불필요, 클라이언트에서 토큰 제거
 // router.post('/logout', authController.logOut);
 

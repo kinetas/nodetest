@@ -179,35 +179,36 @@ exports.getCreatedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
+        // 1. 자신이 부여한 미션 가져오기
         const createdMissions = await Mission.findAll({
             where: {
-                u1_id: userId,
-                u2_id: {
-                    [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
-                },
-                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 
+                u1_id: userId, // 미션을 부여한 사용자
+                u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
+                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만
             },
-
-            include: [
-                {
-                    model: Room,
-                    as: 'room',
-                    attributes: ['r_id', 'r_title'], // 방 이름만 가져오기
-                },
-            ],
         });
 
-        const missions = createdMissions.map(mission => ({
-            m_id: mission.m_id,
-            m_title: mission.m_title,
-            m_deadline: mission.m_deadline,
-            
-            m_status: mission.m_status,
-            r_id: mission.r_id,
-            r_title: mission.room ? mission.room.r_title : '없음',
-        }));
+        // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
+        const missionsWithRoomTitle = await Promise.all(
+            createdMissions.map(async (mission) => {
+                // Room 테이블에서 r_title 가져오기
+                const room = await Room.findOne({
+                    where: { r_id: mission.r_id },
+                });
 
-        res.json({ missions });
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: mission.m_status,
+                    r_id: mission.r_id,
+                    r_title: room ? room.r_title : '없음', // r_title 설정
+                };
+            })
+        );
+
+        // 3. 결과 응답
+        res.json({ missions: missionsWithRoomTitle });
     } catch (error) {
         console.error('자신이 부여한 미션 조회 오류:', error);
         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });

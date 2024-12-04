@@ -167,7 +167,7 @@ exports.getAssignedMissions = async (req, res) => {
             })
         );
 
-        res.json({ missions });
+        res.json({ missions: missionsWithRoomTitle });
     } catch (error) {
         console.error('자신이 수행해야 할 미션 조회 오류:', error);
         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });

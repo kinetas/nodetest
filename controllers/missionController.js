@@ -146,7 +146,7 @@ exports.getAssignedMissions = async (req, res) => {
                 m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 
             },
         });
-        const missionRoom = await Room.findOne({
+        const missionRoom = await Room.findAll({
             where: { r_id: assignedMissions.r_id }
         });
 

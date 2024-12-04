@@ -18,7 +18,7 @@ env:
   REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
   FIREBASE_TYPE: "service_account"
   FIREBASE_PROJECT_ID: "capdesign-d9d41"
-  FIREBASE_PRIVATE_KEY_ID: "579c6731d105f85d9c9013312d4dfc0022bd5c36"
+  FIREBASE_PRIVATE_KEY_ID: "6283e3baa4c9c5c64e3bdb218b7dc9e1126fa830"
   FIREBASE_PRIVATE_KEY: ${{ secrets.SECRET_KEY }}
   FIREBASE_CLIENT_EMAIL: "firebase-adminsdk-typ5c@capdesign-d9d41.iam.gserviceaccount.com"
   FIREBASE_CLIENT_ID: "107971463282083225635"
@@ -26,6 +26,7 @@ env:
   FIREBASE_TOKEN_URI: "https://oauth2.googleapis.com/token"
   FIREBASE_AUTH_PROVIDER_CERT_URL: "https://www.googleapis.com/oauth2/v1/certs"
   FIREBASE_CLIENT_CERT_URL: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-typ5c%40capdesign-d9d41.iam.gserviceaccount.com"
+  FIREBASE_UNIVERSE_DOMAIN: "googleapis.com"
   # JWT_EXPIRES_IN: 1d  # JWT 만료 시간
 
 permissions:
@@ -98,7 +99,8 @@ jobs:
         echo "FIREBASE_TOKEN_URI=${{ env.FIREBASE_TOKEN_URI }}" >> .env
         echo "FIREBASE_AUTH_PROVIDER_CERT_URL=${{ env.FIREBASE_AUTH_PROVIDER_CERT_URL }}" >> .env
         echo "FIREBASE_CLIENT_CERT_URL=${{ env.FIREBASE_CLIENT_CERT_URL }}" >> .env
-    
+        echo "FIREBASE_CLIENT_CERT_URL=${{ env.FIREBASE_CLIENT_CERT_URL }}" >> .env
+        echo "FIREBASE_UNIVERSE_DOMAIN=${{ env.FIREBASE_UNIVERSE_DOMAIN }}" >> .env
 
     # Copy .env to EC2
     - name: Copy .env to EC2

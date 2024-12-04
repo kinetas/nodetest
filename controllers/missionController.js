@@ -153,7 +153,6 @@ exports.getAssignedMissions = async (req, res) => {
                 },
             ],
         });
-        
 
         console.log('[DEBUG] Assigned Missions:', JSON.stringify(assignedMissions, null, 2)); // 디버깅 로그 추가
 

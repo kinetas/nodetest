@@ -40,6 +40,14 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.BOOLEAN,
     defaultValue: false, // 기본값은 false
   },
+  u1_nickname: {
+    type: DataTypes.STRING(30),
+    allowNull: false,
+  },
+  u2_nickname: {
+    type: DataTypes.STRING(30),
+    allowNull: false,
+  },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����

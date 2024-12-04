@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../Camera&Photo/CameraMain.dart'; // CameraScreen 파일을 import
 
 class ChatPlusButton extends StatelessWidget {
   final BuildContext context;
@@ -50,9 +51,9 @@ class ChatPlusButton extends StatelessWidget {
                 ),
                 _buildCircleButton(
                   context,
-                  Icons.card_giftcard,
-                  '리워드 요청',
-                  _navigateToRewardRequestScreen,
+                  Icons.camera_alt,
+                  '카메라 인증',
+                  _navigateToCameraScreen,
                 ),
               ],
             ),
@@ -114,11 +115,11 @@ class ChatPlusButton extends StatelessWidget {
     );
   }
 
-  /// 리워드 요청 화면으로 이동
-  void _navigateToRewardRequestScreen() {
+  /// 카메라 인증 화면으로 이동
+  void _navigateToCameraScreen() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => RewardRequestScreen()),
+      MaterialPageRoute(builder: (context) => CameraScreen()),
     );
   }
 }
@@ -150,16 +151,6 @@ class MissionRequestScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('미션 요청')),
       body: Center(child: Text('미션 요청 화면')),
-    );
-  }
-}
-
-class RewardRequestScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('리워드 요청')),
-      body: Center(child: Text('리워드 요청 화면')),
     );
   }
 }

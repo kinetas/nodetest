@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.1' // 최신 버전으로 수정
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -11,6 +21,12 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8" // Kotlin의 JVM 타겟을 Java 1.8로 설정
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

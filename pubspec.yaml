@@ -47,6 +47,11 @@ dependencies:
   badges: ^2.0.3
   web_socket_channel: ^2.1.0
   path_provider: ^2.0.11
+  camera: ^0.11.0
+  image_gallery_saver: ^2.0.3
+  photo_manager: ^2.6.0
+  exif: ^2.0.0
+
   
   flutter_localizations: # 로컬라이제이션 패키지 추가
     sdk: flutter

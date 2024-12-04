@@ -53,7 +53,7 @@ exports.createMission = async (req, res) => {
         res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
     } catch (error) {
         console.error('미션 생성 오류:', error);
-        res.status(500).json({ success: false, message: '미션 생성 중 오류가 발생했습니다.' });
+        res.status(500).json({ success: false, message: `미션 생성 중 오류(${error})가 발생했습니다.` });
     }
 };
 

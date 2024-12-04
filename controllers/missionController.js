@@ -143,7 +143,7 @@ exports.getAssignedMissions = async (req, res) => {
         const assignedMissions = await Mission.findAll({
             where: {
                 u2_id: userId, // 자신이 수행해야 할 미션
-                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 //==========추가==============
+                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 
             },
             include: [
                 {
@@ -183,7 +183,7 @@ exports.getCreatedMissions = async (req, res) => {
                 u2_id: {
                     [Op.ne]: userId, // 자신이 자신에게 부여한 미션은 제외
                 },
-                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 //==========추가==============
+                m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만 
             },
 
             include: [
@@ -212,7 +212,7 @@ exports.getCreatedMissions = async (req, res) => {
     }
 };
 
-// 자신이 완료한 미션 목록 //==========추가==============
+// 자신이 완료한 미션 목록 
 exports.getCompletedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -232,7 +232,7 @@ exports.getCompletedMissions = async (req, res) => {
 };
 
 
-// 자신이 부여한 미션 중 상대가 완료한 미션 목록 //==========추가==============
+// 자신이 부여한 미션 중 상대가 완료한 미션 목록 
 exports.getGivenCompletedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
@@ -647,8 +647,3 @@ exports.checkMissionDeadline = async () => {
         console.error('마감 기한 확인 및 상태 업데이트 오류:', error);
     }
 };
-
-
-// 미션 상태 별 리스트 출력
-
-// 상태를 요청으로 변환

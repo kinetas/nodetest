@@ -40,6 +40,10 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.BOOLEAN,
     defaultValue: false, // 기본값은 false
   },
+  missionAuthenticationAuthority: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+  },
   // u1_nickname: {
   //   type: DataTypes.STRING(30),
   //   allowNull: false,

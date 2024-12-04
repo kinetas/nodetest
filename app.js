@@ -13,12 +13,14 @@ const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?
 const userInfoRoutes = require('./routes/userInfoRoutes');
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
+
+const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
+
 const db = require('./config/db');
 
 
 const app = express();
 const PORT = 3000;
-const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
 const roomController = require('./controllers/roomController');
 //=====================추가========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);

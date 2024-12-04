@@ -38,9 +38,10 @@ exports.getLoggedInUserAll = async (req, res) => {
         try {
             const user = await User.findOne({
                 where: { u_id: req.session.user.id },
+                attributes: { exclude: ['u_password', 'session_id'] }, // 비밀번호와 세션 아이디 제외
             });
             if (user) {
-                return res.status(200).json(user); // 사용자 전체 정보를 반환
+                return res.status(200).json(user); // 사용자 정보 반환
             } else {
                 return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
             }

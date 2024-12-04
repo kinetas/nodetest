@@ -17,6 +17,14 @@ const { checkMissionDeadline } = require('./controllers/missionController');
 const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // 관계 설정 불러오기
 
+db.sync({ alter: true }) // 필요 시 테이블 구조를 동기화
+    .then(() => {
+        console.log('Database synchronized.');
+    })
+    .catch(err => {
+        console.error('Database synchronization error:', err);
+    });
+
 
 const app = express();
 const PORT = 3000;

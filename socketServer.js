@@ -193,4 +193,19 @@ server.listen(3001, () => {
   console.log('HTTP Server running on port 3001');
 });
 
-module.exports = { io };
+
+//=======================================================
+
+// sendMessage 함수 내보내기
+const sendMessage = (data) => {
+  const { r_id, message_contents, u1_id, u2_id } = data;
+
+  io.to(r_id).emit('receiveMessage', {
+      u1_id,
+      u2_id,
+      message_contents,
+      send_date: new Date(),
+  });
+};
+
+module.exports = { io, sendMessage  };

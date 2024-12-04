@@ -8,8 +8,11 @@ const resultController = require('./resultController'); // resultController 가�
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
+//============================================================================
 const { io } = require('../socketServer');
 const RMessage = require('../models/messageModel'); // 메시지 모델 가져오기
+const { sendMessage } = require('../socketServer'); // sendMessage 가져오기
+//============================================================================
 
 
 // const sequelize = require('../config/db'); // 데이터베이스 연결
@@ -384,26 +387,26 @@ exports.requestMissionApproval = async (req, res) => {
         }
 
 
-        // 메시지 생성
+        //============================================================================
         const roomId = mission.r_id;
         const messageContents = `사용자 ${mission.u1_id}가 미션 "${mission.m_title}"을(를) 요청했습니다.`;
 
-        // DB에 메시지 저장
         await RMessage.create({
             u1_id: mission.u1_id,
             u2_id: mission.u2_id,
             r_id: roomId,
             message_contents: messageContents,
-            send_date: new Date()
+            send_date: new Date(),
         });
 
-        // 소켓을 통해 메시지 전송
-        io.to(roomId).emit('receiveMessage', {
+        // sendMessage 호출
+        sendMessage({
             u1_id: mission.u1_id,
             u2_id: mission.u2_id,
             r_id: roomId,
-            message_contents: messageContents
+            message_contents: messageContents,
         });
+        //============================================================================
 
 
         res.json({ success: true, message: '미션 상태가 "요청"으로 변경되었습니다.' });

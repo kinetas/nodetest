@@ -247,7 +247,7 @@ exports.deleteAccount = async (req, res) => { // 추가
 
 
 // 로그인한 사용자의 u_id 반환
-exports.getLoggedInUserId = (req, res) => {
+exports.uesrInfo = (req, res) => {
     if (req.session && req.session.user) {
         // 세션에 저장된 u_id 반환
         return res.status(200).json({ u_id: req.session.user.id });

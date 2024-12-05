@@ -808,26 +808,26 @@ exports.checkMissionDeadline = async () => {
 //     }
 // };
 
-// // 자신이 만든 미션 목록, 상태 : 진행중
-// exports.getRequestedSelfMissions = async (req, res) => {
-//     const userId = req.session.user.id; // 현재 로그인한 사용자 ID
+// 자신이 만든 미션 목록, 상태 : 진행중
+exports.getRequestedSelfMissions = async (req, res) => {
+    const userId = req.session.user.id; // 현재 로그인한 사용자 ID
 
-//     try {
-//         // 자신이 자기 자신에게 생성한 상태가 "진행중"인 미션 조회
-//         const missions = await Mission.findAll({
-//             where: {
-//                 u1_id: userId,
-//                 u2_id: userId,
-//                 m_status: '진행중', // 상태가 "진행중"인 미션만 필터링
-//             },
-//         });
+    try {
+        // 자신이 자기 자신에게 생성한 상태가 "진행중"인 미션 조회
+        const missions = await Mission.findAll({
+            where: {
+                u1_id: userId,
+                u2_id: userId,
+                m_status: '진행중', // 상태가 "진행중"인 미션만 필터링
+            },
+        });
 
-//         res.status(200).json({ missions });
-//     } catch (error) {
-//         console.error('자신에게 생성한 진행중 상태의 미션 조회 오류:', error);
-//         res.status(500).json({ message: '진행중 상태의 미션을 조회하는 중 오류가 발생했습니다.' });
-//     }
-// };
+        res.status(200).json({ missions });
+    } catch (error) {
+        console.error('자신에게 생성한 진행중 상태의 미션 조회 오류:', error);
+        res.status(500).json({ message: '진행중 상태의 미션을 조회하는 중 오류가 발생했습니다.' });
+    }
+};
 
 
 exports.requestVoteForMission = async (req, res) => {

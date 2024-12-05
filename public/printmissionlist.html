@@ -28,13 +28,19 @@
     <h2>부여한 미션</h2>
     <ul id="createdMissions">로딩 중...</ul>
 
-    <!-- ===========================추가========================= -->
     <h2>완료한 미션</h2>
     <ul id="completedMissions">로딩 중...</ul>
 
     <h2>상대가 완료한 미션</h2>
     <ul id="givenCompletedMissions">로딩 중...</ul>
-    <!-- ===========================추가========================= -->
+
+    <!-- ======= 친구가 생성한 미션 추가 ======= -->
+    <h2>친구가 생성한 미션</h2>
+    <ul id="friendCreatedMissions">로딩 중...</ul>
+
+    <!-- ======= 인증 권한 부여 미션 추가 ======= -->
+    <h2>인증 권한 부여 미션</h2>
+    <ul id="grantedAuthorityMissions">로딩 중...</ul>
 
     <!-- 미션 작업 UI -->
     <h2>미션 작업</h2>
@@ -210,7 +216,6 @@
                 document.getElementById('createdMissions').textContent = '미션 데이터를 가져오는 중 오류가 발생했습니다.';
             });
 
-        // =======================추가==============================
         // 완료한 미션 목록 가져오기
         fetch('/dashboard/missions/completed')
             .then(response => response.json())
@@ -221,7 +226,12 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 ID: ${mission.m_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                        listItem.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            마감일: ${mission.m_deadline}, 
+                            상태: ${mission.m_status} 
+                        `;
                         completedList.appendChild(listItem);
                     });
                 } else {
@@ -239,7 +249,12 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 ID: ${mission.m_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                        listItem.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            마감일: ${mission.m_deadline}, 
+                            상태: ${mission.m_status}
+                        `;
                         givenCompletedList.appendChild(listItem);
                     });
                 } else {
@@ -249,59 +264,51 @@
 
         //===================================================================================================================
 
-        // // 자신이 수행해야 할 미션 목록 가져오기
-        // fetch('/dashboard/missions/assigned')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         const assignedList = document.getElementById('assignedMissions');
-        //         assignedList.innerHTML = ''; // 기존 내용 초기화
+        // ======= 친구가 생성한 미션 목록 추가 =======
+        fetch('/dashboard/missions/friendCreated')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('friendCreatedMissions');
+                list.innerHTML = '';
+                if (data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const item = document.createElement('li');
+                        item.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            부여자: ${mission.u1_id}, 
+                            대상: ${mission.u2_id}, 
+                            마감일: ${mission.m_deadline}
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.textContent = '친구가 생성한 미션이 없습니다.';
+                }
+            });
 
-        //         if (data.missions && data.missions.length > 0) {
-        //             data.missions.forEach(mission => {
-        //                 const listItem = document.createElement('li');
-        //                 listItem.textContent = `
-        //                     미션: ${mission.missionTitle},
-        //                     마감일: ${mission.deadline},
-        //                     상태: ${mission.status},
-        //                     방 이름: ${mission.roomTitle || mission.communityRoomTitle || '없음'}
-        //                 `;
-        //                 assignedList.appendChild(listItem);
-        //             });
-        //         } else {
-        //             assignedList.textContent = '수행해야 할 미션이 없습니다.';
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('수행해야 할 미션 목록 가져오기 오류:', error);
-        //         document.getElementById('assignedMissions').textContent = '데이터를 불러오는 중 오류가 발생했습니다.';
-        //     });
-
-        // // 자신이 부여한 미션 목록 가져오기
-        // fetch('/dashboard/missions/created')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         const createdList = document.getElementById('createdMissions');
-        //         createdList.innerHTML = ''; // 기존 내용 초기화
-
-        //         if (data.missions && data.missions.length > 0) {
-        //             data.missions.forEach(mission => {
-        //                 const listItem = document.createElement('li');
-        //                 listItem.textContent = `
-        //                     미션: ${mission.missionTitle},
-        //                     마감일: ${mission.deadline},
-        //                     상태: ${mission.status},
-        //                     방 이름: ${mission.roomTitle || mission.communityRoomTitle || '없음'}
-        //                 `;
-        //                 createdList.appendChild(listItem);
-        //             });
-        //         } else {
-        //             createdList.textContent = '부여한 미션이 없습니다.';
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error('부여한 미션 목록 가져오기 오류:', error);
-        //         document.getElementById('createdMissions').textContent = '데이터를 불러오는 중 오류가 발생했습니다.';
-        //     });
+        // ======= 인증 권한 부여 미션 목록 추가 =======
+        fetch('/dashboard/missions/grantedAuthority')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('grantedAuthorityMissions');
+                list.innerHTML = '';
+                if (data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const item = document.createElement('li');
+                        item.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            인증 권한자: ${mission.missionAuthenticationAuthority}, 
+                            대상: ${mission.u2_id}, 
+                            마감일: ${mission.m_deadline}
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.textContent = '인증 권한 부여 미션이 없습니다.';
+                }
+            });
     </script>
 </body>
 </html>

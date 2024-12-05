@@ -58,33 +58,14 @@
         <h3>미션 생성</h3>
         <div class="error" id="errorMessage"></div>
         <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
+        <input type="text" id="authenticationAuthority" placeholder="인증 권한을 가진 사용자 ID">
         <input type="text" id="m_title" placeholder="미션 이름">
-        <!-- <input type="date" id="m_deadline" placeholder="미션 마감일"> -->
         <input type="datetime-local" id="m_deadline" placeholder="미션 마감일">
         <input type="text" id="m_reword" placeholder="보상">
         <button onclick="createMission()">미션 생성</button>
     </div>
 
-    <!-- <h1 id="greeting">Hello, </h1>
-    <h2>미션 삭제</h2> -->
-
-    <!-- 미션 삭제 폼 -->
-    <!-- <div class="form-container">
-        <div class="error" id="errorMessage"></div>
-        <input type="text" id="m_id" placeholder="미션 ID">
-        <button onclick="deleteMission()">미션 삭제</button>
-    </div> -->
-
-    <!-- 미션 인증 폼 -->
-    <!-- <h1 id="greeting">Hello, </h1>
-
-    <h2>미션 인증</h2>
-    <div class="form-container">
-        <input type="text" id="m_id_input" placeholder="미션 ID 입력">
-        <button onclick="successMission()">미션 인증 성공</button>
-        <button onclick="failureMission()">미션 인증 실패</button>
-    </div> -->
-
+    
     <h2>i_friend 목록</h2>
     <ul id="iFriendsList">로딩 중...</ul>
     <div class="form-container">
@@ -236,15 +217,16 @@
         function createMission() {
             // 입력 값 가져오기
             const u2_id = document.getElementById('u2_id').value;
+            const authenticationAuthority = document.getElementById('authenticationAuthority').value;
             const m_title = document.getElementById('m_title').value;
             const m_deadline = document.getElementById('m_deadline').value;
             const m_reword = document.getElementById('m_reword').value;
 
-            // 필수 값 검증
-            if (!u2_id) {
-                document.getElementById('errorMessage').textContent = "받는 사용자 ID는 필수 항목입니다.";
-                return;
-            }
+            // // 필수 값 검증
+            // if (!u2_id) {
+            //     document.getElementById('errorMessage').textContent = "받는 사용자 ID는 필수 항목입니다.";
+            //     return;
+            // }
 
             // 서버로 데이터 전송
             fetch('/dashboard/missioncreate', {
@@ -256,7 +238,7 @@
                 //     Authorization: `Bearer ${token}`, // JWT 토큰 추가
                 // },
 
-                body: JSON.stringify({ u1_id: userId, u2_id, m_title, m_deadline, m_reword })
+                body: JSON.stringify({ u2_id, authenticationAuthority, m_title, m_deadline, m_reword })
             })
             .then(response => response.json())
             .then(data => {

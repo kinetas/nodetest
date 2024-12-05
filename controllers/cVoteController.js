@@ -2,6 +2,8 @@ const { Op } = require('sequelize');
 const { sequelize } = require('../models/comunity_voteModel'); // sequelize 인스턴스를 models에서 가져옵니다.
 const CVote = require('../models/comunity_voteModel');
 const c_v_notdup = require('../models/c_v_not_dupModel'); 
+const Mission = require('../models/missionModel');
+const MResult = require('../models/m_resultModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
@@ -184,5 +186,63 @@ exports.getVoteDetails = async (req, res) => {
     } catch (error) {
         console.error("Error fetching vote details:", error);
         res.status(500).json({ success: false, message: "투표 정보를 가져오는데 실패했습니다." });
+    }
+};
+exports.checkAndUpdateMissions = async () => {
+    try {
+        const now = new Date();
+        console.log(`[${now}] 정기 작업 실행`);
+
+        // 현재 날짜가 데드라인을 지난 투표 조회
+        const expiredVotes = await CVote.findAll({
+            where: {
+                c_deletedate: { [Op.lte]: now },
+            },
+        });
+
+        for (const vote of expiredVotes) {
+            const { c_good, c_bad, u_id, c_number } = vote;
+
+            // c_good > c_bad 또는 투표가 없는 경우
+            if (c_good > c_bad || (c_good === 0 && c_bad === 0)) {
+                const missions = await Mission.findAll({
+                    where: { u1_id: u_id, m_id: c_number },
+                });
+
+                for (const mission of missions) {
+                    // 미션 성공 처리
+                    await mission.update({ m_status: '완료' });
+                    await MResult.create({
+                        m_id: mission.m_id,
+                        u_id: mission.u2_id,
+                        m_deadline: mission.m_deadline,
+                        m_status: '성공',
+                    });
+
+                    console.log(`미션 ${mission.m_id}이 성공 처리되었습니다.`);
+                }
+            } else {
+                const missions = await Mission.findAll({
+                    where: { u1_id: u_id, m_id: c_number },
+                });
+
+                for (const mission of missions) {
+                    // 미션 실패 처리
+                    await mission.update({ m_status: '완료' });
+                    await MResult.create({
+                        m_id: mission.m_id,
+                        u_id: mission.u2_id,
+                        m_deadline: mission.m_deadline,
+                        m_status: '실패',
+                    });
+
+                    console.log(`미션 ${mission.m_id}이 실패 처리되었습니다.`);
+                }
+            }
+        }
+
+        console.log(`[${now}] 정기 작업 완료: 총 ${expiredVotes.length}개의 투표를 처리했습니다.`);
+    } catch (error) {
+        console.error(`정기 작업 오류: ${error.message}`);
     }
 };

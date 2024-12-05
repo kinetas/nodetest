@@ -770,43 +770,6 @@ exports.checkMissionDeadline = async () => {
 };
 
 // ===================== 투표 요청 ===============================
-// exports.requestVoteForMission = async (req, res) => {
-//     const { m_id } = req.body;
-
-//     if (!m_id) {
-//         return res.status(400).json({ success: false, message: '미션 ID가 누락되었습니다.' });
-//     }
-
-//     try {
-//         // m_id를 기반으로 미션 정보 가져오기
-//         const mission = await Mission.findOne({ where: { m_id } });
-
-//         if (!mission) {
-//             return res.status(404).json({ success: false, message: '해당 미션을 찾을 수 없습니다.' });
-//         }
-
-//         const { u1_id, m_title, m_deadline } = mission;
-//         const c_number = uuidv4(); // 고유 투표 번호 생성
-//         const c_deletedate = new Date(new Date(m_deadline).getTime() + 3 * 24 * 60 * 60 * 1000); // 마감일 + 3일
-
-//         // 투표 생성
-//         const newVote = await CVote.create({
-//             u_id: u1_id,
-//             c_number,
-//             c_title: m_title,
-//             c_contents: `미션 "${m_title}"의 투표`,
-//             c_good: 0,
-//             c_bad: 0,
-//             c_deletedate,
-//             c_image: null,
-//         });
-
-//         res.json({ success: true, message: '투표가 성공적으로 생성되었습니다.', vote: newVote });
-//     } catch (error) {
-//         console.error('투표 요청 중 오류:', error);
-//         res.status(500).json({ success: false, message: '투표 생성 중 오류가 발생했습니다.' });
-//     }
-// };
 
 // 자신이 만든 미션 목록, 상태 : 진행중
 exports.getRequestedSelfMissions = async (req, res) => {

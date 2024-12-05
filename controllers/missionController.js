@@ -4,6 +4,7 @@ const Mission = require('../models/missionModel'); // Mission 모델 불러오�
 const Room = require('../models/roomModel'); // Room 모델 가져오기
 const MResult = require('../models/m_resultModel.js'); //MResult 모델 가져오기
 const CRoom = require('../models/comunity_roomModel'); // Community Room 테이블
+const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추가
 const resultController = require('./resultController'); // resultController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
@@ -21,8 +22,24 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
-    const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body; 
+    const { u2_id, authenticationAuthority, m_title, m_deadline, m_reword } = req.body;
+    const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
+
     try {
+
+        // 인증 권한 확인
+        let missionAuthenticationAuthority = authenticationAuthority || u1_id;
+
+        if (missionAuthenticationAuthority !== u1_id) {
+            const isFriend = await IFriend.findOne({
+                where: { u_id: u1_id, f_id: missionAuthenticationAuthority },
+            });
+
+            if (!isFriend) {
+                return res.status(400).json({ success: false, message: '인증 권한 사용자 ID가 친구 목록에 없습니다.' });
+            }
+        }
+
         // u2_id가 입력되지 않은 경우 u1_id와 동일하게 설정
         const assignedU2Id = u2_id || u1_id;
 
@@ -51,7 +68,7 @@ exports.createMission = async (req, res) => {
             m_reword,
             m_status: stat,
             r_id: room.r_id, // Room ID를 저장
-            // missionAuthenticationAuthority: u1_id,
+            missionAuthenticationAuthority,
         });
 
         res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
@@ -463,11 +480,16 @@ exports.requestMissionApproval = async (req, res) => {
 exports.successMission = async (req, res) => {
     const { m_id } = req.body;
     const u1_id = req.session.user.id;
+    
     try {
         const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        if (mission.missionAuthenticationAuthority !== u1_id) {
+            return res.status(403).json({ success: false, message: '미션 인증 권한이 없습니다.' });
         }
         
         // m_status가 "요청"일 때만 상태 변경 가능
@@ -518,6 +540,10 @@ exports.failureMission = async (req, res) => {
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+        }
+
+        if (mission.missionAuthenticationAuthority !== u1_id) {
+            return res.status(403).json({ success: false, message: '미션 인증 권한이 없습니다.' });
         }
 
         // m_status가 "요청"일 때만 상태 변경 가능

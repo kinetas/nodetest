@@ -65,50 +65,13 @@
     <script>
 
         // ====== 내가 생성한 미션 (투표 요청 가능) ======
-        function requestVote(m_id) {
-            const formData = new FormData();
-            formData.append('m_id', m_id);
-
-            fetch('/dashboard/missionVote', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('투표 요청이 성공적으로 처리되었습니다.');
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('투표 요청 중 오류:', error));
-        }
-
-        fetch('/dashboard/missions/created')
-            .then(response => response.json())
-            .then(data => {
-                const list = document.getElementById('myCreatedMissions');
-                list.innerHTML = '';
-                if (data.missions.length > 0) {
-                    data.missions.forEach(mission => {
-                        const item = document.createElement('li');
-                        item.innerHTML = `
-                            미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}
-                            <button onclick="requestVote('${mission.m_id}')">투표 요청</button>
-                        `;
-                        list.appendChild(item);
-                    });
-                } else {
-                    list.textContent = '생성된 미션이 없습니다.';
-                }
-            });
-
         // function requestVote(m_id) {
+        //     const formData = new FormData();
+        //     formData.append('m_id', m_id);
+
         //     fetch('/dashboard/missionVote', {
         //         method: 'POST',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         body: JSON.stringify({ m_id }),
+        //         body: formData,
         //     })
         //     .then(response => response.json())
         //     .then(data => {
@@ -140,6 +103,43 @@
         //             list.textContent = '생성된 미션이 없습니다.';
         //         }
         //     });
+
+        function requestVote(m_id) {
+            fetch('/dashboard/missionVote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ m_id }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('투표 요청이 성공적으로 처리되었습니다.');
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('투표 요청 중 오류:', error));
+        }
+
+        fetch('/dashboard/missions/created')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('myCreatedMissions');
+                list.innerHTML = '';
+                if (data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const item = document.createElement('li');
+                        item.innerHTML = `
+                            미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}
+                            <button onclick="requestVote('${mission.m_id}')">투표 요청</button>
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.textContent = '생성된 미션이 없습니다.';
+                }
+            });
 
         // 미션 삭제
         function deleteMission() {

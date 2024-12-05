@@ -7,8 +7,8 @@ const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMi
         requestVoteForMission  } = require('../controllers/missionController');
 const requireAuth = require('../middleware/authMiddleware'); // requireAuth 미들웨어 경로 확인
 
-const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage() });
+// const multer = require('multer');
+// const upload = multer({ storage: multer.memoryStorage() });
 
 // 미션 리스트 반환 라우트
 router.get('/missions', requireAuth, getUserMissions);
@@ -35,9 +35,9 @@ router.get('/missions/friendCompleted', requireAuth, getFriendCompletedMissions)
 router.get('/missions/grantedAuthority', requireAuth, getMissionsWithGrantedAuthority);
 
 // ====== 투표 요청 라우트 (수정된 부분) ======
-router.post('/missionVote', requireAuth, upload.single('c_image'), requestVoteForMission);
+// router.post('/missionVote', requireAuth, upload.single('c_image'), requestVoteForMission);
 // 사진 업로드 없이 JSON 데이터만 처리
-// router.post('/missionVote', requireAuth, requestVoteForMission);
+router.post('/missionVote', requireAuth, requestVoteForMission);
 
 
 // 미션 생성 요청 처리

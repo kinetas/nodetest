@@ -4,7 +4,7 @@ const router = express.Router();
 const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMissions, 
         getGivenCompletedMissions, getFriendAssignedMissions, getFriendCompletedMissions, getMissionsWithGrantedAuthority, 
         requestMissionApproval, createMission, deleteMission, successMission, failureMission, printRoomMission,
-        requestVoteForMission  } = require('../controllers/missionController');
+        requestVoteForMission, getRequestedSelfMissions  } = require('../controllers/missionController');
 const requireAuth = require('../middleware/authMiddleware'); // requireAuth 미들웨어 경로 확인
 
 // const multer = require('multer');
@@ -38,6 +38,8 @@ router.get('/missions/grantedAuthority', requireAuth, getMissionsWithGrantedAuth
 // router.post('/missionVote', requireAuth, upload.single('c_image'), requestVoteForMission);
 // 사진 업로드 없이 JSON 데이터만 처리
 router.post('/missionVote', requireAuth, requestVoteForMission);
+
+router.get('/missions/selfRequested', requireAuth, getRequestedSelfMissions);
 
 
 // 미션 생성 요청 처리

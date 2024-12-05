@@ -24,9 +24,9 @@
 <body>
     <h1>미션 목록</h1>
 
-    <!-- 내가 생성한 미션 (투표 요청 가능) -->
-    <h2>내가 생성한 미션 (투표 요청 가능)</h2>
-    <ul id="myCreatedMissions">로딩 중...</ul>
+    <!-- 자신에게 생성한 요청 상태의 미션 (투표 요청 가능) -->
+    <h2>자신에게 생성한 요청 상태의 미션</h2>
+    <ul id="selfRequestedMissions">로딩 중...</ul>
 
     <h2>수행해야 할 미션</h2>
     <ul id="assignedMissions">로딩 중...</ul>
@@ -122,10 +122,11 @@
             .catch(error => console.error('투표 요청 중 오류:', error));
         }
 
-        fetch('/dashboard/missions/created')
+        // 자신에게 생성한 요청 상태의 미션 가져오기
+        fetch('/dashboard/missions/selfRequested')
             .then(response => response.json())
             .then(data => {
-                const list = document.getElementById('myCreatedMissions');
+                const list = document.getElementById('selfRequestedMissions');
                 list.innerHTML = '';
                 if (data.missions.length > 0) {
                     data.missions.forEach(mission => {
@@ -137,7 +138,7 @@
                         list.appendChild(item);
                     });
                 } else {
-                    list.textContent = '생성된 미션이 없습니다.';
+                    list.textContent = '요청 상태의 미션이 없습니다.';
                 }
             });
 

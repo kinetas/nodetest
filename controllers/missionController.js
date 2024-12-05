@@ -367,83 +367,50 @@ exports.getGivenCompletedMissions = async (req, res) => {
     }
 };
 
-//=====================================================================================
+// ======= 1. 친구가 생성한 미션 조회 (추가된 코드) =======
+exports.getFriendCreatedMissions = async (req, res) => {
+    const userId = req.session.user.id;
 
+    try {
+        // 1. 로그인한 사용자의 친구 ID 목록 조회
+        const friends = await IFriend.findAll({ where: { u_id: userId } });
+        const friendIds = friends.map(friend => friend.f_id);
 
-// // 자신이 수행해야 할 미션 목록 (u2_id = userId)
-// exports.getAssignedMissions = async (req, res) => {
-//     try {
-//         const userId = req.session.user.id;
+        if (friendIds.length === 0) {
+            return res.status(200).json({ missions: [] });
+        }
 
-//         const assignedMissions = await Mission.findAll({
-//             where: { u2_id: userId },
-//             include: [
-//                 {
-//                     model: Room,
-//                     as: 'room', // Room 테이블
-//                     attributes: ['r_title'],
-//                 },
-//                 {
-//                     model: CRoom,
-//                     as: 'communityRoom', // Community Room 테이블
-//                     attributes: ['cr_title'],
-//                 },
-//             ],
-//         });
+        // 2. 친구가 생성한 미션 조회
+        const missions = await Mission.findAll({
+            where: {
+                u1_id: { [Op.in]: friendIds },
+                u2_id: { [Op.ne]: userId }, // 자신을 대상으로 하지 않는 미션
+            },
+        });
 
-//         const missions = assignedMissions.map((mission) => ({
-//             missionTitle: mission.m_title,
-//             deadline: mission.m_deadline,
-//             status: mission.m_status,
-//             roomTitle: mission.room ? mission.room.r_title : null,
-//             communityRoomTitle: mission.communityRoom ? mission.communityRoom.cr_title : null,
-//         }));
+        res.status(200).json({ missions });
+    } catch (error) {
+        console.error('친구가 생성한 미션 조회 오류:', error);
+        res.status(500).json({ message: '친구가 생성한 미션을 조회하는 중 오류가 발생했습니다.' });
+    }
+};
 
-//         res.json({ missions });
-//     } catch (error) {
-//         console.error('수행해야 할 미션 조회 오류:', error);
-//         res.status(500).json({ message: '수행해야 할 미션을 불러오는데 실패했습니다.' });
-//     }
-// };
+// ======= 2. 인증 권한을 부여한 미션 조회 (추가된 코드) =======
+exports.getMissionsWithGrantedAuthority = async (req, res) => {
+    const userId = req.session.user.id;
 
-// // 자신이 부여한 미션 목록 (u1_id = userId)
-// exports.getCreatedMissions = async (req, res) => {
-//     try {
-//         const userId = req.session.user.id;
+    try {
+        // 로그인한 사용자가 인증 권한을 부여한 미션 조회
+        const missions = await Mission.findAll({
+            where: { missionAuthenticationAuthority: { [Op.ne]: userId }, u1_id: userId },
+        });
 
-//         const createdMissions = await Mission.findAll({
-//             where: { u1_id: userId },
-//             include: [
-//                 {
-//                     model: Room,
-//                     as: 'room', // Room 테이블
-//                     attributes: ['r_title'],
-//                 },
-//                 {
-//                     model: CRoom,
-//                     as: 'communityRoom', // Community Room 테이블
-//                     attributes: ['cr_title'],
-//                 },
-//             ],
-//         });
-
-//         const missions = createdMissions.map((mission) => ({
-//             missionTitle: mission.m_title,
-//             deadline: mission.m_deadline,
-//             status: mission.m_status,
-//             roomTitle: mission.room ? mission.room.r_title : null,
-//             communityRoomTitle: mission.communityRoom ? mission.communityRoom.cr_title : null,
-//         }));
-
-//         res.json({ missions });
-//     } catch (error) {
-//         console.error('부여한 미션 조회 오류:', error);
-//         res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
-//     }
-// };
-
-
-// 방이름 추가 - 유저 아이디/닉네임으로 
+        res.status(200).json({ missions });
+    } catch (error) {
+        console.error('인증 권한 부여 미션 조회 오류:', error);
+        res.status(500).json({ message: '인증 권한 부여 미션을 조회하는 중 오류가 발생했습니다.' });
+    }
+};
 
 
 

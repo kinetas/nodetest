@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMissions, 
-        getGivenCompletedMissions, getFriendCreatedMissions, getMissionsWithGrantedAuthority, 
+        getGivenCompletedMissions, getFriendAssignedMissions, getFriendCompletedMissions, getMissionsWithGrantedAuthority, 
         requestMissionApproval, createMission, deleteMission, successMission, failureMission, printRoomMission  } = require('../controllers/missionController');
 const requireAuth = require('../middleware/authMiddleware'); // requireAuth 미들웨어 경로 확인
 
@@ -21,8 +21,11 @@ router.get('/missions/completed', requireAuth, getCompletedMissions);
 // 자신이 부여한 미션 중 상대가 완료한 미션 
 router.get('/missions/givenCompleted', requireAuth, getGivenCompletedMissions);
 
-// 친구가 생성한 미션 조회
-router.get('/missions/friendCreated', requireAuth, getFriendCreatedMissions);
+// 친구가 수행해야 하는 미션
+router.get('/missions/friendAssigned', requireAuth, getFriendAssignedMissions);
+
+// 친구가 완료한 미션
+router.get('/missions/friendCompleted', requireAuth, getFriendCompletedMissions);
 
 // 인증 권한을 부여한 미션 조회
 router.get('/missions/grantedAuthority', requireAuth, getMissionsWithGrantedAuthority);

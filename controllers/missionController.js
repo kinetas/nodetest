@@ -367,12 +367,12 @@ exports.getGivenCompletedMissions = async (req, res) => {
     }
 };
 
-// ======= 1. 친구가 생성한 미션 조회 (추가된 코드) =======
-exports.getFriendCreatedMissions = async (req, res) => {
+// ====== 1. 친구가 수행해야 하는 미션 (추가된 코드) ======
+exports.getFriendAssignedMissions = async (req, res) => {
     const userId = req.session.user.id;
 
     try {
-        // 1. 로그인한 사용자의 친구 ID 목록 조회
+        // 1. 로그인한 사용자의 친구 목록 조회
         const friends = await IFriend.findAll({ where: { u_id: userId } });
         const friendIds = friends.map(friend => friend.f_id);
 
@@ -380,22 +380,51 @@ exports.getFriendCreatedMissions = async (req, res) => {
             return res.status(200).json({ missions: [] });
         }
 
-        // 2. 친구가 생성한 미션 조회
+        // 2. 친구가 수행해야 하는 미션 조회
         const missions = await Mission.findAll({
             where: {
-                u1_id: { [Op.in]: friendIds },
-                u2_id: { [Op.ne]: userId }, // 자신을 대상으로 하지 않는 미션
+                u2_id: { [Op.in]: friendIds },
+                u1_id: { [Op.eq]: userId }, // 로그인한 사용자가 생성한 미션
+                m_status: '진행중', // 상태가 '진행중'인 미션
             },
         });
 
         res.status(200).json({ missions });
     } catch (error) {
-        console.error('친구가 생성한 미션 조회 오류:', error);
-        res.status(500).json({ message: '친구가 생성한 미션을 조회하는 중 오류가 발생했습니다.' });
+        console.error('친구가 수행해야 하는 미션 조회 오류:', error);
+        res.status(500).json({ message: '친구가 수행해야 하는 미션을 조회하는 중 오류가 발생했습니다.' });
     }
 };
 
-// ======= 2. 인증 권한을 부여한 미션 조회 (추가된 코드) =======
+// ====== 2. 친구가 완료한 미션 (추가된 코드) ======
+exports.getFriendCompletedMissions = async (req, res) => {
+    const userId = req.session.user.id;
+
+    try {
+        // 1. 로그인한 사용자의 친구 목록 조회
+        const friends = await IFriend.findAll({ where: { u_id: userId } });
+        const friendIds = friends.map(friend => friend.f_id);
+
+        if (friendIds.length === 0) {
+            return res.status(200).json({ missions: [] });
+        }
+
+        // 2. 친구가 완료한 미션 조회
+        const missions = await Mission.findAll({
+            where: {
+                u2_id: { [Op.in]: friendIds },
+                m_status: '완료', // 상태가 '완료'인 미션
+            },
+        });
+
+        res.status(200).json({ missions });
+    } catch (error) {
+        console.error('친구가 완료한 미션 조회 오류:', error);
+        res.status(500).json({ message: '친구가 완료한 미션을 조회하는 중 오류가 발생했습니다.' });
+    }
+};
+
+// ======= 3. 인증 권한을 부여한 미션 조회 (추가된 코드) =======
 exports.getMissionsWithGrantedAuthority = async (req, res) => {
     const userId = req.session.user.id;
 

@@ -34,9 +34,11 @@
     <h2>상대가 완료한 미션</h2>
     <ul id="givenCompletedMissions">로딩 중...</ul>
 
-    <!-- ======= 친구가 생성한 미션 추가 ======= -->
-    <h2>친구가 생성한 미션</h2>
-    <ul id="friendCreatedMissions">로딩 중...</ul>
+    <h2>친구가 수행해야 하는 미션</h2>
+    <ul id="friendAssignedMissions">로딩 중...</ul>
+
+    <h2>친구가 완료한 미션</h2>
+    <ul id="friendCompletedMissions">로딩 중...</ul>
 
     <!-- ======= 인증 권한 부여 미션 추가 ======= -->
     <h2>인증 권한 부여 미션</h2>
@@ -264,11 +266,11 @@
 
         //===================================================================================================================
 
-        // ======= 친구가 생성한 미션 목록 추가 =======
-        fetch('/dashboard/missions/friendCreated')
+        // ====== 친구가 수행해야 하는 미션 가져오기 ======
+        fetch('/dashboard/missions/friendAssigned')
             .then(response => response.json())
             .then(data => {
-                const list = document.getElementById('friendCreatedMissions');
+                const list = document.getElementById('friendAssignedMissions');
                 list.innerHTML = '';
                 if (data.missions.length > 0) {
                     data.missions.forEach(mission => {
@@ -276,14 +278,35 @@
                         item.textContent = `
                             미션 ID: ${mission.m_id}, 
                             미션 이름: ${mission.m_title}, 
-                            부여자: ${mission.u1_id}, 
-                            대상: ${mission.u2_id}, 
+                            수행자: ${mission.u2_id}, 
                             마감일: ${mission.m_deadline}
                         `;
                         list.appendChild(item);
                     });
                 } else {
-                    list.textContent = '친구가 생성한 미션이 없습니다.';
+                    list.textContent = '친구가 수행해야 할 미션이 없습니다.';
+                }
+            });
+
+        // ====== 친구가 완료한 미션 가져오기 ======
+        fetch('/dashboard/missions/friendCompleted')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('friendCompletedMissions');
+                list.innerHTML = '';
+                if (data.missions.length > 0) {
+                    data.missions.forEach(mission => {
+                        const item = document.createElement('li');
+                        item.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            수행자: ${mission.u2_id}, 
+                            완료일: ${mission.m_deadline}
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.textContent = '친구가 완료한 미션이 없습니다.';
                 }
             });
 

@@ -99,6 +99,7 @@
                 if (data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const item = document.createElement('li');
+                        item.className = "mission-item"; // 스타일 적용
                         item.innerHTML = `
                             미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}
                             <input type="file" id="file-${mission.m_id}" accept="image/*">

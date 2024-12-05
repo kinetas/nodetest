@@ -484,7 +484,7 @@ exports.successMission = async (req, res) => {
         // resultController를 통해 결과 저장
         const saveResultResponse = await resultController.saveResult(
             m_id,
-            u1_id,
+            mission.u2_id,
             // mission.m_deadline,
             currentTime, // 현재 시간 전달
             '성공'
@@ -533,7 +533,7 @@ exports.failureMission = async (req, res) => {
         // resultController를 통해 결과 저장
         const saveResultResponse = await resultController.saveResult(
             m_id,
-            u1_id,
+            mission.u2_id,
             // mission.m_deadline,
             currentTime, // 현재 시간 전달
             '실패'

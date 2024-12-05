@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'MissionVoting_screen.dart';
+import 'MissionVotingScreen.dart';
 
 // CommunityScreen: 커뮤니티 메인 화면
 class CommunityScreen extends StatefulWidget {

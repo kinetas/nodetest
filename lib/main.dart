@@ -3,7 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences 추가
 import 'screens/Login_page/StartLogin_screen.dart';
 import 'screens/ScreenMain.dart';
-import 'screens/Login_page/findAccount_screen.dart';
+import 'screens/Login_page/FindAccountScreen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // 비동기 초기화

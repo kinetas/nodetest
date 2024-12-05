@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'signUp_screen.dart';
-import 'Login_screen.dart';
-import 'findAccount_screen.dart';
+import 'SignUpScreen.dart';
+import 'LoginScreen.dart';
+import 'FindAccountScreen.dart';
 import '../ScreenMain.dart'; // Update the path if necessary
 
 class StartLoginScreen extends StatelessWidget {

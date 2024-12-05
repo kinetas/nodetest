@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'SignUp_screen.dart';
-import 'findAccount_screen.dart';
+import 'SignUpScreen.dart';
+import 'FindAccountScreen.dart';
 import '../ScreenMain.dart';
 import '../../SessionCookieManager.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../Mission/AchievementPanel_screen.dart'; // AchievementPanel 파일을 임포트
-import 'WeeklyCalendar_screen.dart';
-import '../Friends/FriendList_widget.dart';
-import 'MonthlyCalendar_screen.dart';
+import 'WeeklyCalendarScreen.dart';
+import '../Friends/FriendListWidget.dart';
+import 'MonthlyCalendarScreen.dart';
 import '../Community/LatestPosts.dart'; // 최신 게시글 위젯 임포트
 
 class HomeScreen extends StatefulWidget {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges; // Badge 패키지 임포트
 import 'dart:convert'; // JSON 파싱용
 import '../../SessionCookieManager.dart';
-import 'FriendSearch_screen.dart';
-import 'AddFriend_screen.dart';
+import 'FriendSearchScreen.dart';
+import 'AddFriendScreen.dart';
 import 'FriendRequestScreen.dart';
 import 'FriendClick.dart'; // 팝업 형태의 FriendClick 위젯
 

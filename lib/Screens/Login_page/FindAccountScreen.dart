@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'Login_screen.dart';
-import 'FindPassword_screen.dart';
+import 'LoginScreen.dart';
+import 'FindPasswordScreen.dart';
 
 class FindAccountScreen extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();

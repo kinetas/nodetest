@@ -21,11 +21,15 @@
         }
         .mission-item {
             display: flex;
+            flex-wrap: wrap; /* 버튼이 너무 길면 다음 줄로 이동 */
             align-items: center;
-            margin-bottom: 10px;
+            gap: 10px; /* 버튼 간격 조정 */
         }
-        button, input[type="file"] {
+        button {
             margin-left: 10px;
+        }
+        input[type="file"] {
+            margin-left: 5px;
         }
     </style>
 </head>

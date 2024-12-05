@@ -18,7 +18,7 @@ const CVote = sequelize.define('CVote', {
   },
   c_contents: {
     type: DataTypes.STRING(50),
-    allowNull: false,
+    allowNull: true,
   },
   c_good: {
     type: DataTypes.INTEGER,

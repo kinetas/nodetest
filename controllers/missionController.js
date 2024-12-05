@@ -846,6 +846,16 @@ exports.requestVoteForMission = async (req, res) => {
             return res.status(404).json({ success: false, message: '해당 미션을 찾을 수 없습니다.' });
         }
 
+        // ===== 추가된 기능: 미션 상태를 "요청"으로 변경 =====
+        const updated = await Mission.update(
+            { m_status: '요청' }, // 상태를 "요청"으로 변경
+            { where: { m_id } }  // m_id 조건으로 업데이트
+        );
+
+        if (updated[0] === 0) {
+            return res.status(400).json({ success: false, message: '미션 상태 변경에 실패했습니다.' });
+        }
+
         const { u1_id, m_title, m_deadline } = mission;
         const c_number = uuidv4(); // 고유 투표 번호 생성
         const c_deletedate = new Date(new Date(m_deadline).getTime() + 3 * 24 * 60 * 60 * 1000); // 마감일 + 3일

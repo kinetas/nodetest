@@ -240,11 +240,11 @@
             const m_deadline = document.getElementById('m_deadline').value;
             const m_reword = document.getElementById('m_reword').value;
 
-            // 필수 값 검증
-            if (!u2_id) {
-                document.getElementById('errorMessage').textContent = "받는 사용자 ID는 필수 항목입니다.";
-                return;
-            }
+            // // 필수 값 검증
+            // if (!u2_id) {
+            //     document.getElementById('errorMessage').textContent = "받는 사용자 ID는 필수 항목입니다.";
+            //     return;
+            // }
 
             // 서버로 데이터 전송
             fetch('/dashboard/missioncreate', {

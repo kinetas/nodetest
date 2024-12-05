@@ -772,7 +772,6 @@ exports.checkMissionDeadline = async () => {
 // ===================== 투표 요청 ===============================
 // exports.requestVoteForMission = async (req, res) => {
 //     const { m_id } = req.body;
-//     const c_image = req.file ? req.file.buffer : null; // 이미지 데이터
 
 //     if (!m_id) {
 //         return res.status(400).json({ success: false, message: '미션 ID가 누락되었습니다.' });
@@ -799,7 +798,7 @@ exports.checkMissionDeadline = async () => {
 //             c_good: 0,
 //             c_bad: 0,
 //             c_deletedate,
-//             c_image,
+//             c_image: null,
 //         });
 
 //         res.json({ success: true, message: '투표가 성공적으로 생성되었습니다.', vote: newVote });
@@ -809,8 +808,31 @@ exports.checkMissionDeadline = async () => {
 //     }
 // };
 
+// // 자신이 만든 미션 목록, 상태 : 진행중
+// exports.getRequestedSelfMissions = async (req, res) => {
+//     const userId = req.session.user.id; // 현재 로그인한 사용자 ID
+
+//     try {
+//         // 자신이 자기 자신에게 생성한 상태가 "진행중"인 미션 조회
+//         const missions = await Mission.findAll({
+//             where: {
+//                 u1_id: userId,
+//                 u2_id: userId,
+//                 m_status: '진행중', // 상태가 "진행중"인 미션만 필터링
+//             },
+//         });
+
+//         res.status(200).json({ missions });
+//     } catch (error) {
+//         console.error('자신에게 생성한 진행중 상태의 미션 조회 오류:', error);
+//         res.status(500).json({ message: '진행중 상태의 미션을 조회하는 중 오류가 발생했습니다.' });
+//     }
+// };
+
+
 exports.requestVoteForMission = async (req, res) => {
     const { m_id } = req.body;
+    const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리
 
     if (!m_id) {
         return res.status(400).json({ success: false, message: '미션 ID가 누락되었습니다.' });
@@ -837,33 +859,12 @@ exports.requestVoteForMission = async (req, res) => {
             c_good: 0,
             c_bad: 0,
             c_deletedate,
-            c_image: null,
+            c_image, // 사진 저장 (null일 수도 있음)
         });
 
         res.json({ success: true, message: '투표가 성공적으로 생성되었습니다.', vote: newVote });
     } catch (error) {
         console.error('투표 요청 중 오류:', error);
         res.status(500).json({ success: false, message: '투표 생성 중 오류가 발생했습니다.' });
-    }
-};
-
-// 자신이 만든 미션 목록, 상태 : 진행중
-exports.getRequestedSelfMissions = async (req, res) => {
-    const userId = req.session.user.id; // 현재 로그인한 사용자 ID
-
-    try {
-        // 자신이 자기 자신에게 생성한 상태가 "진행중"인 미션 조회
-        const missions = await Mission.findAll({
-            where: {
-                u1_id: userId,
-                u2_id: userId,
-                m_status: '진행중', // 상태가 "진행중"인 미션만 필터링
-            },
-        });
-
-        res.status(200).json({ missions });
-    } catch (error) {
-        console.error('자신에게 생성한 진행중 상태의 미션 조회 오류:', error);
-        res.status(500).json({ message: '진행중 상태의 미션을 조회하는 중 오류가 발생했습니다.' });
     }
 };

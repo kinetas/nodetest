@@ -23,11 +23,14 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 exports.createMission = async (req, res) => {
     const { u1_id, u2_id, m_title, m_deadline, m_reword } = req.body; 
     try {
+        // u2_id가 입력되지 않은 경우 u1_id와 동일하게 설정
+        const assignedU2Id = u2_id || u1_id;
+
         // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
         const room = await Room.findOne({
             where: {
                 u1_id,
-                u2_id
+                u2_id: assignedU2Id
             }
         });
 
@@ -42,7 +45,7 @@ exports.createMission = async (req, res) => {
         await Mission.create({
             m_id: missionId,
             u1_id,
-            u2_id,
+            u2_id: assignedU2Id,    // 입력받은 u2_id 또는 u1_id를 저장
             m_title,
             m_deadline,
             m_reword,

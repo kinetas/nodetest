@@ -215,7 +215,7 @@ exports.checkAndUpdateMissions = async () => {
                     await MResult.create({
                         m_id: mission.m_id,
                         u_id: mission.u2_id,
-                        m_deadline: mission.m_deadline,
+                        m_deadline: now,
                         m_status: '성공',
                     });
 
@@ -232,7 +232,7 @@ exports.checkAndUpdateMissions = async () => {
                     await MResult.create({
                         m_id: mission.m_id,
                         u_id: mission.u2_id,
-                        m_deadline: mission.m_deadline,
+                        m_deadline: now,
                         m_status: '실패',
                     });
 

@@ -221,7 +221,12 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 ID: ${mission.m_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                        listItem.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            마감일: ${mission.m_deadline}, 
+                            상태: ${mission.m_status} 
+                        `;
                         completedList.appendChild(listItem);
                     });
                 } else {
@@ -239,7 +244,12 @@
                 if (data.missions && data.missions.length > 0) {
                     data.missions.forEach(mission => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `미션 ID: ${mission.m_id}, 미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}`;
+                        listItem.textContent = `
+                            미션 ID: ${mission.m_id}, 
+                            미션 이름: ${mission.m_title}, 
+                            마감일: ${mission.m_deadline}, 
+                            상태: ${mission.m_status}
+                        `;
                         givenCompletedList.appendChild(listItem);
                     });
                 } else {

@@ -222,14 +222,31 @@ exports.getCompletedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
+        // 1. 완료한 미션 가져오기
         const completedMissions = await Mission.findAll({
             where: {
                 u2_id: userId,
-                m_status: '완료', // "완료" 상태의 미션만
+                m_status: '완료',
             },
         });
 
-        res.json({ missions: completedMissions });
+        // 2. 각 미션에 대해 m_result 테이블에서 m_status 가져오기
+        const missionsWithStatus = await Promise.all(
+            completedMissions.map(async (mission) => {
+                const result = await MResult.findOne({
+                    where: { m_id: mission.m_id, u_id: userId },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                };
+            })
+        );
+
+        res.json({ missions: missionsWithStatus });
     } catch (error) {
         console.error('Completed missions error:', error);
         res.status(500).json({ message: 'Completed missions fetch failed.' });
@@ -242,15 +259,31 @@ exports.getGivenCompletedMissions = async (req, res) => {
     try {
         const userId = req.session.user.id;
 
+        // 1. 부여한 완료된 미션 가져오기
         const givenCompletedMissions = await Mission.findAll({
             where: {
                 u1_id: userId,
-                u2_id: { [Op.ne]: userId }, // 상대방이 수행한 미션만
-                m_status: '완료', // "완료" 상태의 미션만
+                m_status: '완료',
             },
         });
 
-        res.json({ missions: givenCompletedMissions });
+        // 2. 각 미션에 대해 m_result 테이블에서 m_status 가져오기
+        const missionsWithStatus = await Promise.all(
+            givenCompletedMissions.map(async (mission) => {
+                const result = await MResult.findOne({
+                    where: { m_id: mission.m_id, u_id: mission.u2_id },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                };
+            })
+        );
+
+        res.json({ missions: missionsWithStatus });
     } catch (error) {
         console.error('Given completed missions error:', error);
         res.status(500).json({ message: 'Given completed missions fetch failed.' });

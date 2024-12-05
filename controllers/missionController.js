@@ -820,7 +820,8 @@ exports.requestVoteForMission = async (req, res) => {
         }
 
         const { u1_id, m_title, m_deadline } = mission;
-        const c_number = uuidv4(); // 고유 투표 번호 생성
+        // const c_number = uuidv4(); // 고유 투표 번호 생성
+        const c_number = m_id;
         const c_deletedate = new Date(new Date(m_deadline).getTime() + 3 * 24 * 60 * 60 * 1000); // 마감일 + 3일
 
         // 투표 생성

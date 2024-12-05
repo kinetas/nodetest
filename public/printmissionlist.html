@@ -21,15 +21,14 @@
         }
         .mission-item {
             display: flex;
-            flex-wrap: wrap; /* 버튼이 너무 길면 다음 줄로 이동 */
-            align-items: center;
-            gap: 10px; /* 버튼 간격 조정 */
+            flex-direction: column; /* 수직 정렬 */
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
-        button {
-            margin-left: 10px;
-        }
-        input[type="file"] {
-            margin-left: 5px;
+        .mission-buttons {
+            display: flex;
+            gap: 10px; /* 버튼 간 간격 */
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -113,9 +112,11 @@
                         const item = document.createElement('li');
                         item.className = "mission-item"; // 스타일 적용
                         item.innerHTML = `
-                            미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}
-                            <input type="file" id="file-${mission.m_id}" accept="image/*">
-                            <button onclick="requestVote('${mission.m_id}')">투표 요청</button>
+                            <span>미션 이름: ${mission.m_title}, 마감일: ${mission.m_deadline}</span>
+                            <div class="mission-buttons">
+                                <input type="file" id="file-${mission.m_id}" accept="image/*">
+                                <button onclick="requestVote('${mission.m_id}')">투표 요청</button>
+                            </div>
                         `;
                         list.appendChild(item);
                     });

@@ -846,6 +846,10 @@ exports.requestVoteForMission = async (req, res) => {
             return res.status(404).json({ success: false, message: '해당 미션을 찾을 수 없습니다.' });
         }
 
+        await mission.update({
+            m_status: '요청',
+        });
+
         const { u1_id, m_title, m_deadline } = mission;
         const c_number = uuidv4(); // 고유 투표 번호 생성
         const c_deletedate = new Date(new Date(m_deadline).getTime() + 3 * 24 * 60 * 60 * 1000); // 마감일 + 3일

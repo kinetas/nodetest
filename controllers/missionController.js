@@ -384,7 +384,7 @@ exports.getFriendAssignedMissions = async (req, res) => {
         const missions = await Mission.findAll({
             where: {
                 u2_id: { [Op.in]: friendIds },
-                u1_id: { [Op.eq]: userId }, // 로그인한 사용자가 생성한 미션
+                // u1_id: { [Op.eq]: userId }, // 로그인한 사용자가 생성한 미션
                 m_status: '진행중', // 상태가 '진행중'인 미션
             },
         });

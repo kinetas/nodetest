@@ -102,7 +102,10 @@ const upload = multer({ storage });
 //   });
 // });
 
-
+function toKST(date) {
+  const utcDate = new Date(date); // UTC 기준으로 생성된 날짜
+  return new Date(utcDate.getTime() + 9 * 60 * 60 * 1000); // UTC+9로 변환
+}
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력

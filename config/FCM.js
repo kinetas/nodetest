@@ -2,7 +2,7 @@ const admin = require('firebase-admin');
 const path = require('path');
 
 // Firebase Admin SDK 초기화
-const serviceAccountPath = path.join(__dirname, 'firebase-adminsdk.json');
+const serviceAccountPath = path.join(__dirname, '../firebase-adminsdk.json');
 
 try {
     if (!admin.apps.length) { // 중복 초기화 방지

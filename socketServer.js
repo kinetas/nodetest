@@ -178,12 +178,13 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null
   });
 } catch (error) {
-  console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력
-   // Sequelize의 validation errors를 상세히 출력
-    if (error.name === 'SequelizeValidationError') {
+  console.error('DB 저장 오류:', error); // DB 저장 실패 시 에러 로그 출력
+  if (error.name === 'SequelizeValidationError') {
     error.errors.forEach((err) => {
       console.error(`Validation Error - Field: ${err.path}, Message: ${err.message}`);
     });
+  } else {
+    console.error('오류 종류:', error.name); // 다른 유형의 오류도 확인할 수 있도록 처리합니다.
   }
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
 }

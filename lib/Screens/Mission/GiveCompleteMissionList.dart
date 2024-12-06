@@ -66,13 +66,10 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('상대방이 완료한 미션'),
-      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : completedMissions.isEmpty
-          ? Center(child: Text('상대방이 완료한 미션이 없습니다.'))
+          ? Center(child: Text('완료된 미션이 없습니다.'))
           : ListView.builder(
         itemCount: completedMissions.length,
         itemBuilder: (context, index) {

@@ -44,15 +44,16 @@ class _AchievementPanelState extends State<AchievementPanel> {
     });
 
     try {
-      Map<String, String> urls = {
-        '일일': 'http://54.180.54.31:3000/result/daily',
-        '주간': 'http://54.180.54.31:3000/result/weekly',
-        '월간': 'http://54.180.54.31:3000/result/monthly',
-        '연간': 'http://54.180.54.31:3000/result/yearly',
+      // URL 및 파라미터 매핑
+      Map<String, Map<String, String>> urlsAndKeys = {
+        '일일': {'url': 'http://54.180.54.31:3000/result/daily', 'key': 'dailyRate'},
+        '주간': {'url': 'http://54.180.54.31:3000/result/weekly', 'key': 'weeklyRate'},
+        '월간': {'url': 'http://54.180.54.31:3000/result/monthly', 'key': 'monthlyRate'},
+        '연간': {'url': 'http://54.180.54.31:3000/result/yearly', 'key': 'yearlyRate'},
       };
 
       for (var period in achievementPeriods) {
-        final response = await SessionCookieManager.get(urls[period]!);
+        final response = await SessionCookieManager.get(urlsAndKeys[period]!['url']!);
 
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -61,7 +62,7 @@ class _AchievementPanelState extends State<AchievementPanel> {
           print('[$period] 응답 데이터: $responseData');
 
           setState(() {
-            achievementRates[period] = responseData['rate']?.toDouble() ?? 0.0;
+            achievementRates[period] = responseData[urlsAndKeys[period]!['key']]?.toDouble() ?? 0.0;
           });
         } else {
           print('[$period] 데이터 가져오기 실패: ${response.statusCode}');

@@ -69,14 +69,26 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
             TextField(
               controller: deadlineController,
               decoration: InputDecoration(labelText: '미션 기한'),
+              readOnly: true,
               onTap: () async {
-                final selectedTime = await Navigator.push(
+                final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => TimeSettingScreen()),
+                  MaterialPageRoute(builder: (context) => TimeSettingScreen()),
                 );
-                if (selectedTime != null) {
-                  deadlineController.text = selectedTime;
+                if (result != null) {
+                  setState(() {
+                    final DateTime date = result['selectedDate'];
+                    final int hour = result['selectedHour'];
+                    final int minute = result['selectedMinute'];
+                    final bool isAllDay = result['isAllDay'];
+
+                    // "종일" 선택 시와 특정 시간 선택 시 출력 형식
+                    if (isAllDay) {
+                      deadlineController.text = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} 종일";
+                    } else {
+                      deadlineController.text = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} ${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+                    }
+                  });
                 }
               },
             ),

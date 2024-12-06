@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'MissionCreateScreen.dart';
+import 'CreateMissionScreen.dart';
 import 'AchievementPanel_screen.dart';
 import 'MyMissionList.dart';
 import 'MyCompleteMissionList.dart';
@@ -25,85 +25,74 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
     super.dispose();
   }
 
+  void _showAchievementPanel() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return AchievementPanel(
+          onClose: () {
+            Navigator.pop(context);
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            title: Text('미션 목록'),
-            actions: [
-              TextButton(
-                onPressed: () {},
-                child: Text('추천', style: TextStyle(color: Colors.black)),
-              ),
-              IconButton(
-                icon: Icon(Icons.send), // 비행기 모양 버튼
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OtherMission(), // OtherMission 화면으로 이동
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MissionCreateScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-            bottom: TabBar(
-              controller: _tabController,
-              tabs: [
-                Tab(text: '내 미션'), // 1번 탭
-                Tab(text: '완료한 미션'), // 2번 탭
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('미션 목록'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // 추천 기능 동작
+            },
+            child: Text('추천', style: TextStyle(color: Colors.black)),
           ),
-          body: TabBarView(
-            controller: _tabController,
-            children: [
-              MyMissionList(), // 내 미션 리스트 (1번 탭)
-              MyCompleteMissionList(), // 완료한 미션 리스트 (2번 탭)
-            ],
+          IconButton(
+            icon: Icon(Icons.bar_chart), // 달성률 아이콘 추가
+            onPressed: _showAchievementPanel,
+            tooltip: '달성률 보기',
           ),
-          bottomNavigationBar: BottomAppBar(
-            child: IconButton(
-              icon: Icon(Icons.bar_chart),
-              onPressed: () {
-                // missionProvider.toggleAchievementPanel();
-              },
-              tooltip: '달성률 보기',
-            ),
+          IconButton(
+            icon: Icon(Icons.send), // 비행기 모양 버튼
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OtherMission(), // OtherMission 화면으로 이동
+                ),
+              );
+            },
           ),
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MissionCreateScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(text: '내 미션'), // 1번 탭
+            Tab(text: '완료한 미션'), // 2번 탭
+          ],
         ),
-
-        // 달성률 패널 처리
-        // if (missionProvider.isAchievementPanelOpen)
-        //   GestureDetector(
-        //     onTap: missionProvider.toggleAchievementPanel,
-        //     child: Container(
-        //       color: Colors.black.withOpacity(0.5),
-        //     ),
-        //   ),
-        // if (missionProvider.isAchievementPanelOpen)
-        //   Align(
-        //     alignment: Alignment.bottomCenter,
-        //     child: AchievementPanel(
-        //       onClose: missionProvider.toggleAchievementPanel,
-        //     ),
-        //   ),
-
-      ],
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          MyMissionList(), // 내 미션 리스트 (1번 탭)
+          MyCompleteMissionList(), // 완료한 미션 리스트 (2번 탭)
+        ],
+      ),
     );
   }
 }

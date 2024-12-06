@@ -35,11 +35,15 @@ class _GiveMissionListState extends State<GiveMissionList> {
           missions = (responseData['missions'] as List<dynamic>).map((mission) {
             return {
               'm_id': mission['m_id'] ?? 'No ID',
+              'u1_id': mission['u1_id'] ?? 'No Creator ID',
+              'u2_id': mission['u2_id'] ?? 'No Assignee ID',
               'm_title': mission['m_title'] ?? 'No Title',
               'm_deadline': mission['m_deadline'] ?? 'No Deadline',
+              'm_reword': mission['m_reword'] ?? 'No Reward',
               'm_status': mission['m_status'] ?? 'No Status',
               'r_id': mission['r_id'] ?? 'No Room ID',
-              'r_title': mission['r_title'] ?? 'No Room Title',
+              'm_extended': mission['m_extended'] ?? 'No Extension Info',
+              'missionAuthenticationAuthority': mission['missionAuthenticationAuthority'] ?? 'No Authority',
             };
           }).toList();
           isLoading = false;
@@ -62,9 +66,6 @@ class _GiveMissionListState extends State<GiveMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('부여한 미션 목록'),
-      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : missions.isEmpty
@@ -85,8 +86,12 @@ class _GiveMissionListState extends State<GiveMissionList> {
                 children: [
                   Text('마감일: ${formatDate(mission['m_deadline'])}'),
                   Text('상태: ${mission['m_status']}'),
+                  Text('보상: ${mission['m_reword']}'),
                   Text('방 ID: ${mission['r_id']}'),
-                  Text('방 제목: ${mission['r_title']}'),
+                  Text('연장 여부: ${mission['m_extended']}'),
+                  Text('인증 권한자: ${mission['missionAuthenticationAuthority']}'),
+                  Text('생성자 ID: ${mission['u1_id']}'),
+                  Text('수행자 ID: ${mission['u2_id']}'),
                 ],
               ),
             ),

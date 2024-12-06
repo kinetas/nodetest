@@ -38,6 +38,8 @@ class _MyMissionListState extends State<MyMissionList> {
               'm_status': item['m_status'] ?? 'No Status',
               'r_id': item['r_id'] ?? 'No Room ID',
               'r_title': item['r_title'] ?? 'No Room Title',
+              'u1_id': item['u1_id'] ?? 'No Creator',
+              'u2_id': item['u2_id'] ?? 'No Assignee',
             };
           }).toList();
           isLoading = false;
@@ -59,9 +61,6 @@ class _MyMissionListState extends State<MyMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('미션 목록'),
-      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : missions.isEmpty
@@ -80,6 +79,8 @@ class _MyMissionListState extends State<MyMissionList> {
                   Text('Deadline: ${mission['m_deadline']}'),
                   Text('Status: ${mission['m_status']}'),
                   Text('Room: ${mission['r_title']}'),
+                  Text('Creator: ${mission['u1_id']}'),
+                  Text('Assignee: ${mission['u2_id']}'),
                 ],
               ),
             ),

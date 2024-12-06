@@ -28,21 +28,13 @@ exports.createMission = async (req, res) => {
 
     try {
 
-        // // 인증 권한 확인
-        // let missionAuthenticationAuthority = authenticationAuthority || u1_id;
-
-        // if (missionAuthenticationAuthority !== u1_id) {
-        //     const isFriend = await IFriend.findOne({
-        //         where: { u_id: u1_id, f_id: missionAuthenticationAuthority },
-        //     });
-
-        //     if (!isFriend) {
-        //         return res.status(400).json({ success: false, message: '인증 권한 사용자 ID가 친구 목록에 없습니다.' });
-        //     }
-        // }
-
-        // // u2_id가 입력되지 않은 경우 u1_id와 동일하게 설정
-        // const assignedU2Id = u2_id || u1_id;
+        // 마감기한이 입력되지 않은 경우 에러 반환
+        if (!m_deadline) {
+            return res.status(400).json({
+                success: false,
+                message: '미션 마감기한을 입력해야 합니다.',
+            });
+        }
 
         const assignedU2Id = u2_id || u1_id;
 
@@ -94,7 +86,7 @@ exports.createMission = async (req, res) => {
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
             // 다른 사용자에게 미션 생성 시
-            if (authenticationAuthority) {
+            if (authenticationAuthority && authenticationAuthority !== u1_id) {
                 return res.status(400).json({
                     success: false,
                     message: '다른 사용자에게 미션 생성 시 인증 권한자를 입력할 수 없습니다.',

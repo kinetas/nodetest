@@ -112,6 +112,14 @@ jobs:
         echo "Generated firebase-adminsdk.json:"
         cat firebase-adminsdk.json
       shell: bash
+
+    - name: Debug Firebase JSON creation
+      run: |
+        echo "Raw secret:"
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+        echo "Processed JSON:"
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | sed 's/\\n/\n/g'
+      shell: bash
     
     # Copy .env to EC2
     - name: Copy .env to EC2

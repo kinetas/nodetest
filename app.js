@@ -201,7 +201,7 @@ cron.schedule('0 0 * * *', async () => {
 // app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
 // app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
-const { sendNotificationController } = require('./controllers/notificationController');
+const { sendNotificationController } = require('./controllers/sendNotification');
 
 
 // FCM ?���?? ?��?�� API ?��?��?��?��?��

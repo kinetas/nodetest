@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-const admin = require('firebase');
+const admin = require('firebase-admin');
 
 dotenv.config();
 ////

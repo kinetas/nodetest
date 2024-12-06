@@ -87,13 +87,14 @@ exports.createMission = async (req, res) => {
                 m_reword,
                 m_status: stat,
                 r_id: room.r_id, // Room ID를 저장
+                m_extended: false,
                 missionAuthenticationAuthority,
             });
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
             // 다른 사용자에게 미션 생성 시
-            if (authenticationAuthority) {
+            if (authenticationAuthority !== u1_id) {
                 return res.status(400).json({
                     success: false,
                     message: '다른 사용자에게 미션 생성 시 인증 권한자를 입력할 수 없습니다.',
@@ -124,7 +125,8 @@ exports.createMission = async (req, res) => {
                 m_reword,
                 m_status: stat,
                 r_id: room.r_id, // Room ID를 저장
-                missionAuthenticationAuthority,
+                m_extended: false,
+                missionAuthenticationAuthority: missionId,
             });
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });

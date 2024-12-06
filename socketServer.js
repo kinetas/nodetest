@@ -168,13 +168,13 @@ try {
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+    send_date: toKST(newMessage.send_date).toISOString().slice(0, 19).replace('T', ' '),
     image: fileBuffer ? fileBuffer.toString('base64') : null // Base64로 인코딩하여 클라이언트에 전송
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+    send_date: toKST(newMessage.send_date).toISOString().slice(0, 19).replace('T', ' '),
     image: fileBuffer ? fileBuffer.toString('base64') : null
   });
 } catch (error) {

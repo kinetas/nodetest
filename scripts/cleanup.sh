@@ -1,3 +1,4 @@
 #!/bin/bash
-# ±âÁ¸ ÆÄÀÏ »èÁ¦
-rm -rf /home/ubuntu/nodetest/*
+# ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+# rm -rf /home/ubuntu/nodetest/*
+find /home/ubuntu/nodetest/ -mindepth 1 ! -name "firebase-adminsdk.json" -exec rm -rf {} +

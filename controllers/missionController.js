@@ -792,7 +792,7 @@ exports.getRequestedSelfMissions = async (req, res) => {
     }
 };
 
-
+// 개인 미션을 투표에 업로드
 exports.requestVoteForMission = async (req, res) => {
     const { m_id } = req.body;
     const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리

@@ -1,5 +1,5 @@
 const express = require('express');
-const session = require('express-session'); //ï¿½ê½­ï¿½ï¿½?ï¿½ç•°ë¶½ï¿½ï¿??
+const session = require('express-session'); //ï¿½ê½­ï¿½ï¿½?ï¿½ç•°ë¶½ï¿½ï¿???
 const cron = require('node-cron');
 const path = require('path');
 const chatRoutes = require('./routes/chatRoutes');
@@ -17,12 +17,12 @@ const { checkAndUpdateMissions } = require('./controllers/cVoteController');
 
 
 const db = require('./config/db');
-const { Room, Mission } = require('./models/relations'); // ê´?ê³? ?„¤? • ë¶ˆëŸ¬?˜¤ê¸?
+const { Room, Mission } = require('./models/relations'); // ï¿??ï¿?? ?ï¿½ï¿½?ï¿½ï¿½ ë¶ˆëŸ¬?ï¿½ï¿½ï¿??
 
 const app = express();
 const PORT = 3000;
 const roomController = require('./controllers/roomController');
-//=====================ì¶”ê??========================
+//=====================ì¶”ï¿½??========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 // // ======== ?ï¿½ï¿½?ï¿½ï¿½ JWT ============
@@ -30,7 +30,7 @@ const jwt = require('jsonwebtoken'); // JWT ì¶”ï¿½??
 // const requireAuth = require('./middleware/authMiddleware');
 
 const cors = require('cors');
-app.use(cors());  // ëª¨ë“  ì¶œì²˜?ï¿½ï¿½ ?ï¿½ï¿½ï¿???ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½
+app.use(cors());  // ëª¨ë“  ì¶œì²˜?ï¿½ï¿½ ?ï¿½ï¿½ï¿????ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½
 
 app.use(express.json()); // JSON ï¿½ë™†ï¿½ë–›ï¿½ì“£ ï¿½ìï¿½ë¸³ èª˜ëªƒë±¾ï¿½?ï¿½ï¿½ï¿½ë¼± ï¿½ê½•ï¿½ì ™
 app.use(express.urlencoded({ extended: true })); // URL ï¿½ì”¤?ï¿½ï¿½ë¶¾ëµ«ï¿½ë§‚ ï¿½ëœ²ï¿½ì” ï¿½ê½£ ï¿½ë™†ï¿½ë–›ï¿½ì“£ ï¿½ìï¿½ë¸³ èª˜ëªƒë±¾ï¿½?ï¿½ï¿½ï¿½ë¼± ï¿½ê½•ï¿½ì ™
@@ -38,21 +38,21 @@ app.use(express.urlencoded({ extended: true })); // URL ï¿½ì”¤?ï¿½ï¿½ë¶¾ëµ«ï¿½ë§
 // ï¿½ê½­ï¿½ï¿½?? ï¿½ê½•ï¿½ì ™
 app.use(session({
     secret: 'your_secret_key', // ï¿½ê½­ï¿½ï¿½?? ï¿½ë¸«ï¿½ìƒ‡ï¿½ì†•ï¿½ë¿‰ ï¿½ê¶—ï¿½ìŠœï¿½ë¸· ï¿½ê¶
-    resave: false, // ï¿½ê½­ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ï¿½ë¹†ï¿½ê¸½ ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ë¸·ï§ï¿½ ï¿½ë¿¬?ï¿½ï¿½ï¿??
-    saveUninitialized: false, // ?ï¿½ï¿½?ï¿½ï¿½ë¦°ï¿½?ï¿½ï¿½ï¿½ë¦ºï§ï¿½ ï¿½ë¸¡ï¿½ï¿½ï¿?? ï¿½ê½­ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ë¸·ï§ï¿½ ï¿½ë¿¬?ï¿½ï¿½ï¿??
+    resave: false, // ï¿½ê½­ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ï¿½ë¹†ï¿½ê¸½ ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ë¸·ï§ï¿½ ï¿½ë¿¬?ï¿½ï¿½ï¿???
+    saveUninitialized: false, // ?ï¿½ï¿½?ï¿½ï¿½ë¦°ï¿½?ï¿½ï¿½ï¿½ë¦ºï§ï¿½ ï¿½ë¸¡ï¿½ï¿½ï¿??? ï¿½ê½­ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ë¸·ï§ï¿½ ï¿½ë¿¬?ï¿½ï¿½ï¿???
     // store: new SequelizeStore({
-    //     db: sequelize, // Sequelize ?¸?Š¤?„´?Š¤??? ?—°ê²?
+    //     db: sequelize, // Sequelize ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½??? ?ï¿½ï¿½ï¿??
     // }),
     // cookie: {
-    //     maxAge: 24 * 60 * 60 * 1000, // 1?¼
+    //     maxAge: 24 * 60 * 60 * 1000, // 1?ï¿½ï¿½
     //     httpOnly: true,
-    //     secure: false, // HTTPS ?‚¬?š© ?‹œ trueë¡? ?„¤? •
+    //     secure: false, // HTTPS ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ trueï¿?? ?ï¿½ï¿½?ï¿½ï¿½
     // }
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?ï¿½ï¿½ì¢ê¶ï¿½ì“½ ï¿½ï¿½??ï¿½ìŠš æ¹²ê³Œï¿?? (ï¿½ë¿¬æ¹²ê³—ê½Œï¿½?ï¿½ï¿½ ï¿½ë¸¯?ï¿½ï¿½ï¿??)
+    cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?ï¿½ï¿½ì¢ê¶ï¿½ì“½ ï¿½ï¿½??ï¿½ìŠš æ¹²ê³Œï¿??? (ï¿½ë¿¬æ¹²ê³—ê½Œï¿½?ï¿½ï¿½ ï¿½ë¸¯?ï¿½ï¿½ï¿???)
 }));
 
 // // ======== ?ï¿½ï¿½?ï¿½ï¿½ JWT ============
-// // JSON ?ï¿½ï¿½?ï¿½ï¿½ï¿?? URL ?ï¿½ï¿½ì½”ë”© ?ï¿½ï¿½?ï¿½ï¿½
+// // JSON ?ï¿½ï¿½?ï¿½ï¿½ï¿??? URL ?ï¿½ï¿½ì½”ë”© ?ï¿½ï¿½?ï¿½ï¿½
 // app.use(cors());
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
@@ -61,10 +61,10 @@ app.use(session({
 app.use(express.static('public'));
 
 
-// ë©”ì‹œï¿?? ????ï¿½ï¿½?ï¿½ï¿½ ì²˜ë¦¬?ï¿½ï¿½?ï¿½ï¿½ API ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ì¶”ï¿½??
+// ë©”ì‹œï¿??? ????ï¿½ï¿½?ï¿½ï¿½ ì²˜ë¦¬?ï¿½ï¿½?ï¿½ï¿½ API ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ì¶”ï¿½??
 app.post('/api/messages', (req, res) => {
     const { u1_id, u2_id, r_id, message_contents } = req.body;})
-   /* // DB?ï¿½ï¿½ ë©”ì‹œï¿?? ????ï¿½ï¿½ ë¡œì§ ì¶”ï¿½??
+   /* // DB?ï¿½ï¿½ ë©”ì‹œï¿??? ????ï¿½ï¿½ ë¡œì§ ì¶”ï¿½??
     if (!u1_id || !u2_id || !r_id || !message_contents) {
         console.error('Missing required fields:', { u1_id, u2_id, r_id, message_contents});
         return res.status(400).json({ message: '?ï¿½ï¿½?ï¿½ï¿½ ê°’ì´ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½.' });
@@ -79,7 +79,7 @@ app.post('/api/messages', (req, res) => {
                 return res.status(500).json({ message: 'Failed to save message' });
             }
 
-            // DB?ï¿½ï¿½ ?ï¿½ï¿½ê³µì ?ï¿½ï¿½ï¿?? ????ï¿½ï¿½?ï¿½ï¿½ ê²½ìš°
+            // DB?ï¿½ï¿½ ?ï¿½ï¿½ê³µì ?ï¿½ï¿½ï¿??? ????ï¿½ï¿½?ï¿½ï¿½ ê²½ìš°
             res.json({
                 //r_id: r_id,
                 message_contents: message_contents,
@@ -104,17 +104,17 @@ const requireAuth = (req, res, next) => {
 
 
 
-// ï¿½ì‚ï¿½ë–†: ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½è¹‚ï¿½??ï¿?? ï¿½ì”ªï¿½ìŠ¦ï¿½ë“ƒ è¹‚ëŒ„?ï¿½ï¿½
+// ï¿½ì‚ï¿½ë–†: ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½è¹‚ï¿½??ï¿??? ï¿½ì”ªï¿½ìŠ¦ï¿½ë“ƒ è¹‚ëŒ„?ï¿½ï¿½
 app.get('/dashboard', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
     // const userId = req.session.user.id;
     // res.json({ userId });
 });
 app.get('/community_missions', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'community_missions.html')); // community-missions.html ?ï¿½ï¿½?ï¿½ï¿½ï¿?? ê²½ë¡œ
+    res.sendFile(path.join(__dirname, 'public', 'community_missions.html')); // community-missions.html ?ï¿½ï¿½?ï¿½ï¿½ï¿??? ê²½ë¡œ
 });
 
-// ï¿½ï¿½??ï¿½ï¿½ï¿?? ï¿½ì ™è¹‚ï¿½??ï¿½ï¿½ è«›ì„‘?ï¿½ï¿½ï¿½ë¸¯ï¿½ë’— ï¿½ì”ªï¿½ìŠ¦ï¿½ë“ƒ ?ï¿½ï¿½ë¶½ï¿½ï¿??
+// ï¿½ï¿½??ï¿½ï¿½ï¿??? ï¿½ì ™è¹‚ï¿½??ï¿½ï¿½ è«›ì„‘?ï¿½ï¿½ï¿½ë¸¯ï¿½ë’— ï¿½ì”ªï¿½ìŠ¦ï¿½ë“ƒ ?ï¿½ï¿½ë¶½ï¿½ï¿???
 app.get('/user-info', requireAuth, (req, res) => {
     res.json({ userId: req.session.user.id });
 });
@@ -127,7 +127,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html')); // ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½è¹‚ï¿½??ï¿?? HTML ï¿½ë™†ï¿½ì”ª
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html')); // ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½è¹‚ï¿½??ï¿??? HTML ï¿½ë™†ï¿½ì”ª
 });
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html')); // ï¿½ì‰¶ï¿½ìåª›ï¿½ï¿½ì—¯ HTML ï¿½ë™†ï¿½ì”ª
@@ -137,13 +137,13 @@ app.get('/rooms', (req, res) => {
 });
 
 app.get('/findinfo', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½/ë¹„ï¿½??ë²ˆí˜¸ ì°¾ê¸° ?ï¿½ï¿½?ï¿½ï¿½ï¿??
+    res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½/ë¹„ï¿½??ë²ˆí˜¸ ì°¾ê¸° ?ï¿½ï¿½?ï¿½ï¿½ï¿???
 });
 app.get('/cVote', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
 });
 app.get('/chat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'chat.html')); //ì±„íŒ… ?ï¿½ï¿½?ï¿½ï¿½ï¿??
+    res.sendFile(path.join(__dirname, 'public', 'chat.html')); //ì±„íŒ… ?ï¿½ï¿½?ï¿½ï¿½ï¿???
 });
 
 app.get('/result', (req, res) => {
@@ -161,42 +161,42 @@ app.use('/chat', chatRoutes);
 
 app.use('/api/auth', authRoutes);
 
-app.use('/dashboard', missionRoutes); // èª˜ëª„??? ï¿½ì”ªï¿½ìŠ¦ï¿½ë“ƒ?ï¿½ï¿½ï¿?? /dashboardæ¿¡ï¿½ ï¿½ê½•ï¿½ì ™
+app.use('/dashboard', missionRoutes); // èª˜ëª„??? ï¿½ì”ªï¿½ìŠ¦ï¿½ë“ƒ?ï¿½ï¿½ï¿??? /dashboardæ¿¡ï¿½ ï¿½ê½•ï¿½ì ™
 app.use('/api/rooms', roomRoutes);
 
-app.use('/api/missions', missionRoutes); // ë¯¸ì…˜ ï¿???ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿??
+app.use('/api/missions', missionRoutes); // ë¯¸ì…˜ ï¿????ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿???
 
-app.use('/result', resultRoutes); // '/result' ê²½ë¡œ?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿??
+app.use('/result', resultRoutes); // '/result' ê²½ë¡œ?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½ï¿???
 
-// userInfoRoutes ?“±ë¡?
+// userInfoRoutes ?ï¿½ï¿½ï¿??
 app.use('/api/user-info', userInfoRoutes);
 
 // ì¹œêµ¬ ë¦¬ìŠ¤?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ì¶”ï¿½??
 app.use('/dashboard/friends', friendRoutes);
 app.use('/api/cVote', cVoteRoutes);
 app.use('/api/comumunity_missions', c_missionRoutes);
-// cron.schedule('* * * * *', () => { // ë§? ë¶? ?‹¤?–‰ 
+// cron.schedule('* * * * *', () => { // ï¿?? ï¿?? ?ï¿½ï¿½?ï¿½ï¿½ 
 cron.schedule('0 0 * * *', () => {
-    console.log('ë¯¸ì…˜ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ï¿?? ì²˜ë¦¬ ?ï¿½ï¿½?ï¿½ï¿½');
+    console.log('ë¯¸ì…˜ ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½ ï¿??? ì²˜ë¦¬ ?ï¿½ï¿½?ï¿½ï¿½');
     checkMissionStatus();
 });
 
 
 /*
-// ë¯¸ì…˜ ë§ˆê°ê¸°í•œ ?™•?¸ (ë§? ë¶„ë§ˆ?‹¤ ?‹¤?–‰)
-cron.schedule('* * * * *', () => { // ë§? ë¶? ?‹¤?–‰
+// ë¯¸ì…˜ ë§ˆê°ê¸°í•œ ?ï¿½ï¿½?ï¿½ï¿½ (ï¿?? ë¶„ë§ˆ?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½)
+cron.schedule('* * * * *', () => { // ï¿?? ï¿?? ?ï¿½ï¿½?ï¿½ï¿½
 */
-// // ë¯¸ì…˜ ë§ˆê°ê¸°í•œ ?™•?¸ (ë§¤ì¼ ë§ˆë‹¤ ?‹¤?–‰)
- cron.schedule('0 0 * * *', () => { // ë§¤ì¼ ?‹¤?–‰
-    console.log('ë§ˆê° ê¸°í•œ ?™•?¸ ë°? ?ƒ?ƒœ ?—…?°?´?Š¸ ?‹¤?–‰');
+// // ë¯¸ì…˜ ë§ˆê°ê¸°í•œ ?ï¿½ï¿½?ï¿½ï¿½ (ë§¤ì¼ ë§ˆë‹¤ ?ï¿½ï¿½?ï¿½ï¿½)
+ cron.schedule('0 0 * * *', () => { // ë§¤ì¼ ?ï¿½ï¿½?ï¿½ï¿½
+    console.log('ë§ˆê° ê¸°í•œ ?ï¿½ï¿½?ï¿½ï¿½ ï¿?? ?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½');
     checkMissionDeadline();
 });
 cron.schedule('0 0 * * *', async () => {
-    console.log('¸ÅÀÏ ÀÚÁ¤ Á¤±â ÀÛ¾÷ ½ÃÀÛ');
+    console.log('ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Û¾ï¿½ ï¿½ï¿½ï¿½ï¿½');
     await checkAndUpdateMissions();
 });
 // // ======== ?ï¿½ï¿½?ï¿½ï¿½ JWT ============
-// // JWT ?ï¿½ï¿½ï¿?? ë¯¸ë“¤?ï¿½ï¿½?ï¿½ï¿½ï¿?? ë³´í˜¸?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
+// // JWT ?ï¿½ï¿½ï¿??? ë¯¸ë“¤?ï¿½ï¿½?ï¿½ï¿½ï¿??? ë³´í˜¸?ï¿½ï¿½ ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 // app.use('/dashboard', require('./middleware/authMiddleware'), missionRoutes);
 // app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
 // app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
@@ -204,7 +204,7 @@ cron.schedule('0 0 * * *', async () => {
 const { sendNotificationController } = require('./controllers/notificationController');
 
 
-// FCM ?•Œë¦? ? „?†¡ API ?—”?“œ?¬?¸?Š¸
+// FCM ?ï¿½ï¿½ï¿?? ?ï¿½ï¿½?ï¿½ï¿½ API ?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½?ï¿½ï¿½
 app.post('/api/send-notification', sendNotificationController);
 
 

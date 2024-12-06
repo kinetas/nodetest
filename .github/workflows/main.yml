@@ -122,7 +122,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i my-key.pem ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }} \
         "ls ~/nodetest/firebase-adminsdk.json && echo 'File exists on EC2' || echo 'File missing on EC2'"
         rm my-key.pem  # 키 파일을 삭제하여 보안 유지
-        rm firebase-adminsdk.json  # 로컬 JSON 파일 삭제
+        # rm firebase-adminsdk.json  # 로컬 JSON 파일 삭제
 
     # Deploy to AWS EC2 from S3
     - name: Deploy to AWS EC2 from S3

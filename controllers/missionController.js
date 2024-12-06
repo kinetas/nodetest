@@ -36,6 +36,15 @@ exports.createMission = async (req, res) => {
             });
         }
 
+        // 마감기한이 과거인 경우 에러 반환
+        const now = new Date();
+        if (new Date(m_deadline) < now) {
+            return res.status(400).json({
+                success: false,
+                message: '미션 마감기한은 현재 시간보다 이후여야 합니다.',
+            });
+        }
+
         const assignedU2Id = u2_id || u1_id;
 
         if (assignedU2Id === u1_id) {

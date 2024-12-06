@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저
+import 'StartLogin_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -217,7 +218,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context); // 다이얼로그 닫기
-              Navigator.pushReplacementNamed(context, '/startLogin'); // StartLogin 화면으로 이동
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => StartLoginScreen()),
+              ); // StartLoginScreen으로 이동
             },
             child: Text('확인'),
           ),

@@ -126,7 +126,7 @@ exports.createMission = async (req, res) => {
                 m_status: stat,
                 r_id: room.r_id, // Room ID를 저장
                 m_extended: false,
-                missionAuthenticationAuthority,
+                missionAuthenticationAuthority: missionId,
             });
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });

@@ -19,7 +19,6 @@ env:
   FIREBASE_TYPE: "service_account"
   FIREBASE_PROJECT_ID: "capdesign-d9d41"
   FIREBASE_PRIVATE_KEY_ID: "6283e3baa4c9c5c64e3bdb218b7dc9e1126fa830"
-  FIREBASE_PRIVATE_KEY: ${{ secrets.SECRET_KEY }}
   FIREBASE_CLIENT_EMAIL: "firebase-adminsdk-typ5c@capdesign-d9d41.iam.gserviceaccount.com"
   FIREBASE_CLIENT_ID: "107971463282083225635"
   FIREBASE_AUTH_URI: "https://accounts.google.com/o/oauth2/auth"
@@ -88,7 +87,6 @@ jobs:
         echo "DATABASE_USER=${{ secrets.DATABASE_USERNAME }}" >> .env
         echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
         echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
-        echo "FIREBASE_PRIVATE_KEY=${{ secrets.SECRET_KEY }}" >> .env
 
         echo "FIREBASE_TYPE=${{ env.FIREBASE_TYPE }}" >> .env
         echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}" >> .env

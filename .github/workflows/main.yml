@@ -115,6 +115,9 @@ jobs:
         echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
         chmod 600 my-key.pem
         scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
+        echo "JSON file content:"
+        cat firebase-adminsdk.json
+        # JSON 파일 복사
         scp -o StrictHostKeyChecking=no -i my-key.pem firebase-adminsdk.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/firebase-adminsdk.json
         rm my-key.pem  # 키 파일을 삭제하여 보안 유지
         rm firebase-adminsdk.json  # 로컬 JSON 파일 삭제

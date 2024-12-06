@@ -179,6 +179,12 @@ try {
   });
 } catch (error) {
   console.error('DB 저장 오류:', error.message); // DB 저장 실패 시 에러 로그 출력
+   // Sequelize의 validation errors를 상세히 출력
+    if (error.name === 'SequelizeValidationError') {
+    error.errors.forEach((err) => {
+      console.error(`Validation Error - Field: ${err.path}, Message: ${err.message}`);
+    });
+  }
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
 }
 });

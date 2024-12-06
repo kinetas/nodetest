@@ -17,7 +17,7 @@ const serviceAccount = {
     client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
     universe_domain:process.env.FIREBASE_UNIVERSE_DOMAIN
 };
-/*
+
 try {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
@@ -26,8 +26,8 @@ try {
 } catch (error) {
     console.error('Error initializing Firebase Admin SDK:', error);
 }
-*/
 
+/*
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
@@ -36,7 +36,7 @@ if (!admin.apps.length) {
 } else {
     console.log('Firebase Admin SDK already initialized.');
 }
-
+*/
 // FCM 메시지 전송 로직
 const sendNotification = async (token, title, body) => {
     const message = {

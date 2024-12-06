@@ -15,6 +15,8 @@ const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const { checkAndUpdateMissions } = require('./controllers/cVoteController');
 
+const timeConverterMiddleware = require('./middleware/timeConverter');
+
 
 const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
@@ -164,7 +166,7 @@ app.use('/api/auth', authRoutes);
 app.use('/dashboard', missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
 app.use('/api/rooms', roomRoutes);
 
-app.use('/api/missions', missionRoutes); // 미션 �????�� ?��?��?�� ?���???
+app.use('/api/missions', timeConverterMiddleware, missionRoutes); // 미션 �????�� ?��?��?�� ?���???
 
 app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
 
@@ -180,6 +182,7 @@ cron.schedule('0 0 * * *', () => {
     console.log('미션 ?��?�� ?��?�� �??? 처리 ?��?��');
     checkMissionStatus();
 });
+
 
 
 /*

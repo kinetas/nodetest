@@ -10,7 +10,7 @@ const resultController = require('./resultController'); // resultController 가�
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
-const moment = require('moment-timezone');
+// const moment = require('moment-timezone');
 
 // //============================================================================
 // const { io } = require('../socketServer');
@@ -241,8 +241,8 @@ exports.getAssignedMissions = async (req, res) => {
                 return {
                     m_id: mission.m_id,
                     m_title: mission.m_title,
-                    // m_deadline: mission.m_deadline,
-                    m_deadline: moment(mission.m_deadline).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
+                    m_deadline: mission.m_deadline,
+                    // m_deadline: moment(mission.m_deadline).tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss'),
                     m_status: mission.m_status,
                     r_id: mission.r_id,
                     r_title: room ? room.r_title : '없음',

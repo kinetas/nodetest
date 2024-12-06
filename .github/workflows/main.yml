@@ -16,17 +16,17 @@ env:
   DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
   REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
   REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
-  FIREBASE_TYPE: "service_account"
-  FIREBASE_PROJECT_ID: "capdesign-d9d41"
-  FIREBASE_PRIVATE_KEY_ID: "6283e3baa4c9c5c64e3bdb218b7dc9e1126fa830"
-  FIREBASE_PRIVATE_KEY: ${{ secrets.SECRET_KEY }}
-  FIREBASE_CLIENT_EMAIL: "firebase-adminsdk-typ5c@capdesign-d9d41.iam.gserviceaccount.com"
-  FIREBASE_CLIENT_ID: "107971463282083225635"
-  FIREBASE_AUTH_URI: "https://accounts.google.com/o/oauth2/auth"
-  FIREBASE_TOKEN_URI: "https://oauth2.googleapis.com/token"
-  FIREBASE_AUTH_PROVIDER_CERT_URL: "https://www.googleapis.com/oauth2/v1/certs"
-  FIREBASE_CLIENT_CERT_URL: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-typ5c%40capdesign-d9d41.iam.gserviceaccount.com"
-  FIREBASE_UNIVERSE_DOMAIN: "googleapis.com"
+  # FIREBASE_TYPE: "service_account"
+  # FIREBASE_PROJECT_ID: "capdesign-d9d41"
+  # FIREBASE_PRIVATE_KEY_ID: "6283e3baa4c9c5c64e3bdb218b7dc9e1126fa830"
+  # FIREBASE_PRIVATE_KEY: ${{ secrets.SECRET_KEY }}
+  # FIREBASE_CLIENT_EMAIL: "firebase-adminsdk-typ5c@capdesign-d9d41.iam.gserviceaccount.com"
+  # FIREBASE_CLIENT_ID: "107971463282083225635"
+  # FIREBASE_AUTH_URI: "https://accounts.google.com/o/oauth2/auth"
+  # FIREBASE_TOKEN_URI: "https://oauth2.googleapis.com/token"
+  # FIREBASE_AUTH_PROVIDER_CERT_URL: "https://www.googleapis.com/oauth2/v1/certs"
+  # FIREBASE_CLIENT_CERT_URL: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-typ5c%40capdesign-d9d41.iam.gserviceaccount.com"
+  # FIREBASE_UNIVERSE_DOMAIN: "googleapis.com"
   # JWT_EXPIRES_IN: 1d  # JWT 만료 시간
 
 permissions:
@@ -84,30 +84,31 @@ jobs:
     # Create .env file with environment variables
     - name: Create .env file
       run: |
-        echo "FIREBASE_PRIVATE_KEY=${{ secrets.SECRET_KEY }}" >> .env
-        sed -i 's/\\n/\n/g' .env
+        # echo "FIREBASE_PRIVATE_KEY=${{ secrets.SECRET_KEY }}" >> .env
+        # sed -i 's/\\n/\n/g' .env
         echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
         echo "DATABASE_USER=${{ secrets.DATABASE_USERNAME }}" >> .env
         echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
         echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
         
 
-        echo "FIREBASE_TYPE=${{ env.FIREBASE_TYPE }}" >> .env
-        echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}" >> .env
-        echo "FIREBASE_PRIVATE_KEY_ID=${{ env.FIREBASE_PRIVATE_KEY_ID }}" >> .env
-        echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
-        echo "FIREBASE_CLIENT_ID=${{ env.FIREBASE_CLIENT_ID }}" >> .env
-        echo "FIREBASE_AUTH_URI=${{ env.FIREBASE_AUTH_URI }}" >> .env
-        echo "FIREBASE_TOKEN_URI=${{ env.FIREBASE_TOKEN_URI }}" >> .env
-        echo "FIREBASE_AUTH_PROVIDER_CERT_URL=${{ env.FIREBASE_AUTH_PROVIDER_CERT_URL }}" >> .env
-        echo "FIREBASE_CLIENT_CERT_URL=${{ env.FIREBASE_CLIENT_CERT_URL }}" >> .env
-        echo "FIREBASE_CLIENT_CERT_URL=${{ env.FIREBASE_CLIENT_CERT_URL }}" >> .env
-        echo "FIREBASE_UNIVERSE_DOMAIN=${{ env.FIREBASE_UNIVERSE_DOMAIN }}" >> .env
+        # echo "FIREBASE_TYPE=${{ env.FIREBASE_TYPE }}" >> .env
+        # echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}" >> .env
+        # echo "FIREBASE_PRIVATE_KEY_ID=${{ env.FIREBASE_PRIVATE_KEY_ID }}" >> .env
+        # echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
+        # echo "FIREBASE_CLIENT_ID=${{ env.FIREBASE_CLIENT_ID }}" >> .env
+        # echo "FIREBASE_AUTH_URI=${{ env.FIREBASE_AUTH_URI }}" >> .env
+        # echo "FIREBASE_TOKEN_URI=${{ env.FIREBASE_TOKEN_URI }}" >> .env
+        # echo "FIREBASE_AUTH_PROVIDER_CERT_URL=${{ env.FIREBASE_AUTH_PROVIDER_CERT_URL }}" >> .env
+        # echo "FIREBASE_CLIENT_CERT_URL=${{ env.FIREBASE_CLIENT_CERT_URL }}" >> .env
+        # echo "FIREBASE_CLIENT_CERT_URL=${{ env.FIREBASE_CLIENT_CERT_URL }}" >> .env
+        # echo "FIREBASE_UNIVERSE_DOMAIN=${{ env.FIREBASE_UNIVERSE_DOMAIN }}" >> .env
 
 
     - name: Create Firebase JSON file
       run: |
-        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > firebase-adminsdk.json
+        # echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > firebase-adminsdk.json
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | sed 's/\\n/\n/g' > firebase-adminsdk.json
     
     # Copy .env to EC2
     - name: Copy .env to EC2
@@ -122,7 +123,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i my-key.pem ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }} \
         "ls ~/nodetest/firebase-adminsdk.json && echo 'File exists on EC2' || echo 'File missing on EC2'"
         rm my-key.pem  # 키 파일을 삭제하여 보안 유지
-        # rm firebase-adminsdk.json  # 로컬 JSON 파일 삭제
+        rm firebase-adminsdk.json  # 로컬 JSON 파일 삭제
 
     # Deploy to AWS EC2 from S3
     - name: Deploy to AWS EC2 from S3

@@ -19,30 +19,34 @@ class _MyMissionListState extends State<MyMissionList> {
 
   Future<void> fetchMissions() async {
     try {
-      // SessionCookieManager의 정적 메서드 get 호출
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/api/missions/missions/assigned', // String URL 사용
+        'http://54.180.54.31:3000/api/missions/missions/assigned',
       );
 
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
-        // 성공적으로 데이터를 가져온 경우
-        final List<dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         setState(() {
-          missions = data.map((item) {
+          missions = (responseData['missions'] as List<dynamic>).map((item) {
             return {
-              'title': item['title'] ?? 'No Title',
-              'dueDate': item['dueDate'] ?? 'No Due Date',
+              'm_id': item['m_id'] ?? 'No ID',
+              'm_title': item['m_title'] ?? 'No Title',
+              'm_deadline': item['m_deadline'] ?? 'No Deadline',
+              'm_status': item['m_status'] ?? 'No Status',
+              'r_id': item['r_id'] ?? 'No Room ID',
+              'r_title': item['r_title'] ?? 'No Room Title',
             };
           }).toList();
           isLoading = false;
         });
       } else {
-        // 서버 응답이 실패했을 때
         setState(() {
           isLoading = false;
         });
-        throw Exception('Failed to load missions. Status code: ${response.statusCode}');
+        print('Failed to load missions. Status code: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
@@ -54,23 +58,34 @@ class _MyMissionListState extends State<MyMissionList> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Center(child: CircularProgressIndicator()); // 로딩 중일 때
-    }
-
-    if (missions.isEmpty) {
-      return Center(child: Text('미션 없음')); // 미션이 없을 때
-    }
-
-    return ListView.builder(
-      itemCount: missions.length,
-      itemBuilder: (context, index) {
-        final mission = missions[index];
-        return ListTile(
-          title: Text(mission['title']),
-          subtitle: Text(mission['dueDate']),
-        );
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('미션 목록'),
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator()) // 로딩 중
+          : missions.isEmpty
+          ? Center(child: Text('미션 없음')) // 데이터가 없을 때
+          : ListView.builder(
+        itemCount: missions.length,
+        itemBuilder: (context, index) {
+          final mission = missions[index];
+          return Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: ListTile(
+              title: Text(mission['m_title']),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Deadline: ${mission['m_deadline']}'),
+                  Text('Status: ${mission['m_status']}'),
+                  Text('Room: ${mission['r_title']}'),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

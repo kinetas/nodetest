@@ -25,12 +25,15 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
         'http://54.180.54.31:3000/api/missions/missions/givenCompleted',
       );
 
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         // 성공적으로 데이터를 가져온 경우
-        final List<dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         setState(() {
-          completedMissions = data.map((mission) {
+          completedMissions = (responseData['missions'] as List<dynamic>).map((mission) {
             return {
               'm_id': mission['m_id'] ?? 'No ID',
               'u1_id': mission['u1_id'] ?? 'No User ID',
@@ -39,7 +42,7 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
               'm_deadline': mission['m_deadline'] ?? 'No Deadline',
               'm_reword': mission['m_reword'] ?? 'No Reward',
               'm_status': mission['m_status'] ?? 'No Status',
-              'I_id': mission['I_id'] ?? 'No ID',
+              'r_id': mission['r_id'] ?? 'No Room ID',
               'm_extended': mission['m_extended'] ?? false,
             };
           }).toList();
@@ -50,7 +53,7 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
         setState(() {
           isLoading = false;
         });
-        throw Exception('Failed to load completed missions. Status code: ${response.statusCode}');
+        print('Failed to load completed missions. Status code: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
@@ -62,19 +65,15 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Center(child: CircularProgressIndicator()); // 로딩 중
-    }
-
-    if (completedMissions.isEmpty) {
-      return Center(child: Text('상대방이 완료한 미션이 없습니다.'));
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text('상대방이 완료한 미션'),
       ),
-      body: ListView.builder(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator()) // 로딩 중
+          : completedMissions.isEmpty
+          ? Center(child: Text('상대방이 완료한 미션이 없습니다.'))
+          : ListView.builder(
         itemCount: completedMissions.length,
         itemBuilder: (context, index) {
           final mission = completedMissions[index];
@@ -91,8 +90,9 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
                   Text('마감일: ${formatDate(mission['m_deadline'])}'),
                   Text('리워드: ${mission['m_reword']}'),
                   Text('상태: ${mission['m_status']}'),
-                  Text('유저 ID: ${mission['u2_id']}'),
-                  Text('타이틀 ID: ${mission['I_id']}'),
+                  Text('부여자 ID: ${mission['u1_id']}'),
+                  Text('수행자 ID: ${mission['u2_id']}'),
+                  Text('방 ID: ${mission['r_id']}'),
                   Text('추가시간 사용: ${mission['m_extended'] ? "예" : "아니오"}'),
                 ],
               ),

@@ -12,64 +12,25 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController deadlineController = TextEditingController();
   final TextEditingController rewardController = TextEditingController();
-  final TextEditingController u2IdController = TextEditingController(); // 상대방 ID 입력 필드
+  final TextEditingController u2IdController = TextEditingController(); // u2_id 입력
+  final TextEditingController authenticationController = TextEditingController(); // authenticationAuthority 입력
 
-  String? u1Id; // 사용자 ID
-  bool isLoading = true; // 로딩 상태 플래그
-  bool isForOtherUser = false; // 체크박스 상태
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserId();
-  }
-
-  // u1_id 불러오기
-  Future<void> _fetchUserId() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/api/user-info/user-id',
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        print('응답 데이터: $responseData');
-        setState(() {
-          u1Id = responseData['u_id'];
-          isLoading = false;
-        });
-      } else {
-        print('Failed to fetch user ID: ${response.body}');
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (error) {
-      print('Error fetching user ID: $error');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+  bool isMyMission = false; // 내 미션 여부
+  bool isShareMission = false; // 미션 공유 여부
 
   // 미션 생성 API 호출
   Future<void> _createMission() async {
-    if (u1Id == null) {
-      print('u1_id is not loaded yet.');
-      return;
-    }
-
     final missionData = {
-      "u1_id": u1Id,
-      "u2_id": isForOtherUser ? u2IdController.text : u1Id,
+      "u2_id": isMyMission ? null : u2IdController.text,
+      "authenticationAuthority": isMyMission && isShareMission
+          ? authenticationController.text
+          : null,
       "m_title": titleController.text,
       "m_deadline": deadlineController.text,
       "m_reword": rewardController.text.isEmpty ? null : rewardController.text,
     };
+
+    print('Mission Data: $missionData');
 
     try {
       final response = await SessionCookieManager.post(
@@ -80,7 +41,6 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
 
       if (response.statusCode == 200) {
         print('Mission created successfully!');
-        // 성공 시 추가 로직
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('미션이 성공적으로 생성되었습니다!')),
         );
@@ -98,9 +58,7 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
       appBar: AppBar(
         title: Text('미션 생성'),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator()) // 로딩 중 표시
-          : Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -127,22 +85,41 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
               decoration: InputDecoration(labelText: '보상'),
             ),
             CheckboxListTile(
-              title: Text('상대방에게 할당'),
-              value: isForOtherUser,
+              title: Text('내 미션'),
+              value: isMyMission,
               onChanged: (value) {
                 setState(() {
-                  isForOtherUser = value!;
+                  isMyMission = value!;
+                  if (!isMyMission) {
+                    isShareMission = false; // 내 미션 해제 시 공유도 해제
+                    authenticationController.clear(); // 공유 ID 초기화
+                  }
                 });
               },
             ),
-            if (isForOtherUser)
+            if (isMyMission)
+              CheckboxListTile(
+                title: Text('미션 공유하기'),
+                value: isShareMission,
+                onChanged: (value) {
+                  setState(() {
+                    isShareMission = value!;
+                  });
+                },
+              ),
+            if (!isMyMission) // 내 미션 체크 안 했을 때만 표시
               TextField(
                 controller: u2IdController,
-                decoration: InputDecoration(labelText: '상대방 ID'),
+                decoration: InputDecoration(labelText: '부여할 상대방 ID'),
+              ),
+            if (isMyMission && isShareMission) // 내 미션 && 공유 체크 시 표시
+              TextField(
+                controller: authenticationController,
+                decoration: InputDecoration(labelText: '공유할 상대방 ID'),
               ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: u1Id == null ? null : _createMission, // u1_id 없을 시 비활성화
+              onPressed: _createMission, // 미션 생성 함수 호출
               child: Text('미션 생성'),
             ),
           ],

@@ -24,19 +24,22 @@ class _GiveMissionListState extends State<GiveMissionList> {
         'http://54.180.54.31:3000/api/missions/missions/created',
       );
 
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         // 성공적으로 데이터를 가져온 경우
-        final List<dynamic> data = jsonDecode(response.body);
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         setState(() {
-          missions = data.map((mission) {
+          missions = (responseData['missions'] as List<dynamic>).map((mission) {
             return {
               'm_id': mission['m_id'] ?? 'No ID',
               'm_title': mission['m_title'] ?? 'No Title',
               'm_deadline': mission['m_deadline'] ?? 'No Deadline',
               'm_status': mission['m_status'] ?? 'No Status',
-              'I_id': mission['I_id'] ?? 'No I_id',
-              't_title': mission['t_title'] ?? 'No t_title',
+              'r_id': mission['r_id'] ?? 'No Room ID',
+              'r_title': mission['r_title'] ?? 'No Room Title',
             };
           }).toList();
           isLoading = false;
@@ -46,7 +49,7 @@ class _GiveMissionListState extends State<GiveMissionList> {
         setState(() {
           isLoading = false;
         });
-        throw Exception('Failed to load missions. Status code: ${response.statusCode}');
+        print('Failed to load missions. Status code: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
@@ -58,19 +61,15 @@ class _GiveMissionListState extends State<GiveMissionList> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Center(child: CircularProgressIndicator()); // 로딩 중
-    }
-
-    if (missions.isEmpty) {
-      return Center(child: Text('부여된 미션이 없습니다.'));
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text('부여한 미션 목록'),
       ),
-      body: ListView.builder(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator()) // 로딩 중
+          : missions.isEmpty
+          ? Center(child: Text('부여된 미션이 없습니다.')) // 미션이 없을 때
+          : ListView.builder(
         itemCount: missions.length,
         itemBuilder: (context, index) {
           final mission = missions[index];
@@ -86,8 +85,8 @@ class _GiveMissionListState extends State<GiveMissionList> {
                 children: [
                   Text('마감일: ${formatDate(mission['m_deadline'])}'),
                   Text('상태: ${mission['m_status']}'),
-                  Text('타이틀 ID: ${mission['I_id']}'),
-                  Text('타이틀: ${mission['t_title']}'),
+                  Text('방 ID: ${mission['r_id']}'),
+                  Text('방 제목: ${mission['r_title']}'),
                 ],
               ),
             ),

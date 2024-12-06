@@ -122,6 +122,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final birthdate = _birthdateController.text.trim();
     final email = _emailController.text.trim();
 
+    // 정규식 패턴
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final userIdRegex = RegExp(r'^.{4,}$'); // 최소 4자리 이상
+    final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
+
     // 비밀번호 확인
     if (password != confirmPassword) {
       _showDialog('오류', '비밀번호가 일치하지 않습니다.');
@@ -131,6 +136,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
     // 입력 값 검증
     if (userId.isEmpty || password.isEmpty || nickname.isEmpty || name.isEmpty || birthdate.isEmpty || email.isEmpty) {
       _showDialog('오류', '모든 필드를 입력해주세요.');
+      return;
+    }
+
+    // 이메일 형식 검증
+    if (!emailRegex.hasMatch(email)) {
+      _showDialog('오류', '올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    // 아이디 검증 (최소 4자리 이상)
+    if (!userIdRegex.hasMatch(userId)) {
+      _showDialog('오류', '아이디는 최소 4자리 이상이어야 합니다.');
+      return;
+    }
+
+    // 비밀번호 검증 (영어, 숫자, 특수문자 포함 최소 8자리 이상)
+    if (!passwordRegex.hasMatch(password)) {
+      _showDialog('오류', '비밀번호는 영어, 숫자, 특수문자를 포함해 최소 8자리 이상이어야 합니다.');
       return;
     }
 

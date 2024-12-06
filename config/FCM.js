@@ -18,9 +18,14 @@ const serviceAccount = {
     universe_domain:process.env.FIREBASE_UNIVERSE_DOMAIN
 };
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-});
+try {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+    });
+    console.log('Firebase Admin SDK initialized successfully.');
+} catch (error) {
+    console.error('Error initializing Firebase Admin SDK:', error);
+}
 
 // FCM 메시지 전송 로직
 const sendNotification = async (token, title, body) => {

@@ -7,6 +7,9 @@ const { Op } = require('sequelize'); // [추가됨] Sequelize 연산자 추가
 
 exports.getRooms = async (req, res) => {
     const u1_id = req.session.user.id;
+    if (!u1_id) {
+        return res.status(401).json({ message: '로그인이 필요합니다.' });
+    }
     const rooms = await Room.findAll({
         where: { u1_id }
     });

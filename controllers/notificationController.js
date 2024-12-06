@@ -6,8 +6,8 @@ const sendNotificationController = async (req, res) => {
 
 
     if (!token || !title || !body) {
-        return res.status(400).json({ message: 'FCM 토큰, 제목, 내용이 필요합니다.' });
         console.log('Request received:', req.body);
+        return res.status(400).json({ message: 'FCM 토큰, 제목, 내용이 필요합니다.' });
     }
 
     try {

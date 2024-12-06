@@ -11,7 +11,7 @@ const sendNotificationController = async (req, res) => {
     }
 
     try {
-        const response = await sendNotification(title, body);
+        const response = await sendNotification(token, title, body);
         res.status(200).json({ message: 'Notification sent successfully', response });
     } catch (error) {
         res.status(500).json({ message: 'Failed to send notification', error });

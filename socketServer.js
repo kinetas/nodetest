@@ -188,7 +188,7 @@ try {
   socket.emit('errorMessage', 'Failed to save message to DB'); // 클라이언트로 에러 메시지 전송
 }
 });
-
+//
 // 클라이언트가 연결 해제되었을 때 처리
 socket.on('disconnect', () => {
 console.log('User disconnected');

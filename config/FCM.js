@@ -1,6 +1,6 @@
 const admin = require('firebase-admin');
 const path = require('path');
-
+//
 // Firebase Admin SDK 초기화
 const serviceAccount = path.join('/home/ubuntu/nodetest/firebase-adminsdk.json');
 

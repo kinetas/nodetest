@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:intl/intl.dart'; // 날짜 형식 변환을 위한 패키지
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
+import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -12,31 +13,158 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _birthdateController = TextEditingController(); // 0000-00-00 형식
-  final TextEditingController _userIdController = TextEditingController(); // USER ID
+  final TextEditingController _birthdateController = TextEditingController();
+  final TextEditingController _userIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      locale: const Locale("ko", "KR"), // 한국어 설정
-    );
+  DateTime _selectedDate = DateTime.now();
+  DateTime _focusedDate = DateTime.now();
 
-    if (pickedDate != null) {
-      // 0000-00-00 형식으로 변환
-      final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-      setState(() {
-        _birthdateController.text = formattedDate; // 텍스트 필드에 표시
-      });
-    }
+  Future<void> _selectDate(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              height: 450,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownButton<int>(
+                        value: _focusedDate.year,
+                        items: List.generate(
+                          100,
+                              (index) => DateTime.now().year - index,
+                        ).map((year) {
+                          return DropdownMenuItem<int>(
+                            value: year,
+                            child: Text(
+                              '$year년',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (year) {
+                          if (year != null) {
+                            setState(() {
+                              _focusedDate = DateTime(year, _focusedDate.month);
+                            });
+                          }
+                        },
+                      ),
+                      SizedBox(width: 16),
+                      DropdownButton<int>(
+                        value: _focusedDate.month,
+                        items: List.generate(12, (index) => index + 1).map((month) {
+                          return DropdownMenuItem<int>(
+                            value: month,
+                            child: Text(
+                              '$month월',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (month) {
+                          if (month != null) {
+                            setState(() {
+                              _focusedDate = DateTime(_focusedDate.year, month);
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: TableCalendar(
+                      firstDay: DateTime(1900),
+                      lastDay: DateTime.now(),
+                      focusedDay: _focusedDate,
+                      selectedDayPredicate: (day) => isSameDay(day, _selectedDate),
+                      calendarStyle: CalendarStyle(
+                        todayDecoration: BoxDecoration(
+                          color: Colors.lightBlueAccent,
+                          shape: BoxShape.circle,
+                        ),
+                        selectedDecoration: BoxDecoration(
+                          color: Colors.lightBlue,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      onDaySelected: (selectedDay, focusedDay) {
+                        setState(() {
+                          _selectedDate = selectedDay;
+                          _focusedDate = focusedDay;
+                          _birthdateController.text = DateFormat('yyyy-MM-dd').format(selectedDay);
+                        });
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> signUp() async {
-    // 기존 코드 유지
+    final userId = _userIdController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+    final nickname = _nicknameController.text.trim();
+    final name = _nameController.text.trim();
+    final birthdate = _birthdateController.text.trim();
+    final email = _emailController.text.trim();
+
+    // 비밀번호 확인
+    if (password != confirmPassword) {
+      _showDialog('오류', '비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // 입력 값 검증
+    if (userId.isEmpty || password.isEmpty || nickname.isEmpty || name.isEmpty || birthdate.isEmpty || email.isEmpty) {
+      _showDialog('오류', '모든 필드를 입력해주세요.');
+      return;
+    }
+
+    // 서버로 데이터 전송
+    final signUpData = {
+      "u_id": userId,
+      "u_password": password,
+      "u_nickname": nickname,
+      "u_name": name,
+      "u_birth": birthdate,
+      "u_mail": email,
+    };
+
+    try {
+      final response = await SessionCookieManager.post(
+        'http://54.180.54.31:3000/api/auth/register', // 회원가입 API 경로
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(signUpData),
+      );
+
+      // 응답 상태 코드 처리
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = json.decode(response.body);
+        if (responseData['message'] == "회원가입이 완료되었습니다.") {
+          _showDialogWithRedirect('회원가입 성공', '회원가입이 완료되었습니다! 로그인해주세요!');
+        } else {
+          _showDialog('오류', '알 수 없는 응답입니다: ${response.body}');
+        }
+      } else {
+        _showDialog('오류', '회원가입에 실패했습니다: ${response.body}');
+      }
+    } catch (e) {
+      _showDialog('오류', '회원가입 중 문제가 발생했습니다: $e');
+    }
   }
 
   void _showDialog(String title, String content) {
@@ -54,6 +182,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+
+// 회원가입 성공 시 StartLogin으로 리다이렉션
+  void _showDialogWithRedirect(String title, String content) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // 다이얼로그 닫기
+              Navigator.pushReplacementNamed(context, '/startLogin'); // StartLogin 화면으로 이동
+            },
+            child: Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -142,27 +292,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildDateField(String label, TextEditingController controller, BuildContext context, Color primaryColor) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(color: primaryColor),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide.none,
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: BorderSide(color: primaryColor, width: 2),
-          ),
-          suffixIcon: Icon(Icons.calendar_today, color: primaryColor),
-        ),
-        onTap: () => _selectDate(context),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: TextFormField(
+    controller: controller,
+    readOnly: true,
+    decoration: InputDecoration(
+    labelText: label,
+    labelStyle: TextStyle(color: primaryColor),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(15),
+    borderSide: BorderSide.none,
+    ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide(color: primaryColor, width: 2),
       ),
+      suffixIcon: Icon(Icons.calendar_today, color: primaryColor),
+    ),
+      onTap: () => _selectDate(context),
+    ),
     );
   }
 }

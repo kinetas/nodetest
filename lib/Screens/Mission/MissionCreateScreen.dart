@@ -12,6 +12,7 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController deadlineController = TextEditingController();
   final TextEditingController rewardController = TextEditingController();
+  final TextEditingController u2IdController = TextEditingController(); // 상대방 ID 입력 필드
 
   String? u1Id; // 사용자 ID
   bool isLoading = true; // 로딩 상태 플래그
@@ -31,13 +32,14 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
       });
 
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/api/auth/user-id',
+        'http://54.180.54.31:3000/api/user-info/user-id',
       );
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
+        print('응답 데이터: $responseData');
         setState(() {
-          u1Id = responseData['u1_id'];
+          u1Id = responseData['u_id'];
           isLoading = false;
         });
       } else {
@@ -63,7 +65,7 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
 
     final missionData = {
       "u1_id": u1Id,
-      "u2_id": isForOtherUser ? u1Id : null,
+      "u2_id": isForOtherUser ? u2IdController.text : u1Id,
       "m_title": titleController.text,
       "m_deadline": deadlineController.text,
       "m_reword": rewardController.text.isEmpty ? null : rewardController.text,
@@ -79,6 +81,9 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
       if (response.statusCode == 200) {
         print('Mission created successfully!');
         // 성공 시 추가 로직
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('미션이 성공적으로 생성되었습니다!')),
+        );
       } else {
         print('Failed to create mission: ${response.body}');
       }
@@ -130,6 +135,11 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
                 });
               },
             ),
+            if (isForOtherUser)
+              TextField(
+                controller: u2IdController,
+                decoration: InputDecoration(labelText: '상대방 ID'),
+              ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: u1Id == null ? null : _createMission, // u1_id 없을 시 비활성화

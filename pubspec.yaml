@@ -53,6 +53,7 @@ dependencies:
   exif: ^2.0.0
   firebase_core: ^2.15.0
   firebase_messaging: ^14.6.1
+  table_calendar: ^3.0.7
 
   
   flutter_localizations: # 로컬라이제이션 패키지 추가

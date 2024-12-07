@@ -27,21 +27,4 @@ try {
     throw new Error('Failed to initialize Firebase Admin SDK');
 }
 
-// FCM 메시지 전송 로직
-const sendNotification = async (token, title, body) => {
-    const message = {
-        notification: { title, body },
-        token,
-    };
-
-    try {
-        const response = await admin.messaging().send(message);
-        console.log('Notification sent successfully:', response);
-        return response;
-    } catch (error) {
-        console.error('Error sending notification:', error.message);
-        throw error;
-    }
-};
-
-module.exports = { sendNotification };
+module.exports = admin;

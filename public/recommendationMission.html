@@ -1,5 +1,60 @@
-<script>
-    // 추천 미션 데이터 가져오기
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>추천 미션</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>추천 미션</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>미션 이름</th>
+                <th>카테고리</th>
+                <th>설명</th>
+                <th>액션</th>
+            </tr>
+        </thead>
+        <tbody id="missionTableBody">
+            <!-- 미션 데이터가 여기 추가됩니다 -->
+        </tbody>
+    </table>
+    <p id="errorMessage" class="error" style="display:none;"></p>
+
+    <script>
+        // 추천 미션 데이터 가져오기
     fetch('/api/recommendationMission')
         .then(response => {
             if (!response.ok) {
@@ -43,4 +98,7 @@
             errorMessage.style.display = 'block';
             errorMessage.innerHTML = `추천 미션 데이터를 불러오는 중 오류가 발생했습니다: <br>${error.message}`;
         });
-</script>
+
+    </script>
+</body>
+</html>

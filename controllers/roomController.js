@@ -224,12 +224,12 @@ exports.enterRoom = async (req, res) => {
 // 방 이름 변경 함수 추가
 exports.updateRoomName = async (req, res) => {
     const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
-    const { u2_id, newRoomName } = req.body; // 입력받은 유저 ID와 새로운 방 이름
+    const { u2_id, newRoomName, r_type } = req.body; // 입력받은 유저 ID와 새로운 방 이름
 
     try {
         const updated = await Room.update(
             { r_title: newRoomName },
-            { where: { u1_id, u2_id } }
+            { where: { u1_id, u2_id, r_type } }
         );
 
         if (updated[0] === 0) {

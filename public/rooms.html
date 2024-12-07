@@ -168,11 +168,15 @@
         function updateRoomName() {
             const u2_id = document.getElementById('userIdInput').value;
             const newRoomName = document.getElementById('roomNameInput').value;
+            let r_type = document.getElementById('roomTypeInput').vaule;
+            if (!r_type){
+                r_type = "general";
+            }
 
             fetch('/api/rooms/update', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ u2_id, newRoomName })
+                body: JSON.stringify({ u2_id, newRoomName, r_type })
             })
             .then(response => response.json())
             .then(data => {

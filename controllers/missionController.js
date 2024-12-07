@@ -848,3 +848,35 @@ exports.requestVoteForMission = async (req, res) => {
         res.status(500).json({ success: false, message: '투표 생성 중 오류가 발생했습니다.' });
     }
 };
+
+ 
+// 추천 미션 기반으로 미션 생성
+exports.createMissionFromRecommendation = async (req, res) => {
+    const { m_title } = req.body; // 추천 미션 제목
+    const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID
+
+    if (!u1_id || !m_title) {
+        return res.status(400).json({ success: false, message: '필수 데이터가 누락되었습니다.' });
+    }
+
+    try {
+        const now = new Date();
+        const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59); // 금일 23:59:59
+
+        await Mission.create({
+            m_id: uuidv4(),               // 고유한 미션 ID 생성
+            u1_id,                        // 현재 로그인된 사용자
+            u2_id: u1_id,                 // 수행자도 현재 사용자
+            m_title,                      // 추천 미션 제목
+            m_deadline: deadline,         // 마감기한
+            m_reword: null,               // 보상은 없음
+            m_status: '진행중',           // 기본 상태는 '진행중'
+            missionAuthenticationAuthority: u1_id, // 인증 권한은 본인
+        });
+
+        res.status(201).json({ success: true, message: '추천 미션이 성공적으로 생성되었습니다.' });
+    } catch (error) {
+        console.error('추천 미션 생성 오류:', error);
+        res.status(500).json({ success: false, message: '추천 미션 생성 중 오류가 발생했습니다.' });
+    }
+};

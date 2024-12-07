@@ -40,6 +40,7 @@ const sendNotification = async (userId, token, title, body = {}) => {
 };
 // API 컨트롤러 함수
 const sendNotificationController = async (req, res) => {
+    console.log('Request Headers:', req.headers); // 요청 헤더 출력
     console.log('Request Received at Controller:', req.body); // 요청 데이터 확인
     const { userId, token, title, body } = req.body;
 

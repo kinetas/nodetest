@@ -2,7 +2,7 @@
 const Room = require('../models/roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨] Sequelize 연산자 추가
-
+const RMessage = require('../models/messageModel');
 // const jwt = require('jsonwebtoken'); // JWT 추가
 
 exports.getRooms = async (req, res) => {

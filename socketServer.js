@@ -102,10 +102,6 @@ const upload = multer({ storage });
 //   });
 // });
 
-function toKST(date) {
-  const utcDate = new Date(date); // UTC 기준으로 생성된 날짜
-  return new Date(utcDate.getTime() + 9 * 60 * 60 * 1000); // UTC+9로 변환
-}
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
@@ -171,13 +167,13 @@ try {
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
     image: fileBuffer ? fileBuffer.toString('base64') : null // Base64로 인코딩하여 클라이언트에 전송
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
     image: fileBuffer ? fileBuffer.toString('base64') : null
   });
 } catch (error) {

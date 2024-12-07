@@ -11,6 +11,7 @@ const cVoteRoutes = require('./routes/cVoteRoutes');
 const c_missionRoutes = require('./routes/c_missionRoutes');
 const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?�� 추�??
 const userInfoRoutes = require('./routes/userInfoRoutes');
+const recommendationMissionRoutes = require('./routes/recommendationMissionRoutes'); // 라우트 파일 가져오기
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const { checkAndUpdateMissions } = require('./controllers/cVoteController');
@@ -198,7 +199,8 @@ cron.schedule('0 0 * * *', () => {
 });
 
 
-
+// 추천 미션 라우트 설정
+app.use('/recommendationMission', recommendationMissionRoutes);
 
 // // 미션 마감기한 ?��?�� (�?? 분마?�� ?��?��)
 // cron.schedule('* * * * *', () => { // �?? �?? ?��?��

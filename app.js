@@ -161,7 +161,7 @@ app.get('/cVote/details/', (req, res) => {
 });
 
 // 추천 미션 페이지 라우트
-router.get('/api/recommendations', (req, res) => {
+app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
 
@@ -205,7 +205,7 @@ cron.schedule('0 0 * * *', () => {
 
 
 // 추천 미션 라우트 설정
-app.use('/recommendationMission', recommendationMissionRoutes);
+app.use('/api/recommendationMission', recommendationMissionRoutes);
 
 // // 미션 마감기한 ?��?�� (�?? 분마?�� ?��?��)
 // cron.schedule('* * * * *', () => { // �?? �?? ?��?��

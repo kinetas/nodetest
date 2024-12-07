@@ -871,6 +871,7 @@ exports.createMissionFromRecommendation = async (req, res) => {
             m_deadline: deadline,         // 마감기한
             m_reword: null,               // 보상은 없음
             m_status: '진행중',           // 기본 상태는 '진행중'
+            m_extended: 'false',
             missionAuthenticationAuthority: u1_id, // 인증 권한은 본인
         });
 

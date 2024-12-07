@@ -15,7 +15,7 @@ const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const { checkAndUpdateMissions } = require('./controllers/cVoteController');
 
-// const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
+const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
 
 const db = require('./config/db');

@@ -12,6 +12,9 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     port: 3306,
     // timezone: '+09:00', // KST 시간대 설정 추가
+    // dialectOptions: {
+    //   timezone: 'Asia/Seoul', // MySQL 서버와의 시간대 동기화
+    // },
   }
 );
 

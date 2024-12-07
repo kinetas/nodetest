@@ -174,7 +174,7 @@ try {
     u2_id,
     r_id,
     message_contents,
-    send_date: new Date(), // 현재 시간 설정
+    send_date: new Date(new Date().getTime() + 9 * 60 * 60 * 1000), // KST 시간 설정
     image: fileBuffer,
     image_type: image_type || null,
     is_read:1
@@ -185,14 +185,14 @@ try {
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+    send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
     is_read: newMessage.is_read
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,
     message_contents,
-    send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
+    send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null,
     is_read
   });

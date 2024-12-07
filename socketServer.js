@@ -124,8 +124,8 @@ io.on('connection', (socket) => {
 socket.on('markAsRead', async (data) => {
   const { r_id, u1_id } = data;
   try {
-      await chatController.markMessageAsRead({ r_id, u1_id });
-      io.to(r_id).emit('messageRead', { r_id, u1_id });
+      await chatController.markMessageAsRead({data});
+      io.to(r_id).emit('messageRead', { r_id: data.r_id, u1_id: data.u1_id });
   } catch (error) {
       console.error("소켓 메시지 읽음 처리 오류:", error);
   }

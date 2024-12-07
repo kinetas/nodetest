@@ -160,6 +160,11 @@ app.get('/cVote/details/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'voteDetails.html'));
 });
 
+// 추천 미션 페이지 라우트
+router.get('/api/recommendations', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
+});
+
 // app.use('/chat', chatRoutes);
 app.use('/chat', timeConverterMiddleware, chatRoutes);
 

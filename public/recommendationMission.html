@@ -55,50 +55,48 @@
 
     <script>
         // 추천 미션 데이터 가져오기
-    fetch('/api/recommendationMission')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP 에러: ${response.status} ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const tableBody = document.getElementById('missionTableBody');
-            if (Object.keys(data).length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4">추천 미션이 없습니다.</td></tr>';
-            } else {
-                // 객체 데이터를 카테고리별로 처리
-                Object.entries(data).forEach(([category, missions]) => {
-                    // 카테고리 제목 추가
-                    const categoryRow = document.createElement('tr');
-                    categoryRow.innerHTML = `
-                        <td colspan="4" style="background-color: #f4f4f4; font-weight: bold;">
-                            ${category}
-                        </td>
-                    `;
-                    tableBody.appendChild(categoryRow);
-
-                    // 해당 카테고리의 미션 추가
-                    missions.forEach(mission => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${mission.m_title}</td>
-                            <td>${mission.category}</td>
-                            <td>${mission.description || 'N/A'}</td>
-                            <td><button>생성</button></td>
+        fetch('/api/recommendationMission')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP 에러: ${response.status} ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const tableBody = document.getElementById('missionTableBody');
+                if (Object.keys(data).length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="3">추천 미션이 없습니다.</td></tr>';
+                } else {
+                    // 객체 데이터를 카테고리별로 처리
+                    Object.entries(data).forEach(([category, missions]) => {
+                        // 카테고리 제목 추가
+                        const categoryRow = document.createElement('tr');
+                        categoryRow.innerHTML = `
+                            <td colspan="3" style="background-color: #f4f4f4; font-weight: bold;">
+                                ${category}
+                            </td>
                         `;
-                        tableBody.appendChild(row);
-                    });
-                });
-            }
-        })
-        .catch(error => {
-            console.error('추천 미션 데이터를 불러오는 중 오류 발생:', error);
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.style.display = 'block';
-            errorMessage.innerHTML = `추천 미션 데이터를 불러오는 중 오류가 발생했습니다: <br>${error.message}`;
-        });
+                        tableBody.appendChild(categoryRow);
 
+                        // 해당 카테고리의 미션 추가
+                        missions.forEach(mission => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${mission.m_title}</td>
+                                <td>${mission.category}</td>
+                                <td><button>생성</button></td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('추천 미션 데이터를 불러오는 중 오류 발생:', error);
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.style.display = 'block';
+                errorMessage.innerHTML = `추천 미션 데이터를 불러오는 중 오류가 발생했습니다: <br>${error.message}`;
+            });
     </script>
 </body>
 </html>

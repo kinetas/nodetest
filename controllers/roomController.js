@@ -195,6 +195,7 @@ exports.enterRoom = async (req, res) => {
             {
                 where: {
                     r_id,           // 해당 채팅방
+                    u2_id: u1_id,   // 현재 사용자가 수신자인 경우
                     is_read: 1      // 읽지 않은 메시지만 처리
                 }
             }

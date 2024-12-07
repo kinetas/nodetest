@@ -16,25 +16,24 @@ class _AddChatScreenState extends State<AddChatScreen> {
   final TextEditingController _roomNameController = TextEditingController();
   bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Future<void> _createChatRoom() async {
     const String apiUrl = 'http://54.180.54.31:3000/api/rooms';
 
     try {
       setState(() => _isLoading = true);
 
+      // API 요청 데이터
+      final requestBody = {
+        'u2_id': _u2IdController.text, // 상대방 ID
+        'roomName': _roomNameController.text.isEmpty ? null : _roomNameController.text, // 방 이름 (옵션)
+        'r_type': widget.chatType, // 채팅방 유형 (전달된 chatType 사용)
+      };
+
+      // POST 요청
       final response = await SessionCookieManager.post(
         apiUrl,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'u2_id': _u2IdController.text,
-          'roomName': _roomNameController.text.isEmpty ? null : _roomNameController.text,
-          'r_type': widget.chatType, // 부모 위젯에서 전달된 chatType 사용
-        }),
+        body: jsonEncode(requestBody),
       );
 
       setState(() => _isLoading = false);
@@ -43,11 +42,13 @@ class _AddChatScreenState extends State<AddChatScreen> {
         final responseData = jsonDecode(response.body);
 
         if (responseData['success'] == true) {
+          // 성공 메시지 표시 및 이전 화면으로 이동
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방이 성공적으로 생성되었습니다!')),
           );
           Navigator.pop(context); // 이전 화면으로 돌아감
         } else {
+          // 실패 메시지 표시
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'] ?? '채팅방 생성 실패')),
           );

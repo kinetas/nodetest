@@ -129,7 +129,9 @@ class _FriendListWidgetState extends State<FriendListWidget> {
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               position: badges.BadgePosition.topEnd(top: 0, end: 3),
-              badgeColor: Colors.red,
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: Colors.red, // 기존 badgeColor 대체
+              ),
               child: IconButton(
                 icon: Icon(Icons.notifications),
                 onPressed: () => _navigateToFriendRequests(context),

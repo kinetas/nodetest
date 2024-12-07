@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Home/HomeScreen.dart';
-import 'Chat/ChatScreen.dart';
+import 'Chat/MainChatScreen.dart';
 import 'Mission/MissionScreen.dart';
 import 'Community/CommunityScreen.dart';
 import 'Setting/settings_screen.dart';

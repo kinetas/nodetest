@@ -1,83 +1,102 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저 추가
-import 'ChatRoomScreen.dart';
+import '../../SessionCookieManager.dart'; // 실제 프로젝트에 맞는 경로로 수정
+import 'ChatRoomScreen.dart'; // ChatRoomScreen.dart 파일 경로에 맞게 수정
 
-class EnterChatroom extends StatelessWidget {
-  final String rId; // 방 ID (r_id)
-  final String u2Id; // 친구 ID (u2_id)
+class EnterChatRoom extends StatefulWidget {
+  final Map<String, dynamic> roomData; // room 객체 전체
 
-  const EnterChatroom({
-    required this.rId,
-    required this.u2Id,
-    Key? key,
-  }) : super(key: key);
+  EnterChatRoom({required this.roomData});
 
-  Future<void> _enterRoom(BuildContext context) async {
-    const String apiUrl = 'http://54.180.54.31:3000/api/rooms/enter';
+  @override
+  _EnterChatRoomState createState() => _EnterChatRoomState();
+}
 
+class _EnterChatRoomState extends State<EnterChatRoom> {
+  bool isLoading = true; // 로딩 상태 관리
+
+  @override
+  void initState() {
+    super.initState();
+    enterChatRoom(); // 방 진입 로직 호출
+  }
+
+  Future<void> enterChatRoom() async {
     try {
-      // 세션 쿠키 매니저를 사용한 POST 요청
+      final url = 'http://54.180.54.31:3000/api/rooms/enter';
+      final body = {
+        'r_id': widget.roomData['r_id'], // 전달받은 room 데이터에서 r_id 가져오기
+        'u2_id': widget.roomData['u2_id'], // 전달받은 room 데이터에서 u2_id 가져오기
+      };
+
       final response = await SessionCookieManager.post(
-        apiUrl,
+        url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'r_id': rId, 'u2_id': u2Id}),
+        body: json.encode(body),
       );
 
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-
-        if (responseData['message'] == "방에 성공적으로 입장했습니다.") {
-          final roomData = responseData['room'];
-
-          // 방 입장 성공 시 ChatRoomScreen으로 이동
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatRoomScreen(
-                chatId: roomData['r_id'], // 방 ID
-                chatTitle: roomData['i_title'] ?? '제목 없음', // 방 제목
-                userId: roomData['u1_id'], // 현재 사용자 ID
-                otherUserId: roomData['u2_id'], // 상대방 ID
-              ),
+        print('방 입장 성공');
+        // ChatRoomScreen으로 이동
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatRoomScreen(
+              roomData: widget.roomData, // room 데이터 전달
             ),
-          );
-        } else {
-          _showErrorDialog(context, responseData['message'] ?? '방 입장 실패');
-        }
+          ),
+        );
       } else {
-        _showErrorDialog(context, '방 입장 요청 실패: ${response.statusCode}');
+        print('Error: ${response.statusCode}');
+        print('Response: ${response.body}');
+        // 에러 처리
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('오류'),
+            content: Text('방 입장에 실패했습니다. 다시 시도해주세요.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('확인'),
+              ),
+            ],
+          ),
+        );
       }
     } catch (e) {
-      _showErrorDialog(context, '네트워크 오류: $e');
+      print('Error during room entry: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('오류'),
+          content: Text('네트워크 연결을 확인해주세요.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('확인'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      setState(() {
+        isLoading = false; // 로딩 상태 해제
+      });
     }
-  }
-
-  void _showErrorDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('오류'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('확인'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _enterRoom(context); // 방 입장 시도
-    });
-
     return Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator()) // 로딩 중 표시
+          : Center(
+        child: Text('채팅방 입장 중...'),
       ),
     );
   }

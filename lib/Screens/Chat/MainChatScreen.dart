@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'NormalChatList.dart'; // 일반 채팅 리스트
-import 'MissionChatList.dart'; // 미션 채팅 리스트
+import 'GeneralRoomList.dart'; // 일반 채팅 리스트
+import 'OpenRoomList.dart'; // 미션 채팅 리스트
 import 'AddChat_screen.dart'; // AddChat 화면
 
 class ChatScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
 
   void _navigateToAddChat() {
     // 현재 선택된 탭에 따라 채팅 타입 설정
-    String chatType = _tabController.index == 0 ? 'general' : 'open';
+    String chatType = _tabController.index == 0 ? 'general' : 'open'; // 'general' 또는 'open'
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -56,8 +56,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _tabController,
         children: [
-          NormalChatList(), // 일반 채팅 리스트 화면
-          MissionChatList(), // 미션 채팅 리스트 화면
+          GeneralRoomList(), // 일반 채팅 리스트 화면
+          OpenRoomList(), // 미션 채팅 리스트 화면
         ],
       ),
     );

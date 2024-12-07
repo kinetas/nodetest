@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'ChatContent.dart'; // ChatContent를 import
-import 'ChatPlusButton.dart'; // ChatPlusButton을 import
+import 'ChatContent.dart'; // ChatContent import
+import 'ChatPlusButton.dart'; // ChatPlusButton import
 
 class ChatRoomScreen extends StatefulWidget {
-  final String chatId; // 채팅방 ID
-  final String chatTitle; // 채팅방 제목
-  final String userId; // 유저 아이디
-  final String otherUserId; // 상대방 아이디
+  final Map<String, dynamic> roomData; // roomData를 받도록 수정
 
   const ChatRoomScreen({
-    required this.chatId,
-    required this.chatTitle,
-    required this.userId,
-    required this.otherUserId,
+    required this.roomData,
     Key? key,
   }) : super(key: key);
 
@@ -22,35 +16,42 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
-  late IO.Socket socket;
-  TextEditingController _messageController = TextEditingController();
-  bool _showPlusOptions = false;
+  late IO.Socket socket; // Socket.IO 클라이언트
+  final TextEditingController _messageController = TextEditingController();
+  bool _showPlusOptions = false; // "+" 버튼 옵션 표시 여부
   final GlobalKey<ChatContentState> _chatContentKey = GlobalKey<ChatContentState>(); // ChatContent 상태 접근용 Key
 
   @override
   void initState() {
     super.initState();
-    _initializeSocket();
+    _initializeSocket(); // 소켓 초기화
+  }
+
+  @override
+  void dispose() {
+    socket.disconnect(); // 소켓 연결 해제
+    socket.dispose();
+    _messageController.dispose(); // 컨트롤러 해제
+    super.dispose();
   }
 
   void _initializeSocket() {
+    print('Initializing socket for room: ${widget.roomData['r_id']}');
+
     socket = IO.io(
       'http://54.180.54.31:3001',
       IO.OptionBuilder()
-          .setTransports(['websocket'])
+          .setTransports(['websocket']) // WebSocket 사용
           .disableAutoConnect()
           .build(),
     );
 
     socket.onConnect((_) {
       print('Socket connected');
-      debugPrint('joinRoom: ${{
-        'r_id': widget.chatId,
-        'u1_id': widget.userId,
-      }}');
       socket.emit('joinRoom', {
-        'r_id': widget.chatId,
-        'u1_id': widget.userId,
+        'r_id': widget.roomData['r_id'],
+        'u1_id': widget.roomData['u1_id'],
+        'u2_id': widget.roomData['u2_id'],
       });
     });
 
@@ -58,27 +59,30 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       print('Socket disconnected');
     });
 
+    // 메시지 수신 이벤트
     socket.on('receiveMessage', (data) {
       print('Message received: $data');
-      _chatContentKey.currentState?.addMessage(data); // 메시지 업데이트
+      _chatContentKey.currentState?.addMessage(data); // ChatContent에만 메시지 추가
     });
 
     socket.connect();
   }
 
   void _sendMessage() {
-    if (_messageController.text.isEmpty) return;
+    final messageContent = _messageController.text.trim();
+    if (messageContent.isEmpty) return;
 
     final messageData = {
-      'r_id': widget.chatId,
-      'u1_id': widget.userId,
-      'u2_id': widget.otherUserId,
-      'message_contents': _messageController.text,
-      'send_date': DateTime.now().toString(), // 임시로 현재 시간 추가
+      'r_id': widget.roomData['r_id'],
+      'u1_id': widget.roomData['u1_id'],
+      'u2_id': widget.roomData['u2_id'],
+      'message_contents': messageContent,
+      'send_date': DateTime.now().toIso8601String(),
     };
 
-    socket.emit('sendMessage', messageData);
-    print('Message sent: ${_messageController.text}');
+    print('Sending message: $messageData');
+    socket.emit('sendMessage', messageData); // 메시지 서버 전송
+
     _messageController.clear();
   }
 
@@ -92,16 +96,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.chatTitle),
+        title: Text(widget.roomData['r_title'] ?? '채팅방'),
       ),
       body: Column(
         children: [
           Expanded(
             child: ChatContent(
-              key: _chatContentKey, // GlobalKey를 ChatContent에 전달
-              chatId: widget.chatId,
-              userId: widget.userId,
-              otherUserId: widget.otherUserId,
+              key: _chatContentKey,
+              chatId: widget.roomData['r_id'],
+              userId: widget.roomData['u1_id'],
+              otherUserId: widget.roomData['u2_id'],
             ),
           ),
           if (_showPlusOptions)
@@ -135,13 +139,5 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    socket.disconnect();
-    socket.dispose();
-    _messageController.dispose();
-    super.dispose();
   }
 }

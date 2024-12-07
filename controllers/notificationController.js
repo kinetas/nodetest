@@ -40,9 +40,11 @@ const sendNotification = async (userId, token, title, body = {}) => {
 };
 // API 컨트롤러 함수
 const sendNotificationController = async (req, res) => {
+    console.log('Request Received at Controller:', req.body); // 요청 데이터 확인
     const { userId, token, title, body } = req.body;
 
     if (!userId || !token || !title || !body) {
+        console.error('Missing Required Fields:', req.body); // 누락된 데이터 확인
         return res.status(400).json({ error: 'Missing required fields.' });
     }
 

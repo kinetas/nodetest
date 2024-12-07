@@ -149,8 +149,7 @@ exports.getMessages = async (r_id) => {
   }
 };
 //메시지 읽음 처리
-exports.markMessageAsRead = async (req, res) => {
-  const { r_id, u1_id } = req.body;
+exports.markMessageAsRead = async ({ r_id, u1_id }) => {
   try {
       await RMessage.update(
           { is_read: 0 },

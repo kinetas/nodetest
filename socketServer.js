@@ -172,7 +172,7 @@ try {
     send_date: new Date(), // 현재 시간 설정
     image: fileBuffer,
     image_type: image_type || null,
-    is_read
+    is_read:1
   });
   //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
 
@@ -182,7 +182,7 @@ try {
     message_contents,
     send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
-    is_read
+    is_read:1
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,

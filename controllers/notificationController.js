@@ -1,4 +1,3 @@
-const { sendNotification } = require('../config/FCM');
 const NotificationLog = require('../models/notificationModel');
 
 /// 기본 알림 전송 함수

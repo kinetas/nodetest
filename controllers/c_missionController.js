@@ -121,7 +121,8 @@ exports.acceptCommunityMission = async (req, res) => {
             m_reword: null,
             m_status: '진행중',
             r_id: rid_u1_u2,
-            m_extended: false
+            m_extended: false,
+            missionAuthenticationAuthority: mission.u_id,
         });
 
         await Mission.create({
@@ -133,7 +134,8 @@ exports.acceptCommunityMission = async (req, res) => {
             m_reword: null,
             m_status: '진행중',
             r_id: rid_u2_u1,
-            m_extended: false
+            m_extended: false,
+            missionAuthenticationAuthority: u2_id,
         });
 
         

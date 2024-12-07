@@ -146,11 +146,11 @@ exports.getMessages = async (r_id) => {
   }
 };
 //메시지 읽음 처리
-exports.markMessageAsRead = async ({ r_id, u1_id }) => {
+exports.markMessageAsRead = async ({ r_id}) => {
   try {
       const updatedCount =await RMessage.update(
           { is_read: 0 },
-          { where: { r_id, u2_id: u1_id, is_read: 1 } } // 받은 메시지만 업데이트
+          { where: { r_id, is_read: 1 } } // 받은 메시지만 업데이트
       );
       console.log(`Updated ${updatedCount} messages as read.`);
       return updatedCount > 0; // 업데이트 성공 여부 반환

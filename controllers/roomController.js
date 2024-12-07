@@ -189,7 +189,16 @@ exports.enterRoom = async (req, res) => {
         if (!room) {
             return res.status(404).json({ message: '해당 방을 찾을 수 없습니다.' });
         }
-
+         // 방에 입장하면서 메시지의 is_read 값을 업데이트
+        const updatedCount = await RMessage.update(
+            { is_read: 0 }, // 읽음 처리
+            {
+                where: {
+                    r_id,           // 해당 채팅방
+                    is_read: 1      // 읽지 않은 메시지만 처리
+                }
+            }
+        );
         // 방 입장에 필요한 다른 로직 추가 (예: 로그 기록)
         console.log(JSON.stringify({ message: '방에 성공적으로 입장했습니다.', room }));
         res.json({ message: '방에 성공적으로 입장했습니다.', room });

@@ -101,7 +101,9 @@
             messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
             chatMessages.appendChild(messageElement);
 
-
+            if (data.u1_id !== sessionStorage.getItem('user_id')) { // 사용자가 보낸 메시지가 아니면
+                socket.emit('markAsRead', { r_id: data.r_id, u1_id: sessionStorage.getItem('user_id') });
+            }
              // 이미지가 포함된 경우 이미지를 표시
             if (data.image) {
                 const imageElement = document.createElement("img");

@@ -153,7 +153,7 @@ exports.markMessageAsRead = async ({ r_id, u1_id }) => {
           { where: { r_id, u2_id: u1_id, is_read: 1 } } // 받은 메시지만 업데이트
       );
       console.log(`Updated ${updatedCount} messages as read.`);
-      return true;
+      return updatedCount > 0; // 업데이트 성공 여부 반환
   } catch (error) {
       console.error("Error updating is_read:", error);
       return false;

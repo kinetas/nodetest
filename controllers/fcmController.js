@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+const admin = require('../config/FCM');
 const path = require('path');
 const NotificationLog = require('../models/notificationModel');
 
@@ -11,96 +11,84 @@ const NotificationLog = require('../models/notificationModel');
 });
 */
 
-// 기본 알림 전송 함수
-const sendNotification = async (token, payload, userId) => {
+// 알림 전송 함수
+const sendNotification = async (userId, token, title, body = {}) => {
+    const message = {
+        notification: { title, body }, // 알림 제목과 내용
+        token, // FCM 토큰
+    };
+
     try {
-        const response = await admin.messaging().send({
-            token: token,
-            notification: {
-                title: payload.title,
-                body: payload.body,
-            },
-            data: payload.data || {},
-        });
+        // Firebase를 통해 알림 전송
+        const response = await admin.messaging().send(message);
 
-        console.log('Successfully sent message:', response);
-
-        // 성공 시 알림 로그 저장
+        // 성공 시 로그 저장
         await NotificationLog.create({
             userId,
-            title: payload.title,
-            body: payload.body,
+            title,
+            body,
             status: 'success',
             timestamp: new Date(),
         });
-    } catch (error) {
-        console.error('Error sending message:', error);
 
-        // 실패 시 알림 로그 저장
+        console.log(`Notification sent to user ${userId}:`, response);
+        return response;
+    } catch (error) {
+        console.error(`Failed to send notification to user ${userId}:`, error.message);
+
+        // 실패 시 로그 저장
         await NotificationLog.create({
             userId,
-            title: payload.title,
-            body: payload.body,
+            title,
+            body,
             status: 'failed',
             errorMessage: error.message,
             timestamp: new Date(),
         });
+
+        throw error;
     }
 };
 
 // 친구 요청 알림 함수
 const sendFriendRequestNotification = async (token, senderId, userId) => {
-    await sendNotification(token, {
-        title: '친구 요청',
-        body: `${senderId}님이 친구 요청을 보냈습니다.`,
-    }, userId);
+    const title = '친구 요청 알림';
+    const body = `${senderId}님이 친구 요청을 보냈습니다.`;
+    return await sendNotification(userId, token, title, body);
 };
 
 // 친구 요청 수락 알림 함수
 const sendFriendAcceptNotification = async (token, senderId, userId) => {
-    await sendNotification(token, {
-        title: '친구 요청 수락',
-        body: `${senderId}님이 친구 요청을 수락했습니다.`,
-    }, userId);
-};
-
-// 친구 요청 거절 알림 함수
-const sendFriendRejectNotification = async (token, senderId, userId) => {
-    await sendNotification(token, {
-        title: '친구 요청 거절',
-        body: `${senderId}님이 친구 요청을 거절했습니다.`,
-    }, userId);
+    const title = '미션 수락 알림';
+    const body = `${senderId}님이 미션을 수락하였습니다.`;
+    return await sendNotification(userId, token, title, body);
 };
 
 // 미션 생성 알림 함수
 const sendMissionCreateNotification = async (token, senderId, userId) => {
-    await sendNotification(token, {
-        title: '미션 생성 완료',
-        body: `${senderId}님이 미션을 생성하였습니다.`,
-    }, userId);
+    const title = '미션 생성 알림';
+    const body = `${senderId}님이 미션을 생성하였습니다.`;
+    return await sendNotification(userId, token, title, body);
 };
 
 // 미션 성공 알림 함수
 const sendMissionSuccessNotification = async (token, senderId, userId) => {
-    await sendNotification(token, {
-        title: '미션 성공',
-        body: `${senderId}님이 미션을 성공하였습니다.`,
-    }, userId);
+    const title = '미션 성공 알림';
+    const body = `${senderId}님이 미션을 성공하였습니다.`;
+    return await sendNotification(userId, token, title, body);
 };
 
 // 미션 실패 알림 함수
 const sendMissionFailureNotification = async (token, senderId, userId) => {
-    await sendNotification(token, {
-        title: '미션 실패',
-        body: `${senderId}님이 미션을 실패하였습니다.`,
-    }, userId);
+    const title = '미션 실패 알림';
+    const body = `${senderId}님이 미션을 실패하였습니다.`;
+    return await sendNotification(userId, token, title, body);
 };
 
 module.exports = {
     sendNotification,
     sendFriendRequestNotification,
     sendFriendAcceptNotification,
-    sendFriendRejectNotification,
     sendMissionCreateNotification,
     sendMissionSuccessNotification,
     sendMissionFailureNotification,

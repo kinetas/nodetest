@@ -105,7 +105,7 @@ const upload = multer({ storage });
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
-/*
+
   socket.on('createRoom', (roomName) => {
     chatController.createRoom(socket, roomName); // 방 생성 처리
   });
@@ -119,7 +119,7 @@ io.on('connection', (socket) => {
         }
     });
 });
-*/
+
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 

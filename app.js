@@ -226,8 +226,16 @@ app.post('/api/send-notification', sendNotificationController);
 
 
 app.use((req, res, next) => {
-    console.log(`[${req.method}] ${req.url} - Body:`, req.body);
-    next();
+    let rawBody = '';
+    req.on('data', (chunk) => {
+        rawBody += chunk.toString(); // 요청 Body를 문자열로 저장
+    });
+
+    req.on('end', () => {
+        console.log(`[${req.method}] ${req.url} - Headers:`, req.headers);
+        console.log(`Raw Body:`, rawBody);
+        next();
+    });
 });
 
 app.listen(PORT, '0.0.0.0', () => {

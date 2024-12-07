@@ -7,7 +7,9 @@ let serviceAccount;
 
 try {
     // JSON 파일에서 객체로 변환
+    console.log('Attempting to load Service Account from:', serviceAccountPath); // 경로 확인
     serviceAccount = require(serviceAccountPath);
+    console.log('Service Account Loaded:', serviceAccount ? 'Success' : 'Failed'); // 로드 성공 여부
 } catch (error) {
     console.error('Error loading service account JSON file:', error.message);
     throw new Error('Failed to load Firebase service account file');
@@ -27,21 +29,4 @@ try {
     throw new Error('Failed to initialize Firebase Admin SDK');
 }
 
-// FCM 메시지 전송 로직
-const sendNotification = async (token, title, body) => {
-    const message = {
-        notification: { title, body },
-        token,
-    };
-
-    try {
-        const response = await admin.messaging().send(message);
-        console.log('Notification sent successfully:', response);
-        return response;
-    } catch (error) {
-        console.error('Error sending notification:', error.message);
-        throw error;
-    }
-};
-
-module.exports = { sendNotification };
+module.exports = admin;

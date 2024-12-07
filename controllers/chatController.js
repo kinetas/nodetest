@@ -136,9 +136,6 @@ exports.getMessages = async (r_id) => {
       order: [['send_date', 'ASC']],
     });
 
-    // // 메시지 반환
-    // console.log(JSON.stringify(messages));
-    // return messages;
     // Sequelize 객체를 JSON으로 변환
     const jsonMessages = messages.map(msg => msg.toJSON());
     console.log(JSON.stringify(jsonMessages));
@@ -151,13 +148,14 @@ exports.getMessages = async (r_id) => {
 //메시지 읽음 처리
 exports.markMessageAsRead = async ({ r_id, u1_id }) => {
   try {
-      await RMessage.update(
+      const updatedCount =await RMessage.update(
           { is_read: 0 },
           { where: { r_id, u2_id: u1_id, is_read: 1 } } // 받은 메시지만 업데이트
       );
-      res.status(200).json({ message: "메시지 읽음 처리 완료" });
+      console.log(`Updated ${updatedCount} messages as read.`);
+      return true;
   } catch (error) {
-      console.error("메시지 읽음 처리 오류:", error);
-      res.status(500).json({ message: "메시지 읽음 처리 실패" });
+      console.error("Error updating is_read:", error);
+      return false;
   }
 };

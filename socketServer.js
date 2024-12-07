@@ -124,10 +124,15 @@ io.on('connection', (socket) => {
 socket.on('markAsRead', async (data) => {
   const { r_id, u1_id } = data;
   try {
-      await chatController.markMessageAsRead({data});
-      io.to(r_id).emit('messageRead', { r_id: data.r_id, u1_id: data.u1_id });
+    const success = await chatController.markMessageAsRead({ r_id, u1_id });
+    if (success) {
+      io.to(r_id).emit('messageRead', { r_id, u1_id }); // 클라이언트에 읽음 상태 알림
+      console.log(`Messages in room ${r_id} marked as read for user ${u1_id}`);
+  } else {
+      console.error("Failed to mark messages as read.");
+  }
   } catch (error) {
-      console.error("소켓 메시지 읽음 처리 오류:", error);
+    console.error("Socket markAsRead error:", error);
   }
 });
 

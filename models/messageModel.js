@@ -71,7 +71,8 @@ const RMessage = sequelize.define('RMessage', {
   }, // 변경된 부분 - 이미지 타입 필드 추가
   is_read: {
     type: TINYINT(1),
-    allowNull: true,
+    allowNull: false,
+    defaultValue: 1
   }
 }, {
   tableName: 'r_message',

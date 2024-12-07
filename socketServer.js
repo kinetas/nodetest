@@ -174,7 +174,7 @@ try {
     u2_id,
     r_id,
     message_contents,
-    send_date: new Date(new Date().getTime() + 9 * 60 * 60 * 1000), // KST 시간 설정
+    send_date: new Date(), // KST 시간 설정
     image: fileBuffer,
     image_type: image_type || null,
     is_read:1

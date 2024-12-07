@@ -863,6 +863,8 @@ exports.createMissionFromRecommendation = async (req, res) => {
         const now = new Date();
         const deadline = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59); // 금일 23:59:59
 
+        const room = await Room.findOne({ where: { u1_id:u1_id, u2_id:u1_id } });
+
         await Mission.create({
             m_id: uuidv4(),               // 고유한 미션 ID 생성
             u1_id,                        // 현재 로그인된 사용자
@@ -871,6 +873,7 @@ exports.createMissionFromRecommendation = async (req, res) => {
             m_deadline: deadline,         // 마감기한
             m_reword: null,               // 보상은 없음
             m_status: '진행중',           // 기본 상태는 '진행중'
+            r_id: room.r_id,
             m_extended: 'false',
             missionAuthenticationAuthority: u1_id, // 인증 권한은 본인
         });

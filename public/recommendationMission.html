@@ -51,14 +51,14 @@
             <!-- 미션 데이터가 여기 추가됩니다 -->
         </tbody>
     </table>
-    <p id="errorMessage" class="error" style="display:none;">추천 미션 데이터를 불러오는 중 오류가 발생했습니다.</p>
+    <p id="errorMessage" class="error" style="display:none;"></p>
 
     <script>
         // 추천 미션 데이터 가져오기
         fetch('/api/recommendationMission')
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('네트워크 응답이 올바르지 않습니다.');
+                    throw new Error(`HTTP 에러: ${response.status} ${response.statusText}`);
                 }
                 return response.json();
             })
@@ -83,7 +83,7 @@
                 console.error('추천 미션 데이터를 불러오는 중 오류 발생:', error);
                 const errorMessage = document.getElementById('errorMessage');
                 errorMessage.style.display = 'block';
-                errorMessage.textContent = '추천 미션 데이터를 불러오는 중 오류가 발생했습니다.';
+                errorMessage.innerHTML = `추천 미션 데이터를 불러오는 중 오류가 발생했습니다: <br>${error.message}`;
             });
     </script>
 </body>

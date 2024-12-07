@@ -142,11 +142,11 @@
         // 방 삭제 함수
         function deleteRoom() {
             const u2_id = document.getElementById('userIdInput').value;
-            let type = document.getElementById('roomTypeInput').vaule;
-            if (!type){
-                type = "general";
+            let r_type = document.getElementById('roomTypeInput').vaule;
+            if (!r_type){
+                r_type = "general";
             }
-            fetch(`/api/rooms/${u2_id}/${type}`, {
+            fetch(`/api/rooms/${u2_id}/${r_type}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
 

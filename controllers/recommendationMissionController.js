@@ -17,6 +17,6 @@ exports.getRecommendationsByCategory = async (req, res) => {
         res.json(groupedRecommendations);
     } catch (error) {
         console.error('추천 미션 데이터를 가져오는 중 오류 발생:', error);
-        res.status(500).json({ message: '추천 미션 데이터를 가져오는 중 오류가 발생했습니다.' });
+        res.status(500).json({ message: `추천 미션 데이터를 가져오는 중 오류(${error})가 발생했습니다.controller` });
     }
 };

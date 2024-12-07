@@ -55,7 +55,7 @@
 
     <script>
         // 추천 미션 데이터 가져오기
-        fetch('/api/recommendations')
+        fetch('/api/recommendationMission')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('네트워크 응답이 올바르지 않습니다.');

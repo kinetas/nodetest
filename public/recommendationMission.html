@@ -96,6 +96,30 @@
                 errorMessage.style.display = 'block';
                 errorMessage.innerHTML = `추천 미션 데이터를 불러오는 중 오류가 발생했습니다: <br>${error.message}`;
             });
+            
+        // 추천 미션 생성 요청
+        function createMission(m_title) {
+            fetch('/api/recommendationMission/create-mission', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ m_title }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP 에러: ${response.status} ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('추천 미션 생성 중 오류 발생:', error);
+                    alert('추천 미션 생성 중 오류가 발생했습니다.');
+                });
+        }
     </script>
 </body>
 </html>

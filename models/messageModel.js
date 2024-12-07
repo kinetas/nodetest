@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes, TINYINT } = require('sequelize');
 const sequelize = require('../config/db');
 const RMessage = sequelize.define('RMessage', {
   //   u1_id: {
@@ -68,7 +68,11 @@ const RMessage = sequelize.define('RMessage', {
   image_type: {
     type: DataTypes.STRING(50),
     allowNull: true,
-  } // 변경된 부분 - 이미지 타입 필드 추가
+  }, // 변경된 부분 - 이미지 타입 필드 추가
+  is_read: {
+    type: TINYINT(1),
+    allowNull: true,
+  }
 }, {
   tableName: 'r_message',
   timestamps: false,

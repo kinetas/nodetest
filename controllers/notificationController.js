@@ -1,7 +1,7 @@
 const { sendNotification } = require('../config/FCM');
 const NotificationLog = require('../models/notificationModel');
 
-/// 알림 전송 함수
+/// 기본 알림 전송 함수
 const sendNotification = async (userId, token, title, body = {}) => {
     const message = {
         notification: { title, body }, // 알림 제목과 내용
@@ -39,7 +39,21 @@ const sendNotification = async (userId, token, title, body = {}) => {
         throw error;
     }
 };
+// API 컨트롤러 함수
+const sendNotificationController = async (req, res) => {
+    const { userId, token, title, body } = req.body;
 
+    if (!userId || !token || !title || !body) {
+        return res.status(400).json({ error: 'Missing required fields.' });
+    }
+
+    try {
+        const response = await sendNotification(userId, token, title, body);
+        res.status(200).json({ message: 'Notification sent successfully.', response });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to send notification.' });
+    }
+};
 // 친구 요청 알림 함수
 const sendFriendRequestNotification = async (token, senderId, userId) => {
     const title = '친구 요청 알림';
@@ -76,7 +90,7 @@ const sendMissionFailureNotification = async (token, senderId, userId) => {
 };
 
 module.exports = {
-    sendNotification,
+    sendNotificationController,
     sendFriendRequestNotification,
     sendFriendAcceptNotification,
     sendMissionCreateNotification,

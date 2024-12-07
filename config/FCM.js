@@ -7,7 +7,9 @@ let serviceAccount;
 
 try {
     // JSON 파일에서 객체로 변환
+    console.log('Attempting to load Service Account from:', serviceAccountPath); // 경로 확인
     serviceAccount = require(serviceAccountPath);
+    console.log('Service Account Loaded:', serviceAccount ? 'Success' : 'Failed'); // 로드 성공 여부
 } catch (error) {
     console.error('Error loading service account JSON file:', error.message);
     throw new Error('Failed to load Firebase service account file');

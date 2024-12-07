@@ -78,24 +78,25 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
           r_id,
           message_num,
           send_date,
-          message_contents: message
+          message_contents: message,
+          is_read
       });
 
       // 성공적으로 저장된 경우 콘솔 로그
       console.log('Message saved:', newMessage);
 
       // 클라이언트에 메시지 전송
-      socket.emit('receiveMessage', { u1_id, message, send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') });
+      socket.emit('receiveMessage', { u1_id, message, is_read, send_date: send_date.toISOString().slice(0, 19).replace('T', ' ') });
   } catch (error) {
       console.error('Error saving message with Sequelize:', error);
   }
 };
 
 exports.sendMessageWithFile = async (req, res) => {
-  const { u1_id, u2_id, r_id, message_contents } = req.body;
+  const { u1_id, u2_id, r_id, message_contents, is_read } = req.body;
   const file = req.file;
 
-  if (!u1_id || !u2_id || !r_id || (!message_contents && !file)) {
+  if (!u1_id || !u2_id || !r_id || !is_read ||(!message_contents && !file)) {
       return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
   }
 
@@ -115,7 +116,8 @@ exports.sendMessageWithFile = async (req, res) => {
           message_contents,
           send_date: new Date(),
           image: fileBuffer,
-          image_type: fileType
+          image_type: fileType,
+          is_read
       }); // 변경된 부분 - 메시지와 파일을 DB에 저장
 
       res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.', newMessage });
@@ -144,5 +146,19 @@ exports.getMessages = async (r_id) => {
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);
     throw error; // 오류가 발생하면 throw하여 호출한 쪽에서 처리
+  }
+};
+//메시지 읽음 처리
+exports.markMessageAsRead = async (req, res) => {
+  const { r_id, u1_id } = req.body;
+  try {
+      await RMessage.update(
+          { is_read: 0 },
+          { where: { r_id, u2_id: u1_id, is_read: 1 } } // 받은 메시지만 업데이트
+      );
+      res.status(200).json({ message: "메시지 읽음 처리 완료" });
+  } catch (error) {
+      console.error("메시지 읽음 처리 오류:", error);
+      res.status(500).json({ message: "메시지 읽음 처리 실패" });
   }
 };

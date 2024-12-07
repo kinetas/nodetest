@@ -149,7 +149,8 @@
                         u1_id,
                         u2_id,
                         image: base64Image,
-                        image_type: file.type
+                        image_type: file.type,
+                        is_read
                     });
         
                     // 소켓으로 메시지와 이미지 전송
@@ -159,7 +160,8 @@
                         u1_id,
                         u2_id,
                         image: base64Image,
-                        image_type: file.type
+                        image_type: file.type,
+                        is_read
                     });
         
                     // 입력 필드 초기화
@@ -173,12 +175,18 @@
                     message_contents: message,
                     r_id,
                     u1_id,
-                    u2_id
+                    u2_id,
+                    is_read
                 });
         
                 // 메시지 입력란 초기화
                 messageInput.value = "";
             }
+        }
+
+         // 읽음 처리
+        function markMessagesAsRead() {
+            socket.emit('markAsRead', { r_id: roomId, u1_id });
         }
         /*function sendMessage() {
             // 메시지 입력 필드를 불러오기

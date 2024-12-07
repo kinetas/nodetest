@@ -120,18 +120,30 @@ io.on('connection', (socket) => {
     });
 });
 
+//메시지 읽음 처리 실시간 반영
+socket.on('markAsRead', async (data) => {
+  const { r_id, u1_id } = data;
+  try {
+      await chatController.markMessageAsRead({ r_id, u1_id });
+      io.to(r_id).emit('messageRead', { r_id, u1_id });
+  } catch (error) {
+      console.error("소켓 메시지 읽음 처리 오류:", error);
+  }
+});
+
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 
-    const { message_contents, r_id, u1_id, u2_id, image, image_type } = data;
+    const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
 
     // 필수 값 검증
-    if (!message_contents || !r_id || !u1_id || !u2_id) {
+    if (!message_contents || !r_id || !u1_id || !u2_id||is_read) {
       let missingFields = [];
       if (!message_contents) missingFields.push('message_contents'); // 누락된 필드를 확인
       if (!r_id) missingFields.push('r_id');
       if (!u1_id) missingFields.push('u1_id');
       if (!u2_id) missingFields.push('u2_id');
+      if (!is_read) missingFields.push('is_read');
       if (missingFields.length > 0) {
       console.error(`누락된 필드: ${missingFields.join(', ')}`); // 누락된 필드 로그 출력 (수정된 부분)
       socket.emit('errorMessage', `필수 필드 누락: ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)
@@ -159,7 +171,8 @@ try {
     message_contents,
     send_date: new Date(), // 현재 시간 설정
     image: fileBuffer,
-    image_type: image_type || null
+    image_type: image_type || null,
+    is_read
   });
   //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
 
@@ -168,13 +181,15 @@ try {
     u1_id,
     message_contents,
     send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
-    image: fileBuffer ? fileBuffer.toString('base64') : null // Base64로 인코딩하여 클라이언트에 전송
+    image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
+    is_read
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,
     message_contents,
     send_date: newMessage.send_date.toISOString().slice(0, 19).replace('T', ' '),
-    image: fileBuffer ? fileBuffer.toString('base64') : null
+    image: fileBuffer ? fileBuffer.toString('base64') : null,
+    is_read
   });
 } catch (error) {
   console.error('DB 저장 오류:', error); // DB 저장 실패 시 에러 로그 출력

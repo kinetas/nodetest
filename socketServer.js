@@ -4,7 +4,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 const cors = require('cors');
-
+const { sendMessageNotification } = require('./notificationController');
 const chatController = require('./controllers/chatController');
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -275,7 +275,7 @@ try {
 
     const title = '새로운 메시지 도착';
     const body = message_contents || '[이미지]';
-    await sendNotification(u2_id, title, body); 
+    await sendMessageNotification(u2_id, title, body); 
 }
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {

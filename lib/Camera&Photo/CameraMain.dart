@@ -89,12 +89,37 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _capturePhoto() async {
     try {
+      // 기존 사진 삭제
+      if (_capturedPhotoPath != null && File(_capturedPhotoPath!).existsSync()) {
+        await File(_capturedPhotoPath!).delete();
+        print("기존 사진 삭제 완료");
+      }
+
+      // 새로운 사진 촬영
       final XFile image = await _cameraController.takePicture();
       setState(() {
-        _capturedPhotoPath = image.path;
+        _capturedPhotoPath = image.path; // 새로운 사진 경로 저장
+        print("새로 찍은 사진 경로: $_capturedPhotoPath");
       });
     } catch (e) {
       print("사진 촬영 에러: $e");
+    }
+  }
+
+  void _goToPhotoWaterMark() {
+    if (_capturedPhotoPath != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhotoWaterMark(
+            imagePath: _capturedPhotoPath!,
+            rId: widget.rId,
+            u2Id: widget.u2Id,
+          ),
+        ),
+      );
+    } else {
+      print("사진 경로가 설정되지 않았습니다!");
     }
   }
 

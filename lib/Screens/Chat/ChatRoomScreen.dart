@@ -65,13 +65,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       print('Message received: $data');
       // ChatContent 상태에 메시지 추가
       if (_chatContentKey.currentState != null) {
-        _chatContentKey.currentState?.addMessage({
-          'u1_id': data['u1_id'], // 보낸 사람 ID
-          'message_contents': data['message_contents'], // 메시지 내용
-          'send_date': data['send_date'], // 메시지 전송 시간
-          'image': data['image'], // 이미지(있으면 Base64로 디코딩 가능)
-          'is_read': data['is_read'], // 읽음 상태
-        });
+        _chatContentKey.currentState?.addMessage(data);
       }
     });
 
@@ -94,9 +88,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     // 서버에 메시지 전송
     socket.emit('sendMessage', messageData);
-
-    // 메시지를 화면에 바로 추가
-    _chatContentKey.currentState?.addMessage(messageData);
 
     // 입력 필드 초기화
     _messageController.clear();

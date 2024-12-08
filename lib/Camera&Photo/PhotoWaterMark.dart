@@ -29,16 +29,18 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
   @override
   void initState() {
     super.initState();
-    _applyPolaroidEffect(); // 폴라로이드 효과를 적용
+    print("PhotoWaterMark에서 받은 경로: ${widget.imagePath}");
+    _applyPolaroidEffect(widget.imagePath); // 전달받은 경로로 폴라로이드 효과 적용
   }
 
-  Future<void> _applyPolaroidEffect() async {
+  Future<void> _applyPolaroidEffect(String imagePath) async {
     try {
-      // 원본 이미지 로드
-      final ui.Image image = await decodeImageFromList(
-        File(widget.imagePath).readAsBytesSync(),
-      );
+      print("폴라로이드 효과 생성 중 경로: $imagePath");
 
+      // 이미지 로드
+      final ui.Image image = await decodeImageFromList(
+        File(imagePath).readAsBytesSync(),
+      );
       // 폴라로이드 캔버스 생성
       final double padding = 20.0;
       final double bottomSpace = 150.0; // 바닥 공간을 늘려서 150으로 설정
@@ -130,47 +132,65 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
       final ByteData? byteData = await finalImage.toByteData(format: ui.ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 
+      // 이후 생성된 파일 경로를 _imageFile로 저장
       final tempDir = await getTemporaryDirectory();
-      final outputFile = File('${tempDir.path}/polaroid_image.png');
+      final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+      final outputFile = File('${tempDir.path}/polaroid_image_$timestamp.png');
       await outputFile.writeAsBytes(buffer);
 
       setState(() {
         _imageFile = outputFile;
+        print("폴라로이드 효과 생성 완료, 경로: ${_imageFile!.path}");
       });
     } catch (e) {
       print("폴라로이드 효과 적용 중 오류 발생: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("폴라로이드 효과 적용 중 오류가 발생했습니다.")),
-      );
     }
   }
 
-  // 확대된 이미지 화면
-  void _showImageInFullScreen() {
+  // 파일 삭제
+  Future<void> _deleteImageFile() async {
+    if (_imageFile != null && await _imageFile!.exists()) {
+      try {
+        await _imageFile!.delete();
+        print("워터마크 이미지 삭제 완료.");
+      } catch (e) {
+        print("워터마크 이미지 삭제 중 오류 발생: $e");
+      }
+    }
+  }
+
+  // 뒤로 가기 버튼 눌렀을 때 초기화 확인 다이얼로그
+  void _showExitConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: InteractiveViewer(
-            child: Image.file(_imageFile!),
+      builder: (context) => AlertDialog(
+        title: Text("폴라로이드 초기화"),
+        content: Text("뒤로 가면 생성된 워터마크 사진이 삭제됩니다. 진행하시겠습니까?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // 다이얼로그 닫기
+            },
+            child: Text("취소"),
           ),
-        );
-      },
+          TextButton(
+            onPressed: () async {
+              await _deleteImageFile(); // 파일 삭제
+              Navigator.of(context).pop(); // 다이얼로그 닫기
+              Navigator.of(context).pop(); // 이전 화면으로 돌아가기
+            },
+            child: Text("확인"),
+          ),
+        ],
+      ),
     );
   }
 
-  // "다음" 버튼 눌렀을 때 PhotoSend로 넘어가기
-  void _navigateToNextScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PhotoSend(
-          imagePath: _imageFile!.path,
-          rId: widget.rId,
-          u2Id: widget.u2Id,
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    _deleteImageFile(); // 화면 종료 시 파일 삭제
+    _textController.dispose(); // 컨트롤러 해제
+    super.dispose();
   }
 
   @override
@@ -178,6 +198,10 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
     return Scaffold(
       appBar: AppBar(
         title: Text("폴라로이드 효과"),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: _showExitConfirmationDialog, // 뒤로 가기 버튼 동작
+        ),
       ),
       body: Center(
         child: _imageFile == null
@@ -186,18 +210,26 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
           mainAxisSize: MainAxisSize.min,
           children: [
             GestureDetector(
-              onTap: _showImageInFullScreen, // 이미지 클릭 시 확대
+              onTap: () {
+                if (_imageFile != null) {
+                  showDialog(
+                    context: context,
+                    builder: (_) => Dialog(
+                      child: Image.file(_imageFile!),
+                    ),
+                  );
+                }
+              }, // 이미지 클릭 시 확대
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
                 height: MediaQuery.of(context).size.height * 0.5, // 50% of the screen height
                 child: Image.file(
                   _imageFile!,
-                  fit: BoxFit.contain, // Ensures the image is scaled to fit
+                  fit: BoxFit.contain, // 이미지를 컨테이너 안에 맞춤
                 ),
               ),
             ),
             SizedBox(height: 20),
-            // 메시지 입력 필드 추가
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: TextField(
@@ -210,17 +242,21 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _message = _textController.text.trim(); // 입력된 메시지 업데이트
-                  _applyPolaroidEffect(); // 폴라로이드 효과와 메시지 추가
-                });
+              onPressed: () async {
+                if (_imageFile != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PhotoSend(
+                        imagePath: _imageFile!.path,
+                        rId: widget.rId,
+                        u2Id: widget.u2Id,
+                      ),
+                    ),
+                  );
+                  await _deleteImageFile(); // 파일 삭제
+                }
               },
-              child: Text("확인"),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _navigateToNextScreen, // "다음" 버튼 눌렀을 때 PhotoSend 화면으로 이동
               child: Text("다음"),
             ),
           ],

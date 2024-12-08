@@ -23,19 +23,19 @@ class _AddChatScreenState extends State<AddChatScreen> {
       setState(() => _isLoading = true);
 
       // API 요청 데이터
-      final params = {
+      final requestBody = {
         'u2_id': _u2IdController.text, // 상대방 ID
         'roomName': _roomNameController.text.isEmpty
-            ? '${_u2IdController.text}-${SessionCookieManager.currentUserId} 방'
-            : _roomNameController.text, // 방 이름 (옵션)
-        'r_type': widget.chatType, // 채팅방 유형 (전달된 chatType 사용)
+            ? '${_u2IdController.text}-${widget.chatType}' // 기본 방 이름 설정
+            : _roomNameController.text, // 입력된 방 이름 사용
+        'r_type': widget.chatType, // 채팅방 유형
       };
 
       // POST 요청
       final response = await SessionCookieManager.post(
         apiUrl,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(params),
+        body: jsonEncode(requestBody),
       );
 
       setState(() => _isLoading = false);

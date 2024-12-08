@@ -30,6 +30,10 @@ const User = sequelize.define('user', {
     session_id: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    token: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     tableName: 'user',

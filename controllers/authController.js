@@ -3,6 +3,7 @@ const User = require('../models/userModel'); // 경로를 확인하세요
 const Mission = require('../models/missionModel');
 const Room = require('../models/roomModel');
 const RMessage = require('../models/messageModel'); // r_message 모델 가져오기
+const NotificationLog = require('../models/notificationModel'); // r_message 모델 가져오기
 const { Op } = require('sequelize'); // 추가: Sequelize의 Op 객체 가져오기
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
@@ -11,7 +12,8 @@ const roomController = require('./roomController'); // roomController 가져오�
 
 // 로그인 처리 함수 - 쿠키
 exports.login = async (req, res) => {
-    const { u_id, u_password } = req.body;
+    const { u_id, u_password, token } = req.body;// 여기에 디바이스 토큰 추가
+    // const { u_id, u_password } = req.body;
 
     try {
 
@@ -23,6 +25,10 @@ exports.login = async (req, res) => {
         // 사용자가 없거나 비밀번호가 일치하지 않는 경우
         if (!user) {
             return res.status(401).json({ message: '존재하지 않는 사용자입니다.' });
+        }
+
+        if (!token) {
+            return res.status(401).json({ message: '받은 디바이스 토큰이 없습니다.' });
         }
 
         // 비밀번호 일치 여부 확인 (bcrypt 사용)
@@ -49,6 +55,12 @@ exports.login = async (req, res) => {
             name: user.u_name,
         };
         // console.log('[DEBUG] 새로운 세션 설정:', req.session); // 추가
+
+        // 디바이스 토큰 저장
+        await User.update(
+            { token: token },
+            { where: { u_id } }
+        );
 
         // 로그인 성공 시 응답
         return res.status(200).json({

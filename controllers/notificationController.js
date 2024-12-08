@@ -104,17 +104,38 @@ const sendMissionCreateNotification = async (token, senderId, userId) => {
     return await sendNotification(userId, token, title, body);
 };
 
+// 미션 인증 요청 알림 함수
+const sendRequestMissionApprovalNotification = async (token, senderId, userId) => {
+    const title = '미션 인증 요청 알림';
+    const body = `${senderId}님이 미션 인증을 요청하였습니다.`;
+    return await sendNotification(userId, token, title, body);
+};
+
 // 미션 성공 알림 함수
 const sendMissionSuccessNotification = async (token, senderId, userId) => {
     const title = '미션 성공 알림';
-    const body = `${senderId}님이 미션을 성공하였습니다.`;
+    const body = `${senderId}님이 미션을 성공 처리하였습니다.`;
     return await sendNotification(userId, token, title, body);
 };
 
 // 미션 실패 알림 함수
 const sendMissionFailureNotification = async (token, senderId, userId) => {
     const title = '미션 실패 알림';
-    const body = `${senderId}님이 미션을 실패하였습니다.`;
+    const body = `${senderId}님이 미션을 실패 처리하였습니다.`;
+    return await sendNotification(userId, token, title, body);
+};
+
+// 미션 마감기한 임박 (10분) 알림 함수
+const sendMissionDeadlineTenMinutesNotification = async (token, userId, missionTitle) => {
+    const title = '마감 기한 임박 알림';
+    const body = `${missionTitle} 미션의 마감기한이 10분 남았습니다.`;
+    return await sendNotification(userId, token, title, body);
+};
+
+// 미션 마감기한 경과 알림 함수
+const sendMissionDeadlineNotification = async (token, userId, missionTitle) => {
+    const title = '마감 기한 경과 알림';
+    const body = `${missionTitle} 미션의 마감기한이 지났습니다.`;
     return await sendNotification(userId, token, title, body);
 };
 
@@ -125,4 +146,7 @@ module.exports = {
     sendMissionCreateNotification,
     sendMissionSuccessNotification,
     sendMissionFailureNotification,
+    sendRequestMissionApprovalNotification,
+    sendMissionDeadlineTenMinutesNotification,
+    sendMissionDeadlineNotification,
 };

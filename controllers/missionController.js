@@ -6,7 +6,9 @@ const MResult = require('../models/m_resultModel.js'); //MResult 모델 가져�
 const CRoom = require('../models/comunity_roomModel'); // Community Room 테이블
 const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추가
 const CVote = require('../models/comunity_voteModel');
+const User = require('../models/userModel');
 const resultController = require('./resultController'); // resultController 가져오기
+const notificationController = require('./notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
@@ -131,6 +133,23 @@ exports.createMission = async (req, res) => {
                 m_extended: false,
                 missionAuthenticationAuthority: u1_id,
             });
+
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+            const user = await User.findOne({
+                where: {
+                    u_id: u2_id,
+                }
+            })
+            const sendMissionCreateNotification = await notificationController.sendMissionCreateNotification(
+                user.token,
+                u1_id,
+                assignedU2Id,
+            );
+
+            if(!sendMissionCreateNotification){
+                return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
+            }
+            // ================ 알림 추가 - 디바이스 토큰 =======================
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         }
@@ -505,6 +524,25 @@ exports.requestMissionApproval = async (req, res) => {
             return res.status(400).json({ success: false, message: '미션 상태를 변경할 수 없습니다.' });
         }
 
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        if (userId !== mission.u1_id){
+            const user = await User.findOne({
+                where: {
+                    u_id: mission.u1_id,
+                }
+            })
+            const sendRequestMissionApprovalNotification = await notificationController.sendRequestMissionApprovalNotification(
+                user.token,
+                userId,
+                mission.u1_id,
+            );
+
+            if(!sendRequestMissionApprovalNotification){
+                return res.status(400).json({ success: false, message: '미션 인증 요청 알림 전송을 실패했습니다.' });
+            }
+        }
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+
 
         // //============================================================================
         // const roomId = mission.r_id;
@@ -584,6 +622,25 @@ exports.successMission = async (req, res) => {
             });
         }
 
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        if (u1_id !== mission.u2_id){
+            const user = await User.findOne({
+                where: {
+                    u_id: u2_id,
+                }
+            })
+            const sendMissionSuccessNotification = await notificationController.sendMissionSuccessNotification(
+                user.token,
+                u1_id,
+                mission.u2_id,
+            );
+
+            if(!sendMissionSuccessNotification){
+                return res.status(400).json({ success: false, message: '미션 성공 알림 전송을 실패했습니다.' });
+            }
+        }
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+
         res.json({ success: true, message: '미션이 성공으로 갱신되었습니다.' });
     } catch (error) {
         console.error('미션 성공 처리 오류:', error);
@@ -646,6 +703,25 @@ exports.failureMission = async (req, res) => {
             });
         }
 
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        if (u1_id !== mission.u2_id){
+            const user = await User.findOne({
+                where: {
+                    u_id:u2_id,
+                }
+            })
+            const sendMissionFailureNotification = await notificationController.sendMissionFailureNotification(
+                user.token,
+                u1_id,
+                mission.u2_id,
+            );
+
+            if(!sendMissionFailureNotification){
+                return res.status(400).json({ success: false, message: '미션 실패 알림 전송을 실패했습니다.' });
+            }
+        }
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+
         res.json({ success: true, message: '미션이 실패로 갱신되었습니다.' });
     } catch (error) {
         console.error('미션 실패 처리 오류:', error);
@@ -701,6 +777,37 @@ exports.checkMissionDeadline = async () => {
         // 현재 시간 가져오기
         const now = new Date();
 
+        const exactTenMinutesLater = new Date(now.getTime() + 10 * 60 * 1000); // 10분 뒤 시간
+
+        // 10분 뒤에 마감 기한이 설정된 미션 조회
+        const missionsWithExactTenMinutesLeft = await Mission.findAll({
+            where: {
+                m_deadline: exactTenMinutesLater, // 정확히 10분 후
+                m_status: { [Op.or]: ['진행중', '요청'] }, // 상태가 "진행중" 또는 "요청"
+            },
+        });
+
+        // 10분 남은 미션들 알림 보내기
+        for (const missionTenMinutes of missionsWithExactTenMinutesLeft) {
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+            const user = await User.findOne({
+                where: {
+                    u_id: missionTenMinutes.u2_id,
+                }
+            })
+            const sendMissionDeadlineTenMinutesNotification = await notificationController.sendMissionDeadlineTenMinutesNotification(
+                user.token,
+                user.u_id,
+                missionTenMinutes.m_title,
+            );
+
+            if(!sendMissionDeadlineTenMinutesNotification){
+                return res.status(400).json({ success: false, message: '미션 마감기한 임박 알림 전송을 실패했습니다.' });
+            }
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+        }
+
+
         // 마감 기한이 지난 미션 조회
         const expiredMissions = await Mission.findAll({
             where: {
@@ -734,6 +841,25 @@ exports.checkMissionDeadline = async () => {
                     m_status: '실패',
                 });
 
+
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+                const user = await User.findOne({
+                    where: {
+                        u_id: mission.u2_id,
+                    }
+                })
+                const sendMissionDeadlineNotification = await notificationController.sendMissionDeadlineNotification(
+                    user.token,
+                    user.u_id,
+                    mission.m_title,
+                );
+
+                if(!sendMissionDeadlineNotification){
+                    return res.status(400).json({ success: false, message: '미션 마감기한 경과 알림 전송을 실패했습니다.' });
+                }
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+
+
                 console.log(
                     `미션 ${mission.m_id}이 완료 처리되고, m_result에 저장되었습니다.`
                 );
@@ -751,6 +877,23 @@ exports.checkMissionDeadline = async () => {
                     m_deadline: originalDeadline, // 원래 마감 기한 저장
                     m_status: '실패',
                 });
+
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+                const user = await User.findOne({
+                    where: {
+                        u_id: mission.u2_id,
+                    }
+                })
+                const sendMissionDeadlineNotification = await notificationController.sendMissionDeadlineNotification(
+                    user.token,
+                    user.u_id,
+                    mission.m_title,
+                );
+
+                if(!sendMissionDeadlineNotification){
+                    return res.status(400).json({ success: false, message: '미션 마감기한 경과 알림 전송을 실패했습니다.' });
+                }
+                // ================ 알림 추가 - 디바이스 토큰 =======================
 
                 console.log(
                     `미션 ${mission.m_id}의 마감 기한이 지났고 날짜가 변경되었으므로 완료 처리되었습니다.`

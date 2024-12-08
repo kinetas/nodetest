@@ -1,5 +1,7 @@
 const IFriend = require('../models/i_friendModel'); // i_friend 모델
 const TFriend = require('../models/t_friendModel'); // t_friend 모델
+const User = require('../models/userModel');
+const notificationController = require('./notificationController'); // notificationController 가져오기
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
 
@@ -134,6 +136,23 @@ exports.friendRequestSend = async (req, res) => {
                         { where: { u_id, f_id } }
                     );
 
+                    // ================ 알림 추가 - 디바이스 토큰 =======================
+                    const user = await User.findOne({
+                        where: {
+                            u_id: f_id,
+                        }
+                    })
+                    const sendFriendRequestNotification = await notificationController.sendFriendRequestNotification(
+                        user.token,
+                        u_id,
+                        user.u_id,  // = f_id
+                    );
+
+                    if(!sendFriendRequestNotification){
+                        return res.status(400).json({ success: false, message: '친구 요청 알림 전송을 실패했습니다.' });
+                    }
+                    // ================ 알림 추가 - 디바이스 토큰 =======================
+
                     return res.json({ success: true, message: '친구 요청이 성공적으로 다시 전송되었습니다.' });
                 }
             } else if (existingRequest.f_status === 2) {
@@ -143,6 +162,24 @@ exports.friendRequestSend = async (req, res) => {
                     { f_status: 0, f_create: new Date() }, // 상태를 요청으로 변경
                     { where: { u_id, f_id } }
                 );
+
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+                const user = await User.findOne({
+                    where: {
+                        u_id: f_id,
+                    }
+                })
+                const sendFriendRequestNotification = await notificationController.sendFriendRequestNotification(
+                    user.token,
+                    u_id,
+                    user.u_id,  // = f_id
+                );
+
+                if(!sendFriendRequestNotification){
+                    return res.status(400).json({ success: false, message: '친구 요청 알림 전송을 실패했습니다.' });
+                }
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+
                 return res.json({ success: true, message: '친구 요청이 성공적으로 다시 전송되었습니다.' });
             }
         }
@@ -155,6 +192,23 @@ exports.friendRequestSend = async (req, res) => {
                 f_create: new Date(),
                 f_status: 0, // 0 = 요청
             });
+
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+            const user = await User.findOne({
+                where: {
+                    u_id: f_id,
+                }
+            })
+            const sendFriendRequestNotification = await notificationController.sendFriendRequestNotification(
+                user.token,
+                u_id,
+                user.u_id,  // = f_id
+            );
+
+            if(!sendFriendRequestNotification){
+                return res.status(400).json({ success: false, message: '친구 요청 알림 전송을 실패했습니다.' });
+            }
+            // ================ 알림 추가 - 디바이스 토큰 =======================
 
             return res.json({ success: true, message: '친구 요청이 성공적으로 전송되었습니다.' });
         }
@@ -272,7 +326,7 @@ exports.friendRequestSend = async (req, res) => {
 
 //===========================================================================================================
 
-
+// 친구 요청 수락
 exports.friendRequestAccept = async (req, res) => {
     const { f_id } = req.body;
     const u_id = req.session?.user?.id;
@@ -310,6 +364,23 @@ exports.friendRequestAccept = async (req, res) => {
             { where: { u_id: f_id, f_id: u_id } }
         );
 
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        const user = await User.findOne({
+            where: {
+                u_id: f_id,
+            }
+        })
+        const sendFriendAcceptNotification = await notificationController.sendFriendAcceptNotification(
+            user.token,
+            u_id,
+            user.u_id,  // = f_id
+        );
+
+        if(!sendFriendAcceptNotification){
+            return res.status(400).json({ success: false, message: '친구 요청 수락 알림 전송을 실패했습니다.' });
+        }
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+
         console.log(JSON.stringify({ success: true, message: '친구 요청이 수락되었습니다.' }));
         res.json({ success: true, message: '친구 요청이 수락되었습니다.' });
     } catch (error) {
@@ -338,6 +409,24 @@ exports.friendRequestReject = async (req, res) => {
         );
 
         if (result[0] > 0) {
+
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+            const user = await User.findOne({
+                where: {
+                    u_id: f_id,
+                }
+            })
+            const sendFriendAcceptNotification = await notificationController.sendFriendAcceptNotification(
+                user.token,
+                u_id,
+                user.u_id,  // = f_id
+            );
+
+            if(!sendFriendAcceptNotification){
+                return res.status(400).json({ success: false, message: '친구 요청 수락 알림 전송을 실패했습니다.' });
+            }
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+
             console.log(JSON.stringify({ success: true, message: '친구 요청이 거절되었습니다.' }));
             res.json({ success: true, message: '친구 요청이 거절되었습니다.' });
         } else {

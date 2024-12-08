@@ -15,7 +15,7 @@ exports.createRoom = (socket, roomName) => {
   
   socket.emit('roomCreated', r_id);
 };
-
+//
 exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
     if (!r_id || !u1_id) {

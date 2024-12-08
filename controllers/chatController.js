@@ -16,10 +16,10 @@ exports.createRoom = (socket, roomName) => {
   socket.emit('roomCreated', r_id);
 };
 
-exports.joinRoom = async (socket, { r_id, u1_id }) => {
+exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
     if (!r_id || !u1_id) {
-      console.error(`Missing r_id or u1_id:`, { r_id, u1_id });
+      console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
       return;
     }
     // 사용자가 방에 들어갔을 때 방에 사용자 정보 업데이트 또는 추가
@@ -37,7 +37,7 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
 
     // 소켓을 이용해 방에 참여시키기
     socket.join(r_id);
-    console.log(`User ${u1_id} joined room ${r_id}`);
+    console.log(`joined room ${r_id}`);
   } catch (error) {
     console.error('Error joining room with Sequelize:', error);
   }

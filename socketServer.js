@@ -138,8 +138,8 @@ socket.on('markAsRead', async (data) => {
 */
 // 방 입장 처리
 socket.on('joinRoom', async (data) => {
-  const { r_id, u1_id } = data;
-  if (!r_id || !u1_id) {
+  const { r_id, u2_id } = data;
+  if (!r_id || !u2_id) {
       console.error('Invalid joinRoom data:', data);
       socket.emit('errorMessage', 'Invalid room or user ID');
       return;

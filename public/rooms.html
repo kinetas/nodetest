@@ -115,9 +115,13 @@
         });
     }
 */
-function joinRoom(r_id, u1_id) {
-    socket.emit('joinRoom', { r_id, u1_id });
+function joinRoom(r_id, u2_id) {
+    console.log(`Joining room: r_id=${r_id}, u2_id=${u2_id}`);
+
+    socket.emit('joinRoom', { r_id, u2_id });
+    
     window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+    
     socket.on('initialMessages', (messages) => {
         console.log('Initial Messages:', messages);
         });

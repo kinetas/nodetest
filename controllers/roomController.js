@@ -236,18 +236,16 @@ exports.updateRoomName = async (req, res) => {
     const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
     const { u2_id, newRoomName, r_type } = req.body; // 입력받은 유저 ID와 새로운 방 이름
 
-    let roomType = r_type;
-
     try {
 
-        if(r_type !== 'open'){
-            roomType = 'general';
+        // r_type이 없거나 잘못된 값일 경우 에러 처리
+        if (!r_type) {
+            return res.status(400).json({ message: "방 타입을 입력해야 합니다." });
         }
 
         const updated = await Room.update(
             { r_title: newRoomName },
-            // { where: { u1_id, u2_id, r_type } }
-            { where: { u1_id, u2_id, r_type: roomType } }
+            { where: { u1_id, u2_id, r_type } }
         );
 
         if (updated[0] === 0) {
@@ -257,6 +255,6 @@ exports.updateRoomName = async (req, res) => {
         return res.json({ message: "방 이름이 성공적으로 변경되었습니다." });
     } catch (error) {
         console.error("방 이름 변경 중 오류:", error);
-        res.status(500).json({ message: `방 이름 변경 중 오류(${error})가 발생했습니다.controller` });
+        res.status(500).json({ message: "방 이름 변경 중 오류가 발생했습니다." });
     }
 };

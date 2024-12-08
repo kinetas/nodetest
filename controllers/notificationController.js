@@ -92,8 +92,8 @@ const sendFriendRequestNotification = async (token, senderId, userId) => {
 
 // 친구 요청 수락 알림 함수
 const sendFriendAcceptNotification = async (token, senderId, userId) => {
-    const title = '미션 수락 알림';
-    const body = `${senderId}님이 미션을 수락하였습니다.`;
+    const title = '친구 요청 수락 알림';
+    const body = `${senderId}님이 친구 요청을 수락하였습니다.`;
     return await sendNotification(userId, token, title, body);
 };
 

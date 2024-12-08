@@ -409,24 +409,6 @@ exports.friendRequestReject = async (req, res) => {
         );
 
         if (result[0] > 0) {
-
-            // ================ 알림 추가 - 디바이스 토큰 =======================
-            const user = await User.findOne({
-                where: {
-                    u_id: f_id,
-                }
-            })
-            const sendFriendAcceptNotification = await notificationController.sendFriendAcceptNotification(
-                user.token,
-                u_id,
-                user.u_id,  // = f_id
-            );
-
-            if(!sendFriendAcceptNotification){
-                return res.status(400).json({ success: false, message: '친구 요청 수락 알림 전송을 실패했습니다.' });
-            }
-            // ================ 알림 추가 - 디바이스 토큰 =======================
-
             console.log(JSON.stringify({ success: true, message: '친구 요청이 거절되었습니다.' }));
             res.json({ success: true, message: '친구 요청이 거절되었습니다.' });
         } else {

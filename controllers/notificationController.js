@@ -146,6 +146,20 @@ const sendAcceptCommunityMissionNotification = async (token, userId, missionTitl
     return await sendNotification(userId, token, title, body);
 };
 
+// 투표 미션 성공 알림 함수
+const sendVoteMissionSuccessNotification = async (token, userId, missionTitle) => {
+    const title = '투표 미션 성공 알림';
+    const body = `${missionTitle} 투표 미션이 성공되었습니다.`;
+    return await sendNotification(userId, token, title, body);
+};
+
+// 투표 미션 실패 알림 함수
+const sendVoteMissionFailureNotification = async (token, userId, missionTitle) => {
+    const title = '투표 미션 실패 알림';
+    const body = `${missionTitle} 투표 미션이 실패되었습니다.`;
+    return await sendNotification(userId, token, title, body);
+};
+
 //메시지 수신 알림
 const sendMessageNotification = async (senderId, receiverId, messageContent) => {
     const title = '새로운 메시지 도착';
@@ -170,4 +184,6 @@ module.exports = {
     sendMissionDeadlineNotification,
     sendMessageNotification,
     sendAcceptCommunityMissionNotification,
+    sendVoteMissionSuccessNotification,
+    sendVoteMissionFailureNotification,
 };

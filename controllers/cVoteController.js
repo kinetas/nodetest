@@ -4,6 +4,8 @@ const CVote = require('../models/comunity_voteModel');
 const c_v_notdup = require('../models/c_v_not_dupModel'); 
 const Mission = require('../models/missionModel');
 const MResult = require('../models/m_resultModel');
+const User = require('../models/userModel');
+const notificationController = require('./notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
@@ -219,6 +221,24 @@ exports.checkAndUpdateMissions = async () => {
                         m_status: '성공',
                     });
 
+                    // ================ 알림 추가 - 디바이스 토큰 =======================
+                    const user = await User.findOne({
+                        where: {
+                            u_id: mission.u2_id,
+                        }
+                    })
+                    const sendVoteMissionSuccessNotification = await notificationController.sendVoteMissionSuccessNotification(
+                        user.token,
+                        user.u_id,
+                        mission.m_title
+                    );
+
+                    if(!sendVoteMissionSuccessNotification){
+                        return res.status(400).json({ success: false, message: '투표 미션 성공 알림 전송을 실패했습니다.' });
+                    }
+                    
+                    // ================ 알림 추가 - 디바이스 토큰 =======================
+
                     console.log(`미션 ${mission.m_id}이 성공 처리되었습니다.`);
                 }
             } else {
@@ -235,6 +255,24 @@ exports.checkAndUpdateMissions = async () => {
                         m_deadline: now,
                         m_status: '실패',
                     });
+
+                    // ================ 알림 추가 - 디바이스 토큰 =======================
+                    const user = await User.findOne({
+                        where: {
+                            u_id: mission.u2_id,
+                        }
+                    })
+                    const sendVoteMissionFailureNotification = await notificationController.sendVoteMissionFailureNotification(
+                        user.token,
+                        user.u_id,
+                        mission.m_title
+                    );
+
+                    if(!sendVoteMissionFailureNotification){
+                        return res.status(400).json({ success: false, message: '투표 미션 실패 알림 전송을 실패했습니다.' });
+                    }
+                    
+                    // ================ 알림 추가 - 디바이스 토큰 =======================
 
                     console.log(`미션 ${mission.m_id}이 실패 처리되었습니다.`);
                 }

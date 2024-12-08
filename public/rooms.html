@@ -40,7 +40,7 @@
         //     window.location.href = '/'; // 로그인 페이지로 리디렉션
         // }
 
-        const socket = io("http://13.124.126.234:3001",{
+        const socket = io("http://54.180.54.31:3001",{
             path: '/socket.io'
             // auth: { token }, // JWT 토큰을 소켓 인증에 추가
         });
@@ -95,6 +95,7 @@
       //  function enterRoom(r_id, u2_id) {
       //      window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
       //  }
+      /*
         function enterRoom(r_id, u2_id) {
         fetch('/api/rooms/enter', {
             method: 'POST',
@@ -113,7 +114,21 @@
             alert('방 입장 중 오류가 발생했습니다.');
         });
     }
+*/
+function joinRoom(r_id, u1_id) {
+    socket.emit('joinRoom', { r_id, u1_id });
 
+    socket.on('initialMessages', (messages) => {
+        console.log('Initial Messages:', messages);
+        const roomList = document.getElementById('roomList');
+        roomList.innerHTML = '';
+        messages.forEach((message) => {
+            const messageItem = document.createElement('li');
+            messageItem.textContent = `${message.u1_id}: ${message.message_contents}`;
+            roomList.appendChild(messageItem);
+        });
+    });
+}
         // 방 추가 함수
         function addRoom() {
             const u2_id = document.getElementById('userIdInput').value;

@@ -31,7 +31,7 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
     }
     // 방에 사용자를 추가하거나 관련 작업을 수행할 수 있음
     await Room.update(
-      { u2_id: u1_id },  // 사용자가 방에 참여했다고 업데이트
+      { is_read : 0 },  // 사용자가 방에 참여했다고 업데이트
       { where: { r_id } }
     );
 

@@ -105,7 +105,7 @@ const upload = multer({ storage });
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
-
+/*
   socket.on('createRoom', (roomName) => {
     chatController.createRoom(socket, roomName); // 방 생성 처리
   });
@@ -135,7 +135,36 @@ socket.on('markAsRead', async (data) => {
     console.error("Socket markAsRead error:", error);
   }
 });
+*/
+// 방 입장 처리
+socket.on('joinRoom', async (data) => {
+  const { r_id, u1_id } = data;
+  if (!r_id || !u1_id) {
+      console.error('Invalid joinRoom data:', data);
+      socket.emit('errorMessage', 'Invalid room or user ID');
+      return;
+  }
 
+  try {
+      // 소켓 방 참여
+      socket.join(r_id);
+      console.log(`User ${u1_id} joined room ${r_id}`);
+
+      // 메시지 읽음 상태 갱신
+      const updatedCount = await RMessage.update(
+          { is_read: 0 },
+          { where: { r_id, u2_id: u1_id, is_read: 1 } }
+      );
+      console.log(`Updated ${updatedCount} messages as read for room ${r_id}`);
+
+      // 초기 메시지 로드
+      const messages = await chatController.getMessages(r_id);
+      socket.emit('initialMessages', messages);
+  } catch (error) {
+      console.error('Error in joinRoom:', error);
+      socket.emit('errorMessage', 'Failed to join room or load messages');
+  }
+});
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 

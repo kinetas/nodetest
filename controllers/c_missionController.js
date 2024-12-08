@@ -144,7 +144,31 @@ exports.acceptCommunityMission = async (req, res) => {
             missionAuthenticationAuthority: u2_id,
         });
 
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        const user = await User.findOne({
+            where: {
+                u_id: mission.u_id,
+            }
+        })
+        const sendFriendAcceptNotification = await notificationController.sendFriendAcceptNotification(
+            user.token,
+            user.u_id,
+            missionTitle
+        );
+
+        if(!sendFriendAcceptNotification){
+            return res.status(400).json({ success: false, message: '친구 요청 수락 알림 전송을 실패했습니다.' });
+        }
+
+        // 커뮤니티 미션 수락 알림 함수
+        const sendAcceptCommunityMissionNotification = async (token, userId, missionTitle) => {
+            const title = '커뮤니티 미션 수락 알림';
+            const body = `${missionTitle} 커뮤니티 미션이 수락되어 미션이 생성되었습니다.`;
+            return await sendNotification(userId, token, title, body);
+        };
         
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 수락 오류:', error);

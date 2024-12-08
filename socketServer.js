@@ -235,6 +235,7 @@ try {
    // 메시지 브로드캐스트,  안전성 검사
   io.to(r_id).emit('receiveMessage', {
     u1_id,
+    r_id,
     message_contents,
     send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
@@ -242,6 +243,7 @@ try {
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,
+    r_id,
     message_contents,
     send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null,

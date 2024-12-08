@@ -865,6 +865,10 @@ exports.createMissionFromRecommendation = async (req, res) => {
 
         const room = await Room.findOne({ where: { u1_id:u1_id, u2_id:u1_id } });
 
+        if (!room) {
+            return res.status(400).json({ success: false, message: '사용자 방이 존재하지 않습니다.' });
+        }
+
         await Mission.create({
             m_id: uuidv4(),               // 고유한 미션 ID 생성
             u1_id,                        // 현재 로그인된 사용자

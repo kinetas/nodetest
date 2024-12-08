@@ -13,7 +13,7 @@ const missionRoutes = require('./routes/missionRoutes');
 const logger = require('./logger');
 const RMessage  = require('./models/messageModel');
 const multer = require('multer');
-
+const Room  = require('./models/roomModel');
 const app = express();
 const server = http.createServer(app);
 
@@ -140,6 +140,8 @@ socket.on('markAsRead', async (data) => {
 socket.on('joinRoom', async (data) => {
   const { r_id, u2_id } = data;
   const u1_id = data.u1_id || socket.handshake.query.u1_id;
+  const room = await Room.findOne({ where: { r_id } });
+  u2_id = room.u2_id;
   if (!r_id || !u2_id || u1_id) {
       console.error('Invalid joinRoom data:', data);
       socket.emit('errorMessage', 'Invalid room or user ID');
@@ -150,7 +152,6 @@ socket.on('joinRoom', async (data) => {
       // 소켓 방 참여
       socket.join(r_id);
       console.log(`User ${u1_id} joined room ${r_id}`);
-      u2_id = room.u2_id;
       // 메시지 읽음 상태 갱신
       const updatedCount = await RMessage.update(
           { is_read: 0 },

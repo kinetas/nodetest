@@ -150,7 +150,6 @@ if (!u1_id || !u2_id) {
     return;
 }
   //const room = await Room.findOne({ where: { r_id } });
-  u2_id = room.u2_id;
   /*if (!r_id || !u2_id || u1_id) {
       console.error('Invalid joinRoom data:', data);
       socket.emit('errorMessage', 'Invalid room or user ID');

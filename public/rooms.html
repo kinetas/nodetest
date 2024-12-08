@@ -116,13 +116,14 @@
     }
 */
 function joinRoom(r_id, u2_id) {
+    const u1_id = sessionStorage.getItem('user_id');
     if (!u2_id) {
         console.error(`u2_id가 누락되었습니다. r_id=${r_id}`);
         return;
     }
     console.log(`Joining room: r_id=${r_id}`);
 
-    socket.emit('joinRoom', { r_id, u2_id });
+    socket.emit('joinRoom', { r_id, u1_id, u2_id });
     
     window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
     

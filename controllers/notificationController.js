@@ -1,7 +1,34 @@
 const NotificationLog = require('../models/notificationModel');
+/*
+// 클라이언트에서 전달받은 토큰 DB에 저장
+const saveToken = async (req, res) => {
+    const { userId, token } = req.body;
 
+    // 필수 필드 확인
+    if (!userId || !token) {
+        return res.status(400).json({ error: 'Missing userId or token' });
+    }
+
+    try {
+        // 토큰 저장 또는 업데이트
+        await db.query(
+            'INSERT INTO user_tokens (user_id, token) VALUES (?, ?) ON DUPLICATE KEY UPDATE token = ?',
+            [userId, token, token]
+        );
+        res.status(200).json({ message: 'Token saved successfully' });
+    } catch (error) {
+        console.error('Error saving token:', error);
+        res.status(500).json({ error: 'Failed to save token' });
+    }
+};
+*/
 /// 기본 알림 전송 함수
-const sendNotification = async (userId, token, title, body = {}) => {
+const sendNotification = async (userId, title, body = {}) => {
+    const [rows] = await db.query('SELECT token FROM user WHERE user_id = ?', [userId]);
+    if (rows.length === 0) {
+        throw new Error('No token found for user');
+    }
+    const token = rows[0].token;
     const message = {
         notification: { title, body }, // 알림 제목과 내용
         token, // FCM 토큰

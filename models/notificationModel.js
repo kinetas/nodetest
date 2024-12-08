@@ -14,6 +14,10 @@ const NotificationLog = db.define('NotificationLog', {
         type: Sequelize.STRING,
         allowNull: false,
         },
+    token: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
     status: {
         type: Sequelize.STRING,
         allowNull: false, // 'success' 또는 'failed'

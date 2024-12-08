@@ -4,6 +4,7 @@ const { sequelize } = require('../models/messageModel');
 const Room = require('../models/roomModel');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
+const u1_id = req.session.user.id;
 
 exports.createRoom = (socket, roomName) => {
   const r_id = Math.random().toString(36).substr(2, 9);
@@ -16,11 +17,11 @@ exports.createRoom = (socket, roomName) => {
   socket.emit('roomCreated', r_id);
 };
 
-exports.joinRoom = async (socket, { r_id, u1_id }) => {
+exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
     // 필수 파라미터 확인
-    if (!r_id || !u1_id) {
-      console.error(`Missing r_id or u1_id:`, { r_id, u1_id });
+    if (!r_id || !u2_id) {
+      console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
       socket.emit('joinRoomError', { message: '필수 데이터가 누락되었습니다.' });
       return;
     }

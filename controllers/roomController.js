@@ -38,7 +38,7 @@ exports.getRooms = async (req, res) => {
 //         return res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
 //     }
 // };
-
+//
 exports.addRoom = async (req, res) => {
     const u1_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
     const { u2_id, roomName, r_type } = req.body;

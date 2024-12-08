@@ -16,55 +16,6 @@ exports.createRoom = (socket, roomName) => {
   socket.emit('roomCreated', r_id);
 };
 
-exports.joinRoom = async (socket, { r_id}) => {
-  try {
-    // 필수 파라미터 확인
-    if (!r_id || !u2_id) {
-      console.error(`Missing r_id:`, { r_id});
-      socket.emit('joinRoomError', { message: '필수 데이터가 누락되었습니다.' });
-      return;
-    }
-
-    // 방 존재 여부 확인
-    const room = await Room.findOne({ where: { r_id } });
-    if (!room) {
-      console.error(`Room with ID ${r_id} not found.`);
-      socket.emit('joinRoomError', { message: '해당 방을 찾을 수 없습니다.' });
-      return;
-    }
-
-    // 메시지 읽음 상태 업데이트
-    const updatedCount = await RMessage.update(
-      { is_read: 0 }, // 읽음 처리
-      {
-        where: {
-          r_id,           // 해당 채팅방
-          u2_id: u1_id,   // 현재 사용자가 수신자인 경우
-          is_read: 1      // 읽지 않은 메시지만 처리
-        }
-      }
-    );
-
-    // 소켓을 이용해 방에 참여시키기
-    socket.join(r_id);
-
-    console.log(`User ${u1_id} joined room ${r_id}`);
-    socket.emit('joinRoomSuccess', {
-      message: '방에 성공적으로 입장했습니다.',
-      room,
-      updatedMessages: updatedCount
-    });
-  } catch (error) {
-    console.error('Error joining room with Sequelize:', error);
-    socket.emit('joinRoomError', { message: `방 입장 중 오류가 발생했습니다: ${error.message}` });
-  }
-};
-
-
-
-
-
-/*
 exports.joinRoom = async (socket, { r_id, u1_id }) => {
   try {
     if (!r_id || !u1_id) {
@@ -78,13 +29,12 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
       console.error(`Room with ID ${r_id} not found.`);
       return;
     }
-    
     // 방에 사용자를 추가하거나 관련 작업을 수행할 수 있음
     await Room.update(
       { u2_id: u1_id },  // 사용자가 방에 참여했다고 업데이트
       { where: { r_id } }
     );
-    
+
     // 소켓을 이용해 방에 참여시키기
     socket.join(r_id);
     console.log(`User ${u1_id} joined room ${r_id}`);
@@ -92,7 +42,6 @@ exports.joinRoom = async (socket, { r_id, u1_id }) => {
     console.error('Error joining room with Sequelize:', error);
   }
 };
-*/
 
 // // ===== JWT 기반 채팅방 참여 =====
 // exports.joinRoom = (req, res) => {
@@ -197,11 +146,11 @@ exports.getMessages = async (r_id) => {
   }
 };
 //메시지 읽음 처리
-exports.markMessageAsRead = async ({ r_id}) => {
+exports.markMessageAsRead = async ({ r_id, u1_id }) => {
   try {
       const updatedCount =await RMessage.update(
           { is_read: 0 },
-          { where: { r_id, is_read: 1 } } // 받은 메시지만 업데이트
+          { where: { r_id, u2_id: u1_id, is_read: 1 } } // 받은 메시지만 업데이트
       );
       console.log(`Updated ${updatedCount} messages as read.`);
       return updatedCount > 0; // 업데이트 성공 여부 반환

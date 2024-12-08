@@ -31,7 +31,7 @@ exports.joinRoom = async (socket, { r_id, u2_id }) => {
       return;
     }
     // 방에 사용자를 추가하거나 관련 작업을 수행할 수 있음
-    const updatedCount = await Room.update(
+    const updatedCount = await RMessage.update(
       { is_read: 0 },
       { where: { r_id, u2_id: u1_id, is_read: 1 } }
   );

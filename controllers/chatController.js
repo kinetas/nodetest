@@ -16,11 +16,11 @@ exports.createRoom = (socket, roomName) => {
   socket.emit('roomCreated', r_id);
 };
 
-exports.joinRoom = async (socket, { r_id, u2_id }) => {
+exports.joinRoom = async (socket, { r_id}) => {
   try {
     // 필수 파라미터 확인
     if (!r_id || !u2_id) {
-      console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
+      console.error(`Missing r_id:`, { r_id});
       socket.emit('joinRoomError', { message: '필수 데이터가 누락되었습니다.' });
       return;
     }

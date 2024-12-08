@@ -118,12 +118,12 @@
     
     //방 입장 함수
     function joinRoom(r_id) {
-        socket.emit("joinRoom", { r_id, u2_id });
+        socket.emit("joinRoom", { r_id});
 
         // 서버로부터 성공 이벤트 수신
         socket.on("joinRoomSuccess", data => {
             alert(data.message);
-            window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+            window.location.href = `/chat.html?r_id=${r_id}`;
         });
 
         // 서버로부터 오류 이벤트 수신

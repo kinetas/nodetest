@@ -145,6 +145,7 @@ app.get('/findinfo', (req, res) => {
 app.get('/cVote', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
 });
+
 app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'chat.html')); //채팅 ?��?���???
 });
@@ -231,7 +232,7 @@ const {sendNotificationController} = require('./controllers/notificationControll
 // FCM ?���?? ?��?�� API ?��?��?��?��?��
 app.post('/api/send-notification', sendNotificationController);
 
-
+/*
 app.use((req, res, next) => {
     let rawBody = '';
     req.on('data', (chunk) => {
@@ -243,6 +244,11 @@ app.use((req, res, next) => {
         console.log(`Raw Body:`, rawBody);
         next();
     });
+});
+*/
+
+app.use((req, res) => {
+    res.status(404).send('404 Not Found');
 });
 
 app.listen(PORT, '0.0.0.0', () => {

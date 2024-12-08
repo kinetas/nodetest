@@ -11,7 +11,8 @@ exports.getRooms = async (req, res) => {
         return res.status(401).json({ message: '로그인이 필요합니다.' });
     }
     const rooms = await Room.findAll({
-        where: { u1_id }
+        where: { u1_id },
+        attributes: ['r_id', 'u2_id', 'r_title'] // `u2_id` 포함
     });
     console.log(JSON.stringify({ rooms }));
     res.json({ rooms });

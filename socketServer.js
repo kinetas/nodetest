@@ -140,7 +140,16 @@ socket.on('markAsRead', async (data) => {
 socket.on('joinRoom', async (data) => {
   let { r_id, u2_id } = data;
   const u1_id = data.u1_id || socket.handshake.query.u1_id;
-  const room = await Room.findOne({ where: { r_id } });
+  if (!u2_id) {
+    const room = await Room.findOne({ where: { r_id } });
+    u2_id = room ? room.u2_id : null;
+}
+
+if (!u1_id || !u2_id) {
+    console.error('Invalid joinRoom data:', { r_id, u1_id, u2_id });
+    return;
+}
+  //const room = await Room.findOne({ where: { r_id } });
   u2_id = room.u2_id;
   /*if (!r_id || !u2_id || u1_id) {
       console.error('Invalid joinRoom data:', data);

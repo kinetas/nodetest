@@ -192,13 +192,27 @@ exports.register = async (req, res) => {
 };
 
 // 로그아웃 함수
-exports.logOut = (req, res) => {
+exports.logOut = async (req, res) => {
     
+    const u_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
+
+    
+    // 디바이스 토큰 삭제
+    const updateToken = await User.update(
+        { token: null },
+        { where: { u_id } }
+    );
+
+    if(!updateToken){
+        return res.status(401).json({ message: '세션에 유저 아이디가 없습니다.' });
+    }
+
     req.session.destroy((err) => {
         if (err) {
             console.error('세션 삭제 오류:', err);
             return res.status(500).json({ message: '로그아웃 중 오류가 발생했습니다.' });
         }
+
         res.status(200).json({ success: true, message: '로그아웃 성공' });
     });
 

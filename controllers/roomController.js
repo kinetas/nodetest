@@ -254,6 +254,6 @@ exports.updateRoomName = async (req, res) => {
         return res.json({ message: "방 이름이 성공적으로 변경되었습니다." });
     } catch (error) {
         console.error("방 이름 변경 중 오류:", error);
-        res.status(500).json({ message: "방 이름 변경 중 오류가 발생했습니다." });
+        res.status(500).json({ message: `방 이름 변경 중 오류(${error})가 발생했습니다.controller` });
     }
 };

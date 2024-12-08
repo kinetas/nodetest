@@ -12,7 +12,7 @@ exports.getRooms = async (req, res) => {
     }
     const rooms = await Room.findAll({
         where: { u1_id },
-        attributes: ['r_id', 'u1_id', 'u2_id', 'r_title', 'r_type'] // `u2_id` 포함
+        attributes: ['u1_id', 'u2_id', 'r_id', 'r_title', 'r_type'] // `u2_id` 포함
     });
     console.log(JSON.stringify({ rooms }));
     res.json({ rooms });

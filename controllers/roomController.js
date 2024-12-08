@@ -236,15 +236,18 @@ exports.updateRoomName = async (req, res) => {
     const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
     const { u2_id, newRoomName, r_type } = req.body; // 입력받은 유저 ID와 새로운 방 이름
 
+    let roomType = r_type;
+
     try {
 
         if(r_type !== 'open'){
-            r_type = 'general';
+            roomType = 'general';
         }
 
         const updated = await Room.update(
             { r_title: newRoomName },
-            { where: { u1_id, u2_id, r_type } }
+            // { where: { u1_id, u2_id, r_type } }
+            { where: { u1_id, u2_id, roomType } }
         );
 
         if (updated[0] === 0) {

@@ -1,3 +1,4 @@
+const db = require('../config/db');
 const NotificationLog = require('../models/notificationModel');
 /*
 // 클라이언트에서 전달받은 토큰 DB에 저장

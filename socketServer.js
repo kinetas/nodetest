@@ -8,7 +8,7 @@ const cors = require('cors');
 const chatController = require('./controllers/chatController');
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
-const chatRoutes = require('./routes/chatRoutes');
+//const chatRoutes = require('./routes/chatRoutes');
 const missionRoutes = require('./routes/missionRoutes');
 const logger = require('./logger');
 const RMessage  = require('./models/messageModel');
@@ -31,7 +31,7 @@ const io = socketIo(server, {
 app.use(cors());
 app.use(express.json());
 app.use('/auth', authRoutes);
-app.use('/chat', chatRoutes);
+//app.use('/chat', chatRoutes);
 app.use('/mission', missionRoutes);
 
 const storage = multer.memoryStorage();

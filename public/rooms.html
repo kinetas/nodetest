@@ -118,7 +118,7 @@
     
     //방 입장 함수
     function joinRoom(r_id) {
-        socket.emit("joinRoom", { r_id, u1_id });
+        socket.emit("joinRoom", { r_id, u2_id });
 
         // 서버로부터 성공 이벤트 수신
         socket.on("joinRoomSuccess", data => {

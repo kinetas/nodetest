@@ -150,22 +150,15 @@ exports.acceptCommunityMission = async (req, res) => {
                 u_id: mission.u_id,
             }
         })
-        const sendFriendAcceptNotification = await notificationController.sendFriendAcceptNotification(
+        const sendAcceptCommunityMissionNotification = await notificationController.sendAcceptCommunityMissionNotification(
             user.token,
             user.u_id,
             missionTitle
         );
 
-        if(!sendFriendAcceptNotification){
+        if(!sendAcceptCommunityMissionNotification){
             return res.status(400).json({ success: false, message: '친구 요청 수락 알림 전송을 실패했습니다.' });
         }
-
-        // 커뮤니티 미션 수락 알림 함수
-        const sendAcceptCommunityMissionNotification = async (token, userId, missionTitle) => {
-            const title = '커뮤니티 미션 수락 알림';
-            const body = `${missionTitle} 커뮤니티 미션이 수락되어 미션이 생성되었습니다.`;
-            return await sendNotification(userId, token, title, body);
-        };
         
         // ================ 알림 추가 - 디바이스 토큰 =======================
 

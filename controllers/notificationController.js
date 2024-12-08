@@ -139,6 +139,13 @@ const sendMissionDeadlineNotification = async (token, userId, missionTitle) => {
     return await sendNotification(userId, token, title, body);
 };
 
+// 커뮤니티 미션 수락 알림 함수
+const sendAcceptCommunityMissionNotification = async (token, userId, missionTitle) => {
+    const title = '커뮤니티 미션 수락 알림';
+    const body = `${missionTitle} 커뮤니티 미션이 수락되어 미션이 생성되었습니다.`;
+    return await sendNotification(userId, token, title, body);
+};
+
 //메시지 수신 알림
 const sendMessageNotification = async (senderId, receiverId, messageContent) => {
     const title = '새로운 메시지 도착';
@@ -162,4 +169,5 @@ module.exports = {
     sendMissionDeadlineTenMinutesNotification,
     sendMissionDeadlineNotification,
     sendMessageNotification,
+    sendAcceptCommunityMissionNotification,
 };

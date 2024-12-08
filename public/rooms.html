@@ -40,7 +40,7 @@
         //     window.location.href = '/'; // 로그인 페이지로 리디렉션
         // }
 
-        const socket = io("http://13.124.126.234:3001",{
+        const socket = io("http://http://54.180.54.31:3001",{
             path: '/socket.io'
             // auth: { token }, // JWT 토큰을 소켓 인증에 추가
         });
@@ -78,7 +78,7 @@
                         // 방 입장 버튼 추가
                         const enterButton = document.createElement('button');
                         enterButton.textContent = '입장';
-                        enterButton.onclick = () => enterRoom(room.r_id, room.u2_id); // 방 ID를 전달
+                        enterButton.onclick = () => joinRoom(room.r_id); // 방 ID를 전달
                         listItem.appendChild(enterButton);
 
                         roomListElement.appendChild(listItem);
@@ -95,6 +95,7 @@
       //  function enterRoom(r_id, u2_id) {
       //      window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
       //  }
+      /*
         function enterRoom(r_id, u2_id) {
         fetch('/api/rooms/enter', {
             method: 'POST',
@@ -113,8 +114,25 @@
             alert('방 입장 중 오류가 발생했습니다.');
         });
     }
+*/
+    
+    //방 입장 함수
+    function joinRoom(r_id) {
+        socket.emit("joinRoom", { r_id, u1_id });
 
-        // 방 추가 함수
+        // 서버로부터 성공 이벤트 수신
+        socket.on("joinRoomSuccess", data => {
+            alert(data.message);
+            window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+        });
+
+        // 서버로부터 오류 이벤트 수신
+        socket.on("joinRoomError", error => {
+            alert(error.message);
+        });
+    }
+
+      // 방 추가 함수
         function addRoom() {
             const u2_id = document.getElementById('userIdInput').value;
             const roomName = document.getElementById('roomNameInput').value; // 입력된 방 이름

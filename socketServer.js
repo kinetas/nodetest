@@ -173,7 +173,7 @@ try {
     u1_id,
     u2_id,
     r_id,
-    message_contents,
+    message_contents: message_contents || `파일 첨부: ${file.originalname || 'unknown_file'}`, // 파일 이름을 message_contents로 설정
     send_date: new Date(), // KST 시간 설정
     image: fileBuffer,
     image_type: image_type || null,

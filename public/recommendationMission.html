@@ -83,7 +83,7 @@
                             row.innerHTML = `
                                 <td>${mission.m_title}</td>
                                 <td>${mission.category}</td>
-                                <td><button>생성</button></td>
+                                <td><button onclick="createMission('${mission.m_title}')">생성</button></td>
                             `;
                             tableBody.appendChild(row);
                         });

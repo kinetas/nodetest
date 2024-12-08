@@ -101,10 +101,21 @@ const upload = multer({ storage });
 //     console.log('User disconnected');
 //   });
 // });
+const userSockets = new Map(); // 사용자 ID와 소켓 ID 매핑
 
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
+
+  const userId = socket.handshake.query.u1_id;
+  if (userId) {
+      userSockets.set(userId, socket.id);
+  }
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+    userSockets.delete(userId);
+});
+
 /*
   socket.on('createRoom', (roomName) => {
     chatController.createRoom(socket, roomName); // 방 생성 처리
@@ -236,6 +247,34 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null,
     is_read
   });
+  // 상대방 연결 상태 확인
+  const receiverSocketId = userSockets.get(u2_id);
+  const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);
+
+  if (isReceiverConnected) {
+      await RMessage.update(
+          { is_read: 0 },
+          { where: { r_id, u2_id: u1_id, is_read: 1 } }
+      );
+      io.to(receiverSocketId).emit('messageRead', { r_id, u1_id });
+  }
+  // 메시지 읽음 처리
+  socket.on('markAsRead', async (data) => {
+    const { r_id, u1_id } = data;
+
+    try {
+        const success = await RMessage.update(
+            { is_read: 0 },
+            { where: { r_id, u2_id: u1_id, is_read: 1 } }
+        );
+        if (success) {
+            io.to(r_id).emit('messageRead', { r_id, u1_id });
+        }
+    } catch (error) {
+        console.error('Error in markAsRead:', error);
+    }
+});
+
 } catch (error) {
   console.error('DB 저장 오류:', error); // DB 저장 실패 시 에러 로그 출력
   if (error.name === 'SequelizeValidationError') {
@@ -250,9 +289,11 @@ try {
 });
 //
 // 클라이언트가 연결 해제되었을 때 처리
+/*
 socket.on('disconnect', () => {
 console.log('User disconnected');
 });
+*/
 });
 
 server.listen(3001, () => {

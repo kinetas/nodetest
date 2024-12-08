@@ -168,10 +168,7 @@
         function updateRoomName() {
             const u2_id = document.getElementById('userIdInput').value;
             const newRoomName = document.getElementById('roomNameInput').value;
-            let r_type = document.getElementById('roomTypeInput').vaule;
-            if (!r_type){
-                r_type = "general";
-            }
+            const r_type = document.getElementById('roomTypeInput').vaule;
 
             fetch('/api/rooms/update', {
                 method: 'PUT',

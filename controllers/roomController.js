@@ -237,6 +237,11 @@ exports.updateRoomName = async (req, res) => {
     const { u2_id, newRoomName, r_type } = req.body; // 입력받은 유저 ID와 새로운 방 이름
 
     try {
+
+        if(r_type !== 'open'){
+            r_type = 'general';
+        }
+
         const updated = await Room.update(
             { r_title: newRoomName },
             { where: { u1_id, u2_id, r_type } }

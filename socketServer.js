@@ -4,7 +4,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 const cors = require('cors');
-
+const requireAuth = require('./middleware/authMiddleware');
 const chatController = require('./controllers/chatController');
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -27,6 +27,11 @@ const io = socketIo(server, {
   path: '/socket.io'  // path 설정
 });
 
+io.use((socket, next) => {
+  const req = socket.request; // WebSocket의 요청 객체 가져오기
+  const res = {}; // 더미 응답 객체 (필요 없음)
+  requireAuth(req, res, next); // 기존 미들웨어 호출
+});
 
 app.use(cors());
 app.use(express.json());
@@ -101,7 +106,7 @@ const upload = multer({ storage });
 //     console.log('User disconnected');
 //   });
 // });
-
+/*
 // 소켓 연결 처리
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
@@ -119,6 +124,25 @@ io.on('connection', (socket) => {
         }
     });
 });
+*/
+
+// WebSocket 연결 처리
+io.on('connection', (socket) => {
+  console.log('WebSocket 연결 성공');
+
+  // WebSocket 이벤트 처리
+  socket.on('joinRoom', async ({ r_id }) => {
+    const u1_id = socket.request.session.user.id; // 세션 데이터에서 u1_id 가져오기
+    if (!u1_id) {
+      socket.emit('joinRoomError', { message: '로그인이 필요합니다.' });
+      return;
+    }
+
+    console.log(`User ${u1_id} attempting to join room ${r_id}`);
+    exports.joinRoom(socket, { r_id, u1_id });
+  });
+});
+
 
 //메시지 읽음 처리 실시간 반영
 socket.on('markAsRead', async (data) => {
@@ -213,7 +237,7 @@ try {
 socket.on('disconnect', () => {
 console.log('User disconnected');
 });
-});
+
 
 server.listen(3001, () => {
   console.log('HTTP Server running on port 3001');

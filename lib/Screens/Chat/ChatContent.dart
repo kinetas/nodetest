@@ -68,9 +68,10 @@ class ChatContentState extends State<ChatContent> {
 
   void addMessage(Map<String, dynamic> newMessage) {
     setState(() {
-      messages.add(newMessage);
+      messages.add(newMessage); // 새 메시지를 리스트에 추가
     });
 
+    // 새 메시지가 추가되면 자동으로 스크롤을 맨 아래로 이동
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });

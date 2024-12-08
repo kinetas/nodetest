@@ -48,7 +48,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     socket.onConnect((_) {
       print('Socket connected');
-      socket.emit('joinRoom', {
+      socket.emit('enterRoom', {
         'r_id': widget.roomData['r_id'],
         'u1_id': widget.roomData['u1_id'],
         'u2_id': widget.roomData['u2_id'],
@@ -57,15 +57,25 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     socket.onDisconnect((_) {
       print('Socket disconnected');
+      socket.connect(); // 연결 끊어질 경우 재연결
     });
 
     // 메시지 수신 이벤트
     socket.on('receiveMessage', (data) {
       print('Message received: $data');
-      _chatContentKey.currentState?.addMessage(data); // ChatContent에만 메시지 추가
+      // ChatContent 상태에 메시지 추가
+      if (_chatContentKey.currentState != null) {
+        _chatContentKey.currentState?.addMessage({
+          'u1_id': data['u1_id'], // 보낸 사람 ID
+          'message_contents': data['message_contents'], // 메시지 내용
+          'send_date': data['send_date'], // 메시지 전송 시간
+          'image': data['image'], // 이미지(있으면 Base64로 디코딩 가능)
+          'is_read': data['is_read'], // 읽음 상태
+        });
+      }
     });
 
-    socket.connect();
+    socket.connect(); // 소켓 연결 시작
   }
 
   void _sendMessage() {
@@ -81,8 +91,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     };
 
     print('Sending message: $messageData');
-    socket.emit('sendMessage', messageData); // 메시지 서버 전송
 
+    // 서버에 메시지 전송
+    socket.emit('sendMessage', messageData);
+
+    // 메시지를 화면에 바로 추가
+    _chatContentKey.currentState?.addMessage(messageData);
+
+    // 입력 필드 초기화
     _messageController.clear();
   }
 

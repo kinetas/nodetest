@@ -3,8 +3,14 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'PhotoSend.dart'; // PhotoSend 화면 import
 
 class CameraScreen extends StatefulWidget {
+  final String rId;
+  final String u2Id;
+
+  CameraScreen({required this.rId, required this.u2Id});
+
   @override
   _CameraScreenState createState() => _CameraScreenState();
 }
@@ -13,26 +19,26 @@ class _CameraScreenState extends State<CameraScreen> {
   late CameraController _cameraController;
   late List<CameraDescription> _cameras;
   bool _isCameraInitialized = false;
+  String? _capturedPhotoPath;
   int _selectedCameraIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _checkCameraPermission(); // 권한 체크 및 초기화 호출
+    _checkCameraPermission();
   }
 
   Future<void> _checkCameraPermission() async {
     if (await Permission.camera.request().isGranted) {
-      await _initializeCamera(); // 권한이 허용되면 카메라 초기화
+      await _initializeCamera();
     } else {
       print("카메라 권한이 거부되었습니다.");
-      _showPermissionDialog(); // 권한 거부 시 안내 메시지
+      _showPermissionDialog();
     }
   }
 
   Future<void> _initializeCamera() async {
     try {
-      // 사용 가능한 카메라 가져오기
       _cameras = await availableCameras();
       if (_cameras.isNotEmpty) {
         _cameraController = CameraController(
@@ -40,7 +46,6 @@ class _CameraScreenState extends State<CameraScreen> {
           ResolutionPreset.high,
         );
 
-        // 카메라 초기화
         await _cameraController.initialize();
         setState(() {
           _isCameraInitialized = true;
@@ -64,7 +69,7 @@ class _CameraScreenState extends State<CameraScreen> {
             onPressed: () async {
               Navigator.of(context).pop();
               if (await Permission.camera.request().isGranted) {
-                await _initializeCamera(); // 권한 허용 후 초기화
+                await _initializeCamera();
               } else {
                 print("카메라 권한이 여전히 거부되었습니다.");
               }
@@ -82,26 +87,21 @@ class _CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  Future<void> _capturePhoto() async {
+    try {
+      final XFile image = await _cameraController.takePicture();
+      setState(() {
+        _capturedPhotoPath = image.path;
+      });
+    } catch (e) {
+      print("사진 촬영 에러: $e");
+    }
+  }
+
   @override
   void dispose() {
     _cameraController.dispose();
     super.dispose();
-  }
-
-  void _capturePhoto() async {
-    try {
-      final image = await _cameraController.takePicture();
-      print("사진 저장 경로: ${image.path}");
-      // 사진 저장 및 미리보기 화면으로 이동
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DisplayPhotoScreen(imagePath: image.path),
-        ),
-      );
-    } catch (e) {
-      print("사진 촬영 에러: $e");
-    }
   }
 
   @override
@@ -119,18 +119,69 @@ class _CameraScreenState extends State<CameraScreen> {
       body: _isCameraInitialized
           ? Stack(
         children: [
-          CameraPreview(_cameraController), // 카메라 미리보기
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: FloatingActionButton(
-                onPressed: _capturePhoto,
-                child: Icon(Icons.camera_alt),
+          if (_capturedPhotoPath == null)
+            CameraPreview(_cameraController),
+          if (_capturedPhotoPath != null)
+            Image.file(
+              File(_capturedPhotoPath!),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          if (_capturedPhotoPath == null)
+            Positioned(
+              bottom: 20,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: FloatingActionButton(
+                  onPressed: _capturePhoto,
+                  child: Icon(Icons.camera_alt),
+                ),
               ),
             ),
-          ),
+          if (_capturedPhotoPath != null)
+            Positioned(
+              bottom: 50,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _capturedPhotoPath = null; // 다시 찍기
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black.withOpacity(0.7),
+                    ),
+                    child: Text("다시 찍기", style: TextStyle(color: Colors.white)),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_capturedPhotoPath != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PhotoSend(
+                              imagePath: _capturedPhotoPath!,
+                              rId: widget.rId,
+                              u2Id: widget.u2Id,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black.withOpacity(0.7),
+                    ),
+                    child: Text("다음", style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+            ),
         ],
       )
           : Center(
@@ -149,23 +200,5 @@ class _CameraScreenState extends State<CameraScreen> {
       await _cameraController.initialize();
       setState(() {});
     }
-  }
-}
-
-class DisplayPhotoScreen extends StatelessWidget {
-  final String imagePath;
-
-  DisplayPhotoScreen({required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("사진 미리보기"),
-      ),
-      body: Center(
-        child: Image.file(File(imagePath)), // 저장된 사진 불러오기
-      ),
-    );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../Camera&Photo/CameraMain.dart'; // CameraScreen 파일을 import
+import '../Mission/MissionVerificationScreen.dart'; // MissionVerificationScreen import
 
 class ChatPlusButton extends StatelessWidget {
   final BuildContext context;
@@ -35,25 +35,22 @@ class ChatPlusButton extends StatelessWidget {
                   context,
                   Icons.add,
                   '미션 생성',
-                  _navigateToMissionCreateScreen,
+                      () => _navigateToScreen(context, MissionCreateScreen()),
                 ),
                 _buildCircleButton(
                   context,
                   Icons.check_circle,
                   '미션 인증',
-                  _navigateToMissionVerifyScreen,
+                      () => _navigateToScreen(
+                    context,
+                    MissionVerificationScreen(rId: "example_rId", u2Id: "example_u2Id"),
+                  ),
                 ),
                 _buildCircleButton(
                   context,
                   Icons.request_page,
                   '미션 요청',
-                  _navigateToMissionRequestScreen,
-                ),
-                _buildCircleButton(
-                  context,
-                  Icons.camera_alt,
-                  '카메라 인증',
-                  _navigateToCameraScreen,
+                      () => _navigateToScreen(context, MissionRequestScreen()),
                 ),
               ],
             ),
@@ -91,56 +88,21 @@ class ChatPlusButton extends StatelessWidget {
     );
   }
 
-  /// 미션 생성 화면으로 이동
-  void _navigateToMissionCreateScreen() {
+  void _navigateToScreen(BuildContext context, Widget screen) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MissionCreateScreen()),
-    );
-  }
-
-  /// 미션 인증 화면으로 이동
-  void _navigateToMissionVerifyScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MissionVerifyScreen()),
-    );
-  }
-
-  /// 미션 요청 화면으로 이동
-  void _navigateToMissionRequestScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MissionRequestScreen()),
-    );
-  }
-
-  /// 카메라 인증 화면으로 이동
-  void _navigateToCameraScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CameraScreen()),
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 }
 
-// 각각의 화면을 위한 간단한 클래스 예제
+// 예제 화면 클래스들
 class MissionCreateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('미션 생성')),
       body: Center(child: Text('미션 생성 화면')),
-    );
-  }
-}
-
-class MissionVerifyScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('미션 인증')),
-      body: Center(child: Text('미션 인증 화면')),
     );
   }
 }

@@ -150,7 +150,7 @@ socket.on('joinRoom', async (data) => {
       // 소켓 방 참여
       socket.join(r_id);
       console.log(`User ${u1_id} joined room ${r_id}`);
-      u2_id = data.u2_id;
+      u2_id = room.u2_id;
       // 메시지 읽음 상태 갱신
       const updatedCount = await RMessage.update(
           { is_read: 0 },

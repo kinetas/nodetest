@@ -165,7 +165,7 @@
                     if (data.missions && data.missions.length > 0) {
                         data.missions.forEach(mission => {
                             const listItem = document.createElement('li');
-                            listItem.textContent = `ID: ${mission.m_id}, RID: ${mission.u2_id}, Title: ${mission.m_title}, Status: ${mission.m_status}`;
+                            listItem.textContent = `MID: ${mission.m_id}, U2ID: ${mission.u2_id}, Title: ${mission.m_title}, Status: ${mission.m_status}`;
                             missionListElement.appendChild(listItem);
                         });
                     } else {

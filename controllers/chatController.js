@@ -4,7 +4,6 @@ const { sequelize } = require('../models/messageModel');
 const Room = require('../models/roomModel');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
-const u1_id = req.session.user.id;
 
 exports.createRoom = (socket, roomName) => {
   const r_id = Math.random().toString(36).substr(2, 9);

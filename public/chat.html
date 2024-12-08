@@ -98,22 +98,35 @@
 
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
-            chatMessages.appendChild(messageElement);
+             // 메시지가 있는 경우
+    if (data.message_contents) {
+        messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+    } 
+    // 메시지가 없고 파일만 있는 경우
+    else if (!data.message_contents && data.image) {
+        messageElement.textContent = `[${data.send_date}] ${data.u1_id}: [파일 전송]`;
 
-            if (data.u1_id !== sessionStorage.getItem('user_id')) { // 사용자가 보낸 메시지가 아니면
-                socket.emit('markAsRead', { r_id: data.r_id, u1_id: sessionStorage.getItem('user_id') });
-            }
-             // 이미지가 포함된 경우 이미지를 표시
-            if (data.image) {
-                const imageElement = document.createElement("img");
-                imageElement.src = `data:image/jpeg;base64,${arrayBufferToBase64(data.image.data)}`;
-                imageElement.style.maxWidth = "200px";
-                messageElement.appendChild(imageElement);
-            }
-            chatMessages.appendChild(messageElement);
+        const imageElement = document.createElement("img");
+        imageElement.src = `data:image/jpeg;base64,${data.image}`;
+        imageElement.style.maxWidth = "200px";
+        messageElement.appendChild(imageElement);
+    }
 
+    chatMessages.appendChild(messageElement);
+
+    // 이미지가 포함된 경우 이미지를 추가적으로 처리
+    if (data.image && data.message_contents) {
+        const imageElement = document.createElement("img");
+        imageElement.src = `data:image/jpeg;base64,${data.image}`;
+        imageElement.style.maxWidth = "200px";
+        messageElement.appendChild(imageElement);
+    }
+
+    if (data.u1_id !== sessionStorage.getItem('user_id')) { // 사용자가 보낸 메시지가 아니면
+        socket.emit('markAsRead', { r_id: data.r_id, u1_id: sessionStorage.getItem('user_id') });
+    }
         });
+
         function sendMessage() {
             // 메시지 입력 필드와 파일 입력 필드 가져오기
             const messageInput = document.getElementById("messageInput");
@@ -144,7 +157,7 @@
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const base64Image = event.target.result.split(',')[1]; // Base64 인코딩
-                    console.log("Sending data to server:", {
+                    /*console.log("Sending data to server:", {
                         message_contents: message,
                         //message_contents: message || "", // 메시지가 없으면 빈 문자열로 처리
                         r_id,
@@ -154,10 +167,11 @@
                         image_type: file.type,
                         is_read:1
                     });
+                    */
         
                     // 소켓으로 메시지와 이미지 전송
                     socket.emit('sendMessage', {
-                        message_contents: message,
+                        message_contents: message || null, // 메시지가 없으면 null
                         r_id,
                         u1_id,
                         u2_id,

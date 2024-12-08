@@ -193,9 +193,9 @@ if (!u1_id || !u2_id) {
     const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
 
     // 필수 값 검증
-    if (!message_contents || !r_id || !u1_id || !u2_id||is_read) {
+    if (!r_id || !u1_id || !u2_id||is_read) {
       let missingFields = [];
-      if (!message_contents) missingFields.push('message_contents'); // 누락된 필드를 확인
+     // 누락된 필드를 확인
       if (!r_id) missingFields.push('r_id');
       if (!u1_id) missingFields.push('u1_id');
       if (!u2_id) missingFields.push('u2_id');
@@ -206,6 +206,14 @@ if (!u1_id || !u2_id) {
       return;
     }
   }
+  if (!message_contents && !image) {
+    console.error('메시지와 파일이 모두 없습니다.');
+    socket.emit('errorMessage', '메시지나 파일 중 하나는 반드시 포함되어야 합니다.');
+    return;
+}
+
+
+
 try {
   let fileBuffer = null;
 
@@ -224,7 +232,7 @@ try {
     u1_id,
     u2_id,
     r_id,
-    message_contents,
+    message_contents: message_contents || null, // 메시지가 없으면 null로 저장
     send_date: new Date(), // KST 시간 설정
     image: fileBuffer,
     image_type: image_type || null,
@@ -236,7 +244,7 @@ try {
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     r_id,
-    message_contents,
+    message_contents: message_contents || '[이미지]', // 클라이언트에서 기본 메시지
     send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
     is_read: newMessage.is_read

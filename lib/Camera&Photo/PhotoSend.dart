@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import '../UserInfo/UserInfo_Id.dart'; // UserInfoId 클래스 import
+import 'package:path/path.dart' as path; // 파일 경로에서 확장자 추출
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+import '../SessionCookieManager.dart'; // 세션 쿠키 관리 클래스 import
 
 class PhotoSend extends StatefulWidget {
   final String imagePath;
@@ -15,48 +16,85 @@ class PhotoSend extends StatefulWidget {
 }
 
 class _PhotoSendState extends State<PhotoSend> {
-  String? _u1Id; // u1_id 저장 변수
+  late IO.Socket socket;
+  String? _u1Id; // 유저 ID
   bool _isLoading = true; // 로딩 상태 관리
-  TextEditingController _textController = TextEditingController(); // 텍스트 입력 컨트롤러
+  TextEditingController _textController = TextEditingController(); // 메시지 입력 필드
 
   @override
   void initState() {
     super.initState();
-    _loadUserId(); // 화면 초기화 시 u1_id 가져오기
+    _initializeSocket(); // 소켓 초기화
+    _loadUserId(); // 유저 ID 로드
+  }
+
+  @override
+  void dispose() {
+    socket.disconnect(); // 소켓 연결 해제
+    socket.dispose();
+    _textController.dispose(); // 입력 필드 해제
+    super.dispose();
+  }
+
+  Future<void> _initializeSocket() async {
+    print("Initializing socket...");
+    socket = IO.io(
+      'http://54.180.54.31:3001',
+      IO.OptionBuilder()
+          .setTransports(['websocket']) // WebSocket 사용
+          .disableAutoConnect()
+          .build(),
+    );
+
+    socket.onConnect((_) {
+      print('Socket connected');
+      socket.emit('joinRoom', {
+        'r_id': widget.rId,
+        'u1_id': _u1Id,
+        'u2_id': widget.u2Id,
+      });
+    });
+
+    socket.onDisconnect((_) {
+      print('Socket disconnected');
+      socket.connect(); // 연결 끊어질 경우 재연결
+    });
+
+    socket.connect(); // 소켓 연결 시작
   }
 
   Future<void> _loadUserId() async {
+    print("Loading user ID...");
     try {
-      UserInfoId userInfo = UserInfoId();
-      String? userId = await userInfo.fetchUserId();
-      if (userId == null) {
-        throw Exception("유저 ID를 가져올 수 없습니다.");
+      final response = await SessionCookieManager.get('http://54.180.54.31:3000/api/user-info/user-id');
+      if (response.statusCode == 200) {
+        // JSON 객체에서 ID 추출
+        final userId = response.body.contains('u_id')
+            ? response.body.split(':')[1].replaceAll(RegExp(r'[{}"]'), '').trim()
+            : response.body.trim();
+
+        setState(() {
+          _u1Id = userId; // 유저 ID 설정
+          _isLoading = false; // 로딩 상태 해제
+        });
+        print("User ID loaded: $_u1Id");
+      } else {
+        throw Exception('Failed to fetch user ID.');
       }
-      setState(() {
-        _u1Id = userId;
-        _isLoading = false;
-      });
     } catch (e) {
-      print("유저 ID 가져오기 실패: $e");
-      setState(() {
-        _isLoading = false;
-      });
+      print('Error loading user ID: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("유저 정보를 가져오는 데 실패했습니다.")),
+        SnackBar(content: Text('Error fetching user ID.')),
       );
+      setState(() {
+        _isLoading = false; // 로딩 상태 해제
+      });
     }
   }
 
-  Future<void> _sendPhoto(BuildContext context) async {
-    if (_u1Id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('유저 ID를 불러오는 중입니다.')),
-      );
-      return;
-    }
-
-    String message = _textController.text.trim(); // 메시지 가져오기
-    if (message.isEmpty) {
+  void _sendMessage() {
+    final messageContent = _textController.text.trim();
+    if (messageContent.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('메시지를 입력하세요.')),
       );
@@ -64,40 +102,43 @@ class _PhotoSendState extends State<PhotoSend> {
     }
 
     try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('http://your-server-url/photosend'),
-      );
-      request.fields['r_id'] = widget.rId;
-      request.fields['u2_id'] = widget.u2Id;
-      request.fields['u1_id'] = _u1Id!; // u1_id 추가
-      request.fields['message'] = message; // 메시지 추가
-      request.files.add(await http.MultipartFile.fromPath('photo', widget.imagePath));
+      // 이미지 파일 읽기
+      final imageBytes = File(widget.imagePath).readAsBytesSync();
+      print("Image file read successfully.");
 
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        print('사진 전송 성공');
+      // 이미지 타입 추출
+      final imageType = path.extension(widget.imagePath).replaceFirst('.', '');
+      print("Image type: $imageType");
+
+      final messageData = {
+        'r_id': widget.rId,
+        'u1_id': _u1Id,
+        'u2_id': widget.u2Id,
+        'message_contents': messageContent,
+        'send_date': DateTime.now().toIso8601String(),
+        'image': imageBytes, // 이미지 데이터를 바이너리로 전송
+        'image_type': imageType, // 이미지 타입 추가
+      };
+
+      print('Sending message: $messageData');
+      socket.emit('sendMessage', messageData);
+
+      // 서버 응답 확인
+      socket.on('messageSent', (data) {
+        print('Message sent successfully: $data');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('사진 전송 성공')),
+          SnackBar(content: Text('Message sent successfully.')),
         );
-        _executeRequestAction(); // 요청하기 클래스 실행
-        Navigator.pop(context); // 성공 후 이전 화면으로 돌아가기
-      } else {
-        print('사진 전송 실패: ${response.statusCode}');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('사진 전송 실패: ${response.statusCode}')),
-        );
-      }
+
+        // 모든 화면 닫기 (CameraMain.dart까지 닫기)
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      });
     } catch (e) {
-      print('사진 전송 에러: $e');
+      print('Error sending message: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('사진 전송 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('메시지 전송 중 오류가 발생했습니다.')),
       );
     }
-  }
-
-  void _executeRequestAction() {
-    RequestAction().execute(); // 요청하기 작업 실행
   }
 
   @override
@@ -105,7 +146,7 @@ class _PhotoSendState extends State<PhotoSend> {
     if (_isLoading) {
       return Scaffold(
         appBar: AppBar(
-          title: Text("사진 전송"),
+          title: Text("Sending Photo"),
         ),
         body: Center(
           child: CircularProgressIndicator(),
@@ -115,29 +156,29 @@ class _PhotoSendState extends State<PhotoSend> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("사진 전송"),
+        title: Text("Send Photo"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // 뒤로가기 버튼
+            Navigator.pop(context);
           },
         ),
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom, // 키보드 높이만큼 패딩
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Center(
             child: Column(
-              mainAxisSize: MainAxisSize.min, // Column 크기를 자식 크기에 맞게 줄임
+              mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  width: 300, // 이미지 너비
-                  height: 300, // 이미지 높이
+                  width: 300,
+                  height: 300,
                   child: Image.file(
                     File(widget.imagePath),
-                    fit: BoxFit.contain, // 이미지를 컨테이너 안에 맞춤
+                    fit: BoxFit.contain,
                   ),
                 ),
                 SizedBox(height: 20),
@@ -145,17 +186,17 @@ class _PhotoSendState extends State<PhotoSend> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
                     controller: _textController,
-                    maxLength: 30, // 최대 30자 제한
+                    maxLength: 30,
                     decoration: InputDecoration(
-                      labelText: "메시지 입력",
+                      labelText: "Enter your message",
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => _sendPhoto(context),
-                  child: Text("인증하기"),
+                  onPressed: _sendMessage,
+                  child: Text("Send"),
                 ),
               ],
             ),
@@ -163,12 +204,5 @@ class _PhotoSendState extends State<PhotoSend> {
         ),
       ),
     );
-  }
-}
-
-class RequestAction {
-  void execute() {
-    print("요청하기 작업 실행");
-    // 추가 작업 구현
   }
 }

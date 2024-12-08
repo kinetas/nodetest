@@ -112,9 +112,9 @@ class _CameraScreenState extends State<CameraScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => PhotoWaterMark(
-            imagePath: _capturedPhotoPath!,
-            rId: widget.rId,
-            u2Id: widget.u2Id,
+            imagePath: _capturedPhotoPath!, // 촬영된 사진 경로 전달
+            rId: widget.rId,               // rId 전달
+            u2Id: widget.u2Id,             // u2Id 전달
           ),
         ),
       );

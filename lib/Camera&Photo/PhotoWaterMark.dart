@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
-import 'dart:typed_data';
+import 'dart:typed_data'; // ByteData 사용을 위해 추가
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,10 +22,6 @@ class PhotoWaterMark extends StatefulWidget {
 }
 
 class _PhotoWaterMarkState extends State<PhotoWaterMark> {
-  File? _imageFile;
-  TextEditingController _textController = TextEditingController(); // 메시지 입력을 위한 컨트롤러
-  String _message = ''; // 하단에 표시할 메시지
-
   @override
   void initState() {
     super.initState();
@@ -41,6 +37,7 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
       final ui.Image image = await decodeImageFromList(
         File(imagePath).readAsBytesSync(),
       );
+
       // 폴라로이드 캔버스 생성
       final double padding = 20.0;
       final double bottomSpace = 150.0; // 바닥 공간을 늘려서 150으로 설정
@@ -51,8 +48,7 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
       final canvas = Canvas(recorder);
 
       // 배경 그리기
-      final Paint paint = Paint()
-        ..color = Colors.white;
+      final Paint paint = Paint()..color = Colors.white;
       canvas.drawRect(Rect.fromLTWH(0, 0, canvasWidth, canvasHeight), paint);
 
       // 원본 이미지 그리기 (위로 올리기 위해 Y 좌표를 조정)
@@ -86,41 +82,10 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
         textDirection: ui.TextDirection.ltr,
       );
       whiteTextPainter.layout();
-      // 흰색 텍스트를 약간 오프셋을 주어 테두리 효과
-      whiteTextPainter.paint(canvas, textOffset.translate(3.0, 3.0)); // 오프셋을 더 크게 주어 테두리 강조
+      whiteTextPainter.paint(canvas, textOffset.translate(3.0, 3.0)); // 테두리 효과 강조
 
       // 검은색 텍스트 그리기
       textPainter.paint(canvas, textOffset);
-
-      // 사용자 메시지 추가 (하단에 표시)
-      if (_message.isNotEmpty) {
-        final messageTextPainter = TextPainter(
-          text: TextSpan(
-            text: _message, // 사용자 입력 메시지
-            style: TextStyle(color: Colors.black, fontSize: 20),
-          ),
-          textDirection: ui.TextDirection.ltr,
-        );
-        messageTextPainter.layout(
-          minWidth: 0,
-          maxWidth: canvasWidth - padding * 2,
-        );
-        final messageTextOffset = Offset(
-          padding, // 왼쪽 여백
-          image.height.toDouble() + padding + 20.0, // 폴라로이드 아래 여백
-        );
-
-        // 텍스트의 흰색 테두리 그리기 (두꺼운 테두리)
-        final whiteMessageTextPainter = TextPainter(
-          text: TextSpan(text: _message, style: TextStyle(color: Colors.white, fontSize: 20)),
-          textDirection: ui.TextDirection.ltr,
-        );
-        whiteMessageTextPainter.layout();
-        whiteMessageTextPainter.paint(canvas, messageTextOffset.translate(3.0, 3.0)); // 테두리 강조
-
-        // 검은색 텍스트 그리기
-        messageTextPainter.paint(canvas, messageTextOffset);
-      }
 
       // 이미지 저장
       final picture = recorder.endRecording();
@@ -132,133 +97,44 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
       final ByteData? byteData = await finalImage.toByteData(format: ui.ImageByteFormat.png);
       final buffer = byteData!.buffer.asUint8List();
 
-      // 이후 생성된 파일 경로를 _imageFile로 저장
+      // 이후 생성된 파일 경로를 생성
       final tempDir = await getTemporaryDirectory();
       final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
       final outputFile = File('${tempDir.path}/polaroid_image_$timestamp.png');
       await outputFile.writeAsBytes(buffer);
 
-      setState(() {
-        _imageFile = outputFile;
-        print("폴라로이드 효과 생성 완료, 경로: ${_imageFile!.path}");
-      });
+      print("폴라로이드 효과 생성 완료, 경로: ${outputFile.path}");
+
+      // 생성된 워터마크 이미지와 함께 다음 화면으로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PhotoSend(
+            imagePath: outputFile.path, // 최종 이미지 경로
+            rId: widget.rId,           // rId 전달
+            u2Id: widget.u2Id,         // u2Id 전달
+          ),
+        ),
+      );
     } catch (e) {
       print("폴라로이드 효과 적용 중 오류 발생: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("워터마크 생성 실패. 다시 시도해주세요.")),
+      );
+      Navigator.pop(context); // 이전 화면으로 돌아가기
     }
-  }
-
-  // 파일 삭제
-  Future<void> _deleteImageFile() async {
-    if (_imageFile != null && await _imageFile!.exists()) {
-      try {
-        await _imageFile!.delete();
-        print("워터마크 이미지 삭제 완료.");
-      } catch (e) {
-        print("워터마크 이미지 삭제 중 오류 발생: $e");
-      }
-    }
-  }
-
-  // 뒤로 가기 버튼 눌렀을 때 초기화 확인 다이얼로그
-  void _showExitConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("폴라로이드 초기화"),
-        content: Text("뒤로 가면 생성된 워터마크 사진이 삭제됩니다. 진행하시겠습니까?"),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // 다이얼로그 닫기
-            },
-            child: Text("취소"),
-          ),
-          TextButton(
-            onPressed: () async {
-              await _deleteImageFile(); // 파일 삭제
-              Navigator.of(context).pop(); // 다이얼로그 닫기
-              Navigator.of(context).pop(); // 이전 화면으로 돌아가기
-            },
-            child: Text("확인"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _deleteImageFile(); // 화면 종료 시 파일 삭제
-    _textController.dispose(); // 컨트롤러 해제
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("폴라로이드 효과"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: _showExitConfirmationDialog, // 뒤로 가기 버튼 동작
-        ),
-      ),
       body: Center(
-        child: _imageFile == null
-            ? CircularProgressIndicator()
-            : Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: () {
-                if (_imageFile != null) {
-                  showDialog(
-                    context: context,
-                    builder: (_) => Dialog(
-                      child: Image.file(_imageFile!),
-                    ),
-                  );
-                }
-              }, // 이미지 클릭 시 확대
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8, // 80% of the screen width
-                height: MediaQuery.of(context).size.height * 0.5, // 50% of the screen height
-                child: Image.file(
-                  _imageFile!,
-                  fit: BoxFit.contain, // 이미지를 컨테이너 안에 맞춤
-                ),
-              ),
-            ),
+            CircularProgressIndicator(),
             SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TextField(
-                controller: _textController,
-                decoration: InputDecoration(
-                  labelText: "메시지 입력",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                if (_imageFile != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PhotoSend(
-                        imagePath: _imageFile!.path,
-                        rId: widget.rId,
-                        u2Id: widget.u2Id,
-                      ),
-                    ),
-                  );
-                  await _deleteImageFile(); // 파일 삭제
-                }
-              },
-              child: Text("다음"),
-            ),
+            Text("워터마크 찍는 중...", style: TextStyle(fontSize: 16)),
           ],
         ),
       ),

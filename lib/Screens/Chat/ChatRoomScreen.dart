@@ -117,7 +117,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ),
           if (_showPlusOptions)
             ChatPlusButton(
-              context: context,
+              roomData: widget.roomData, // roomData 전달
             ),
           Padding(
             padding: const EdgeInsets.all(8.0),

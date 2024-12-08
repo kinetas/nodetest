@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../Mission/MissionVerificationScreen.dart'; // MissionVerificationScreen import
 
 class ChatPlusButton extends StatelessWidget {
-  final BuildContext context;
+  final Map<String, dynamic> roomData; // roomData 전달받기
 
   const ChatPlusButton({
-    required this.context,
+    required this.roomData, // roomData 추가
     Key? key,
   }) : super(key: key);
 
@@ -43,7 +43,10 @@ class ChatPlusButton extends StatelessWidget {
                   '미션 인증',
                       () => _navigateToScreen(
                     context,
-                    MissionVerificationScreen(rId: "example_rId", u2Id: "example_u2Id"),
+                    MissionVerificationScreen(
+                      rId: roomData['r_id'], // roomData에서 rId 가져오기
+                      u2Id: roomData['u2_id'], // roomData에서 u2Id 가져오기
+                    ),
                   ),
                 ),
                 _buildCircleButton(
@@ -61,7 +64,11 @@ class ChatPlusButton extends StatelessWidget {
   }
 
   Widget _buildCircleButton(
-      BuildContext context, IconData icon, String label, VoidCallback onPressed) {
+      BuildContext context,
+      IconData icon,
+      String label,
+      VoidCallback onPressed,
+      ) {
     return Column(
       children: [
         GestureDetector(

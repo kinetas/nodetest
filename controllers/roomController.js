@@ -247,7 +247,7 @@ exports.updateRoomName = async (req, res) => {
         const updated = await Room.update(
             { r_title: newRoomName },
             // { where: { u1_id, u2_id, r_type } }
-            { where: { u1_id, u2_id, roomType } }
+            { where: { u1_id, u2_id, r_type: roomType } }
         );
 
         if (updated[0] === 0) {

@@ -18,6 +18,7 @@ exports.createRoom = (socket, roomName) => {
 //
 exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
+    const u1_id = socket.handshake.query.u1_id || socket.handshake.auth.u1_id;
     if (!r_id || !u1_id) {
       console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
       return;
@@ -30,11 +31,13 @@ exports.joinRoom = async (socket, { r_id, u2_id }) => {
       return;
     }
     // 방에 사용자를 추가하거나 관련 작업을 수행할 수 있음
-    await Room.update(
-      { is_read : 0 },  // 사용자가 방에 참여했다고 업데이트
-      { where: { r_id } }
-    );
-
+    const updatedCount = await Room.update(
+      { is_read: 0 },
+      { where: { r_id, u2_id: u1_id, is_read: 1 } }
+  );
+  if (updatedCount[0] === 0) {
+    console.warn(`No unread messages found for room ${r_id} and user ${u1_id}`);
+}
     // 소켓을 이용해 방에 참여시키기
     socket.join(r_id);
     console.log(`joined room ${r_id}`);

@@ -132,34 +132,37 @@ io.on('connection', (socket) => {
 
   // WebSocket 이벤트 처리
   socket.on('joinRoom', async ({ r_id }) => {
-    const u1_id = socket.request.session.user.id; // 세션 데이터에서 u1_id 가져오기
-    if (!u1_id) {
-      socket.emit('joinRoomError', { message: '로그인이 필요합니다.' });
-      return;
+    try {
+      const u1_id = socket.request.session?.user?.id; // 세션 데이터에서 u1_id 가져오기
+      if (!u1_id) {
+        socket.emit('joinRoomError', { message: '로그인이 필요합니다.' });
+        return;
+      }
+
+      console.log(`User ${u1_id} attempting to join room ${r_id}`);
+      await chatController.joinRoom(socket, { r_id, u1_id }); // joinRoom 핸들러 호출
+    } catch (error) {
+      console.error('joinRoom Error:', error);
+      socket.emit('joinRoomError', { message: '방 입장 중 오류가 발생했습니다.' });
     }
-
-    console.log(`User ${u1_id} attempting to join room ${r_id}`);
-    exports.joinRoom(socket, { r_id, u1_id });
   });
-});
 
 
-//메시지 읽음 처리 실시간 반영
+// 메시지 읽음 처리 이벤트
 socket.on('markAsRead', async (data) => {
   const { r_id, u1_id } = data;
   try {
     const success = await chatController.markMessageAsRead({ r_id, u1_id });
     if (success) {
-      io.to(r_id).emit('messageRead', { r_id, u1_id }); // 클라이언트에 읽음 상태 알림
+      io.to(r_id).emit('messageRead', { r_id, u1_id }); // 읽음 상태 브로드캐스트
       console.log(`Messages in room ${r_id} marked as read for user ${u1_id}`);
-  } else {
-      console.error("Failed to mark messages as read.");
-  }
+    } else {
+      console.error('Failed to mark messages as read.');
+    }
   } catch (error) {
-    console.error("Socket markAsRead error:", error);
+    console.error('markAsRead Error:', error);
   }
 });
-
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 
@@ -237,7 +240,7 @@ try {
 socket.on('disconnect', () => {
 console.log('User disconnected');
 });
-
+});
 
 server.listen(3001, () => {
   console.log('HTTP Server running on port 3001');

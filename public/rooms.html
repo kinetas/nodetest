@@ -122,12 +122,9 @@ function joinRoom(r_id, u1_id) {
         console.log('Initial Messages:', messages);
         const roomList = document.getElementById('roomList');
         roomList.innerHTML = '';
-        messages.forEach((message) => {
-            const messageItem = document.createElement('li');
-            messageItem.textContent = `${message.u1_id}: ${message.message_contents}`;
-            roomList.appendChild(messageItem);
+        window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
         });
-    });
+    
 }
         // 방 추가 함수
         function addRoom() {

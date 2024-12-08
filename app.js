@@ -145,11 +145,11 @@ app.get('/findinfo', (req, res) => {
 app.get('/cVote', requireAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
 });
-/*
+
 app.get('/chat', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'chat.html')); //채팅 ?��?���???
 });
-*/
+
 app.get('/result', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'result.html')); // result.html 경로
 });

@@ -59,7 +59,7 @@
                             const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000)); // UTC + 9시간
 
                             // 시간 형식으로 변환
-                            const formattedDate = utcDate.toISOString().slice(0, 19).replace('T', ' ');
+                            const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
                             
                             messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
 
@@ -133,11 +133,11 @@
                 return;
             }
         
-            // 메시지가 비어 있는지 확인
-            if (!message && !file) {
-                alert("메시지나 파일을 입력하세요.");
+            // 메시지와 파일이 모두 없는 경우 전송 차단
+            if (!messageContents && !file) {
+                alert('메시지나 파일 중 하나는 반드시 포함되어야 합니다.');
                 return;
-            }
+    }
         
             // 파일이 있는 경우 파일을 읽고 소켓으로 전송
             if (file) {

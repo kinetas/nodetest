@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'PhotoSend.dart'; // PhotoSend 화면 import
+import 'PhotoWaterMark.dart'; // PhotoWaterMark 화면 import
 
 class CameraScreen extends StatefulWidget {
   final String rId;
@@ -165,8 +165,8 @@ class _CameraScreenState extends State<CameraScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PhotoSend(
-                              imagePath: _capturedPhotoPath!,
+                            builder: (context) => PhotoWaterMark(
+                              imagePath: _capturedPhotoPath!, // 정확한 매개변수 이름
                               rId: widget.rId,
                               u2Id: widget.u2Id,
                             ),

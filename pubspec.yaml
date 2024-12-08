@@ -31,7 +31,7 @@ dependencies:
   firebase_core: ^3.8.1
   firebase_messaging: ^15.1.6
   table_calendar: ^3.0.7
-  image: ^4.0.15
+  image: ^4.0.17
   flutter_localizations:
     sdk: flutter
   flutter_time_picker_spinner: ^2.0.0

@@ -23,9 +23,11 @@ class _AddChatScreenState extends State<AddChatScreen> {
       setState(() => _isLoading = true);
 
       // API 요청 데이터
-      final requestBody = {
+      final params = {
         'u2_id': _u2IdController.text, // 상대방 ID
-        'roomName': _roomNameController.text.isEmpty ? null : _roomNameController.text, // 방 이름 (옵션)
+        'roomName': _roomNameController.text.isEmpty
+            ? '${_u2IdController.text}-${SessionCookieManager.currentUserId} 방'
+            : _roomNameController.text, // 방 이름 (옵션)
         'r_type': widget.chatType, // 채팅방 유형 (전달된 chatType 사용)
       };
 
@@ -33,7 +35,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
       final response = await SessionCookieManager.post(
         apiUrl,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(requestBody),
+        body: jsonEncode(params),
       );
 
       setState(() => _isLoading = false);
@@ -41,7 +43,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
 
-        if (responseData['success'] == true) {
+        if (responseData['message'] == "방이 성공적으로 추가되었습니다.") {
           // 성공 메시지 표시 및 이전 화면으로 이동
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방이 성공적으로 생성되었습니다!')),
@@ -50,7 +52,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
         } else {
           // 실패 메시지 표시
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(responseData['message'] ?? '채팅방 생성 실패')),
+            SnackBar(content: Text('채팅방 생성 실패: ${responseData['message']}')),
           );
         }
       } else {

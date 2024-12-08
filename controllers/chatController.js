@@ -19,6 +19,7 @@ exports.createRoom = (socket, roomName) => {
 exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
     const u1_id = socket.handshake.query.u1_id || socket.handshake.auth.u1_id;
+    const u2_id = socket.handshake.query.u1_id || socket.handshake.auth.u2_id;
     if (!r_id || !u1_id) {
       console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
       return;

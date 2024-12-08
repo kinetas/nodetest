@@ -255,7 +255,7 @@ try {
     message_contents,
     send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null,
-    is_read
+    is_read 
   });
   // 상대방 연결 상태 확인
   const receiverSocketId = userSockets.get(u2_id);
@@ -268,6 +268,15 @@ try {
       );
       io.to(receiverSocketId).emit('messageRead', { r_id, u1_id });
   }
+  
+  //상대방 소켓 연결 안되어있을시 FCM 알림 호출
+  if (!isReceiverConnected) {
+    console.log(`User ${u2_id} is offline, sending FCM notification`);
+
+    const title = '새로운 메시지 도착';
+    const body = message_contents || '[이미지]';
+    await sendNotification(u2_id, title, body); 
+}
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {
     const { r_id, u1_id } = data;

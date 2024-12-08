@@ -166,7 +166,7 @@ if (!u1_id || !u2_id) {
       socket.emit('errorMessage', 'Invalid room or user ID');
       return;
   }
-  */    
+  */
 
   try {
       // 소켓 방 참여

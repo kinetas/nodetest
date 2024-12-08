@@ -57,6 +57,7 @@ exports.acceptCommunityMission = async (req, res) => {
 
         let rid_u1_u2 = uuidv4();
         let rid_u2_u1 = uuidv4();
+        let rid_open = uuidv4();
 
         if (rooms.length === 0) {
             // [추가됨] 방 생성
@@ -64,7 +65,8 @@ exports.acceptCommunityMission = async (req, res) => {
             await Room.create({ 
                 u1_id: mission.u_id, 
                 u2_id, 
-                r_id: rid_u1_u2, 
+                // r_id: rid_u1_u2, 
+                r_id: rid_open,
                 r_title: `${mission.u_id}-${u2_id}`, 
                 r_type: 'open' 
             });
@@ -72,14 +74,16 @@ exports.acceptCommunityMission = async (req, res) => {
             await Room.create({ 
                 u1_id: u2_id, 
                 u2_id: mission.u_id, 
-                r_id: rid_u2_u1, 
+                // r_id: rid_u2_u1, 
+                r_id: rid_open,
                 r_title: `${u2_id}-${mission.u_id}`, 
                 r_type: 'open' 
             });
         } else {
             // [변경됨] 기존 방 ID 사용
-            rid_u1_u2 = rooms.find(r => r.u1_id === mission.u_id && r.u2_id === u2_id)?.r_id || uuidv4();
-            rid_u2_u1 = rooms.find(r => r.u1_id === u2_id && r.u2_id === mission.u_id)?.r_id || uuidv4();
+            // rid_u1_u2 = rooms.find(r => r.u1_id === mission.u_id && r.u2_id === u2_id)?.r_id || uuidv4();
+            // rid_u2_u1 = rooms.find(r => r.u1_id === u2_id && r.u2_id === mission.u_id)?.r_id || uuidv4();
+            rid_open = rooms.find(r => r.u1_id === u2_id && r.u2_id === mission.u_id)?.r_id || uuidv4();
         }
 
         // 커뮤니티 미션 업데이트
@@ -120,7 +124,8 @@ exports.acceptCommunityMission = async (req, res) => {
             m_deadline: deadline,
             m_reword: null,
             m_status: '진행중',
-            r_id: rid_u1_u2,
+            // r_id: rid_u1_u2,
+            r_id: rid_open,
             m_extended: false,
             missionAuthenticationAuthority: mission.u_id,
         });
@@ -133,7 +138,8 @@ exports.acceptCommunityMission = async (req, res) => {
             m_deadline: deadline,
             m_reword: null,
             m_status: '진행중',
-            r_id: rid_u2_u1,
+            // r_id: rid_u2_u1,
+            r_id: rid_open,
             m_extended: false,
             missionAuthenticationAuthority: u2_id,
         });

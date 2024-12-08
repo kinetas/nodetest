@@ -238,8 +238,9 @@ exports.updateRoomName = async (req, res) => {
 
     try {
 
-        if(r_type !== 'open'){
-            r_type = 'general';
+        // r_type이 없거나 잘못된 값일 경우 에러 처리
+        if (!r_type) {
+            return res.status(400).json({ message: "방 타입을 입력해야 합니다." });
         }
 
         const updated = await Room.update(

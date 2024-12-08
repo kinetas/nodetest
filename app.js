@@ -231,7 +231,7 @@ const {sendNotificationController} = require('./controllers/notificationControll
 // FCM ?���?? ?��?�� API ?��?��?��?��?��
 app.post('/api/send-notification', sendNotificationController);
 
-
+/*
 app.use((req, res, next) => {
     let rawBody = '';
     req.on('data', (chunk) => {
@@ -243,6 +243,11 @@ app.use((req, res, next) => {
         console.log(`Raw Body:`, rawBody);
         next();
     });
+});
+*/
+
+app.use((req, res) => {
+    res.status(404).send('404 Not Found');
 });
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -192,7 +192,7 @@ const sendMessageNotification = async (userId, messageContent) => {
     try {
         return await sendNotification(userId, title, body);
     } catch (error) {
-        console.error(`Failed to send message notification to user ${receiverId}:`, error.message);
+        console.error(`Failed to send message notification to user ${userId}:`, error.message);
         throw error;
     }
 };

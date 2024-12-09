@@ -84,12 +84,12 @@ exports.createMission = async (req, res) => {
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
             
-            const sendMissionCreateNotification = await notificationController.sendMissionCreateNotification(
+            const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
                 u1_id,
                 missionAuthenticationAuthority,
             );
 
-            if(!sendMissionCreateNotification){
+            if(!sendMissionCreateAuthenticationNotification){
                 return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
             }
             // ================ 알림 추가 - 디바이스 토큰 =======================

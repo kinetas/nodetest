@@ -37,18 +37,11 @@ const sendNotification = async (userId, title, body = {}) => {
         });
 
         if (!user || !user.token) {
-            // throw new Error('No token found for user');
-            console.error('토큰이 없습니다.');
-            return res.status(400).json({ success: false, message: '사용자의 토큰이 존재하지 않습니다.' });
+            throw new Error('No token found for user');
         }
 
         const token = user.token;
-
-        if (!token) {
-            console.error('토큰을 찾을 수 없습니다:', user);
-            throw new Error('사용자의 디바이스 토큰이 없습니다.');
-        }
-
+        
         const message = {
             token,
             notification:{

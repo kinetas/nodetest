@@ -42,12 +42,10 @@ const sendNotification = async (userId, title, body = {}) => {
         const token = user.token;
 
         const message = {
-            notification: {
                 title,
                 body: typeof body === 'string' ? body : JSON.stringify(body),
-            },
-            token,
-        };
+                token,
+                };
 
         // Firebase를 통해 알림 전송
         const response = await admin.messaging().send(message);

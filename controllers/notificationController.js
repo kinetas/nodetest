@@ -42,13 +42,15 @@ const sendNotification = async (userId, title, body = {}) => {
         const token = user.token;
 
         const message = {
+                data:{
                 title,
                 body: typeof body === 'string' ? body : JSON.stringify(body),
+                },
                 token,
                 };
 
         // Firebase를 통해 알림 전송
-        const response = await admin.messaging().send(message);
+        const response = await getMessaging().send(message);
 
         // 성공 시 로그 저장
         await NotificationLog.create({
@@ -175,9 +177,9 @@ const sendVoteMissionFailureNotification = async (userId, missionTitle) => {
 };
 
 //메시지 수신 알림
-const sendMessageNotification = async (senderId, receiverId, messageContent) => {
+const sendMessageNotification = async (receiverId, messageContent) => {
     const title = '새로운 메시지 도착';
-    const body = `${senderId}님이 보낸 메시지: "${messageContent}"`;
+    const body = `메시지: "${messageContent}"`;
 
     try {
         return await sendNotification(receiverId, title, body);

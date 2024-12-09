@@ -73,7 +73,7 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
     console.error('Missing r_id or u1_id:', { r_id, u1_id,u2_id,message });
     return;
   }
-  console.log('Debugging variables:', { r_id, u1_id, u2_id, message,message_num,send_date });
+  console.log('Debugging variables:', { r_id, u1_id, u2_id, message,message_num, send_date });
   try {
       // 메시지 저장
       const newMessage = await RMessage.create({

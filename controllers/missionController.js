@@ -591,16 +591,24 @@ exports.successMission = async (req, res) => {
         );
 
         //==============================리워드 기능 추가==============================
-        // 미션 생성자 reward 50 추가
-        await User.update(
-            { reward: Sequelize.literal('reward + 50') },
-            { where: { u_id: u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
-        );
-        // 미션 성공자 reward 100 추가
-        await User.update(
-            { reward: Sequelize.literal('reward + 100') },
-            { where: { u_id: mission.u2_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
-        );
+        if (mission.u1_id === mission.u2_id){
+            await User.update(
+                { reward: Sequelize.literal('reward + 100') },
+                { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+            );
+        }
+        else{
+            // 미션 생성자 reward 50 추가
+            await User.update(
+                { reward: Sequelize.literal('reward + 50') },
+                { where: { u_id: u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+            );
+            // 미션 성공자 reward 100 추가
+            await User.update(
+                { reward: Sequelize.literal('reward + 100') },
+                { where: { u_id: mission.u2_id } }
+            );
+        }
         //==============================리워드 기능 추가==============================
 
         // 현재 시간 저장

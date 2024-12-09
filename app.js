@@ -65,8 +65,8 @@ app.use(express.static('public'));
 
 
 // 메시�??? ????��?�� 처리?��?�� API ?��?��?��?��?�� 추�??
-app.post('/api/messages', (req, res) => {
-    const { u1_id, u2_id, r_id, message_contents } = req.body;})
+// app.post('/api/messages', (req, res) => {
+//     const { u1_id, u2_id, r_id, message_contents } = req.body;})
    /* // DB?�� 메시�??? ????�� 로직 추�??
     if (!u1_id || !u2_id || !r_id || !message_contents) {
         console.error('Missing required fields:', { u1_id, u2_id, r_id, message_contents});

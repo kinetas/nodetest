@@ -27,7 +27,8 @@ const saveToken = async (req, res) => {
     }
 };
 */
-/// 기본 알림 전송 함수
+
+// 기본 알림 전송 함수
 const sendNotification = async (userId, title, body = {}) => {
     try {
         // Sequelize를 사용해 token 조회

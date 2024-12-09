@@ -160,14 +160,6 @@ if (!u1_id || !u2_id) {
     console.error('Invalid joinRoom data:', { r_id, u1_id, u2_id });
     return;
 }
-  //const room = await Room.findOne({ where: { r_id } });
-  /*if (!r_id || !u2_id || u1_id) {
-      console.error('Invalid joinRoom data:', data);
-      socket.emit('errorMessage', 'Invalid room or user ID');
-      return;
-  }
-  */
-
   try {
       // 소켓 방 참여
       socket.join(r_id);
@@ -213,8 +205,6 @@ if (!u1_id || !u2_id) {
     return;
 }
 
-
-
 try {
   let fileBuffer = null;
 
@@ -240,13 +230,23 @@ try {
     is_read:1
   });
   //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
-
+    // 상대방 연결 상태 확인
+    const receiverSocketId = userSockets.get(u2_id);
+    const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);
+    if (isReceiverConnected) {
+      await RMessage.update(
+          { is_read: 0 },
+          { where: { r_id, u2_id: u1_id, is_read: 1 } }
+      );
+      io.to(receiverSocketId).emit('messageRead', { r_id, u1_id });
+  }
+  
    // 메시지 브로드캐스트,  안전성 검사
   io.to(r_id).emit('receiveMessage', {
     u1_id,
     r_id,
     message_contents: message_contents || '[이미지]', // 클라이언트에서 기본 메시지
-    send_date: newMessage.send_date,
+    send_date: newMessage.send_date,//여기서 보낼 때 시간 뜸
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
     is_read: newMessage.is_read
   });
@@ -259,18 +259,7 @@ try {
     is_read
   });
   
-  // 상대방 연결 상태 확인
-  const receiverSocketId = userSockets.get(u2_id);
-  const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);
 
-  if (isReceiverConnected) {
-      await RMessage.update(
-          { is_read: 0 },
-          { where: { r_id, u2_id: u1_id, is_read: 1 } }
-      );
-      io.to(receiverSocketId).emit('messageRead', { r_id, u1_id });
-  }
-  
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);

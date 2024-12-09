@@ -248,7 +248,7 @@ try {
     message_contents: message_contents || '[이미지]', // 클라이언트에서 기본 메시지
     send_date: newMessage.send_date,//여기서 보낼 때 시간 뜸
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
-    is_read: newMessage.is_read
+    is_read: newMessage.is_read,
   });
   console.log(`Sending message to room ${r_id}:`, {
     u1_id,
@@ -256,15 +256,14 @@ try {
     message_contents,
     send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null,
-    is_read
+    is_read: newMessage.is_read,
   });
   
 
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
-    const body = message_contents || '[이미지]';
-    await notificationController.sendMessageNotification(u2_id, body);
+    await notificationController.sendMessageNotification(u2_id, message_contents || '[이미지]');
 }
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {

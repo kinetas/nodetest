@@ -592,7 +592,7 @@ exports.successMission = async (req, res) => {
 
         //==============================리워드 기능 추가==============================
         if (mission.u1_id === mission.u2_id){
-            const user = await User.findOne({ where: { u_id: u1_id } });
+            const user = await User.findOne({ where: { u_id: mission.u1_id } });
             await User.update(
                 { reward: user.reward + 100 },
                 { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트

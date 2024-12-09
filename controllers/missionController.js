@@ -135,13 +135,8 @@ exports.createMission = async (req, res) => {
             });
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
-            const user = await User.findOne({
-                where: {
-                    u_id: u2_id,
-                }
-            })
+            
             const sendMissionCreateNotification = await notificationController.sendMissionCreateNotification(
-                user.token,
                 u1_id,
                 assignedU2Id,
             );
@@ -526,13 +521,7 @@ exports.requestMissionApproval = async (req, res) => {
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
         if (userId !== mission.u1_id){
-            const user = await User.findOne({
-                where: {
-                    u_id: mission.u1_id,
-                }
-            })
             const sendRequestMissionApprovalNotification = await notificationController.sendRequestMissionApprovalNotification(
-                user.token,
                 userId,
                 mission.u1_id,
             );
@@ -624,13 +613,7 @@ exports.successMission = async (req, res) => {
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
         if (u1_id !== mission.u2_id){
-            const user = await User.findOne({
-                where: {
-                    u_id: u2_id,
-                }
-            })
             const sendMissionSuccessNotification = await notificationController.sendMissionSuccessNotification(
-                user.token,
                 u1_id,
                 mission.u2_id,
             );
@@ -705,13 +688,7 @@ exports.failureMission = async (req, res) => {
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
         if (u1_id !== mission.u2_id){
-            const user = await User.findOne({
-                where: {
-                    u_id:u2_id,
-                }
-            })
             const sendMissionFailureNotification = await notificationController.sendMissionFailureNotification(
-                user.token,
                 u1_id,
                 mission.u2_id,
             );
@@ -790,14 +767,8 @@ exports.checkMissionDeadline = async () => {
         // 10분 남은 미션들 알림 보내기
         for (const missionTenMinutes of missionsWithExactTenMinutesLeft) {
             // ================ 알림 추가 - 디바이스 토큰 =======================
-            const user = await User.findOne({
-                where: {
-                    u_id: missionTenMinutes.u2_id,
-                }
-            })
             const sendMissionDeadlineTenMinutesNotification = await notificationController.sendMissionDeadlineTenMinutesNotification(
-                user.token,
-                user.u_id,
+                missionTenMinutes.u2_id,
                 missionTenMinutes.m_title,
             );
 
@@ -843,14 +814,8 @@ exports.checkMissionDeadline = async () => {
 
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
-                const user = await User.findOne({
-                    where: {
-                        u_id: mission.u2_id,
-                    }
-                })
                 const sendMissionDeadlineNotification = await notificationController.sendMissionDeadlineNotification(
-                    user.token,
-                    user.u_id,
+                    mission.u2_id,
                     mission.m_title,
                 );
 
@@ -879,14 +844,8 @@ exports.checkMissionDeadline = async () => {
                 });
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
-                const user = await User.findOne({
-                    where: {
-                        u_id: mission.u2_id,
-                    }
-                })
                 const sendMissionDeadlineNotification = await notificationController.sendMissionDeadlineNotification(
-                    user.token,
-                    user.u_id,
+                    mission.u2_id,
                     mission.m_title,
                 );
 

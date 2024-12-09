@@ -137,15 +137,9 @@ exports.friendRequestSend = async (req, res) => {
                     );
 
                     // ================ 알림 추가 - 디바이스 토큰 =======================
-                    const user = await User.findOne({
-                        where: {
-                            u_id: f_id,
-                        }
-                    })
                     const sendFriendRequestNotification = await notificationController.sendFriendRequestNotification(
-                        user.token,
                         u_id,
-                        user.u_id,  // = f_id
+                        f_id,
                     );
 
                     if(!sendFriendRequestNotification){
@@ -164,15 +158,9 @@ exports.friendRequestSend = async (req, res) => {
                 );
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
-                const user = await User.findOne({
-                    where: {
-                        u_id: f_id,
-                    }
-                })
                 const sendFriendRequestNotification = await notificationController.sendFriendRequestNotification(
-                    user.token,
                     u_id,
-                    user.u_id,  // = f_id
+                    f_id,
                 );
 
                 if(!sendFriendRequestNotification){
@@ -194,15 +182,9 @@ exports.friendRequestSend = async (req, res) => {
             });
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
-            const user = await User.findOne({
-                where: {
-                    u_id: f_id,
-                }
-            })
             const sendFriendRequestNotification = await notificationController.sendFriendRequestNotification(
-                user.token,
                 u_id,
-                user.u_id,  // = f_id
+                f_id,
             );
 
             if(!sendFriendRequestNotification){
@@ -365,15 +347,9 @@ exports.friendRequestAccept = async (req, res) => {
         );
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
-        const user = await User.findOne({
-            where: {
-                u_id: f_id,
-            }
-        })
         const sendFriendAcceptNotification = await notificationController.sendFriendAcceptNotification(
-            user.token,
             u_id,
-            user.u_id,  // = f_id
+            f_id,
         );
 
         if(!sendFriendAcceptNotification){

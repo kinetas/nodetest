@@ -222,14 +222,8 @@ exports.checkAndUpdateMissions = async () => {
                     });
 
                     // ================ 알림 추가 - 디바이스 토큰 =======================
-                    const user = await User.findOne({
-                        where: {
-                            u_id: mission.u2_id,
-                        }
-                    })
                     const sendVoteMissionSuccessNotification = await notificationController.sendVoteMissionSuccessNotification(
-                        user.token,
-                        user.u_id,
+                        mission.u2_id,
                         mission.m_title
                     );
 
@@ -257,14 +251,8 @@ exports.checkAndUpdateMissions = async () => {
                     });
 
                     // ================ 알림 추가 - 디바이스 토큰 =======================
-                    const user = await User.findOne({
-                        where: {
-                            u_id: mission.u2_id,
-                        }
-                    })
                     const sendVoteMissionFailureNotification = await notificationController.sendVoteMissionFailureNotification(
-                        user.token,
-                        user.u_id,
+                        mission.u2_id,
                         mission.m_title
                     );
 

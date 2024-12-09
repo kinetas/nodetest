@@ -150,14 +150,9 @@ exports.acceptCommunityMission = async (req, res) => {
         });
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
-        const user = await User.findOne({
-            where: {
-                u_id: mission.u_id,
-            }
-        })
+        
         const sendAcceptCommunityMissionNotification = await notificationController.sendAcceptCommunityMissionNotification(
-            user.token,
-            user.u_id,
+            mission.u_id,
             missionTitle
         );
 

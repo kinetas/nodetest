@@ -186,11 +186,11 @@ const sendVoteMissionFailureNotification = async (userId, missionTitle) => {
 };
 
 //메시지 수신 알림
-const sendMessageNotification = async (receiverId, messageContent) => {
+const sendMessageNotification = async (userId, messageContent) => {
     const title = '새로운 메시지 도착';
     const body = `메시지: "${messageContent}"`;
     try {
-        return await sendNotification(receiverId, title, body);
+        return await sendNotification(userId, title, body);
     } catch (error) {
         console.error(`Failed to send message notification to user ${receiverId}:`, error.message);
         throw error;

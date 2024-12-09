@@ -74,7 +74,9 @@ jobs:
     # Upload code to AWS S3
     - name: Upload to AWS S3
       run: |
-        zip -r release.zip *
+        # zip -r release.zip *
+        zip -r project.zip . -x "node_modules/*" "*.log" ".git/*"
+
         aws deploy push \
           --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
           --ignore-hidden-files \

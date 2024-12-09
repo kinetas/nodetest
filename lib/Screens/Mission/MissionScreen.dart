@@ -28,6 +28,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
   void _showAchievementPanel() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return AchievementPanel(
           onClose: () {
@@ -42,21 +43,26 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('미션 목록'),
+        title: Text(
+          '미션 목록',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
         actions: [
           TextButton(
             onPressed: () {
               // 추천 기능 동작
             },
-            child: Text('추천', style: TextStyle(color: Colors.black)),
+            child: Text('추천', style: TextStyle(color: Colors.white)),
           ),
           IconButton(
-            icon: Icon(Icons.bar_chart), // 달성률 아이콘 추가
+            icon: Icon(Icons.bar_chart, color: Colors.white), // 달성률 아이콘
             onPressed: _showAchievementPanel,
             tooltip: '달성률 보기',
           ),
           IconButton(
-            icon: Icon(Icons.send), // 비행기 모양 버튼
+            icon: Icon(Icons.send, color: Colors.white), // 비행기 모양 버튼
             onPressed: () {
               Navigator.push(
                 context,
@@ -67,7 +73,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
             },
           ),
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.add, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
@@ -80,18 +86,30 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
         ],
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
           tabs: [
             Tab(text: '내 미션'), // 1번 탭
             Tab(text: '완료한 미션'), // 2번 탭
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          MyMissionList(), // 내 미션 리스트 (1번 탭)
-          MyCompleteMissionList(), // 완료한 미션 리스트 (2번 탭)
-        ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            MyMissionList(), // 내 미션 리스트 (1번 탭)
+            MyCompleteMissionList(), // 완료한 미션 리스트 (2번 탭)
+          ],
+        ),
       ),
     );
   }

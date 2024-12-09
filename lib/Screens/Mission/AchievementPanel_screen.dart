@@ -57,10 +57,6 @@ class _AchievementPanelState extends State<AchievementPanel> {
 
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
-
-          // 디버깅 로그 추가
-          print('[$period] 응답 데이터: $responseData');
-
           setState(() {
             achievementRates[period] = responseData[urlsAndKeys[period]!['key']]?.toDouble() ?? 0.0;
           });
@@ -96,15 +92,25 @@ class _AchievementPanelState extends State<AchievementPanel> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.lightBlue.shade100,
+            blurRadius: 10,
+            offset: Offset(0, -2),
+          ),
+        ],
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('달성률 보기', style: TextStyle(fontSize: 16)),
+              Text(
+                '달성률 보기',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              ),
               IconButton(
-                icon: Icon(Icons.close),
+                icon: Icon(Icons.close, color: Colors.blueGrey),
                 onPressed: widget.onClose,
               ),
             ],
@@ -114,7 +120,7 @@ class _AchievementPanelState extends State<AchievementPanel> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: Icon(Icons.arrow_back_ios),
+                icon: Icon(Icons.arrow_back_ios, color: Colors.lightBlue),
                 onPressed: () => _changeAchievementPeriod(false),
               ),
               GestureDetector(
@@ -140,12 +146,16 @@ class _AchievementPanelState extends State<AchievementPanel> {
                   );
                 },
                 child: Text(
-                  ' 📊 $_currentAchievementPeriod 달성률 ',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  '📊 $_currentAchievementPeriod 달성률 ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightBlue.shade700,
+                  ),
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.arrow_forward_ios),
+                icon: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue),
                 onPressed: () => _changeAchievementPeriod(true),
               ),
             ],
@@ -161,10 +171,13 @@ class _AchievementPanelState extends State<AchievementPanel> {
                     LinearProgressIndicator(
                       value: _currentAchievementRate / 100,
                       backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
                     ),
                     SizedBox(height: 5),
-                    Text('${_currentAchievementRate.toStringAsFixed(1)}%', style: TextStyle(fontSize: 16)),
+                    Text(
+                      '${_currentAchievementRate.toStringAsFixed(1)}%',
+                      style: TextStyle(fontSize: 16, color: Colors.blueGrey),
+                    ),
                   ],
                 ),
               ),
@@ -172,12 +185,12 @@ class _AchievementPanelState extends State<AchievementPanel> {
                 children: [
                   Text(
                     '${_currentAchievementRate.toInt()}%',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.lightBlue),
                   ),
                   SizedBox(height: 8),
                   Text(
                     getAchievementEmoji(_currentAchievementRate / 100),
-                    style: TextStyle(fontSize: 24),
+                    style: TextStyle(fontSize: 28),
                   ),
                 ],
               ),

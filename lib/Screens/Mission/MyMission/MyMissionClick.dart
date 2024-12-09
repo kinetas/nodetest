@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../MissionVerificationScreen.dart'; // MissionVerificationScreen import
 
+
 class MissionClick extends StatelessWidget {
   final Map<String, dynamic> mission;
 
@@ -48,6 +49,7 @@ class MissionClick extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
+
                     // MissionVerificationScreen으로 이동
                     Navigator.push(
                       context,

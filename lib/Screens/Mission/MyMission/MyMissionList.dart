@@ -35,18 +35,18 @@ class _MyMissionListState extends State<MyMissionList> {
             .map((item) => Map<String, dynamic>.from(item))
             .toList();
 
-        // 새로운 파라미터 추가
         setState(() {
           missions = fetchedMissions.map((mission) {
             return {
               ...mission,
-              'missionAuthenticationAuthority': mission['missionAuthenticationAuthority'] ?? "알 수 없음",
+              'missionAuthenticationAuthority':
+              mission['missionAuthenticationAuthority'] ?? "알 수 없음",
               'm_id': mission['m_id'] ?? "알 수 없음",
               'r_id': mission['r_id'] ?? "알 수 없음",
               'r_title': mission['r_title'] ?? "알 수 없음",
-              'created_date': mission['created_date'] ?? "알 수 없음", // 추가 예시
-              'updated_date': mission['updated_date'] ?? "알 수 없음", // 추가 예시
-              'priority': mission['priority'] ?? "알 수 없음", // 추가 예시
+              'created_date': mission['created_date'] ?? "알 수 없음",
+              'updated_date': mission['updated_date'] ?? "알 수 없음",
+              'priority': mission['priority'] ?? "알 수 없음",
             };
           }).toList();
           isLoading = false;
@@ -67,18 +67,30 @@ class _MyMissionListState extends State<MyMissionList> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
+    return Scaffold(
+      backgroundColor: Colors.lightBlue.shade50,
+      appBar: AppBar(
+        title: Text(
+          '나의 미션',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : missions.isEmpty
+          ? Center(
+        child: Text(
+          '미션 없음',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      )
+          : buildMissionList(),
+    );
+  }
 
-    if (missions.isEmpty) {
-      return Scaffold(
-        body: Center(child: Text('미션 없음')),
-      );
-    }
-
+  Widget buildMissionList() {
     final today = DateTime.now();
     final currentYear = today.year.toString();
     String previousYear = '';
@@ -100,7 +112,7 @@ class _MyMissionListState extends State<MyMissionList> {
           : '알 수 없는 날짜';
       final missionYear = missionDate?.year.toString() ?? '';
 
-      // 년도 헤더 추가 (현재 연도는 표시하지 않음)
+      // 년도 헤더 추가
       if (missionYear != previousYear) {
         previousYear = missionYear;
         if (missionYear != currentYear) {
@@ -109,7 +121,11 @@ class _MyMissionListState extends State<MyMissionList> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 missionYear,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
               ),
             ),
           );
@@ -121,10 +137,14 @@ class _MyMissionListState extends State<MyMissionList> {
         previousDate = formattedDate;
         missionWidgets.add(
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Text(
               formattedDate,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey.shade700,
+              ),
             ),
           ),
         );
@@ -136,10 +156,8 @@ class _MyMissionListState extends State<MyMissionList> {
       ));
     }
 
-    return Scaffold(
-      body: ListView(
-        children: missionWidgets,
-      ),
+    return ListView(
+      children: missionWidgets,
     );
   }
 

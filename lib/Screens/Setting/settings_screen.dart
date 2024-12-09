@@ -35,7 +35,7 @@ class SettingsScreen extends StatelessWidget {
 
       // 모든 SharedPreferences 데이터 삭제
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.clear(); // 모든 저장된 데이터 삭제 (자동 로그인 정보 포함)
+      await prefs.clear();
 
       // 세션 쿠키 삭제
       await SessionCookieManager.clearSessionCookie();
@@ -45,21 +45,18 @@ class SettingsScreen extends StatelessWidget {
       DeviceTokenManager().clearToken();
       print("[DEBUG] Device token cleared during logout.");
 
-      // 알림 메시지 표시
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('로그아웃되었습니다.')),
       );
 
-      // StartLoginScreen으로 이동
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => StartLoginScreen()),
-            (route) => false, // 이전 화면 스택 제거
+            (route) => false,
       );
     } catch (e) {
       print("[ERROR] Logout process failed: $e");
 
-      // 오류 메시지 표시
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('로그아웃에 실패했습니다. 다시 시도해주세요.')),
       );
@@ -71,31 +68,64 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
+        backgroundColor: Colors.lightBlue,
+        elevation: 0,
       ),
-      body: ListView(
-        padding: EdgeInsets.all(16.0),
-        children: [
-          ElevatedButton(
-            onPressed: onNavigateToHome,
-            child: Text('홈 화면으로 이동'),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-          ElevatedButton(
-            onPressed: onNavigateToChat,
-            child: Text('채팅 화면으로 이동'),
-          ),
-          ElevatedButton(
-            onPressed: onNavigateToMission,
-            child: Text('미션 화면으로 이동'),
-          ),
-          ElevatedButton(
-            onPressed: onNavigateToCommunity,
-            child: Text('커뮤니티 화면으로 이동'),
-          ),
-          ElevatedButton(
-            onPressed: () => _logout(context),
-            child: Text('로그아웃'),
-          ),
-        ],
+        ),
+        child: ListView(
+          padding: EdgeInsets.all(16.0),
+          children: [
+            _buildCustomButton('홈 화면으로 이동', onNavigateToHome),
+            SizedBox(height: 10),
+            _buildCustomButton('채팅 화면으로 이동', onNavigateToChat),
+            SizedBox(height: 10),
+            _buildCustomButton('미션 화면으로 이동', onNavigateToMission),
+            SizedBox(height: 10),
+            _buildCustomButton('커뮤니티 화면으로 이동', onNavigateToCommunity),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => _logout(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: EdgeInsets.symmetric(vertical: 14.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              child: Text(
+                '로그아웃',
+                style: TextStyle(fontSize: 16.0, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCustomButton(String text, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.lightBlue,
+        shadowColor: Colors.lightBlueAccent,
+        elevation: 3,
+        padding: EdgeInsets.symmetric(vertical: 14.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       ),
     );
   }

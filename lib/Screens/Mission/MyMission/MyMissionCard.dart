@@ -13,26 +13,61 @@ class MissionCard extends StatelessWidget {
     final isPersonalMission = mission['u1_id'] == currentUserId;
 
     return Card(
+      elevation: 4,
       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        title: Text(mission['m_title'] ?? '제목 없음'),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('마감 기한: ${formatTime(mission['m_deadline'])}'),
-            Text('미션 생성자: ${isPersonalMission ? "개인미션" : mission['u1_id'] ?? "알 수 없음"}'),
-            Text('미션 상태: ${mission['m_status'] ?? "상태 없음"}'),
-          ],
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.lightBlue.shade100],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-        onTap: () {
-          // MissionClick 팝업 창 띄우기
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return MissionClick(mission: mission); // MissionClick에 미션 데이터 전달
-            },
-          );
-        },
+        child: ListTile(
+          contentPadding: EdgeInsets.all(16),
+          title: Text(
+            mission['m_title'] ?? '제목 없음',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: Colors.blueGrey.shade900,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '마감 기한: ${formatTime(mission['m_deadline'])}',
+                  style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                ),
+                Text(
+                  '미션 생성자: ${isPersonalMission ? "개인미션" : mission['u1_id'] ?? "알 수 없음"}',
+                  style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                ),
+                Text(
+                  '미션 상태: ${mission['m_status'] ?? "상태 없음"}',
+                  style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+          trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 20),
+          onTap: () {
+            // MissionClick 팝업 창 띄우기
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return MissionClick(mission: mission); // MissionClick에 미션 데이터 전달
+              },
+            );
+          },
+        ),
       ),
     );
   }

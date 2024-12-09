@@ -63,8 +63,8 @@ jobs:
     # Upload code to AWS S3
     - name: Upload to AWS S3
       run: |
-        # zip -r release.zip *
-        zip -r project.zip . -x "node_modules/*" "*.log" ".git/*"
+        zip -r release.zip *
+        # zip -r project.zip . -x "node_modules/*" "*.log" ".git/*"
         aws s3 cp project.zip s3://${{ env.S3_BUCKET_NAME }}/${{ github.sha }}.zip
         
         # aws deploy push \

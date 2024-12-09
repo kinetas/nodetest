@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const NotificationLog = require('../models/notificationModel');
 const User = require('../models/userModel');
 const admin = require('firebase-admin');
-import { getMessaging } from 'firebase-admin/messaging';
+const { getMessaging } = require('firebase-admin/messaging');
 /*
 //// 클라이언트에서 전달받은 토큰 DB에 저장
 const saveToken = async (req, res) => {

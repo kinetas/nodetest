@@ -4,7 +4,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 const cors = require('cors');
-const notificationController = require('./controllers/notificationController');
 const chatController = require('./controllers/chatController');
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -16,7 +15,93 @@ const multer = require('multer');
 const Room  = require('./models/roomModel');
 const app = express();
 const server = http.createServer(app);
+const admin = require('firebase-admin');
+const { getMessaging } = require('firebase-admin/messaging');
+const path = require('path');
+const User = require('./models/userModel');
+const NotificationLog = require('./models/notificationModel')
+// Firebase Admin SDK 초기화
+const serviceAccountPath = path.join('/home/ubuntu/nodetest/firebase-adminsdk.json');
+let serviceAccount;
 
+try {
+  // JSON 파일에서 객체로 변환
+  console.log('Attempting to load Service Account from:', serviceAccountPath); // 경로 확인
+  serviceAccount = require(serviceAccountPath);
+  console.log('Service Account Loaded:', serviceAccount ? 'Success' : 'Failed'); // 로드 성공 여부
+} catch (error) {
+  console.error('Error loading service account JSON file:', error.message);
+  throw new Error('Failed to load Firebase service account file');
+}
+
+try {
+  if (!admin.apps.length) { // 중복 초기화 방지
+      admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount),
+      });
+      console.log('Firebase Admin SDK initialized successfully.');
+  } else {
+      console.log('Firebase Admin SDK already initialized.');
+  }
+} catch (error) {
+  console.error('Error initializing Firebase Admin SDK:', error.message);
+  throw new Error('Failed to initialize Firebase Admin SDK');
+}
+// 기본 알림 전송 함수
+const sendNotification = async (userId, title, body = {}) => {
+  try {
+      // Sequelize를 사용해 token 조회
+      const user = await User.findOne({
+          where: { u_id: userId },
+          attributes: ['token'],
+      });
+
+      if (!user || !user.token) {
+          throw new Error('No token found for user');
+      }
+
+      const token = user.token;
+
+      const message = {
+          token,
+          notification:{
+              title,
+              body: typeof body === 'string' ? body : JSON.stringify(body),
+              },
+              };
+
+      // Firebase를 통해 알림 전송
+      const response = await getMessaging().send(message);
+
+      // 성공 시 로그 저장
+      await NotificationLog.create({
+          userId,
+          token,
+          title,
+          body,
+          status: 'success',
+          timestamp: new Date(),
+      });
+
+      console.log(`Notification sent to user ${userId}:`, response);
+      return response;
+  } catch (error) {
+      console.error(`Failed to send notification to user ${userId}:`, error.message);
+
+      // 실패 시 로그 저장
+      await NotificationLog.create({
+          userId,
+          token,
+          title,
+          body,
+          status: 'failed',
+          errorMessage: error.message,
+          timestamp: new Date(),
+      });
+
+      throw error;
+  }
+};
 //socket.io 서버 초기화
 const io = socketIo(server, {
   cors: {
@@ -263,8 +348,37 @@ try {
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
-    await notificationController.sendMessageNotification(u2_id, message_contents || '[이미지]');
-}
+
+    const user = await User.findOne({
+        where: { u_id: u2_id },
+        attributes: ['token'],
+    });
+    if (user && user.token) {
+      const message = {
+          token: user.token,
+          notification: {
+              title: '새로운 메시지 도착',
+              body: message_contents || '[이미지]',
+          },
+      };
+      // Firebase를 통해 알림 전송
+      const response = await getMessaging().send(message);
+      return response;
+    };
+
+      // 성공 시 로그 저장
+      await NotificationLog.create({
+        userId,
+        token,
+        title,
+        body,
+        status: 'success',
+        timestamp: new Date(),
+    });
+
+    console.log(`Notification sent to user ${userId}:`, response);
+    return response;
+  }
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {
     const { r_id, u1_id } = data;
@@ -281,8 +395,9 @@ try {
         console.error('Error in markAsRead:', error);
     }
 });
-
-} catch (error) {
+}
+  
+  catch (error) {
   console.error('DB 저장 오류:', error); // DB 저장 실패 시 에러 로그 출력
   if (error.name === 'SequelizeValidationError') {
     error.errors.forEach((err) => {

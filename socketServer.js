@@ -249,7 +249,7 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
     is_read: newMessage.is_read
   });
-  console.log(`Sending message to room ${r_id}:`, {
+  /*console.log(`Sending message to room ${r_id}:`, {
     u1_id,
     r_id,
     message_contents,
@@ -257,6 +257,7 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null,
     is_read
   });
+  */
   // 상대방 연결 상태 확인
   const receiverSocketId = userSockets.get(u2_id);
   const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);

@@ -1,5 +1,8 @@
 const db = require('../config/db');
+const { Op } = require('sequelize');
 const NotificationLog = require('../models/notificationModel');
+const User = require('../models/userModel');
+const admin = require('firebase-admin');
 /*
 // 클라이언트에서 전달받은 토큰 DB에 저장
 const saveToken = async (req, res) => {
@@ -25,17 +28,24 @@ const saveToken = async (req, res) => {
 */
 /// 기본 알림 전송 함수
 const sendNotification = async (userId, title, body = {}) => {
-    const [rows] = await db.query('SELECT token FROM user WHERE user_id = ?', [userId]);
-    if (rows.length === 0) {
-        throw new Error('No token found for user');
-    }
-    const token = rows[0].token;
-    const message = {
-        notification: { title, body }, // 알림 제목과 내용
-        token, // FCM 토큰
-    };
-
     try {
+        // Sequelize를 사용해 token 조회
+        const user = await User.findOne({
+            where: { u_id: userId },
+            attributes: ['token'],
+        });
+
+        if (!user || !user.token) {
+            throw new Error('No token found for user');
+        }
+
+        const token = user.token;
+
+        const message = {
+            notification: { title, body }, // 알림 제목과 내용
+            token, // FCM 토큰
+        };
+
         // Firebase를 통해 알림 전송
         const response = await admin.messaging().send(message);
 

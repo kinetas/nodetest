@@ -255,7 +255,7 @@ try {
     message_contents,
     send_date: newMessage.send_date,
     image: fileBuffer ? fileBuffer.toString('base64') : null,
-    is_read 
+    is_read
   });
   // 상대방 연결 상태 확인
   const receiverSocketId = userSockets.get(u2_id);

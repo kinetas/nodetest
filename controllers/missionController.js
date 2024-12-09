@@ -262,6 +262,7 @@ exports.getAssignedMissions = async (req, res) => {
                     r_title: room ? room.r_title : '없음',
                     u1_id: mission.u1_id,
                     u2_id: mission.u2_id,
+                    missionAuthenticationAuthority: mission.missionAuthenticationAuthority
                 };
             })
         );

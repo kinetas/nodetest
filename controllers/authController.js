@@ -57,7 +57,7 @@ exports.login = async (req, res) => {
         // console.log('[DEBUG] 새로운 세션 설정:', req.session); // 추가
 
         // 디바이스 토큰 저장
-        const updateToken = await User.update(
+        await User.update(
             { token: token },
             { where: { u_id } }
         );

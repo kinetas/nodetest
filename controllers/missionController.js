@@ -10,7 +10,7 @@ const User = require('../models/userModel');
 const resultController = require('./resultController'); // resultController 가져오기
 const notificationController = require('./notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
-const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
+const { Sequelize, Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 // const moment = require('moment-timezone');
 
@@ -590,6 +590,19 @@ exports.successMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        //==============================리워드 기능 추가==============================
+        // 미션 생성자 reward 50 추가
+        await User.update(
+            { reward: Sequelize.literal('reward + 50') },
+            { where: { u_id: u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+        );
+        // 미션 성공자 reward 100 추가
+        await User.update(
+            { reward: Sequelize.literal('reward + 100') },
+            { where: { u_id: mission.u2_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+        );
+        //==============================리워드 기능 추가==============================
+
         // 현재 시간 저장
         const currentTime = new Date();
 
@@ -668,6 +681,19 @@ exports.failureMission = async (req, res) => {
             '실패'
         );
 
+        //==============================리워드 기능 추가==============================
+        // 미션 생성자 reward 50 삭감
+        await User.update(
+            { reward: Sequelize.literal('CASE WHEN reward - 25 < 0 THEN 0 ELSE reward - 25 END') },
+            { where: { u_id: u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+        );
+        // 미션 성공자 reward 100 삭감
+        await User.update(
+            { reward: Sequelize.literal('CASE WHEN reward - 50 < 0 THEN 0 ELSE reward - 50 END') },
+            { where: { u_id: mission.u2_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+        );
+        //==============================리워드 기능 추가==============================
+
         // saveResultResponse가 성공하지 않은 경우
         if (!saveResultResponse.success) {
             return res.status(500).json({
@@ -677,14 +703,14 @@ exports.failureMission = async (req, res) => {
             });
         }
 
-        // saveResultResponse가 성공하지 않은 경우
-        if (!saveResultResponse.success) {
-            return res.status(500).json({
-                success: false,
-                message: `결과 저장 중 오류가 발생했습니다.`,
-                error: saveResultResponse.error || '알 수 없는 오류',
-            });
-        }
+        // // saveResultResponse가 성공하지 않은 경우
+        // if (!saveResultResponse.success) {
+        //     return res.status(500).json({
+        //         success: false,
+        //         message: `결과 저장 중 오류가 발생했습니다.`,
+        //         error: saveResultResponse.error || '알 수 없는 오류',
+        //     });
+        // }
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
         if (u1_id !== mission.u2_id){
@@ -812,6 +838,18 @@ exports.checkMissionDeadline = async () => {
                     m_status: '실패',
                 });
 
+                //==============================리워드 기능 추가==============================
+                // 미션 생성자 reward 50 삭감
+                await User.update(
+                    { reward: Sequelize.literal('CASE WHEN reward - 25 < 0 THEN 0 ELSE reward - 25 END') },
+                    { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+                );
+                // 미션 성공자 reward 100 삭감
+                await User.update(
+                    { reward: Sequelize.literal('CASE WHEN reward - 50 < 0 THEN 0 ELSE reward - 50 END') },
+                    { where: { u_id: mission.u2_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+                );
+                //==============================리워드 기능 추가==============================
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
                 const sendMissionDeadlineNotification = await notificationController.sendMissionDeadlineNotification(
@@ -842,6 +880,19 @@ exports.checkMissionDeadline = async () => {
                     m_deadline: originalDeadline, // 원래 마감 기한 저장
                     m_status: '실패',
                 });
+
+                //==============================리워드 기능 추가==============================
+                // 미션 생성자 reward 50 삭감
+                await User.update(
+                    { reward: Sequelize.literal('CASE WHEN reward - 25 < 0 THEN 0 ELSE reward - 25 END') },
+                    { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+                );
+                // 미션 성공자 reward 100 삭감
+                await User.update(
+                    { reward: Sequelize.literal('CASE WHEN reward - 50 < 0 THEN 0 ELSE reward - 50 END') },
+                    { where: { u_id: mission.u2_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
+                );
+                //==============================리워드 기능 추가==============================
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
                 const sendMissionDeadlineNotification = await notificationController.sendMissionDeadlineNotification(

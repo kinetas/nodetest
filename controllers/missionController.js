@@ -11,7 +11,7 @@ const resultController = require('../controllers/resultController'); // resultCo
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
-
+const Sequelize = require('sequelize');
 // const moment = require('moment-timezone');
 
 // //============================================================================
@@ -592,24 +592,21 @@ exports.successMission = async (req, res) => {
 
         //==============================리워드 기능 추가==============================
         if (mission.u1_id === mission.u2_id){
-            const user = await User.findOne({ where: { u_id: mission.u1_id } });
             await User.update(
-                { reward: user.reward + 100 },
+                { reward: Sequelize.literal('reward + 100') },
                 { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
             );
         }
         else{
-            const user1 = await User.findOne({ where: { u_id: mission.u1_id } });
             // 미션 생성자 reward 50 추가
             await User.update(
                 // { reward: Sequelize.literal('reward + 50') },
-                { reward: user1.reward + 50 },
+                { reward: Sequelize.literal('reward + 50') },
                 { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
             );
-            const user2 = await User.findOne({ where: { u_id: mission.u2_id } });
             // 미션 성공자 reward 100 추가
             await User.update(
-                { reward: user2.reward + 100 },
+                { reward: Sequelize.literal('reward + 100') },
                 { where: { u_id: mission.u2_id } }
             );
         }

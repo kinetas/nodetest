@@ -37,7 +37,7 @@ const User = sequelize.define('user', {
     },
     reward: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        allowNull: false,
         defaultValue: 0, // 기본값 설정 (선택 사항)
     }
 }, {

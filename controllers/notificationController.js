@@ -42,8 +42,11 @@ const sendNotification = async (userId, title, body = {}) => {
         const token = user.token;
 
         const message = {
-            notification: { title, body }, // 알림 제목과 내용
-            token, // FCM 토큰
+            notification: {
+                title,
+                body: typeof body === 'string' ? body : JSON.stringify(body),
+            },
+            token,
         };
 
         // Firebase를 통해 알림 전송

@@ -95,6 +95,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           shape: BoxShape.circle,
                         ),
                       ),
+                      availableCalendarFormats: const {
+                        CalendarFormat.month: 'Month', // Month 형식만 유지
+                      },
                       onDaySelected: (selectedDay, focusedDay) {
                         setState(() {
                           _selectedDate = selectedDay;

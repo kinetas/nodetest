@@ -66,7 +66,7 @@
                 data.missions.forEach(mission => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        ${mission.cr_title}, ${mission.contents}, ${mission.deadline} (상태: ${mission.cr_status})
+                        미션이름: ${mission.cr_title}, 미션내용: ${mission.contents}, 기한: ${mission.deadline} (상태: ${mission.cr_status})
                         <button onclick="acceptCommunityMission('${mission.cr_num}')">수락</button>
                         <button onclick="deleteCommunityMission('${mission.cr_num}')">삭제</button>
                     `;

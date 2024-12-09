@@ -118,7 +118,8 @@ exports.acceptCommunityMission = async (req, res) => {
         const missionTitle = mission.cr_title;
 
         const currentDate = new Date();
-        const deadline = new Date(currentDate.setDate(currentDate.getDate() + 3));
+        // const deadline = new Date(currentDate.setDate(currentDate.getDate() + 3));
+        const deadline = mission.deadline ? mission.deadline : new Date(currentDate.setDate(currentDate.getDate() + 3));
 
         await Mission.create({
             m_id: newMissionId1,

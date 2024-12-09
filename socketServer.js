@@ -180,13 +180,14 @@ if (!u1_id || !u2_id) {
       console.log(`Updated ${updatedCount} messages as read for room ${r_id}`);
 
       // 초기 메시지 로드
-      const messages = await chatController.getMessages(r_id);
-      socket.emit('initialMessages', messages);
+      //const messages = await chatController.getMessages(r_id);
+      //socket.emit('initialMessages', messages);
   } catch (error) {
       console.error('Error in joinRoom:', error);
       socket.emit('errorMessage', 'Failed to join room or load messages');
   }
 });
+
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
 
@@ -249,7 +250,7 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
     is_read: newMessage.is_read
   });
-  /*console.log(`Sending message to room ${r_id}:`, {
+  console.log(`Sending message to room ${r_id}:`, {
     u1_id,
     r_id,
     message_contents,
@@ -257,7 +258,7 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null,
     is_read
   });
-  */
+  
   // 상대방 연결 상태 확인
   const receiverSocketId = userSockets.get(u2_id);
   const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);

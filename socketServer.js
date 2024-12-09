@@ -4,7 +4,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 const cors = require('cors');
-const { sendMessageNotification } = require('./controllers/notificationController');
+const notificationController = require('./controllers/notificationController');
 const chatController = require('./controllers/chatController');
 const db = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
@@ -263,10 +263,8 @@ try {
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
-
-    const title = '새로운 메시지 도착';
     const body = message_contents || '[이미지]';
-    await sendMessageNotification(u2_id, title, body); 
+    await notificationController.sendMessageNotification(u2_id, body);
 }
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {

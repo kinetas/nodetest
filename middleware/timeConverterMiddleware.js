@@ -30,13 +30,22 @@ const timeConverterMiddleware = (req, res, next) => {
 
         // 모델별로 변환해야 하는 시간 필드 지정
         const modelDateFields = {
-            missions: ['m_deadline'],
-            comunityRooms: ['cr_deletedate'], // 예시 필드
+            c_v_notdup: [],
+            CComment: [],
+            comunityRooms: ['deadline'], // 예시 필드
             comunityVotes: ['c_deletedate'],
+            CWrite: [],
             iFriends: [], // 시간 필드 없음
+            MRecoCount: [],
+            MRecommand: [],
             mResults: ['m_deadline'],
+            RMessage: ['send_date'],
+            missions: ['m_deadline'],
             messages: ['send_date'],
+            NotificationLog: [],
             rooms: [], // 시간 필드 없음
+            TFriend: [],
+            User: ['u_birth'],
         };
 
         // 데이터 변환 처리

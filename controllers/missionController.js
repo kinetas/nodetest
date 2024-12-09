@@ -82,6 +82,18 @@ exports.createMission = async (req, res) => {
             const missionId = uuidv4();
             let stat = "진행중";
 
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+            
+            const sendMissionCreateNotification = await notificationController.sendMissionCreateNotification(
+                u1_id,
+                missionAuthenticationAuthority,
+            );
+
+            if(!sendMissionCreateNotification){
+                return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
+            }
+            // ================ 알림 추가 - 디바이스 토큰 =======================
+
             // 미션 생성
             await Mission.create({
                 m_id: missionId,

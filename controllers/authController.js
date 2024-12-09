@@ -152,7 +152,8 @@ exports.register = async (req, res) => {
             u_nickname,
             u_name,
             u_birth,
-            u_mail
+            u_mail,
+            reward: 0
         });
 
         // // 회원가입 성공 후 방 생성

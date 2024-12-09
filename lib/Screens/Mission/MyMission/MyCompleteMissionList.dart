@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart'; // 날짜 포맷 변경을 위한 패키지
-import '../../SessionCookieManager.dart';
+import '../../../SessionCookieManager.dart';
 
 class MyCompleteMissionList extends StatefulWidget {
   @override

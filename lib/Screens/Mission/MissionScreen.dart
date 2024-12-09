@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'CreateMissionScreen.dart';
 import 'AchievementPanel_screen.dart';
-import 'MyMissionList.dart';
-import 'MyCompleteMissionList.dart';
+import 'MyMission/MyMissionList.dart';
+import 'MyMission/MyCompleteMissionList.dart';
 import 'OtherMission.dart';
 
 class MissionScreen extends StatefulWidget {

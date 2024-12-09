@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'MissionVerificationScreen.dart'; // MissionVerificationScreen import
+import '../MissionVerificationScreen.dart'; // MissionVerificationScreen import
 
 class MissionClick extends StatelessWidget {
   final Map<String, dynamic> mission;
@@ -59,6 +59,7 @@ class MissionClick extends StatelessWidget {
                           mId: mission['m_id'] ?? '',
                           missionAuthenticationAuthority:
                           mission['missionAuthenticationAuthority'] ?? '',
+                          voteM: null, // "미션 인증"에서는 VoteM을 null로 전달
                         ),
                       ),
                     );
@@ -80,6 +81,7 @@ class MissionClick extends StatelessWidget {
                           missionAuthenticationAuthority: mission[
                           'missionAuthenticationAuthority'] ??
                               '',
+                          voteM: "check", // "미션 투표 올리기"에서 VoteM에 "check" 전달
                         ),
                       ),
                     );

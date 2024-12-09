@@ -44,13 +44,11 @@ class _AddChatScreenState extends State<AddChatScreen> {
         final responseData = jsonDecode(response.body);
 
         if (responseData['message'] == "방이 성공적으로 추가되었습니다.") {
-          // 성공 메시지 표시 및 이전 화면으로 이동
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방이 성공적으로 생성되었습니다!')),
           );
           Navigator.pop(context); // 이전 화면으로 돌아감
         } else {
-          // 실패 메시지 표시
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방 생성 실패: ${responseData['message']}')),
           );
@@ -74,35 +72,78 @@ class _AddChatScreenState extends State<AddChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(
+          title,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _u2IdController,
-              decoration: InputDecoration(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              _buildTextField(
+                controller: _u2IdController,
                 labelText: '상대방 사용자 ID',
-                border: OutlineInputBorder(),
               ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _roomNameController,
-              decoration: InputDecoration(
+              SizedBox(height: 16),
+              _buildTextField(
+                controller: _roomNameController,
                 labelText: '채팅방 이름 (선택사항)',
-                border: OutlineInputBorder(),
               ),
-            ),
-            SizedBox(height: 32),
-            _isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-              onPressed: _createChatRoom,
-              child: Text('채팅방 생성'),
-            ),
-          ],
+              SizedBox(height: 32),
+              _isLoading
+                  ? CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
+              )
+                  : ElevatedButton(
+                onPressed: _createChatRoom,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlue, // 버튼 배경색
+                  foregroundColor: Colors.white, // 버튼 텍스트 색상
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  '채팅방 생성',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.lightBlue),
         ),
       ),
     );

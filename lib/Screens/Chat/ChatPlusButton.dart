@@ -5,7 +5,7 @@ class ChatPlusButton extends StatelessWidget {
   final Map<String, dynamic> roomData; // roomData 전달받기
 
   const ChatPlusButton({
-    required this.roomData, // roomData 추가
+    required this.roomData,
     Key? key,
   }) : super(key: key);
 
@@ -19,9 +19,10 @@ class ChatPlusButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26,
+              color: Colors.grey.shade300,
               blurRadius: 10,
-              spreadRadius: 2,
+              spreadRadius: 3,
+              offset: Offset(0, 3),
             ),
           ],
         ),
@@ -46,7 +47,6 @@ class ChatPlusButton extends StatelessWidget {
                     YouAndIMissionList(
                       rId: roomData['r_id'], // roomData에서 rId 가져오기
                       u2Id: roomData['u2_id'], // roomData에서 u2Id 가져오기
-
                     ),
                   ),
                 ),
@@ -75,21 +75,35 @@ class ChatPlusButton extends StatelessWidget {
         GestureDetector(
           onTap: onPressed,
           child: Container(
-            width: 50,
-            height: 50,
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.blueAccent,
+              gradient: LinearGradient(
+                colors: [Colors.lightBlue, Colors.lightBlue.shade300],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade300,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
             ),
-            child: Icon(icon, color: Colors.white),
+            child: Icon(icon, color: Colors.white, size: 28),
           ),
         ),
-        SizedBox(height: 4),
+        SizedBox(height: 8),
         TextButton(
           onPressed: onPressed,
           child: Text(
             label,
-            style: TextStyle(color: Colors.black),
+            style: TextStyle(
+              color: Colors.blueGrey.shade800,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -109,7 +123,10 @@ class MissionCreateScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('미션 생성')),
+      appBar: AppBar(
+        title: Text('미션 생성'),
+        backgroundColor: Colors.lightBlue,
+      ),
       body: Center(child: Text('미션 생성 화면')),
     );
   }
@@ -119,7 +136,10 @@ class MissionRequestScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('미션 요청')),
+      appBar: AppBar(
+        title: Text('미션 요청'),
+        backgroundColor: Colors.lightBlue,
+      ),
       body: Center(child: Text('미션 요청 화면')),
     );
   }

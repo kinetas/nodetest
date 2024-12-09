@@ -24,12 +24,11 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   }
 
   void _navigateToAddChat() {
-    // 현재 선택된 탭에 따라 채팅 타입 설정
     String chatType = _tabController.index == 0 ? 'general' : 'open'; // 'general' 또는 'open'
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddChatScreen(chatType: chatType), // AddChatScreen에 chatType 전달
+        builder: (context) => AddChatScreen(chatType: chatType),
       ),
     );
   }
@@ -38,27 +37,51 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('채팅'),
+        title: Text(
+          '채팅',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
         actions: [
           IconButton(
-            icon: Icon(Icons.add), // + 버튼
-            onPressed: _navigateToAddChat, // AddChat으로 이동
+            icon: Icon(Icons.add, color: Colors.white), // + 버튼
+            onPressed: _navigateToAddChat,
           ),
         ],
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: [
-            Tab(text: '일반채팅'),
-            Tab(text: '미션채팅'),
+            Tab(
+              text: '일반채팅',
+              icon: Icon(Icons.chat_bubble_outline),
+            ),
+            Tab(
+              text: '미션채팅',
+              icon: Icon(Icons.assignment),
+            ),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          GeneralRoomList(), // 일반 채팅 리스트 화면
-          OpenRoomList(), // 미션 채팅 리스트 화면
-        ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            GeneralRoomList(), // 일반 채팅 리스트 화면
+            OpenRoomList(), // 미션 채팅 리스트 화면
+          ],
+        ),
       ),
     );
   }

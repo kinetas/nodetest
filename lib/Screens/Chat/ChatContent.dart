@@ -38,11 +38,6 @@ class ChatContentState extends State<ChatContent> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
-        // 디버깅용 출력
-        print(responseData); // 실제 데이터를 확인
-        print(responseData.runtimeType); // 데이터 타입 확인
-
         setState(() {
           messages = List<Map<String, dynamic>>.from(responseData);
           isLoading = false;
@@ -57,7 +52,7 @@ class ChatContentState extends State<ChatContent> {
         });
       }
     } catch (e) {
-      print('Error: $e'); // 에러 확인
+      print('Error: $e');
       setState(() {
         isLoading = false;
       });
@@ -72,10 +67,9 @@ class ChatContentState extends State<ChatContent> {
 
   void addMessage(Map<String, dynamic> newMessage) {
     setState(() {
-      messages.add(newMessage); // 새 메시지를 리스트에 추가
+      messages.add(newMessage);
     });
 
-    // 새 메시지가 추가되면 자동으로 스크롤을 맨 아래로 이동
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToBottom();
     });
@@ -83,31 +77,60 @@ class ChatContentState extends State<ChatContent> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : messages.isEmpty
-        ? Center(child: Text('메시지가 없습니다.'))
-        : ListView.builder(
-      controller: _scrollController,
-      itemCount: messages.length,
-      itemBuilder: (context, index) {
-        final message = messages[index];
-        final isSender = message['u1_id'] == widget.userId;
-
-        // 이미지 메시지와 텍스트 메시지를 구분하여 처리
-        return Padding(
-          padding: const EdgeInsets.symmetric(
-              vertical: 5.0, horizontal: 10.0),
-          child: Align(
-            alignment: isSender
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: message['image'] != null
-                ? _buildImageMessage(message, isSender)
-                : _buildTextMessage(message, isSender),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '채팅',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
           ),
-        );
-      },
+        ),
+        child: isLoading
+            ? Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
+          ),
+        )
+            : messages.isEmpty
+            ? Center(
+          child: Text(
+            '메시지가 없습니다.',
+            style: TextStyle(color: Colors.grey, fontSize: 16),
+          ),
+        )
+            : ListView.builder(
+          controller: _scrollController,
+          itemCount: messages.length,
+          itemBuilder: (context, index) {
+            final message = messages[index];
+            final isSender = message['u1_id'] == widget.userId;
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 5.0,
+                horizontal: 10.0,
+              ),
+              child: Align(
+                alignment: isSender
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
+                child: message['image'] != null
+                    ? _buildImageMessage(message, isSender)
+                    : _buildTextMessage(message, isSender),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -116,19 +139,26 @@ class ChatContentState extends State<ChatContent> {
       padding: EdgeInsets.all(12.0),
       constraints: BoxConstraints(maxWidth: 250),
       decoration: BoxDecoration(
-        color: isSender ? Colors.blue : Colors.grey[300],
+        color: isSender ? Colors.lightBlue : Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
           bottomLeft: isSender ? Radius.circular(12) : Radius.zero,
           bottomRight: isSender ? Radius.zero : Radius.circular(12),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            message['message_contents'] ?? '빈 메시지', // 기본값 설정
+            message['message_contents'] ?? '빈 메시지',
             style: TextStyle(
               color: isSender ? Colors.white : Colors.black,
               fontSize: 16,
@@ -136,7 +166,7 @@ class ChatContentState extends State<ChatContent> {
           ),
           SizedBox(height: 5),
           Text(
-            message['send_date'] ?? '', // 기본값 설정
+            message['send_date'] ?? '',
             style: TextStyle(
               color: isSender ? Colors.white70 : Colors.black54,
               fontSize: 10,
@@ -148,44 +178,40 @@ class ChatContentState extends State<ChatContent> {
   }
 
   Widget _buildImageMessage(Map<String, dynamic> message, bool isSender) {
-    // 디버깅용 출력
-    print("Image data: ${message['image']}");
-    print("Image data type: ${message['image'].runtimeType}");
-
-    // 이미지가 null이거나 잘못된 형식일 경우 기본 이미지를 반환
-    if (message['image'] == null || message['image'] is! Map<String, dynamic>) {
-      return Icon(Icons.broken_image, size: 100, color: Colors.grey);
-    }
-
     try {
-      // Map 구조에서 data 배열 추출
       final List<dynamic> imageData = message['image']['data'];
-
-      // data를 Uint8List로 변환
       final Uint8List imageBytes = Uint8List.fromList(imageData.cast<int>());
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            constraints: BoxConstraints(
-              maxWidth: 200, // 이미지 최대 크기 제한
+            constraints: BoxConstraints(maxWidth: 200),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade200,
+                  blurRadius: 5,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
-            child: Image.memory(
-              imageBytes, // Uint8List를 메모리 이미지로 렌더링
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.broken_image, size: 100, color: Colors.grey);
-              },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.memory(
+                imageBytes,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.broken_image, size: 100, color: Colors.grey);
+                },
+              ),
             ),
           ),
           SizedBox(height: 5),
           Text(
             message['send_date'] ?? '',
-            style: TextStyle(
-              color: Colors.black54,
-              fontSize: 10,
-            ),
+            style: TextStyle(color: Colors.black54, fontSize: 10),
           ),
         ],
       );

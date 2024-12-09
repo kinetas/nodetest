@@ -27,13 +27,11 @@ class _OpenRoomListState extends State<OpenRoomList> {
         final data = json.decode(response.body);
 
         if (data is List) {
-          // 반환 값이 리스트인 경우
           setState(() {
             openRooms = data.where((room) => room['r_type'] == 'open').toList();
             isLoading = false;
           });
         } else if (data is Map<String, dynamic> && data.containsKey('rooms')) {
-          // 반환 값이 객체이며, rooms 키가 있는 경우
           setState(() {
             openRooms = (data['rooms'] as List)
                 .where((room) => room['r_type'] == 'open')
@@ -54,30 +52,72 @@ class _OpenRoomListState extends State<OpenRoomList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0, // AppBar 높이를 0으로 설정하여 숨김
-      ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator()) // 로딩 표시
-          : openRooms.isEmpty
-          ? Center(child: Text('오픈 채팅방이 없습니다.')) // 리스트가 비어 있을 경우
-          : ListView.builder(
-        itemCount: openRooms.length,
-        itemBuilder: (context, index) {
-          final room = openRooms[index];
-          return ListTile(
-            title: Text(room['r_title'] ?? '제목 없음'), // 방 이름 출력
-            subtitle: Text('방 ID: ${room['r_id']}'), // 방 ID 출력
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EnterChatRoom(roomData: room),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: isLoading
+            ? Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
+          ),
+        )
+            : openRooms.isEmpty
+            ? Center(
+          child: Text(
+            '오픈 채팅방이 없습니다.',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
+            ),
+          ),
+        )
+            : ListView.builder(
+          itemCount: openRooms.length,
+          itemBuilder: (context, index) {
+            final room = openRooms[index];
+            return Card(
+              margin:
+              const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ListTile(
+                title: Text(
+                  room['r_title'] ?? '제목 없음',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey.shade800,
+                  ),
                 ),
-              );
-            },
-          );
-        },
+                subtitle: Text(
+                  '방 ID: ${room['r_id']}',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.lightBlue,
+                  size: 16,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EnterChatRoom(roomData: room),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }

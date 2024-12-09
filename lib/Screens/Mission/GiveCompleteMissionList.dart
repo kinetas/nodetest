@@ -29,7 +29,6 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // 성공적으로 데이터를 가져온 경우
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         setState(() {
@@ -49,7 +48,6 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
           isLoading = false;
         });
       } else {
-        // 서버 응답 실패
         setState(() {
           isLoading = false;
         });
@@ -66,32 +64,90 @@ class _GiveCompleteMissionListState extends State<GiveCompleteMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.lightBlue.shade50, // 배경색 설정
+      appBar: AppBar(
+        title: Text(
+          '완료된 미션 목록',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : completedMissions.isEmpty
-          ? Center(child: Text('완료된 미션이 없습니다.'))
+          ? Center(
+        child: Text(
+          '완료된 미션이 없습니다.',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      )
           : ListView.builder(
         itemCount: completedMissions.length,
         itemBuilder: (context, index) {
           final mission = completedMissions[index];
           return Card(
+            elevation: 4,
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: ListTile(
-              title: Text(
-                mission['m_title'], // 미션 제목
-                style: TextStyle(fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                gradient: LinearGradient(
+                  colors: [Colors.white, Colors.lightBlue.shade100],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('마감일: ${formatDate(mission['m_deadline'])}'),
-                  Text('리워드: ${mission['m_reword']}'),
-                  Text('상태: ${mission['m_status']}'),
-                  Text('부여자 ID: ${mission['u1_id']}'),
-                  Text('수행자 ID: ${mission['u2_id']}'),
-                  Text('방 ID: ${mission['r_id']}'),
-                  Text('추가시간 사용: ${mission['m_extended'] ? "예" : "아니오"}'),
-                ],
+              child: ListTile(
+                contentPadding: EdgeInsets.all(16),
+                title: Text(
+                  mission['m_title'], // 미션 제목
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.blueGrey.shade900,
+                  ),
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '마감일: ${formatDate(mission['m_deadline'])}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '리워드: ${mission['m_reword']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '상태: ${mission['m_status']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '부여자 ID: ${mission['u1_id']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '수행자 ID: ${mission['u2_id']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '방 ID: ${mission['r_id']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '추가시간 사용: ${mission['m_extended'] ? "예" : "아니오"}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+                trailing: Icon(Icons.check_circle, color: Colors.green, size: 28), // 완료 아이콘
               ),
             ),
           );

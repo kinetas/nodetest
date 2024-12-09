@@ -89,9 +89,16 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white70,
           indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: [
-            Tab(text: '내 미션'), // 1번 탭
-            Tab(text: '완료한 미션'), // 2번 탭
+            Tab(
+              text: '내 미션',
+              icon: Icon(Icons.list_alt), // 아이콘 추가
+            ), // 1번 탭
+            Tab(
+              text: '완료한 미션',
+              icon: Icon(Icons.check_circle_outline), // 아이콘 추가
+            ), // 2번 탭
           ],
         ),
       ),

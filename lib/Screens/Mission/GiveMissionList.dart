@@ -28,7 +28,6 @@ class _GiveMissionListState extends State<GiveMissionList> {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // 성공적으로 데이터를 가져온 경우
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         setState(() {
@@ -66,33 +65,94 @@ class _GiveMissionListState extends State<GiveMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.lightBlue.shade50, // 배경색 설정
+      appBar: AppBar(
+        title: Text(
+          '부여된 미션 목록',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
+      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : missions.isEmpty
-          ? Center(child: Text('부여된 미션이 없습니다.')) // 미션이 없을 때
+          ? Center(
+        child: Text(
+          '부여된 미션이 없습니다.',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      )
           : ListView.builder(
         itemCount: missions.length,
         itemBuilder: (context, index) {
           final mission = missions[index];
           return Card(
+            elevation: 4,
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: ListTile(
-              title: Text(
-                mission['m_title'], // 미션 제목
-                style: TextStyle(fontWeight: FontWeight.bold),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                gradient: LinearGradient(
+                  colors: [Colors.white, Colors.lightBlue.shade100],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('마감일: ${formatDate(mission['m_deadline'])}'),
-                  Text('상태: ${mission['m_status']}'),
-                  Text('보상: ${mission['m_reword']}'),
-                  Text('방 ID: ${mission['r_id']}'),
-                  Text('연장 여부: ${mission['m_extended']}'),
-                  Text('인증 권한자: ${mission['missionAuthenticationAuthority']}'),
-                  Text('생성자 ID: ${mission['u1_id']}'),
-                  Text('수행자 ID: ${mission['u2_id']}'),
-                ],
+              child: ListTile(
+                contentPadding: EdgeInsets.all(16),
+                title: Text(
+                  mission['m_title'], // 미션 제목
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.blueGrey.shade900,
+                  ),
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '마감일: ${formatDate(mission['m_deadline'])}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '상태: ${mission['m_status']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '보상: ${mission['m_reword']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '방 ID: ${mission['r_id']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '연장 여부: ${mission['m_extended']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '인증 권한자: ${mission['missionAuthenticationAuthority']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '생성자 ID: ${mission['u1_id']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                      Text(
+                        '수행자 ID: ${mission['u2_id']}',
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+                trailing: Icon(Icons.assignment, color: Colors.lightBlue, size: 28), // 아이콘
               ),
             ),
           );

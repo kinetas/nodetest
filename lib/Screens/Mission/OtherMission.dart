@@ -26,21 +26,45 @@ class _OtherMissionState extends State<OtherMission> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Other Mission'),
+        title: Text(
+          '부여한 미션',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: [
-            Tab(text: '부여한 미션'), // 첫 번째 탭
-            Tab(text: '부여한 미션 중 완료'), // 두 번째 탭
+            Tab(
+              text: '부여한 미션',
+              icon: Icon(Icons.list_alt), // 첫 번째 탭 아이콘
+            ),
+            Tab(
+              text: '완료된 미션',
+              icon: Icon(Icons.check_circle_outline), // 두 번째 탭 아이콘
+            ),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          GiveMissionList(), // 부여한 미션 탭 연결
-          GiveCompleteMissionList(), // 부여한 미션 중 완료된 탭 연결
-        ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightBlue.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            GiveMissionList(), // 부여한 미션 탭 연결
+            GiveCompleteMissionList(), // 부여한 미션 중 완료된 탭 연결
+          ],
+        ),
       ),
     );
   }

@@ -52,32 +52,45 @@ class _MissionCertificationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.5), // 반투명 배경
+      backgroundColor: Colors.lightBlue.shade50, // 배경색 설정
       body: Center(
         child: _isLoading
-            ? CircularProgressIndicator() // 로딩 중 표시
-            : _isRequestSuccessful
-            ? AlertDialog(
-          title: Text("알림"),
-          content: Text("미션이 성공적으로 요청되었습니다!"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // 팝업 닫기
-              },
-              child: Text("닫기"),
-            ),
-          ],
-        )
+            ? CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
+        ) // 로딩 중 표시
             : AlertDialog(
-          title: Text("오류"),
-          content: Text("미션 요청에 실패했습니다. 다시 시도해주세요."),
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(
+            _isRequestSuccessful ? "알림" : "오류",
+            style: TextStyle(
+              color: _isRequestSuccessful ? Colors.lightBlue : Colors.redAccent,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            _isRequestSuccessful
+                ? "미션이 성공적으로 요청되었습니다!"
+                : "미션 요청에 실패했습니다. 다시 시도해주세요.",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.blueGrey,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // 팝업 닫기
               },
-              child: Text("닫기"),
+              child: Text(
+                "닫기",
+                style: TextStyle(
+                  color: Colors.lightBlue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),

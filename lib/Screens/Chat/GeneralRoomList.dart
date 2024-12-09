@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON 파싱을 위해 필요
 import '../../SessionCookieManager.dart'; // SessionCookieManager 경로에 맞게 수정
 import 'EnterChatRoom.dart';
+import 'FixChat.dart'; // FixChat 클래스 import
 
 class GeneralRoomList extends StatefulWidget {
   @override
@@ -74,6 +75,17 @@ class _GeneralRoomListState extends State<GeneralRoomList> {
                 MaterialPageRoute(
                   builder: (context) => EnterChatRoom(roomData: room),
                 ),
+              );
+            },
+            onLongPress: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return FixChat(
+                    u2Id: room['u2_id'],
+                    rType: room['r_type'],
+                  );
+                },
               );
             },
           );

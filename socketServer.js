@@ -264,9 +264,12 @@ try {
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
 
-    const title = '새로운 메시지 도착';
+    const sendMessageNotification = await notificationController.sendMessageNotification(
+      u2_id,
+      body
+  );
     const body = message_contents || '[이미지]';
-    await sendMessageNotification(u2_id, title, body); 
+    await sendMessageNotification(u2_id, body); 
 }
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {

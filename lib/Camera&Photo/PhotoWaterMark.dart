@@ -126,6 +126,7 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
               imagePath: outputFile.path, // 최종 이미지 경로
               rId: widget.rId,           // rId 전달
               u2Id: widget.u2Id,         // u2Id 전달
+              mId: widget.mId,
               missionAuthenticationAuthority: widget.missionAuthenticationAuthority, // 권한 전달
             ),
           ),

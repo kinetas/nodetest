@@ -30,8 +30,7 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
       "m_reword": rewardController.text.isEmpty ? null : rewardController.text,
     };
 
-    print('===== 디버깅 시작 ====='); // 디버깅 시작 표시
-    print('전송할 데이터: $missionData'); // 전송할 데이터 출력
+    print('Mission Data: $missionData');
 
     try {
       final response = await SessionCookieManager.post(
@@ -40,35 +39,17 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
         body: json.encode(missionData),
       );
 
-      print('응답 코드: ${response.statusCode}'); // 응답 상태 코드 출력
-      print('응답 본문: ${response.body}'); // 응답 내용 출력
-
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        // 성공 처리
-        print('미션 생성 성공!');
+      if (response.statusCode == 200) {
+        print('Mission created successfully!');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('미션이 성공적으로 생성되었습니다!')),
         );
-        Navigator.pop(context, true); // true 값 반환
       } else {
-        // 실패 처리
-        print('미션 생성 실패. 응답 코드: ${response.statusCode}');
-        print('실패 이유: ${response.body}');
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('미션 생성 실패: ${response.body}')),
-        );
+        print('Failed to create mission: ${response.body}');
       }
     } catch (error) {
-      // 예외 발생 시 처리
-      print('미션 생성 중 오류 발생: $error');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
-      );
+      print('Error creating mission: $error');
     }
-
-    print('===== 디버깅 끝 ====='); // 디버깅 끝 표시
   }
 
   @override
@@ -94,7 +75,7 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
                   context,
                   MaterialPageRoute(builder: (context) => TimeSettingScreen()),
                 );
-                if (result != null && result is Map<String, dynamic>) {
+                if (result != null) {
                   setState(() {
                     final DateTime date = result['selectedDate'];
                     final int hour = result['selectedHour'];

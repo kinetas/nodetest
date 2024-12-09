@@ -5,6 +5,18 @@ import '../../SessionCookieManager.dart'; // SessionCookieManager 경로 확인
 import '../../DeviceTokenManager.dart'; // DeviceTokenManager 경로 확인
 
 class SettingsScreen extends StatelessWidget {
+  final VoidCallback onNavigateToHome;
+  final VoidCallback onNavigateToChat;
+  final VoidCallback onNavigateToMission;
+  final VoidCallback onNavigateToCommunity;
+
+  SettingsScreen({
+    required this.onNavigateToHome,
+    required this.onNavigateToChat,
+    required this.onNavigateToMission,
+    required this.onNavigateToCommunity,
+  });
+
   Future<void> _logout(BuildContext context) async {
     try {
       // 로그아웃 API 호출
@@ -60,13 +72,30 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Settings'),
       ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            _logout(context); // 로그아웃 호출
-          },
-          child: Text('로그아웃'),
-        ),
+      body: ListView(
+        padding: EdgeInsets.all(16.0),
+        children: [
+          ElevatedButton(
+            onPressed: onNavigateToHome,
+            child: Text('홈 화면으로 이동'),
+          ),
+          ElevatedButton(
+            onPressed: onNavigateToChat,
+            child: Text('채팅 화면으로 이동'),
+          ),
+          ElevatedButton(
+            onPressed: onNavigateToMission,
+            child: Text('미션 화면으로 이동'),
+          ),
+          ElevatedButton(
+            onPressed: onNavigateToCommunity,
+            child: Text('커뮤니티 화면으로 이동'),
+          ),
+          ElevatedButton(
+            onPressed: () => _logout(context),
+            child: Text('로그아웃'),
+          ),
+        ],
       ),
     );
   }

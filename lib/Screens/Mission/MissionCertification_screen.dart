@@ -1,49 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../SessionCookieManager.dart'; // SessionCookieManager 경로 확인
 
-class MissionCertificationScreen extends StatelessWidget {
-  final String missionTitle;
-  final String missionDescription;
-  final Function onSubmit;
+class MissionCertification {
+  /// `m_id` 값을 받아 미션 요청을 서버에 POST로 전송합니다.
+  Future<void> sendMissionCertification(String mId, BuildContext context) async {
+    final url = Uri.parse('http://54.180.54.31:3000/api/missions/missionRequest');
+    final body = jsonEncode({'m_id': mId});
 
-  const MissionCertificationScreen({
-    Key? key,
-    required this.missionTitle,
-    required this.missionDescription,
-    required this.onSubmit,
-  }) : super(key: key);
+    try {
+      // 세션 쿠키를 활용하여 요청 헤더 설정
+      final response = await SessionCookieManager.post(
+        url.toString(),
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('미션 인증'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              missionTitle,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20),
-            Text(
-              missionDescription,
-              style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                onSubmit();
-              },
-              child: Text('인증 완료'),
-            ),
-          ],
-        ),
-      ),
-    );
+      // 응답 처리
+      if (response.statusCode == 200) {
+        print('[SUCCESS] Mission request sent successfully: $mId');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Mission certified successfully.')),
+        );
+      } else {
+        print('[ERROR] Failed to send mission request. Status code: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to certify mission.')),
+        );
+      }
+    } catch (e) {
+      print('[ERROR] Error during mission request: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred while certifying mission.')),
+      );
+    } finally {
+      // 호출된 곳으로 돌아가기
+      Navigator.pop(context);
+    }
   }
 }

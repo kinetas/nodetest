@@ -22,7 +22,7 @@ class PhotoVoteUpload extends StatefulWidget {
 
 class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
   bool isUploading = false; // 업로드 상태 관리
-  String uploadMessage = "사진 업로드 중...";
+  String uploadMessage = "";
 
   Future<void> _uploadPhotoWithDio() async {
     setState(() {
@@ -73,6 +73,7 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
         setState(() {
           uploadMessage = "사진 업로드 성공!";
         });
+        _showUploadSuccessDialog();
       } else {
         setState(() {
           uploadMessage = "업로드 실패: ${response.statusCode}, 본문: ${response.data}";
@@ -90,10 +91,46 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _uploadPhotoWithDio(); // 위젯 초기화 시 업로드 수행
+  void _showUploadSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("투표 업로드 완료!"),
+          content: Text("투표 업로드가 성공적으로 완료되었습니다."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+                Navigator.pop(context); // 이전 화면으로 돌아가기
+              },
+              child: Text("확인"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showImagePreview() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return GestureDetector(
+          onTap: () => Navigator.pop(context), // 클릭 시 다이얼로그 닫기
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            insetPadding: EdgeInsets.all(10),
+            child: InteractiveViewer(
+              child: Image.file(
+                File(widget.imagePath),
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -102,25 +139,34 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
       appBar: AppBar(
         title: Text("미션 투표 업로드"),
       ),
-      body: Center(
-        child: isUploading
-            ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text(uploadMessage),
-          ],
-        )
-            : Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(uploadMessage, style: TextStyle(fontSize: 18)),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("돌아가기"),
+            // 이미지 미리 보기 (클릭 시 확대)
+            Expanded(
+              child: GestureDetector(
+                onTap: _showImagePreview, // 이미지 클릭 시 확대 미리 보기
+                child: Image.file(
+                  File(widget.imagePath),
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
+            SizedBox(height: 16),
+            // 업로드 버튼
+            ElevatedButton(
+              onPressed: isUploading
+                  ? null // 업로드 중일 경우 버튼 비활성화
+                  : _uploadPhotoWithDio,
+              child: isUploading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text("투표 업로드"),
+            ),
+            if (uploadMessage.isNotEmpty) ...[
+              SizedBox(height: 16),
+              Text(uploadMessage, style: TextStyle(color: Colors.red)),
+            ],
           ],
         ),
       ),

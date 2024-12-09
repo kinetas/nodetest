@@ -5,7 +5,6 @@ import 'Mission/MissionScreen.dart';
 import 'Community/CommunityScreen.dart';
 import 'Setting/settings_screen.dart';
 
-
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -24,7 +23,12 @@ class _MainScreenState extends State<MainScreen> {
       ChatScreen(),
       MissionScreen(),
       CommunityScreen(),
-      SettingsScreen(),
+      SettingsScreen(
+        onNavigateToHome: () => _onItemTapped(0),
+        onNavigateToChat: () => _onItemTapped(1),
+        onNavigateToMission: () => _onItemTapped(2),
+        onNavigateToCommunity: () => _onItemTapped(3),
+      ),
     ];
   }
 

@@ -8,9 +8,17 @@ class PhotoSend extends StatefulWidget {
   final String imagePath;
   final String rId;
   final String u2Id;
+  final String mId;
   final String missionAuthenticationAuthority;
 
-  PhotoSend({required this.imagePath, required this.rId, required this.u2Id, required this.missionAuthenticationAuthority});
+
+  PhotoSend({
+    required this.imagePath,
+    required this.rId,
+    required this.u2Id,
+    required this.mId,
+    required this.missionAuthenticationAuthority,
+  });
 
   @override
   _PhotoSendState createState() => _PhotoSendState();
@@ -131,7 +139,7 @@ class _PhotoSendState extends State<PhotoSend> {
           SnackBar(content: Text('Message sent successfully.')),
         );
 
-        // 모든 화면 닫기 (CameraMain.dart까지 닫기)
+        // CameraScreen까지 닫고 초기 화면으로 이동
         Navigator.of(context).popUntil((route) => route.isFirst);
       });
     } catch (e) {

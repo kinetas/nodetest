@@ -7,9 +7,20 @@ import 'PhotoWaterMark.dart'; // PhotoWaterMark 화면 import
 
 class CameraScreen extends StatefulWidget {
   final String rId;
+  final String u1Id;
   final String u2Id;
+  final String mId;
+  final String missionAuthenticationAuthority;
+  final String? voteM; // 선택적 파라미터 (null 가능)
 
-  CameraScreen({required this.rId, required this.u2Id});
+  CameraScreen({
+    required this.rId,
+    required this.u1Id,
+    required this.u2Id,
+    required this.mId,
+    required this.missionAuthenticationAuthority,
+    this.voteM,
+  });
 
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -114,7 +125,11 @@ class _CameraScreenState extends State<CameraScreen> {
           builder: (context) => PhotoWaterMark(
             imagePath: _capturedPhotoPath!, // 촬영된 사진 경로 전달
             rId: widget.rId,               // rId 전달
+            u1Id: widget.u1Id,             // u1Id 전달
             u2Id: widget.u2Id,             // u2Id 전달
+            mId: widget.mId,
+            missionAuthenticationAuthority: widget.missionAuthenticationAuthority, // 권한 전달
+            voteM: widget.voteM,           // voteM 전달
           ),
         ),
       );
@@ -182,23 +197,11 @@ class _CameraScreenState extends State<CameraScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black.withOpacity(0.7),
                     ),
-                    child: Text("다시 찍기", style: TextStyle(color: Colors.white)),
+                    child:
+                    Text("다시 찍기", style: TextStyle(color: Colors.white)),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      if (_capturedPhotoPath != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PhotoWaterMark(
-                              imagePath: _capturedPhotoPath!, // 정확한 매개변수 이름
-                              rId: widget.rId,
-                              u2Id: widget.u2Id,
-                            ),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: _goToPhotoWaterMark, // WaterMark로 이동
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black.withOpacity(0.7),
                     ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'MissionVotingScreen.dart';
+import 'CommunityVoteList.dart';
+import 'CommunityPostList.dart'; // CommunityPostList 클래스를 import
+import 'AddPost.dart'; // AddPost 화면 import
+import 'AddVote.dart'; // AddVote 화면 import
 
 // CommunityScreen: 커뮤니티 메인 화면
 class CommunityScreen extends StatefulWidget {
@@ -25,6 +28,21 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     super.dispose();
   }
 
+  void _onAddButtonPressed() {
+    // 현재 탭에 따라 다른 화면으로 이동
+    if (_tabController.index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddPost()), // 게시판 탭 -> AddPost 화면
+      );
+    } else if (_tabController.index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddVote()), // 미션투표 탭 -> AddVote 화면
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,9 +64,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
           if (_tabController.index == 0 || _tabController.index == 1) // 게시판(0) 또는 미션투표(1)에서만 + 버튼 표시
             IconButton(
               icon: Icon(Icons.add),
-              onPressed: () {
-                // 새로운 항목 추가 기능
-              },
+              onPressed: _onAddButtonPressed, // + 버튼 클릭 시 동작
             ),
         ],
         bottom: TabBar(
@@ -62,20 +78,8 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
       body: TabBarView(
         controller: _tabController,
         children: [
-          // 게시판 내용
-          ListView.builder(
-            itemCount: 20, // 예시로 20개의 게시글 표시
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text('게시글 제목 $index'),
-                subtitle: Text('게시글 내용 $index'),
-                onTap: () {
-                  // 게시글 상세 보기 기능
-                },
-              );
-            },
-          ),
-          MissionVotingScreen(), // 미션투표 탭은 별도의 클래스로 분리
+          CommunityPostList(), // CommunityPostList 클래스를 게시판 탭으로 설정
+          CommunityVoteList(), // 미션투표 탭은 별도의 클래스로 분리
         ],
       ),
     );

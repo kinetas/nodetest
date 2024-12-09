@@ -3,9 +3,20 @@ import '../../Camera&Photo/CameraMain.dart';
 
 class MissionVerificationScreen extends StatefulWidget {
   final String rId;
+  final String u1Id;
   final String u2Id;
+  final String mId;
+  final String missionAuthenticationAuthority;
+  final String? voteM; // 선택적 파라미터 (null 가능)
 
-  MissionVerificationScreen({required this.rId, required this.u2Id});
+  MissionVerificationScreen({
+    required this.rId,
+    required this.u1Id,
+    required this.u2Id,
+    required this.mId,
+    required this.missionAuthenticationAuthority,
+    this.voteM,
+  });
 
   @override
   _MissionVerificationScreenState createState() =>
@@ -25,7 +36,14 @@ class _MissionVerificationScreenState extends State<MissionVerificationScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => CameraScreen(rId: widget.rId, u2Id: widget.u2Id),
+          builder: (context) => CameraScreen(
+            rId: widget.rId,
+            u1Id: widget.u1Id,
+            u2Id: widget.u2Id,
+            mId: widget.mId,
+            missionAuthenticationAuthority: widget.missionAuthenticationAuthority,
+            voteM: widget.voteM,
+          ),
         ),
       );
     }

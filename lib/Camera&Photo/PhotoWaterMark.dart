@@ -5,16 +5,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'PhotoSend.dart';
+import 'PhotoVoteUpload.dart';
 
 class PhotoWaterMark extends StatefulWidget {
   final String imagePath;
   final String rId;
+  final String u1Id;
   final String u2Id;
+  final String mId;
+  final String missionAuthenticationAuthority;
+  final String? voteM; // 선택적 파라미터 (null 가능)
 
   PhotoWaterMark({
     required this.imagePath,
     required this.rId,
+    required this.u1Id,
     required this.u2Id,
+    required this.mId,
+    required this.missionAuthenticationAuthority,
+    this.voteM,
   });
 
   @override
@@ -26,6 +35,9 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
   void initState() {
     super.initState();
     print("PhotoWaterMark에서 받은 경로: ${widget.imagePath}");
+    print("PhotoWaterMark에서 받은 missionAuthenticationAuthority: ${widget.missionAuthenticationAuthority}");
+    print("PhotoWaterMark에서 받은 u1Id: ${widget.u1Id}");
+    print("PhotoWaterMark에서 받은 u2Id: ${widget.u2Id}");
     _applyPolaroidEffect(widget.imagePath); // 전달받은 경로로 폴라로이드 효과 적용
   }
 
@@ -105,17 +117,32 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
 
       print("폴라로이드 효과 생성 완료, 경로: ${outputFile.path}");
 
-      // 생성된 워터마크 이미지와 함께 다음 화면으로 이동
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PhotoSend(
-            imagePath: outputFile.path, // 최종 이미지 경로
-            rId: widget.rId,           // rId 전달
-            u2Id: widget.u2Id,         // u2Id 전달
+      // VoteM 값에 따라 적절한 화면으로 이동
+      if (widget.voteM == null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhotoSend(
+              imagePath: outputFile.path, // 최종 이미지 경로
+              rId: widget.rId,           // rId 전달
+              u2Id: widget.u2Id,         // u2Id 전달
+              missionAuthenticationAuthority: widget.missionAuthenticationAuthority, // 권한 전달
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhotoVoteUpload(
+              imagePath: outputFile.path, // 최종 이미지 경로
+              rId: widget.rId,           // rId 전달
+              u2Id: widget.u2Id,         // u2Id 전달
+              mId: widget.mId,
+            ),
+          ),
+        );
+      }
     } catch (e) {
       print("폴라로이드 효과 적용 중 오류 발생: $e");
       ScaffoldMessenger.of(context).showSnackBar(

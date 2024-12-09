@@ -8,8 +8,9 @@ class PhotoSend extends StatefulWidget {
   final String imagePath;
   final String rId;
   final String u2Id;
+  final String missionAuthenticationAuthority;
 
-  PhotoSend({required this.imagePath, required this.rId, required this.u2Id});
+  PhotoSend({required this.imagePath, required this.rId, required this.u2Id, required this.missionAuthenticationAuthority});
 
   @override
   _PhotoSendState createState() => _PhotoSendState();
@@ -51,7 +52,7 @@ class _PhotoSendState extends State<PhotoSend> {
       socket.emit('joinRoom', {
         'r_id': widget.rId,
         'u1_id': _u1Id,
-        'u2_id': widget.u2Id,
+        'u2_id': widget.missionAuthenticationAuthority,
       });
     });
 
@@ -113,7 +114,7 @@ class _PhotoSendState extends State<PhotoSend> {
       final messageData = {
         'r_id': widget.rId,
         'u1_id': _u1Id,
-        'u2_id': widget.u2Id,
+        'u2_id': widget.missionAuthenticationAuthority,
         'message_contents': messageContent,
         'send_date': DateTime.now().toIso8601String(),
         'image': imageBytes, // 이미지 데이터를 바이너리로 전송

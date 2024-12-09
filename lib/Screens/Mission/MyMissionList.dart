@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON 변환을 위해 추가
 import 'package:intl/intl.dart'; // 날짜 포맷을 위해 추가
 import '../../SessionCookieManager.dart';
+import 'MyMissionCard.dart';
 
 class MyMissionList extends StatefulWidget {
   @override
@@ -34,8 +35,20 @@ class _MyMissionListState extends State<MyMissionList> {
             .map((item) => Map<String, dynamic>.from(item))
             .toList();
 
+        // 새로운 파라미터 추가
         setState(() {
-          missions = fetchedMissions;
+          missions = fetchedMissions.map((mission) {
+            return {
+              ...mission,
+              'missionAuthenticationAuthority': mission['missionAuthenticationAuthority'] ?? "알 수 없음",
+              'm_id': mission['m_id'] ?? "알 수 없음",
+              'r_id': mission['r_id'] ?? "알 수 없음",
+              'r_title': mission['r_title'] ?? "알 수 없음",
+              'created_date': mission['created_date'] ?? "알 수 없음", // 추가 예시
+              'updated_date': mission['updated_date'] ?? "알 수 없음", // 추가 예시
+              'priority': mission['priority'] ?? "알 수 없음", // 추가 예시
+            };
+          }).toList();
           isLoading = false;
         });
       } else {
@@ -72,8 +85,8 @@ class _MyMissionListState extends State<MyMissionList> {
 
     // 데드라인 기준으로 정렬
     missions.sort((a, b) {
-      final dateA = DateTime.parse(a['m_deadline']);
-      final dateB = DateTime.parse(b['m_deadline']);
+      final dateA = parseDateTime(a['m_deadline']) ?? DateTime(1970);
+      final dateB = parseDateTime(b['m_deadline']) ?? DateTime(1970);
       return dateA.compareTo(dateB);
     });
 
@@ -81,9 +94,11 @@ class _MyMissionListState extends State<MyMissionList> {
     String previousDate = '';
 
     for (var mission in missions) {
-      final missionDate = DateTime.parse(mission['m_deadline']);
-      final formattedDate = DateFormat('MM/dd (E)', 'ko_KR').format(missionDate);
-      final missionYear = missionDate.year.toString();
+      final missionDate = parseDateTime(mission['m_deadline']);
+      final formattedDate = missionDate != null
+          ? DateFormat('MM/dd (E)', 'ko_KR').format(missionDate)
+          : '알 수 없는 날짜';
+      final missionYear = missionDate?.year.toString() ?? '';
 
       // 년도 헤더 추가 (현재 연도는 표시하지 않음)
       if (missionYear != previousYear) {
@@ -127,40 +142,16 @@ class _MyMissionListState extends State<MyMissionList> {
       ),
     );
   }
-}
 
-class MissionCard extends StatelessWidget {
-  final Map<String, dynamic> mission;
-  final String currentUserId;
-
-  MissionCard({required this.mission, required this.currentUserId});
-
-  @override
-  Widget build(BuildContext context) {
-    final isPersonalMission = mission['u1_id'] == currentUserId;
-
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        title: Text(mission['m_title']),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('마감 기한: ${formatTime(mission['m_deadline'])}'),
-            Text('미션 생성자: ${isPersonalMission ? "개인미션" : mission['u1_id']}'),
-            Text('미션 상태: ${mission['m_status']}'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String formatTime(String dateString) {
+  DateTime? parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) {
+      return null;
+    }
     try {
-      final dateTime = DateTime.parse(dateString);
-      return DateFormat('HH:mm').format(dateTime);
+      return DateTime.parse(dateString);
     } catch (e) {
-      return 'Invalid time';
+      print('Invalid date format: $dateString, error: $e');
+      return null;
     }
   }
 }

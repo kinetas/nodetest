@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../Mission/MissionVerificationScreen.dart'; // MissionVerificationScreen import
+import '../Mission/YouAndIMissionList.dart';
 
 class ChatPlusButton extends StatelessWidget {
   final Map<String, dynamic> roomData; // roomData 전달받기
@@ -43,9 +44,10 @@ class ChatPlusButton extends StatelessWidget {
                   '미션 인증',
                       () => _navigateToScreen(
                     context,
-                    MissionVerificationScreen(
+                    YouAndIMissionList(
                       rId: roomData['r_id'], // roomData에서 rId 가져오기
                       u2Id: roomData['u2_id'], // roomData에서 u2Id 가져오기
+
                     ),
                   ),
                 ),

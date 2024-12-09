@@ -3,7 +3,7 @@ import '../Mission/AchievementPanel_screen.dart'; // AchievementPanel 파일을 
 import '../CalendarScreen/WeeklyCalendarScreen.dart';
 import '../Friends/FriendListWidget.dart';
 import '../CalendarScreen/MonthlyCalendarScreen.dart';
-import '../Community/LatestPosts.dart'; // 최신 게시글 위젯 임포트
+import '../Community/LatestPostList.dart'; // 최신 게시글 위젯 임포트
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onNavigateToCommunity;
@@ -16,12 +16,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _showAchievementPanel = false;
-
-  // 최신 게시글 데이터
-  final List<Map<String, String>> latestPosts = [
-    {'title': '최신 게시글 1', 'content': '이것은 첫 번째 최신 게시글입니다.'},
-    {'title': '최신 게시글 2', 'content': '이것은 두 번째 최신 게시글입니다.'},
-  ];
 
   void _toggleAchievementPanel() {
     setState(() {
@@ -72,10 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(height: 20),
 
                       // 최신 게시글
-
                       LatestPosts(
-                        posts: latestPosts,
-                        onNavigateToCommunity: widget.onNavigateToCommunity,
+                        onNavigateToCommunity: widget.onNavigateToCommunity, // 이 줄 추가
                       ),
                       SizedBox(height: 20),
                     ],

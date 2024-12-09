@@ -69,7 +69,12 @@ exports.createMission = async (req, res) => {
                 }
 
                 const room = await Room.findOne({
-                    where: { u1_id: assignedU2Id, u2_id: missionAuthenticationAuthority}
+                    where: { 
+                        u1_id: assignedU2Id, 
+                        u2_id: missionAuthenticationAuthority,
+                        r_type: 'general'
+                    },
+
                 })
 
                 if (!room){
@@ -89,7 +94,7 @@ exports.createMission = async (req, res) => {
                     m_extended: false,
                     missionAuthenticationAuthority,
                 });
-                res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
+                return res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
             // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
             const room = await Room.findOne({

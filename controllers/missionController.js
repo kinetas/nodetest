@@ -71,7 +71,8 @@ exports.createMission = async (req, res) => {
                 const room = await Room.findOne({
                     where: { 
                         u1_id: assignedU2Id, 
-                        u2_id: missionAuthenticationAuthority 
+                        u2_id: missionAuthenticationAuthority,
+                        r_type: 'general'
                     },
 
                 })

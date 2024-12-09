@@ -1,7 +1,7 @@
 const IFriend = require('../models/i_friendModel'); // i_friend 모델
 const TFriend = require('../models/t_friendModel'); // t_friend 모델
 const User = require('../models/userModel');
-const notificationController = require('./notificationController'); // notificationController 가져오기
+const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 
 // const jwt = require('jsonwebtoken'); // JWT 추가
 

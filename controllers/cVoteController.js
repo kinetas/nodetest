@@ -5,7 +5,7 @@ const c_v_notdup = require('../models/c_v_not_dupModel');
 const Mission = require('../models/missionModel');
 const MResult = require('../models/m_resultModel');
 const User = require('../models/userModel');
-const notificationController = require('./notificationController'); // notificationController 가져오기
+const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 // const jwt = require('jsonwebtoken'); // JWT 추가

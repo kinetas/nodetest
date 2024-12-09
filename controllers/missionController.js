@@ -8,7 +8,7 @@ const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추�
 const CVote = require('../models/comunity_voteModel');
 const User = require('../models/userModel');
 const resultController = require('../controllers/resultController'); // resultController 가져오기
-const notificationController = require('./notificationController'); // notificationController 가져오기
+const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Sequelize, Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 

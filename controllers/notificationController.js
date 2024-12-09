@@ -52,6 +52,7 @@ const sendNotification = async (userId, title, body = {}) => {
         // 성공 시 로그 저장
         await NotificationLog.create({
             userId,
+            token,
             title,
             body,
             status: 'success',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Login_page/StartLogin_screen.dart'; // StartLogin_screen.dart 경로 확인
 import '../../SessionCookieManager.dart'; // SessionCookieManager 경로 확인
+import '../../DeviceTokenManager.dart'; // DeviceTokenManager 경로 확인
 
 class SettingsScreen extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
@@ -11,7 +12,11 @@ class SettingsScreen extends StatelessWidget {
 
     // 세션 쿠키 삭제
     await SessionCookieManager.clearSessionCookie();
-    print("Session cookie cleared during logout.");
+    print("[DEBUG] Session cookie cleared during logout.");
+
+    // 디바이스 토큰 삭제
+    DeviceTokenManager().clearToken();
+    print("[DEBUG] Device token cleared during logout.");
 
     // 알림 메시지 표시
     ScaffoldMessenger.of(context).showSnackBar(

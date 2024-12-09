@@ -97,80 +97,80 @@ const sendNotificationController = async (req, res) => {
     }
 };
 // 친구 요청 알림 함수
-const sendFriendRequestNotification = async (token, senderId, userId) => {
+const sendFriendRequestNotification = async (senderId, userId) => {
     const title = '친구 요청 알림';
     const body = `${senderId}님이 친구 요청을 보냈습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 친구 요청 수락 알림 함수
-const sendFriendAcceptNotification = async (token, senderId, userId) => {
+const sendFriendAcceptNotification = async (senderId, userId) => {
     const title = '친구 요청 수락 알림';
     const body = `${senderId}님이 친구 요청을 수락하였습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 미션 생성 알림 함수
-const sendMissionCreateNotification = async (token, senderId, userId) => {
+const sendMissionCreateNotification = async (senderId, userId) => {
     const title = '미션 생성 알림';
     const body = `${senderId}님이 미션을 생성하였습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 미션 인증 요청 알림 함수
-const sendRequestMissionApprovalNotification = async (token, senderId, userId) => {
+const sendRequestMissionApprovalNotification = async (senderId, userId) => {
     const title = '미션 인증 요청 알림';
     const body = `${senderId}님이 미션 인증을 요청하였습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 미션 성공 알림 함수
-const sendMissionSuccessNotification = async (token, senderId, userId) => {
+const sendMissionSuccessNotification = async (senderId, userId) => {
     const title = '미션 성공 알림';
     const body = `${senderId}님이 미션을 성공 처리하였습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 미션 실패 알림 함수
-const sendMissionFailureNotification = async (token, senderId, userId) => {
+const sendMissionFailureNotification = async (senderId, userId) => {
     const title = '미션 실패 알림';
     const body = `${senderId}님이 미션을 실패 처리하였습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 미션 마감기한 임박 (10분) 알림 함수
-const sendMissionDeadlineTenMinutesNotification = async (token, userId, missionTitle) => {
+const sendMissionDeadlineTenMinutesNotification = async (userId, missionTitle) => {
     const title = '마감 기한 임박 알림';
     const body = `${missionTitle} 미션의 마감기한이 10분 남았습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 미션 마감기한 경과 알림 함수
-const sendMissionDeadlineNotification = async (token, userId, missionTitle) => {
+const sendMissionDeadlineNotification = async (userId, missionTitle) => {
     const title = '마감 기한 경과 알림';
     const body = `${missionTitle} 미션의 마감기한이 지났습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 커뮤니티 미션 수락 알림 함수
-const sendAcceptCommunityMissionNotification = async (token, userId, missionTitle) => {
+const sendAcceptCommunityMissionNotification = async (userId, missionTitle) => {
     const title = '커뮤니티 미션 수락 알림';
     const body = `${missionTitle} 커뮤니티 미션이 수락되어 미션이 생성되었습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 투표 미션 성공 알림 함수
-const sendVoteMissionSuccessNotification = async (token, userId, missionTitle) => {
+const sendVoteMissionSuccessNotification = async (userId, missionTitle) => {
     const title = '투표 미션 성공 알림';
     const body = `${missionTitle} 투표 미션이 성공되었습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 // 투표 미션 실패 알림 함수
-const sendVoteMissionFailureNotification = async (token, userId, missionTitle) => {
+const sendVoteMissionFailureNotification = async (userId, missionTitle) => {
     const title = '투표 미션 실패 알림';
     const body = `${missionTitle} 투표 미션이 실패되었습니다.`;
-    return await sendNotification(userId, token, title, body);
+    return await sendNotification(userId, title, body);
 };
 
 //메시지 수신 알림

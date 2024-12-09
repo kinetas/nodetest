@@ -36,13 +36,9 @@ const User = sequelize.define('user', {
         allowNull: true
     },
     reward: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
         defaultValue: 0, // 기본값 설정 (선택 사항)
-        validate: {
-            isInt: true, // 정수 값인지 검증
-            min: 0, // 음수 값 제한
-        }
     }
 }, {
     tableName: 'user',

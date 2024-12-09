@@ -8,6 +8,7 @@ const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추�
 const CVote = require('../models/comunity_voteModel');
 const User = require('../models/userModel');
 const resultController = require('../controllers/resultController'); // resultController 가져오기
+const roomController = require('../controllers/roomController');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
@@ -66,6 +67,29 @@ exports.createMission = async (req, res) => {
                         message: '인증 권한자로 선택된 사용자가 친구 목록에 없습니다.',
                     });
                 }
+
+                const room = await Room.findOne({
+                    where: { u1_id: assignedU2Id, u2_id: missionAuthenticationAuthority}
+                })
+
+                if (!room){
+                    roomController.addRoom(missionAuthenticationAuthority, `${assignedU2Id}-${missionAuthenticationAuthority}`, 'general')
+                }
+
+                // 미션 생성
+                await Mission.create({
+                    m_id: uuidv4(),
+                    u1_id,
+                    u2_id: assignedU2Id,    // 입력받은 u2_id 또는 u1_id를 저장
+                    m_title,
+                    m_deadline,
+                    m_reword,
+                    m_status: '진행중',
+                    r_id: room.r_id, // Room ID를 저장
+                    m_extended: false,
+                    missionAuthenticationAuthority,
+                });
+                res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
             // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
             const room = await Room.findOne({

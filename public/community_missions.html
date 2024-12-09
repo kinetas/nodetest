@@ -9,6 +9,8 @@
     <div>
         <h3>새로운 미션 생성</h3>
         <input type="text" id="cr_title" placeholder="미션 제목">
+        <input type="text" id="content" placeholder="미션 내용">
+        <input type="datetime-local" id="deadline" placeholder="마감기한">
         <button onclick="createCommunityMission()">생성</button>
     </div>
 
@@ -18,10 +20,13 @@
         // 미션 생성
         function createCommunityMission() {
             const cr_title = document.getElementById('cr_title').value;
+            const content = document.getElementById('content').value;
+            const deadline = document.getElementById('deadline').value;
             fetch('/api/comumunity_missions/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cr_title })
+                // body: JSON.stringify({ cr_title })
+                body: JSON.stringify({ cr_title, content, deadline })
             })
             .then(response => response.json())
             .then(data => alert(data.message))
@@ -61,7 +66,7 @@
                 data.missions.forEach(mission => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
-                        ${mission.cr_title} (상태: ${mission.cr_status})
+                        미션이름: ${mission.cr_title}, 미션내용: ${mission.contents}, 기한: ${mission.deadline} (상태: ${mission.cr_status})
                         <button onclick="acceptCommunityMission('${mission.cr_num}')">수락</button>
                         <button onclick="deleteCommunityMission('${mission.cr_num}')">삭제</button>
                     `;

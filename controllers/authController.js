@@ -57,18 +57,18 @@ exports.login = async (req, res) => {
         // console.log('[DEBUG] 새로운 세션 설정:', req.session); // 추가
 
         // 디바이스 토큰 저장
-        const updateToken = await User.update(
+        await User.update(
             { token: token },
             { where: { u_id } }
         );
 
-        // 업데이트 성공 시 응답
-        if (updateToken[0] > 0) {
-            console.log(JSON.stringify({ message: '디바이스 토큰이 성공적으로 갱신되었습니다.' }));
-        } else {
-            console.log(JSON.stringify({ message: '받은 토큰이 없습니다.' }));
-            return res.status(404).json({ message: '받은 토큰이 없습니다.' });
-        }
+        // // 업데이트 성공 시 응답
+        // if (updateToken[0] > 0) {
+        //     console.log(JSON.stringify({ message: '디바이스 토큰이 성공적으로 갱신되었습니다.' }));
+        // } else {
+        //     console.log(JSON.stringify({ message: '받은 토큰이 없습니다.' }));
+        //     return res.status(404).json({ message: '받은 토큰이 없습니다.' });
+        // }
 
         // 로그인 성공 시 응답
         return res.status(200).json({

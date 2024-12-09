@@ -11,7 +11,8 @@ const { Op } = require('sequelize'); // [추가됨]
 
 // 첫 번째 조건: 커뮤니티 미션 생성
 exports.createCommunityMission = async (req, res) => {
-    const { cr_title } = req.body; // 제목 입력 받기
+    // const { cr_title } = req.body; // 제목 입력 받기
+    const { cr_title, contents, deadline } = req.body;
     const u_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
     const cr_num = uuidv4(); // 랜덤 값 생성
     const cr_status = "match";
@@ -19,7 +20,8 @@ exports.createCommunityMission = async (req, res) => {
     const m2_status = "0";
 
     try {
-        await CRoom.create({ u_id, cr_num, cr_title, cr_status, m1_status, m2_status });
+        // await CRoom.create({ u_id, cr_num, cr_title, cr_status, m1_status, m2_status });
+        await CRoom.create({ u_id, cr_num, cr_title, cr_status, m1_status, m2_status, contents, deadline });
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 생성되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 생성 오류:', error);
@@ -116,7 +118,8 @@ exports.acceptCommunityMission = async (req, res) => {
         const missionTitle = mission.cr_title;
 
         const currentDate = new Date();
-        const deadline = new Date(currentDate.setDate(currentDate.getDate() + 3));
+        // const deadline = new Date(currentDate.setDate(currentDate.getDate() + 3));
+        const deadline = mission.deadline ? mission.deadline : new Date(currentDate.setDate(currentDate.getDate() + 3));
 
         await Mission.create({
             m_id: newMissionId1,

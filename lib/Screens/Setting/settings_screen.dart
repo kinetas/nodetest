@@ -6,29 +6,52 @@ import '../../DeviceTokenManager.dart'; // DeviceTokenManager 경로 확인
 
 class SettingsScreen extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
-    // 모든 SharedPreferences 데이터 삭제
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // 모든 저장된 데이터 삭제 (자동 로그인 정보 포함)
+    try {
+      // 로그아웃 API 호출
+      final response = await SessionCookieManager.post(
+        'http://54.180.54.31:3000/api/auth/logout',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
 
-    // 세션 쿠키 삭제
-    await SessionCookieManager.clearSessionCookie();
-    print("[DEBUG] Session cookie cleared during logout.");
+      if (response.statusCode == 200) {
+        print("[DEBUG] Logout API called successfully.");
+      } else {
+        print("[DEBUG] Logout API failed with status: ${response.statusCode}");
+      }
 
-    // 디바이스 토큰 삭제
-    DeviceTokenManager().clearToken();
-    print("[DEBUG] Device token cleared during logout.");
+      // 모든 SharedPreferences 데이터 삭제
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear(); // 모든 저장된 데이터 삭제 (자동 로그인 정보 포함)
 
-    // 알림 메시지 표시
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('로그아웃되었습니다.')),
-    );
+      // 세션 쿠키 삭제
+      await SessionCookieManager.clearSessionCookie();
+      print("[DEBUG] Session cookie cleared during logout.");
 
-    // StartLoginScreen으로 이동
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => StartLoginScreen()),
-          (route) => false, // 이전 화면 스택 제거
-    );
+      // 디바이스 토큰 삭제
+      DeviceTokenManager().clearToken();
+      print("[DEBUG] Device token cleared during logout.");
+
+      // 알림 메시지 표시
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('로그아웃되었습니다.')),
+      );
+
+      // StartLoginScreen으로 이동
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => StartLoginScreen()),
+            (route) => false, // 이전 화면 스택 제거
+      );
+    } catch (e) {
+      print("[ERROR] Logout process failed: $e");
+
+      // 오류 메시지 표시
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('로그아웃에 실패했습니다. 다시 시도해주세요.')),
+      );
+    }
   }
 
   @override

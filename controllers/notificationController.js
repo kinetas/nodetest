@@ -67,7 +67,7 @@ const sendNotification = async (userId, title, body = {}) => {
         // 실패 시 로그 저장
         await NotificationLog.create({
             userId,
-            toekn,
+            token,
             title,
             body,
             status: 'failed',

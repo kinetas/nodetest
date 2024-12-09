@@ -146,7 +146,7 @@ exports.createMission = async (req, res) => {
         } else {
             // 다른 사용자에게 미션 생성 시
             // 4. 타인에게 미션 생성
-            if (authenticationAuthority !== u1_id) {
+            if (authenticationAuthority && authenticationAuthority !== u1_id) {
                 return res.status(400).json({
                     success: false,
                     message: '다른 사용자에게 미션 생성 시 인증 권한자를 입력할 수 없습니다.',

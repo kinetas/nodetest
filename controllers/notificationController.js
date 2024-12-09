@@ -41,7 +41,7 @@ const sendNotification = async (userId, title, body = {}) => {
         }
 
         const token = user.token;
-        
+
         const message = {
             token,
             notification:{
@@ -111,6 +111,13 @@ const sendFriendRequestNotification = async (senderId, userId) => {
 const sendFriendAcceptNotification = async (senderId, userId) => {
     const title = '친구 요청 수락 알림';
     const body = `${senderId}님이 친구 요청을 수락하였습니다.`;
+    return await sendNotification(userId, title, body);
+};
+
+// 미션 생성 알림 (인증 권한 부여) 함수
+const sendMissionCreateAuthenticationNotification = async (senderId, userId) => {
+    const title = '미션 생성 알림';
+    const body = `${senderId}님이 미션 인증 권한을 부여하였습니다.`;
     return await sendNotification(userId, title, body);
 };
 
@@ -203,4 +210,5 @@ module.exports = {
     sendAcceptCommunityMissionNotification,
     sendVoteMissionSuccessNotification,
     sendVoteMissionFailureNotification,
+    sendMissionCreateAuthenticationNotification,
 };

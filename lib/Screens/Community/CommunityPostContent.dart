@@ -72,7 +72,7 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
 
   // 미션 수락
   Future<void> acceptMission() async {
-    final url = 'http://54.180.54.31:3000/api/comumunity_missions/create';
+    final url = 'http://54.180.54.31:3000/api/comumunity_missions/accept';
     final body = json.encode({"cr_num": widget.crNum});
 
     try {

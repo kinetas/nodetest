@@ -364,6 +364,48 @@ exports.getCreatedMissions = async (req, res) => {
     }
 };
 
+// 자신이 부여한 미션 목록 / 요청 (u1_id = userId)(방 이름 포함)
+exports.getCreatedMissionsReq = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        // 1. 자신이 부여한 미션 가져오기
+        const createdMissions = await Mission.findAll({
+            where: {
+                u1_id: userId, // 미션을 부여한 사용자
+                u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
+                m_status: { [Op.or]: ['요청'] }, // "요청"인 미션만
+            },
+        });
+
+        // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
+        const missionsWithRoomTitle = await Promise.all(
+            createdMissions.map(async (mission) => {
+                const room = await Room.findOne({
+                    where: { r_id: mission.r_id },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: mission.m_status,
+                    r_id: mission.r_id,
+                    r_title: room ? room.r_title : '없음',
+                    u1_id: mission.u1_id,
+                    u2_id: mission.u2_id,
+                };
+            })
+        );
+
+        // 3. 결과 응답
+        res.json({ missions: missionsWithRoomTitle });
+    } catch (error) {
+        console.error('자신이 부여한 미션 조회 오류:', error);
+        res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+    }
+};
+
 // 자신이 완료한 미션 목록 
 exports.getCompletedMissions = async (req, res) => {
     try {

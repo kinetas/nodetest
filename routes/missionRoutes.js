@@ -19,6 +19,9 @@ router.get('/missions/assigned', requireAuth, getAssignedMissions);
 // 자신이 부여한 미션
 router.get('/missions/created', requireAuth, getCreatedMissions);
 
+// 자신이 부여한 미션 (요청)
+router.get('/missions/created_req', requireAuth, getCreatedMissionsReq);
+
 // 자신이 완료한 미션 
 router.get('/missions/completed', requireAuth, getCompletedMissions);
 

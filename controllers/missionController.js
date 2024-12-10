@@ -98,6 +98,19 @@ exports.createMission = async (req, res) => {
                     m_extended: false,
                     missionAuthenticationAuthority,
                 });
+
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+            
+                const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
+                    u1_id,
+                    missionAuthenticationAuthority,
+                );
+
+                if(!sendMissionCreateAuthenticationNotification){
+                    return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
+                }
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+
                 return res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
             // 3-2. 인증권한자가 미션생성자인 경우
@@ -116,17 +129,7 @@ exports.createMission = async (req, res) => {
             const missionId = uuidv4();
             let stat = "진행중";
 
-            // ================ 알림 추가 - 디바이스 토큰 =======================
             
-            const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
-                u1_id,
-                missionAuthenticationAuthority,
-            );
-
-            if(!sendMissionCreateAuthenticationNotification){
-                return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
-            }
-            // ================ 알림 추가 - 디바이스 토큰 =======================
 
             // 미션 생성
             await Mission.create({

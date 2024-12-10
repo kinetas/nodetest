@@ -1,11 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import '../../SessionCookieManager.dart'; // 세션 쿠키 관리자
 
-class WeeklyCalendar extends StatelessWidget {
+class WeeklyCalendar extends StatefulWidget {
   final VoidCallback onAddPressed;
   final VoidCallback onGraphPressed;
 
   WeeklyCalendar({required this.onAddPressed, required this.onGraphPressed});
+
+  @override
+  _WeeklyCalendarState createState() => _WeeklyCalendarState();
+}
+
+class _WeeklyCalendarState extends State<WeeklyCalendar> {
+  Map<String, int> taskCountPerDate = {}; // 날짜별 미션 개수 저장
+  bool isLoading = true; // 로딩 상태 관리
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAssignedMissions();
+  }
+
+  Future<void> fetchAssignedMissions() async {
+    final url = 'http://54.180.54.31:3000/api/missions/missions/assigned';
+
+    try {
+      final response = await SessionCookieManager.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // 날짜별 미션 개수 계산
+        Map<String, int> tempTaskCount = {};
+        for (var mission in data) {
+          final deadline = mission['m_deadline'];
+          if (deadline != null) {
+            final date = DateFormat('yyyy-MM-dd').format(DateTime.parse(deadline));
+            tempTaskCount[date] = (tempTaskCount[date] ?? 0) + 1;
+          }
+        }
+
+        setState(() {
+          taskCountPerDate = tempTaskCount;
+          isLoading = false;
+        });
+      } else {
+        print('Failed to fetch missions: ${response.statusCode}');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching missions: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  int _getTaskCountForDate(DateTime date) {
+    final dateString = DateFormat('yyyy-MM-dd').format(date);
+    return taskCountPerDate[dateString] ?? 0; // 날짜의 미션 개수 반환 (없으면 0)
+  }
 
   List<Map<String, dynamic>> _generateWeeklyData() {
     List<Map<String, dynamic>> weekData = [];
@@ -17,14 +75,10 @@ class WeeklyCalendar extends StatelessWidget {
       weekData.add({
         'day': daysOfWeek[currentDay.weekday % 7],
         'date': DateFormat('MM/dd').format(currentDay),
-        'tasks': _getTasksForDay(currentDay),
+        'tasks': _getTaskCountForDate(currentDay), // API에서 받아온 미션 개수 사용
       });
     }
     return weekData;
-  }
-
-  int _getTasksForDay(DateTime date) {
-    return date.day % 3 + 1;
   }
 
   @override
@@ -35,7 +89,9 @@ class WeeklyCalendar extends StatelessWidget {
 
     List<Map<String, dynamic>> weekData = _generateWeeklyData();
 
-    return Container(
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Container(
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(16),
@@ -67,11 +123,11 @@ class WeeklyCalendar extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: Icon(Icons.bar_chart, color: primaryColor),
-                    onPressed: onGraphPressed,
+                    onPressed: widget.onGraphPressed,
                   ),
                   IconButton(
                     icon: Icon(Icons.add, color: primaryColor),
-                    onPressed: onAddPressed,
+                    onPressed: widget.onAddPressed,
                   ),
                 ],
               ),

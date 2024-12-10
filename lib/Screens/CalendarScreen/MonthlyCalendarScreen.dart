@@ -1,13 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../SessionCookieManager.dart'; // 세션 쿠키 관리자
+import 'dart:convert';
 
-class MonthlyCalendarScreen extends StatelessWidget {
+class MonthlyCalendarScreen extends StatefulWidget {
+  @override
+  _MonthlyCalendarScreenState createState() => _MonthlyCalendarScreenState();
+}
+
+class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
+  Map<String, int> taskCountPerDate = {}; // 날짜별 미션 개수
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAssignedMissions();
+  }
+
+  Future<void> fetchAssignedMissions() async {
+    final url = 'http://54.180.54.31:3000/api/missions/missions/assigned';
+
+    try {
+      final response = await SessionCookieManager.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as List<dynamic>;
+
+        // 날짜별 미션 개수 계산
+        Map<String, int> tempTaskCount = {};
+        for (var mission in data) {
+          final deadline = mission['m_deadline'];
+          if (deadline != null) {
+            final date = DateFormat('yyyy-MM-dd').format(DateTime.parse(deadline));
+            tempTaskCount[date] = (tempTaskCount[date] ?? 0) + 1;
+          }
+        }
+
+        setState(() {
+          taskCountPerDate = tempTaskCount;
+          isLoading = false;
+        });
+      } else {
+        print('Failed to fetch missions: ${response.statusCode}');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching missions: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   List<List<DateTime?>> _generateMonthlyCalendar(DateTime month) {
     List<List<DateTime?>> calendar = [];
     DateTime firstDayOfMonth = DateTime(month.year, month.month, 1);
     DateTime lastDayOfMonth = DateTime(month.year, month.month + 1, 0);
 
-    // 시작일과 끝일을 맞추기 위해 추가된 전후 날짜
+    // 시작일과 끝일 맞추기 위해 추가된 전후 날짜
     DateTime startDate = firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday));
     DateTime endDate = lastDayOfMonth.add(Duration(days: 6 - lastDayOfMonth.weekday));
 
@@ -25,20 +78,22 @@ class MonthlyCalendarScreen extends StatelessWidget {
   }
 
   int _getTaskCountForDate(DateTime date) {
-    // 임의의 미션 개수 반환 (실제 데이터와 연동 가능)
-    return date.day % 3 + 1;
+    final dateString = DateFormat('yyyy-MM-dd').format(date);
+    return taskCountPerDate[dateString] ?? 0; // 해당 날짜의 미션 개수 반환 (없으면 0)
   }
 
   @override
   Widget build(BuildContext context) {
-    DateTime today = DateTime.now();
-    List<List<DateTime?>> monthlyCalendar = _generateMonthlyCalendar(today);
+    final today = DateTime.now();
+    final monthlyCalendar = _generateMonthlyCalendar(today);
 
     return Scaffold(
       appBar: AppBar(
         title: Text('월간 캘린더'),
       ),
-      body: Padding(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
@@ -60,7 +115,12 @@ class MonthlyCalendarScreen extends StatelessWidget {
               children: [
                 TableRow(
                   children: ['일', '월', '화', '수', '목', '금', '토']
-                      .map((day) => Center(child: Text(day, style: TextStyle(fontWeight: FontWeight.bold))))
+                      .map((day) => Center(
+                    child: Text(
+                      day,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ))
                       .toList(),
                 ),
                 ...monthlyCalendar.map(

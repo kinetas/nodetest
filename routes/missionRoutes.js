@@ -4,7 +4,7 @@ const router = express.Router();
 const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMissions, 
         getGivenCompletedMissions, getFriendAssignedMissions, getFriendCompletedMissions, getMissionsWithGrantedAuthority, 
         requestMissionApproval, createMission, deleteMission, successMission, failureMission, printRoomMission,
-        requestVoteForMission, getRequestedSelfMissions  } = require('../controllers/missionController');
+        requestVoteForMission, getRequestedSelfMissions, getCreatedMissionsReq  } = require('../controllers/missionController');
 const requireAuth = require('../middleware/authMiddleware'); // requireAuth 미들웨어 경로 확인
 
 const multer = require('multer');

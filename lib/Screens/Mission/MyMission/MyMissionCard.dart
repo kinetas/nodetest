@@ -11,6 +11,7 @@ class MissionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isPersonalMission = mission['u1_id'] == currentUserId;
+    final isRequesting = mission['m_status'] == "요청중"; // 상태가 "요청중"인지 확인
 
     return Card(
       elevation: 4,
@@ -52,13 +53,22 @@ class MissionCard extends StatelessWidget {
                 ),
                 Text(
                   '미션 상태: ${mission['m_status'] ?? "상태 없음"}',
-                  style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                  style: TextStyle(
+                    color: isRequesting ? Colors.red : Colors.blueGrey, // 요청중일 경우 빨간색
+                    fontSize: 14,
+                  ),
                 ),
               ],
             ),
           ),
-          trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 20),
-          onTap: () {
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            color: isRequesting ? Colors.grey : Colors.lightBlue, // 요청중일 경우 회색으로 비활성화 느낌
+            size: 20,
+          ),
+          onTap: isRequesting
+              ? null // 요청중일 경우 클릭 비활성화
+              : () {
             // MissionClick 팝업 창 띄우기
             showDialog(
               context: context,

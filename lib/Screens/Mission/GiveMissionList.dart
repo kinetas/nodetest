@@ -66,14 +66,7 @@ class _GiveMissionListState extends State<GiveMissionList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade50, // 배경색 설정
-      appBar: AppBar(
-        title: Text(
-          '부여된 미션 목록',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
-      ),
+
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : missions.isEmpty

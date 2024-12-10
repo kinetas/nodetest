@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'GiveMissionList.dart'; // 부여한 미션 목록
-import 'GiveCompleteMissionList.dart'; // 부여한 미션 중 완료된 목록
+import 'RequestedMissionList.dart'; // 부여한 미션 중 완료된 목록
 
 class OtherMission extends StatefulWidget {
   @override
@@ -62,7 +62,7 @@ class _OtherMissionState extends State<OtherMission> with SingleTickerProviderSt
           controller: _tabController,
           children: [
             GiveMissionList(), // 부여한 미션 탭 연결
-            GiveCompleteMissionList(), // 부여한 미션 중 완료된 탭 연결
+            RequestedMissionScreen(), // 부여한 미션 중 완료된 탭 연결
           ],
         ),
       ),

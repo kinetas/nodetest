@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionCookieManager.dart';
+import 'CommunityVoteContent.dart'; // CommunityVoteContent import
 
 class CommunityVoteList extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
         final data = json.decode(response.body);
 
         setState(() {
-          votes = data['votes'];
+          votes = data['votes'] ?? []; // null이면 빈 리스트로 처리
           isLoading = false;
         });
       } else {
@@ -44,16 +45,26 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
     }
   }
 
-  String _formatTitle(String title, int maxLength) {
+  String _formatTitle(String? title, int maxLength) {
+    if (title == null || title.isEmpty) {
+      return '제목 없음'; // 기본값 설정
+    }
     if (title.length > maxLength) {
       return '${title.substring(0, maxLength)}...';
     }
     return title;
   }
 
-  String _formatDate(String dateString) {
-    DateTime date = DateTime.parse(dateString);
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  String _formatDate(String? dateString) {
+    if (dateString == null || dateString.isEmpty) {
+      return '날짜 없음'; // 기본값 설정
+    }
+    try {
+      DateTime date = DateTime.parse(dateString);
+      return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return '잘못된 날짜'; // 날짜 형식 오류 처리
+    }
   }
 
   @override
@@ -68,41 +79,58 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
         itemCount: votes.length,
         itemBuilder: (context, index) {
           final vote = votes[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    blurRadius: 5,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _formatTitle(vote['c_title'], 20), // 제목 출력 및 길이 제한
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+          return GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => Dialog(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.8,
+                    child: CommunityVoteContent(
+                      cNumber: vote['c_number'], // c_number 전달
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '삭제 날짜: ${_formatDate(vote['c_deletedate'])}', // 삭제 날짜 출력
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 8.0, horizontal: 16.0),
+              child: Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      blurRadius: 5,
+                      spreadRadius: 2,
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _formatTitle(vote['c_title'], 20),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '삭제 날짜: ${_formatDate(vote['c_deletedate'])}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

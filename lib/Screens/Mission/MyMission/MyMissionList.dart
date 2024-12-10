@@ -69,14 +69,6 @@ class _MyMissionListState extends State<MyMissionList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade50,
-      appBar: AppBar(
-        title: Text(
-          '나의 미션',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
-      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : missions.isEmpty

@@ -43,11 +43,18 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('미션이 성공적으로 생성되었습니다!')),
         );
+        Navigator.pop(context); // 이전 화면으로 이동
       } else {
         print('Failed to create mission: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('미션 생성에 실패했습니다. 다시 시도해주세요.')),
+        );
       }
     } catch (error) {
       print('Error creating mission: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
+      );
     }
   }
 

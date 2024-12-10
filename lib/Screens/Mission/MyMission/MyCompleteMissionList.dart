@@ -65,11 +65,7 @@ class _MyCompleteMissionListState extends State<MyCompleteMissionList> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.lightBlue.shade50, // 배경색
-      appBar: AppBar(
-        title: Text('완료된 미션 목록', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
-      ),
+
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중
           : completedMissions.isEmpty

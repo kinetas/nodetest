@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path; // 파일 경로에서 확장자 추출
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../SessionCookieManager.dart'; // 세션 쿠키 관리 클래스 import
+import 'dart:convert';
 
 class PhotoSend extends StatefulWidget {
   final String imagePath;
@@ -10,7 +11,6 @@ class PhotoSend extends StatefulWidget {
   final String u2Id;
   final String mId;
   final String missionAuthenticationAuthority;
-
 
   PhotoSend({
     required this.imagePath,
@@ -39,8 +39,7 @@ class _PhotoSendState extends State<PhotoSend> {
 
   @override
   void dispose() {
-    socket.disconnect(); // 소켓 연결 해제
-    socket.dispose();
+    _disconnectSocket(); // 소켓 연결 해제
     _textController.dispose(); // 입력 필드 해제
     super.dispose();
   }
@@ -64,12 +63,19 @@ class _PhotoSendState extends State<PhotoSend> {
       });
     });
 
-    socket.onDisconnect((_) {
-      print('Socket disconnected');
-      socket.connect(); // 연결 끊어질 경우 재연결
-    });
-
     socket.connect(); // 소켓 연결 시작
+  }
+
+  Future<void> _disconnectSocket() async {
+    print("Disconnecting socket...");
+    if (socket.connected) {
+      socket.emit('leaveRoom', {
+        'r_id': widget.rId,
+        'u1_id': _u1Id,
+      });
+      socket.disconnect();
+      print("Socket disconnected");
+    }
   }
 
   Future<void> _loadUserId() async {
@@ -78,9 +84,7 @@ class _PhotoSendState extends State<PhotoSend> {
       final response = await SessionCookieManager.get('http://54.180.54.31:3000/api/user-info/user-id');
       if (response.statusCode == 200) {
         // JSON 객체에서 ID 추출
-        final userId = response.body.contains('u_id')
-            ? response.body.split(':')[1].replaceAll(RegExp(r'[{}"]'), '').trim()
-            : response.body.trim();
+        final userId = json.decode(response.body)['u_id'];
 
         setState(() {
           _u1Id = userId; // 유저 ID 설정
@@ -139,7 +143,8 @@ class _PhotoSendState extends State<PhotoSend> {
           SnackBar(content: Text('Message sent successfully.')),
         );
 
-        // CameraScreen까지 닫고 초기 화면으로 이동
+        // 소켓 닫기 및 화면 종료
+        _disconnectSocket();
         Navigator.of(context).popUntil((route) => route.isFirst);
       });
     } catch (e) {
@@ -169,6 +174,7 @@ class _PhotoSendState extends State<PhotoSend> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            _disconnectSocket();
             Navigator.pop(context);
           },
         ),

@@ -77,59 +77,49 @@ class ChatContentState extends State<ChatContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '채팅',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.lightBlue.shade100, Colors.white],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.lightBlue.shade100, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+      child: isLoading
+          ? Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
         ),
-        child: isLoading
-            ? Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
-          ),
-        )
-            : messages.isEmpty
-            ? Center(
-          child: Text(
-            '메시지가 없습니다.',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
-          ),
-        )
-            : ListView.builder(
-          controller: _scrollController,
-          itemCount: messages.length,
-          itemBuilder: (context, index) {
-            final message = messages[index];
-            final isSender = message['u1_id'] == widget.userId;
+      )
+          : messages.isEmpty
+          ? Center(
+        child: Text(
+          '메시지가 없습니다.',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
+      )
+          : ListView.builder(
+        controller: _scrollController,
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          final message = messages[index];
+          final isSender = message['u1_id'] == widget.userId;
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 5.0,
-                horizontal: 10.0,
-              ),
-              child: Align(
-                alignment: isSender
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
-                child: message['image'] != null
-                    ? _buildImageMessage(message, isSender)
-                    : _buildTextMessage(message, isSender),
-              ),
-            );
-          },
-        ),
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 5.0,
+              horizontal: 10.0,
+            ),
+            child: Align(
+              alignment: isSender
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: message['image'] != null
+                  ? _buildImageMessage(message, isSender)
+                  : _buildTextMessage(message, isSender),
+            ),
+          );
+        },
       ),
     );
   }

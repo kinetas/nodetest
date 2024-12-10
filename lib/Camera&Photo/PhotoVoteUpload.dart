@@ -31,14 +31,11 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
 
     final dio = Dio();
 
-    // API 엔드포인트 URL
     final url = 'http://54.180.54.31:3000/api/missions/missionVote';
 
     try {
-      // 세션 쿠키 가져오기
       String? sessionCookie = await SessionCookieManager.getSessionCookie();
 
-      // 이미지 파일 체크
       final file = File(widget.imagePath);
       if (!file.existsSync()) {
         setState(() {
@@ -47,16 +44,14 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
         return;
       }
 
-      // form-data 데이터 생성
       FormData formData = FormData.fromMap({
-        'm_id': widget.mId, // 미션 ID
+        'm_id': widget.mId,
         'c_image': await MultipartFile.fromFile(
           file.path,
-          filename: file.uri.pathSegments.last, // 파일 이름 설정
+          filename: file.uri.pathSegments.last,
         ),
       });
 
-      // 요청 전송
       Response response = await dio.post(
         url,
         data: formData,
@@ -68,7 +63,6 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
         ),
       );
 
-      // 응답 처리
       if (response.statusCode == 200) {
         setState(() {
           uploadMessage = "사진 업로드 성공!";
@@ -96,13 +90,16 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("투표 업로드 완료!"),
+          title: Text(
+            "투표 업로드 완료!",
+            style: TextStyle(color: Colors.lightBlue),
+          ),
           content: Text("투표 업로드가 성공적으로 완료되었습니다."),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // 다이얼로그 닫기
-                Navigator.pop(context); // 이전 화면으로 돌아가기
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: Text("확인"),
             ),
@@ -117,7 +114,7 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
       context: context,
       builder: (BuildContext context) {
         return GestureDetector(
-          onTap: () => Navigator.pop(context), // 클릭 시 다이얼로그 닫기
+          onTap: () => Navigator.pop(context),
           child: Dialog(
             backgroundColor: Colors.transparent,
             insetPadding: EdgeInsets.all(10),
@@ -137,37 +134,78 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("미션 투표 업로드"),
+        title: Text(
+          "미션 투표 업로드",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // 이미지 미리 보기 (클릭 시 확대)
-            Expanded(
-              child: GestureDetector(
-                onTap: _showImagePreview, // 이미지 클릭 시 확대 미리 보기
-                child: Image.file(
-                  File(widget.imagePath),
-                  fit: BoxFit.contain,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.lightBlue[100]!, Colors.white],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: _showImagePreview,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(
+                        File(widget.imagePath),
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 16),
-            // 업로드 버튼
-            ElevatedButton(
-              onPressed: isUploading
-                  ? null // 업로드 중일 경우 버튼 비활성화
-                  : _uploadPhotoWithDio,
-              child: isUploading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text("투표 업로드"),
-            ),
-            if (uploadMessage.isNotEmpty) ...[
               SizedBox(height: 16),
-              Text(uploadMessage, style: TextStyle(color: Colors.red)),
+              ElevatedButton(
+                onPressed: isUploading ? null : _uploadPhotoWithDio,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                  isUploading ? Colors.grey : Colors.lightBlue[400],
+                  minimumSize: Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: isUploading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                  "투표 업로드",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+              if (uploadMessage.isNotEmpty) ...[
+                SizedBox(height: 16),
+                Text(
+                  uploadMessage,
+                  style: TextStyle(color: Colors.red, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

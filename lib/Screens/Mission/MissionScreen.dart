@@ -50,12 +50,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
         backgroundColor: Colors.lightBlue,
         elevation: 2,
         actions: [
-          TextButton(
-            onPressed: () {
-              // 추천 기능 동작
-            },
-            child: Text('추천', style: TextStyle(color: Colors.white)),
-          ),
+
           IconButton(
             icon: Icon(Icons.bar_chart, color: Colors.white), // 달성률 아이콘
             onPressed: _showAchievementPanel,

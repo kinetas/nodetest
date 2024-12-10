@@ -24,12 +24,8 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
         'http://54.180.54.31:3000/api/missions/missions/created_req',
       );
 
-      print('Requested Missions Response Status Code: ${response.statusCode}');
-      print('Requested Missions Response Body: ${response.body}');
-
       if (response.statusCode == 200) {
         final List<dynamic> missions = jsonDecode(response.body)['missions'];
-        print('Total Missions Fetched: ${missions.length}'); // 총 미션 개수 출력
 
         setState(() {
           requestedMissions = missions.map((mission) {
@@ -42,36 +38,38 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
             };
           }).toList();
           isLoading = false;
-          print('Mapped Missions: $requestedMissions'); // 매핑된 미션 출력
         });
       } else {
         setState(() {
           isLoading = false;
         });
-        print('Failed to load requested missions. Status code: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      print('Error fetching requested missions: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightGreen.shade50, // 배경색 설정
+      backgroundColor: Colors.lightBlue[50], // 배경색 설정
       appBar: AppBar(
         title: Text(
-          '요청된 미션 목록',
+          '요청된 미션',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.green,
-        elevation: 2,
+        backgroundColor: Colors.lightBlue[400],
+        centerTitle: true,
+        elevation: 0,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator()) // 로딩 중
+          ? Center(
+        child: CircularProgressIndicator(
+          color: Colors.lightBlue[400],
+        ),
+      )
           : requestedMissions.isEmpty
           ? Center(
         child: Text(
@@ -83,12 +81,12 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
         itemCount: requestedMissions.length,
         itemBuilder: (context, index) {
           final mission = requestedMissions[index];
-          print('Displaying Mission: $mission'); // 출력할 미션 데이터 출력
           return Card(
-            elevation: 4,
-            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            elevation: 3,
+            margin:
+            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: ListTile(
               contentPadding: EdgeInsets.all(16),
@@ -96,19 +94,32 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
                 mission['m_title'], // 미션 제목
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 18,
                   color: Colors.blueGrey.shade900,
                 ),
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('마감일: ${formatDate(mission['m_deadline'])}'),
-                  Text('상태: ${mission['m_status']}'),
-                  Text('타겟: ${mission['t_title']}'),
+                  SizedBox(height: 4),
+                  Text(
+                    '마감일: ${formatDate(mission['m_deadline'])}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  Text(
+                    '상태: ${mission['m_status']}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
+                  Text(
+                    '타겟: ${mission['t_title']}',
+                    style: TextStyle(color: Colors.grey[700]),
+                  ),
                 ],
               ),
-              trailing: Icon(Icons.pending, color: Colors.orange),
+              trailing: Icon(
+                Icons.pending_actions,
+                color: Colors.orange,
+              ),
               onTap: () => _showMissionDialog(context, mission),
             ),
           );
@@ -123,7 +134,10 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("미션 처리"),
+          title: Text(
+            "미션 처리",
+            style: TextStyle(color: Colors.lightBlue[800]),
+          ),
           content: Text("미션 '${mission['m_title']}'를 처리하시겠습니까?"),
           actions: [
             TextButton(
@@ -131,14 +145,20 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
                 Navigator.pop(context); // 확인 창 닫기
                 _showConfirmationDialog(context, mission, '성공');
               },
-              child: Text("성공"),
+              child: Text(
+                "성공",
+                style: TextStyle(color: Colors.green),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // 확인 창 닫기
                 _showConfirmationDialog(context, mission, '실패');
               },
-              child: Text("실패"),
+              child: Text(
+                "실패",
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           ],
         );
@@ -147,12 +167,16 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
   }
 
   // 확인 메시지 창
-  void _showConfirmationDialog(BuildContext context, Map<String, dynamic> mission, String result) {
+  void _showConfirmationDialog(
+      BuildContext context, Map<String, dynamic> mission, String result) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("확인"),
+          title: Text(
+            "확인",
+            style: TextStyle(color: Colors.lightBlue[800]),
+          ),
           content: Text("정말 '${mission['m_title']}' 미션을 $result 처리하시겠습니까?"),
           actions: [
             TextButton(
@@ -160,11 +184,17 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
                 Navigator.pop(context); // 확인 창 닫기
                 _processMission(mission, result);
               },
-              child: Text("예"),
+              child: Text(
+                "예",
+                style: TextStyle(color: Colors.green),
+              ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context), // 확인 창 닫기
-              child: Text("아니오"),
+              child: Text(
+                "아니오",
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           ],
         );
@@ -173,7 +203,8 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
   }
 
   // 미션 처리 함수
-  Future<void> _processMission(Map<String, dynamic> mission, String result) async {
+  Future<void> _processMission(
+      Map<String, dynamic> mission, String result) async {
     final url = result == '성공'
         ? 'http://54.180.54.31:3000/api/missions/successMission'
         : 'http://54.180.54.31:3000/api/missions/failureMission';
@@ -190,7 +221,6 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
       );
 
       if (response.statusCode == 200) {
-        print("Mission processed successfully: $result");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("미션이 $result 처리되었습니다.")),
         );
@@ -198,13 +228,11 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
           requestedMissions.remove(mission); // 처리된 미션 제거
         });
       } else {
-        print("Failed to process mission. Status code: ${response.statusCode}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("미션 처리에 실패했습니다.")),
         );
       }
     } catch (e) {
-      print("Error processing mission: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("미션 처리 중 오류가 발생했습니다.")),
       );
@@ -217,7 +245,6 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
       final dateTime = DateTime.parse(dateString);
       return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
     } catch (e) {
-      print('Error parsing date: $e');
       return 'Invalid date';
     }
   }

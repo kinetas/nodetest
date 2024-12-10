@@ -47,6 +47,7 @@ class _MyMissionListState extends State<MyMissionList> {
               'created_date': mission['created_date'] ?? "알 수 없음",
               'updated_date': mission['updated_date'] ?? "알 수 없음",
               'priority': mission['priority'] ?? "알 수 없음",
+              'm_status': mission['m_status'] ?? "알 수 없음",
             };
           }).toList();
           isLoading = false;
@@ -142,10 +143,21 @@ class _MyMissionListState extends State<MyMissionList> {
         );
       }
 
-      missionWidgets.add(MissionCard(
-        mission: mission,
-        currentUserId: currentUserId,
-      ));
+      // 미션 상태 확인
+      final isRequestStatus = mission['m_status'] == "요청";
+
+      missionWidgets.add(
+        AbsorbPointer(
+          absorbing: isRequestStatus, // 상태가 "요청"이면 클릭 비활성화
+          child: Opacity(
+            opacity: isRequestStatus ? 0.5 : 1.0, // 상태가 "요청"이면 반투명 처리
+            child: MissionCard(
+              mission: mission,
+              currentUserId: currentUserId,
+            ),
+          ),
+        ),
+      );
     }
 
     return ListView(

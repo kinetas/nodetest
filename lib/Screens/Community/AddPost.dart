@@ -92,8 +92,10 @@ class _AddPostState extends State<AddPost> {
     return Scaffold(
       appBar: AppBar(
         title: Text('게시글 생성'),
+        backgroundColor: Colors.lightBlue[300],
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +104,11 @@ class _AddPostState extends State<AddPost> {
               controller: _titleController,
               decoration: InputDecoration(
                 labelText: '제목',
+                labelStyle: TextStyle(color: Colors.lightBlue[800]),
                 border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.lightBlue[300]!, width: 2),
+                ),
               ),
               style: TextStyle(fontSize: 20),
               maxLength: 100,
@@ -113,8 +119,12 @@ class _AddPostState extends State<AddPost> {
               decoration: InputDecoration(
                 labelText: '내용',
                 hintText: '어떤 미션을 수행하고 싶은지 자세히 설명해주세요!',
-                hintStyle: TextStyle(color: Colors.grey), // 연한 글씨
+                hintStyle: TextStyle(color: Colors.grey),
+                labelStyle: TextStyle(color: Colors.lightBlue[800]),
                 border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.lightBlue[300]!, width: 2),
+                ),
               ),
               maxLines: 5,
               maxLength: 500, // 500자 제한
@@ -125,20 +135,24 @@ class _AddPostState extends State<AddPost> {
                 Expanded(
                   child: Text(
                     _deadline == null ? '마감 시간을 설정하세요.' : '마감 시간: $_deadline',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
                   ),
                 ),
                 ElevatedButton(
                   onPressed: _selectDeadline,
                   child: Text('마감 시간 설정'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightBlue[300],
+                  ),
                 ),
               ],
             ),
             Spacer(),
             ElevatedButton(
               onPressed: _onCreatePressed,
-              child: Text('생성'),
+              child: Text('생성', style: TextStyle(fontSize: 18)),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue[300],
                 minimumSize: Size(double.infinity, 50),
               ),
             ),

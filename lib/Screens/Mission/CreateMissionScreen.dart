@@ -39,15 +39,25 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
       );
 
       if (response.statusCode == 200) {
-        print('Mission created successfully!');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('미션이 성공적으로 생성되었습니다!')),
-        );
-        Navigator.pop(context); // 이전 화면으로 이동
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          print('Mission created successfully!');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('미션이 성공적으로 생성되었습니다!')),
+          );
+          Navigator.pop(context); // 이전 화면으로 이동
+        } else {
+          print('Mission creation failed: ${responseData['message'] ?? 'Unknown error'}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('미션 생성 실패: ${responseData['message'] ?? '알 수 없는 오류'}'),
+            ),
+          );
+        }
       } else {
         print('Failed to create mission: ${response.body}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('미션 생성에 실패했습니다. 다시 시도해주세요.')),
+          SnackBar(content: Text('서버 오류로 미션 생성에 실패했습니다. 다시 시도해주세요.')),
         );
       }
     } catch (error) {

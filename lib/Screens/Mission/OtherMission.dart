@@ -40,13 +40,14 @@ class _OtherMissionState extends State<OtherMission> with SingleTickerProviderSt
           indicatorWeight: 3,
           tabs: [
             Tab(
+              text: '인증 요청 미션',
+              icon: Icon(Icons.check_circle_outline), // 두 번째 탭 아이콘
+            ),
+            Tab(
               text: '부여한 미션',
               icon: Icon(Icons.list_alt), // 첫 번째 탭 아이콘
             ),
-            Tab(
-              text: '완료된 미션',
-              icon: Icon(Icons.check_circle_outline), // 두 번째 탭 아이콘
-            ),
+
           ],
         ),
       ),
@@ -61,8 +62,9 @@ class _OtherMissionState extends State<OtherMission> with SingleTickerProviderSt
         child: TabBarView(
           controller: _tabController,
           children: [
-            GiveMissionList(), // 부여한 미션 탭 연결
+
             RequestedMissionScreen(), // 부여한 미션 중 완료된 탭 연결
+            GiveMissionList(), // 부여한 미션 탭 연결
           ],
         ),
       ),

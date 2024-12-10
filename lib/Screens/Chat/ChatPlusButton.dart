@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../Mission/MissionScreen.dart'; // MissionScreen import
-import '../../Screens/Mission/YouAndIMissionList.dart';
+import '../Mission/MyMission/MyMissionList.dart'; // MyMissionList import
+import '../Mission/RequestedMissionList.dart'; // RequestedMissionList import
+import '../Mission/GiveMissionList.dart'; // GiveMissionList import
+import '../Mission/MyMission/MyCompleteMissionList.dart'; // MyCompleteMissionList import
 
 class ChatPlusButton extends StatelessWidget {
   final Map<String, dynamic> roomData; // roomData 전달받기
@@ -27,26 +29,43 @@ class ChatPlusButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            _buildCircleButton(
-              context,
-              Icons.add,
-              '미션 만들기',
-                  () => _navigateToScreen(context, MissionScreen()),
-            ),
-            _buildCircleButton(
-              context,
-              Icons.check_circle,
-              '미션 인증',
-                  () => _navigateToScreen(
-                context,
-                YouAndIMissionList(
-                  rId: roomData['r_id'], // roomData에서 rId 가져오기
-                  u2Id: roomData['u2_id'], // roomData에서 u2Id 가져오기
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildCircleButton(
+                  context,
+                  Icons.assignment,
+                  '내 미션',
+                      () => _navigateToScreen(context, MyMissionList()),
                 ),
-              ),
+                _buildCircleButton(
+                  context,
+                  Icons.pending_actions,
+                  '인증 요청 미션',
+                      () => _navigateToScreen(context, RequestedMissionScreen()),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildCircleButton(
+                  context,
+                  Icons.assignment_ind,
+                  '부여한 미션',
+                      () => _navigateToScreen(context, GiveMissionList()),
+                ),
+                _buildCircleButton(
+                  context,
+                  Icons.check,
+                  '내가 완료한 미션',
+                      () => _navigateToScreen(context, MyCompleteMissionList()),
+                ),
+              ],
             ),
           ],
         ),

@@ -36,7 +36,6 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
     try {
       final response = await SessionCookieManager.get(url);
 
-      print('Response status code: ${response.statusCode}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final vote = data['votes']?.firstWhere(
@@ -45,7 +44,6 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
         );
 
         if (vote != null) {
-          print('Vote found: $vote');
           setState(() {
             title = vote['c_title'] ?? "제목 없음";
             content = vote['c_contents'] ?? "내용 없음";
@@ -53,21 +51,16 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
             bad = vote['c_bad'] ?? 0;
             deletedate = vote['c_deletedate'] ?? "날짜 없음";
 
-            // 이미지 데이터 처리
             if (vote['c_image'] != null && vote['c_image']['data'] != null) {
               try {
                 imageData = Uint8List.fromList(List<int>.from(vote['c_image']['data']));
-                print('Image data processed successfully');
               } catch (e) {
-                print('Error processing image data: $e');
                 imageData = null;
               }
             } else {
-              print('No image data found');
               imageData = null;
             }
 
-            // 삭제 날짜 처리
             try {
               if (deletedate != "날짜 없음") {
                 deletedate = DateTime.parse(deletedate)
@@ -76,14 +69,12 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
                     .split(' ')[0];
               }
             } catch (e) {
-              print('Error parsing date: $e');
               deletedate = "날짜 없음";
             }
 
             isLoading = false;
           });
         } else {
-          print('No matching vote found');
           setState(() {
             isLoading = false;
           });
@@ -92,7 +83,6 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
           );
         }
       } else {
-        print('Failed to fetch vote content: Status code ${response.statusCode}');
         setState(() {
           isLoading = false;
         });
@@ -101,53 +91,10 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
         );
       }
     } catch (e) {
-      print('Error fetching vote content: $e');
       setState(() {
         isLoading = false;
       });
     }
-  }
-
-  Future<void> fetchImage(String imageUrl) async {
-    print('Starting to fetch image from: $imageUrl');
-    try {
-      final response = await _dio.get(
-        imageUrl,
-        options: Options(responseType: ResponseType.bytes),
-      );
-      print('Image response status code: ${response.statusCode}');
-      if (response.statusCode == 200) {
-        print('Image fetched successfully');
-        setState(() {
-          imageData = Uint8List.fromList(response.data);
-        });
-      } else {
-        print('Failed to load image: Status code ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching image: $e');
-    }
-  }
-
-  void showImageDialog(Uint8List imageData) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        insetPadding: EdgeInsets.all(10),
-        child: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: InteractiveViewer(
-            panEnabled: true,
-            minScale: 0.5,
-            maxScale: 5.0,
-            child: Image.memory(
-              imageData,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Future<void> postVote(String action) async {
@@ -158,7 +105,7 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
     });
 
     setState(() {
-      isButtonDisabled = true; // 버튼 비활성화
+      isButtonDisabled = true;
     });
 
     try {
@@ -167,9 +114,6 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-
-      print('Response status code: ${response.statusCode}');
-      print('Response body: ${response.body}'); // 응답 내용 출력
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -186,117 +130,133 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('투표 반영에 실패했습니다. 상태 코드: ${response.statusCode}'),
-          ),
+          SnackBar(content: Text('투표 반영에 실패했습니다. 상태 코드: ${response.statusCode}')),
         );
         setState(() {
-          isButtonDisabled = false; // 실패 시 버튼 다시 활성화
+          isButtonDisabled = false;
         });
       }
     } catch (e) {
-      print('Error posting vote: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
       );
       setState(() {
-        isButtonDisabled = false; // 실패 시 버튼 다시 활성화
+        isButtonDisabled = false;
       });
     }
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('투표 상세보기'),
+        backgroundColor: Colors.lightBlue,
+        title: Text(
+          '투표 상세보기',
+          style: TextStyle(color: Colors.white),
+        ),
+        elevation: 2,
       ),
+      backgroundColor: Colors.lightBlue.shade50,
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 제목
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 16),
-
-              // 내용
-              Text(
-                content,
-                style: TextStyle(fontSize: 16),
-              ),
-              SizedBox(height: 16),
-
-              // 찬성/반대 카운트
-              Text(
-                "찬성: $good, 반대: $bad",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              SizedBox(height: 16),
-
-              // 삭제 예정일
-              Text(
-                "삭제 예정일: $deletedate",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-              SizedBox(height: 16),
-
-              // 이미지 출력
-              if (imageData != null)
-                GestureDetector(
-                  onTap: () => showImageDialog(imageData!),
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 16),
-                    height: 200,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.memory(
-                        imageData!,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                Text(
-                  '이미지가 없습니다.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-
-              // 찬성/반대 버튼
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          child: Card(
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton(
-                    onPressed:
-                    isButtonDisabled ? null : () => postVote('good'),
-                    child: Text('찬성'),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey.shade900,
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed:
-                    isButtonDisabled ? null : () => postVote('bad'),
-                    child: Text('반대'),
+                  SizedBox(height: 16),
+                  Text(
+                    content,
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey.shade700),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "찬성: $good, 반대: $bad",
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "삭제 예정일: $deletedate",
+                    style: TextStyle(fontSize: 16, color: Colors.blueGrey),
+                  ),
+                  SizedBox(height: 16),
+                  if (imageData != null)
+                    GestureDetector(
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (_) => Dialog(
+                          child: Image.memory(imageData!),
+                        ),
+                      ),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(vertical: 16),
+                        height: 200,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.memory(
+                            imageData!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      '이미지가 없습니다.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightBlue,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: isButtonDisabled ? null : () => postVote('good'),
+                        child: Text('찬성'),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: isButtonDisabled ? null : () => postVote('bad'),
+                        child: Text('반대'),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
-  }
+}

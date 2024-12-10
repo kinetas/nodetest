@@ -71,11 +71,17 @@ class _AddVoteState extends State<AddVote> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('투표 생성'),
+        title: Text(
+          '투표 생성',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.lightBlue[400],
+        elevation: 0,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
+          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
+          : Container(
+        color: Colors.lightBlue[50],
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,9 +90,18 @@ class _AddVoteState extends State<AddVote> {
               controller: _titleController,
               decoration: InputDecoration(
                 labelText: '투표 제목',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: Colors.lightBlue[800]),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.lightBlue[400]!, width: 2),
+                ),
               ),
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 18),
               maxLength: 100, // 최대 100자
             ),
             SizedBox(height: 16),
@@ -95,7 +110,17 @@ class _AddVoteState extends State<AddVote> {
               decoration: InputDecoration(
                 labelText: '투표 내용',
                 hintText: '투표 내용을 입력하세요.',
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(color: Colors.grey),
+                labelStyle: TextStyle(color: Colors.lightBlue[800]),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.lightBlue[400]!, width: 2),
+                ),
               ),
               maxLines: 5, // 여러 줄 입력 가능
               maxLength: 500, // 최대 500자
@@ -103,9 +128,16 @@ class _AddVoteState extends State<AddVote> {
             Spacer(),
             ElevatedButton(
               onPressed: onSubmit,
-              child: Text('생성'),
+              child: Text(
+                '생성',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
               style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lightBlue[400],
                 minimumSize: Size(double.infinity, 50), // 버튼 크기
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
               ),
             ),
           ],

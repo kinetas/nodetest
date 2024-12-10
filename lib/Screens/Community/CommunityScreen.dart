@@ -47,40 +47,39 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('커뮤니티'),
+        title: Text(
+          '커뮤니티',
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+        backgroundColor: Colors.lightBlue[400],
         actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // 알림 기능 추가
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // 검색 기능 추가
-            },
-          ),
           if (_tabController.index == 0 || _tabController.index == 1) // 게시판(0) 또는 미션투표(1)에서만 + 버튼 표시
             IconButton(
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.add, color: Colors.white),
               onPressed: _onAddButtonPressed, // + 버튼 클릭 시 동작
             ),
         ],
         bottom: TabBar(
           controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
           tabs: [
             Tab(text: '게시판'),
             Tab(text: '미션투표'),
           ],
         ),
+        elevation: 0, // 그림자 제거로 깔끔한 디자인
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          CommunityPostList(), // CommunityPostList 클래스를 게시판 탭으로 설정
-          CommunityVoteList(), // 미션투표 탭은 별도의 클래스로 분리
-        ],
+      body: Container(
+        color: Colors.lightBlue[50],
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            CommunityPostList(), // CommunityPostList 클래스를 게시판 탭으로 설정
+            CommunityVoteList(), // 미션투표 탭은 별도의 클래스로 분리
+          ],
+        ),
       ),
     );
   }

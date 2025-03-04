@@ -8,6 +8,7 @@ const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추�
 const CVote = require('../models/comunity_voteModel');
 const User = require('../models/userModel');
 const resultController = require('../controllers/resultController'); // resultController 가져오기
+const roomController = require('../controllers/roomController');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
@@ -54,7 +55,7 @@ exports.createMission = async (req, res) => {
         if (assignedU2Id === u1_id) {
             // 자신에게 미션 생성 시
             const missionAuthenticationAuthority = authenticationAuthority || u1_id;
-
+            // 3-1. 인증권한자가 미션생성자가 아닌 경우
             if (missionAuthenticationAuthority !== u1_id) {
                 const isFriend = await IFriend.findOne({
                     where: { u_id: u1_id, f_id: missionAuthenticationAuthority },
@@ -66,7 +67,53 @@ exports.createMission = async (req, res) => {
                         message: '인증 권한자로 선택된 사용자가 친구 목록에 없습니다.',
                     });
                 }
+
+                const room = await Room.findOne({
+                    where: {
+                        u1_id: assignedU2Id,
+                        u2_id: missionAuthenticationAuthority,
+                        r_type: 'general',
+                    }
+                });
+
+                if (!room){
+                    const newRoom = await roomController.initAddRoom({
+                        body: { u1_id: assignedU2Id, roomName: `${assignedU2Id}-${missionAuthenticationAuthority}` },
+                    });
+                    if (!newRoom.success) {
+                        return res.status(500).json({ success: false, message: '방 생성 실패.' });
+                    }
+                }
+
+                // 미션 생성
+                await Mission.create({
+                    m_id: uuidv4(),
+                    u1_id,
+                    u2_id: assignedU2Id,    // 입력받은 u2_id 또는 u1_id를 저장
+                    m_title,
+                    m_deadline,
+                    m_reword,
+                    m_status: '진행중',
+                    r_id: room.r_id, // Room ID를 저장
+                    m_extended: false,
+                    missionAuthenticationAuthority,
+                });
+
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+            
+                const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
+                    u1_id,
+                    missionAuthenticationAuthority,
+                );
+
+                if(!sendMissionCreateAuthenticationNotification){
+                    return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
+                }
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+
+                return res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
+            // 3-2. 인증권한자가 미션생성자인 경우
             // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
             const room = await Room.findOne({
                 where: {
@@ -82,17 +129,7 @@ exports.createMission = async (req, res) => {
             const missionId = uuidv4();
             let stat = "진행중";
 
-            // ================ 알림 추가 - 디바이스 토큰 =======================
             
-            const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
-                u1_id,
-                missionAuthenticationAuthority,
-            );
-
-            if(!sendMissionCreateAuthenticationNotification){
-                return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
-            }
-            // ================ 알림 추가 - 디바이스 토큰 =======================
 
             // 미션 생성
             await Mission.create({
@@ -105,12 +142,13 @@ exports.createMission = async (req, res) => {
                 m_status: stat,
                 r_id: room.r_id, // Room ID를 저장
                 m_extended: false,
-                missionAuthenticationAuthority,
+                missionAuthenticationAuthority: u1_id,
             });
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
             // 다른 사용자에게 미션 생성 시
+            // 4. 타인에게 미션 생성
             if (authenticationAuthority && authenticationAuthority !== u1_id) {
                 return res.status(400).json({
                     success: false,
@@ -121,7 +159,8 @@ exports.createMission = async (req, res) => {
             const room = await Room.findOne({
                 where: {
                     u1_id,
-                    u2_id: assignedU2Id
+                    u2_id: assignedU2Id,
+                    r_type: 'general',
                 }
             });
 
@@ -297,6 +336,48 @@ exports.getCreatedMissions = async (req, res) => {
                 u1_id: userId, // 미션을 부여한 사용자
                 u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
                 m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만
+            },
+        });
+
+        // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
+        const missionsWithRoomTitle = await Promise.all(
+            createdMissions.map(async (mission) => {
+                const room = await Room.findOne({
+                    where: { r_id: mission.r_id },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: mission.m_status,
+                    r_id: mission.r_id,
+                    r_title: room ? room.r_title : '없음',
+                    u1_id: mission.u1_id,
+                    u2_id: mission.u2_id,
+                };
+            })
+        );
+
+        // 3. 결과 응답
+        res.json({ missions: missionsWithRoomTitle });
+    } catch (error) {
+        console.error('자신이 부여한 미션 조회 오류:', error);
+        res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+    }
+};
+
+// 자신이 부여한 미션 목록 / 요청 (u1_id = userId)(방 이름 포함)
+exports.getCreatedMissionsReq = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        // 1. 자신이 부여한 미션 가져오기
+        const createdMissions = await Mission.findAll({
+            where: {
+                u1_id: userId, // 미션을 부여한 사용자
+                u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
+                m_status: { [Op.or]: ['요청'] }, // "요청"인 미션만
             },
         });
 
@@ -977,6 +1058,7 @@ exports.getRequestedSelfMissions = async (req, res) => {
 exports.requestVoteForMission = async (req, res) => {
     const { m_id } = req.body;
     const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리
+    // const c_image = req.file ? req.file : null;
 
     if (!m_id) {
         return res.status(400).json({ success: false, message: '미션 ID가 누락되었습니다.' });

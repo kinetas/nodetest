@@ -10,7 +10,7 @@ const sequelize = new Sequelize(
   {
     host: process.env.DATABASE_HOST,
     dialect: 'mysql',
-    port: 3306,
+    port: process.env.DATABASE_PORT,
     timezone: '+09:00', // KST 시간대 설정 추가
     // dialectOptions: {
     //   timezone: 'Asia/Seoul', // MySQL 서버와의 시간대 동기화

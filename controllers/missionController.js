@@ -98,6 +98,19 @@ exports.createMission = async (req, res) => {
                     m_extended: false,
                     missionAuthenticationAuthority,
                 });
+
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+            
+                const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
+                    u1_id,
+                    missionAuthenticationAuthority,
+                );
+
+                if(!sendMissionCreateAuthenticationNotification){
+                    return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
+                }
+                // ================ 알림 추가 - 디바이스 토큰 =======================
+
                 return res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
             // 3-2. 인증권한자가 미션생성자인 경우
@@ -116,17 +129,7 @@ exports.createMission = async (req, res) => {
             const missionId = uuidv4();
             let stat = "진행중";
 
-            // ================ 알림 추가 - 디바이스 토큰 =======================
             
-            const sendMissionCreateAuthenticationNotification = await notificationController.sendMissionCreateAuthenticationNotification(
-                u1_id,
-                missionAuthenticationAuthority,
-            );
-
-            if(!sendMissionCreateAuthenticationNotification){
-                return res.status(400).json({ success: false, message: '미션 생성 알림 전송을 실패했습니다.' });
-            }
-            // ================ 알림 추가 - 디바이스 토큰 =======================
 
             // 미션 생성
             await Mission.create({
@@ -333,6 +336,48 @@ exports.getCreatedMissions = async (req, res) => {
                 u1_id: userId, // 미션을 부여한 사용자
                 u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
                 m_status: { [Op.or]: ['진행중', '요청'] }, // "진행중" 또는 "요청"인 미션만
+            },
+        });
+
+        // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
+        const missionsWithRoomTitle = await Promise.all(
+            createdMissions.map(async (mission) => {
+                const room = await Room.findOne({
+                    where: { r_id: mission.r_id },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: mission.m_status,
+                    r_id: mission.r_id,
+                    r_title: room ? room.r_title : '없음',
+                    u1_id: mission.u1_id,
+                    u2_id: mission.u2_id,
+                };
+            })
+        );
+
+        // 3. 결과 응답
+        res.json({ missions: missionsWithRoomTitle });
+    } catch (error) {
+        console.error('자신이 부여한 미션 조회 오류:', error);
+        res.status(500).json({ message: '부여한 미션을 불러오는데 실패했습니다.' });
+    }
+};
+
+// 자신이 부여한 미션 목록 / 요청 (u1_id = userId)(방 이름 포함)
+exports.getCreatedMissionsReq = async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+
+        // 1. 자신이 부여한 미션 가져오기
+        const createdMissions = await Mission.findAll({
+            where: {
+                u1_id: userId, // 미션을 부여한 사용자
+                u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
+                m_status: { [Op.or]: ['요청'] }, // "요청"인 미션만
             },
         });
 

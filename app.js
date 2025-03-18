@@ -30,6 +30,7 @@ const roomController = require('./controllers/roomController');
 
 // // ======== ?��?�� JWT ============
 const jwt = require('jsonwebtoken'); // JWT 추�??
+const requireAuth = require('./middleware/loginRequired'); // JWT 미들웨어 추가
 // const requireAuth = require('./middleware/authMiddleware');
 
 const cors = require('cors');
@@ -176,10 +177,10 @@ app.use('/api/auth', timeConverterMiddleware, authRoutes);
 app.use('/dashboard', timeConverterMiddleware, missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
 
 // app.use('/api/rooms', roomRoutes);
-app.use('/api/rooms', timeConverterMiddleware, roomRoutes);
+app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes);
 
 // app.use('/api/missions', missionRoutes); // 미션 �????�� ?��?��?�� ?���???
-app.use('/api/missions', timeConverterMiddleware, missionRoutes); // 미션 �????�� ?��?��?�� ?���???
+app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); // 미션 �????�� ?��?��?�� ?���???
 
 // app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
 app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???

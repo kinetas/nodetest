@@ -26,7 +26,7 @@ class _YouAndIMissionListState extends State<YouAndIMissionList> {
     try {
       // 서버 호출
       final response = await http.get(
-        Uri.parse('http://example.com/api/missions?rid=${widget.rId}&u2id=${widget.u2Id}'),
+        Uri.parse('http://27.113.11.48:3000/api/missions?rid=${widget.rId}&u2id=${widget.u2Id}'),
       );
 
       if (response.statusCode == 200) {

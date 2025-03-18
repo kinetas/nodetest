@@ -14,7 +14,7 @@ class _AddVoteState extends State<AddVote> {
 
   // POST 요청 함수
   Future<void> createVote() async {
-    final url = 'http://54.180.54.31:3000/api/cVote/create';
+    final url = 'http://27.113.11.48:3000/api/cVote/create';
     final body = json.encode({
       "c_title": _titleController.text,
       "c_contents": _contentController.text,

@@ -31,7 +31,7 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
 
     final dio = Dio();
 
-    final url = 'http://54.180.54.31:3000/api/missions/missionVote';
+    final url = 'http://27.113.11.48:3000/api/missions/missionVote';
 
     try {
       String? sessionCookie = await SessionCookieManager.getSessionCookie();

@@ -18,7 +18,7 @@ void main() async {
 // 세션 쿠키를 활용한 로그인 상태 확인 함수
 Future<bool> checkLoginStatus() async {
   try {
-    final response = await SessionCookieManager.get("http://54.180.54.31:3000/api/session/check");
+    final response = await SessionCookieManager.get("http://27.113.11.48:3000/api/session/check");
     if (response.statusCode == 200) {
       // 세션이 유효한 경우 로그인 상태로 간주
       final data = json.decode(response.body);

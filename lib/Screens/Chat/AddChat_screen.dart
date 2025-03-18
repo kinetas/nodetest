@@ -17,7 +17,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
   bool _isLoading = false;
 
   Future<void> _createChatRoom() async {
-    const String apiUrl = 'http://54.180.54.31:3000/api/rooms';
+    const String apiUrl = 'http://27.113.11.48:3000/api/rooms';
 
     try {
       setState(() => _isLoading = true);

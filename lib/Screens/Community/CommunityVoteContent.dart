@@ -31,7 +31,7 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
   }
 
   Future<void> fetchVoteContent() async {
-    final url = 'http://54.180.54.31:3000/api/cVote/';
+    final url = 'http://27.113.11.48:3000/api/cVote/';
 
     try {
       final response = await SessionCookieManager.get(url);
@@ -98,7 +98,7 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
   }
 
   Future<void> postVote(String action) async {
-    final url = 'http://54.180.54.31:3000/api/cVote/action';
+    final url = 'http://27.113.11.48:3000/api/cVote/action';
     final body = json.encode({
       "c_number": widget.cNumber,
       "action": action,

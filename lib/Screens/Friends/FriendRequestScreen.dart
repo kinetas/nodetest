@@ -22,7 +22,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
   Future<void> _fetchReceivedRequests() async {
     try {
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/dashboard/friends/tfriends',
+        'http://27.113.11.48:3000/dashboard/friends/tfriends',
       );
 
       if (response.statusCode == 200) {
@@ -51,8 +51,8 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
   // 친구 요청 수락 또는 거절
   Future<void> _handleRequest(String friendId, bool accept) async {
     final url = accept
-        ? 'http://54.180.54.31:3000/dashboard/friends/accept'
-        : 'http://54.180.54.31:3000/dashboard/friends/reject';
+        ? 'http://27.113.11.48:3000/dashboard/friends/accept'
+        : 'http://27.113.11.48:3000/dashboard/friends/reject';
 
     try {
       final response = await SessionCookieManager.post(

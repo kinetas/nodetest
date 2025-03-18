@@ -21,7 +21,7 @@ class SettingsScreen extends StatelessWidget {
     try {
       // 로그아웃 API 호출
       final response = await SessionCookieManager.post(
-        'http://54.180.54.31:3000/api/auth/logout',
+        'http://27.113.11.48:3000/api/auth/logout',
         headers: {
           'Content-Type': 'application/json',
         },

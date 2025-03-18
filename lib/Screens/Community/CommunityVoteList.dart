@@ -19,7 +19,7 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
   }
 
   Future<void> fetchVotes() async {
-    final url = 'http://54.180.54.31:3000/api/cVote/';
+    final url = 'http://27.113.11.48:3000/api/cVote/';
 
     try {
       final response = await SessionCookieManager.get(url);

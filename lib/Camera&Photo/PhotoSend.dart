@@ -219,7 +219,7 @@ class _PhotoSendState extends State<PhotoSend> {
                     children: [
                       ElevatedButton(
                         onPressed: _sendMessage,
-                        child: Text("Send"),
+                        child: Text("사진 보내기"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.lightBlue[400],
                           minimumSize: Size(120, 50),

@@ -23,7 +23,7 @@ class _MyMissionListState extends State<MyMissionList> {
   Future<void> fetchMissions() async {
     try {
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/api/missions/missions/assigned',
+        'http://27.113.11.48:3000/api/missions/missions/assigned',
       );
 
       if (response.statusCode == 200) {

@@ -29,7 +29,7 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
   }
 
   Future<void> fetchPostContent() async {
-    final url = 'http://54.180.54.31:3000/api/comumunity_missions/list';
+    final url = 'http://27.113.11.48:3000/api/comumunity_missions/list';
 
     try {
       final response = await SessionCookieManager.get(url);
@@ -69,7 +69,7 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
   }
 
   Future<void> acceptMission() async {
-    final url = 'http://54.180.54.31:3000/api/comumunity_missions/accept';
+    final url = 'http://27.113.11.48:3000/api/comumunity_missions/accept';
     final body = json.encode({"cr_num": widget.crNum});
 
     try {

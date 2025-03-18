@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // 서버 요청
       final response = await http.post(
-        Uri.parse('http://54.180.54.31:3000/api/auth/login'),
+        Uri.parse('http://27.113.11.48:3000/api/auth/login'),
         headers: headers,
         body: body,
       );

@@ -20,7 +20,7 @@ class _CommunityPostListState extends State<CommunityPostList> {
 
   Future<void> fetchMissions() async {
     try {
-      final url = 'http://54.180.54.31:3000/api/comumunity_missions/list';
+      final url = 'http://27.113.11.48:3000/api/comumunity_missions/list';
 
       final response = await SessionCookieManager.get(url);
 

@@ -39,7 +39,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     print('Initializing socket for room: ${widget.roomData['r_id']}');
 
     socket = IO.io(
-      'http://54.180.54.31:3001',
+      'http://27.113.11.48:3001',
       IO.OptionBuilder()
           .setTransports(['websocket']) // WebSocket 사용
           .disableAutoConnect()

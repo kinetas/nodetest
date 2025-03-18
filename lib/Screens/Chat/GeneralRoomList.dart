@@ -21,7 +21,7 @@ class _GeneralRoomListState extends State<GeneralRoomList> {
 
   Future<void> fetchGeneralRooms() async {
     try {
-      final url = 'http://54.180.54.31:3000/api/rooms';
+      final url = 'http://27.113.11.48:3000/api/rooms';
       final response = await SessionCookieManager.get(url);
 
       if (response.statusCode == 200) {

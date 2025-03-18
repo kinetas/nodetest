@@ -8,7 +8,7 @@ class DeleteChatDialog extends StatelessWidget {
   const DeleteChatDialog({required this.u2Id, Key? key}) : super(key: key);
 
   Future<void> _deleteChat(BuildContext context) async {
-    final String apiUrl = 'http://54.180.54.31:3000/api/rooms/$u2Id';
+    final String apiUrl = 'http://27.113.11.48:3000/api/rooms/$u2Id';
 
     try {
       final response = await SessionCookieManager.delete(apiUrl);

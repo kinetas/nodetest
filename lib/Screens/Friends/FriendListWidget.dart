@@ -29,7 +29,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
   Future<void> _fetchFriends() async {
     try {
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/dashboard/friends/ifriends',
+        'http://27.113.11.48:3000/dashboard/friends/ifriends',
       );
 
       if (response.statusCode == 200) {

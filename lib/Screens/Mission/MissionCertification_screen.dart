@@ -17,7 +17,7 @@ class _MissionCertificationScreenState
   bool _isLoading = true; // 로딩 상태
 
   Future<void> sendMissionRequest() async {
-    final String url = "http://54.180.54.31:3000/api/missions/missionRequest";
+    final String url = "http://27.113.11.48:3000/api/missions/missionRequest";
 
     try {
       // POST 요청

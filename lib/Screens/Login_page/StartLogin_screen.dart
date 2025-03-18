@@ -30,7 +30,7 @@ class StartLoginScreen extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    '밥 먹었니?',
+                    '챌린지업',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,

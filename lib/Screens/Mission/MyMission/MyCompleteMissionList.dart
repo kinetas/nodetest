@@ -22,7 +22,7 @@ class _MyCompleteMissionListState extends State<MyCompleteMissionList> {
     try {
       // SessionCookieManager를 활용하여 API 호출
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/api/missions/missions/completed',
+        'http://27.113.11.48:3000/api/missions/missions/completed',
       );
 
       if (response.statusCode == 200) {

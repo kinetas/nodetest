@@ -8,7 +8,7 @@ class FriendClick extends StatelessWidget {
   const FriendClick({required this.friendId});
 
   Future<void> _deleteFriend(BuildContext context) async {
-    final String apiUrl = 'http://54.180.54.31:3000/dashboard/friends/delete';
+    final String apiUrl = 'http://27.113.11.48:3000/dashboard/friends/delete';
 
     try {
       final response = await SessionCookieManager.delete(

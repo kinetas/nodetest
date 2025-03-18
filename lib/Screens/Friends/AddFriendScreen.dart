@@ -44,7 +44,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   Future<void> _fetchSentRequests() async {
     try {
       final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/dashboard/friends/tfriends',
+        'http://27.113.11.48:3000/dashboard/friends/tfriends',
       );
 
       if (response.statusCode == 200) {
@@ -96,7 +96,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse("http://54.180.54.31:3000/dashboard/friends/request"),
+        Uri.parse("http://27.113.11.48:3000/dashboard/friends/request"),
         headers: headers,
         body: jsonEncode({"f_id": friendId}),
       );

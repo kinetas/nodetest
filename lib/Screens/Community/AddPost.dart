@@ -15,7 +15,7 @@ class _AddPostState extends State<AddPost> {
 
   // POST 요청 함수
   Future<void> _createPost() async {
-    final url = 'http://54.180.54.31:3000/api/comumunity_missions/create';
+    final url = 'http://27.113.11.48:3000/api/comumunity_missions/create';
     final body = json.encode({
       "cr_title": _titleController.text,
       "contents": _contentController.text,

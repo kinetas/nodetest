@@ -99,12 +99,12 @@ app.post('/api/rooms/enter', roomController.enterRoom);
 
 
 // �꽭��?? �씤利� 誘몃뱾�?���뼱
-const requireAuth = (req, res, next) => {
-    if (!req.session.user) {
-        return res.status(401).json({ message: '濡쒓?���씤�씠 �븘�슂��??�땲�떎.' });
-    }
-    next();
-};
+// const requireAuth = (req, res, next) => {
+//     if (!req.session.user) {
+//         return res.status(401).json({ message: '濡쒓?���씤�씠 �븘�슂��??�땲�떎.' });
+//     }
+//     next();
+// };
 
 
 

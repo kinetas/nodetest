@@ -1,0 +1,14 @@
+FROM node:18
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+# pm2 설치
+RUN npm install -g pm2
+
+COPY . .
+
+# pm2로 여러 앱 실행
+CMD ["pm2-runtime", "ecosystem.config.js"]

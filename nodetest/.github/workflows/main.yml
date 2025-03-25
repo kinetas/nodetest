@@ -1,0 +1,121 @@
+name: Deploy to Amazon EC2
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET_NAME: universty-assignment-test-bucket
+  CODE_DEPLOY_APPLICATION_NAME: test
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: universty-assignment-test-bucket-deploy-group
+  DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+  DATABASE_USER: ${{ secrets.DATABASE_USERNAME }}
+  DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+  DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+  REMOTE_IP: ${{ secrets.REMOTE_IP }}  # EC2의 IP
+  REMOTE_USER: ${{ secrets.REMOTE_USER }}  # EC2 사용자 이름
+  # JWT_EXPIRES_IN: 1d  # JWT 만료 시간
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4.0.2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+# ============ 수정 JWT =======================
+    #  # Generate JWT_SECRET dynamically
+    # - name: Generate JWT_SECRET
+    #   id: generate_secret
+    #   run: |
+    #     JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(64).toString('hex'))")
+    #     echo "JWT_SECRET=$JWT_SECRET" >> .env
+    #     echo "JWT_EXPIRES_IN=${{ env.JWT_EXPIRES_IN }}" >> .env
+
+
+    # Upload code to AWS S3
+    - name: Upload to AWS S3
+      run: |
+        zip -r project.zip *
+        # zip -r project.zip . -x "node_modules/*" "*.log" ".git/*"
+        aws s3 cp project.zip s3://${{ env.S3_BUCKET_NAME }}/${{ github.sha }}.zip
+        
+        # aws deploy push \
+        #   --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+        #   --ignore-hidden-files \
+        #   --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+        #   --source .
+
+    # Create .env file with environment variables
+    - name: Create .env file
+      run: |
+        # echo "FIREBASE_PRIVATE_KEY=${{ secrets.SECRET_KEY }}" >> .env
+        # sed -i 's/\\n/\n/g' .env
+        echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+        echo "DATABASE_USER=${{ secrets.DATABASE_USERNAME }}" >> .env
+        echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+        echo "DATABASE_HOST=${{ secrets.DATABASE_HOST }}" >> .env
+    
+    - name: Debug Firebase JSON creation
+      run: |
+        echo "Raw secret:"
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+        echo "Processed JSON:"
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | sed 's/\\n/\n/g'
+      shell: bash
+
+    - name: Create Firebase JSON file
+      run: |
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > firebase-adminsdk.json
+    
+    # Copy .env to EC2
+    - name: Copy .env to EC2
+      run: |
+        echo "${{ secrets.REMOTE_PRIVATE_KEY }}" > my-key.pem
+        chmod 600 my-key.pem
+        scp -o StrictHostKeyChecking=no -i my-key.pem .env ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:~/nodetest/.env
+        echo "JSON file content:"
+        cat firebase-adminsdk.json
+        # JSON 파일 복사
+        scp -o StrictHostKeyChecking=no -i my-key.pem firebase-adminsdk.json ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }}:/home/ubuntu/nodetest/firebase-adminsdk.json
+        ssh -o StrictHostKeyChecking=no -i my-key.pem ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_IP }} \
+        "ls ~/nodetest/firebase-adminsdk.json && echo 'File exists on EC2' || echo 'File missing on EC2'"
+        rm my-key.pem  # 키 파일을 삭제하여 보안 유지
+        rm firebase-adminsdk.json  # 로컬 JSON 파일 삭제
+
+    # Deploy to AWS EC2 from S3
+    - name: Deploy to AWS EC2 from S3
+      run: |
+        aws deploy create-deployment \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=${{ env.S3_BUCKET_NAME }},key=${{ github.sha }}.zip,bundleType=zip
+          # --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip

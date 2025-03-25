@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const chatController = require('../controllers/chatController');
-const authenticateToken = require('../auth');
+const authenticateToken = require('../nodetest/auth');
 
 const storage = multer.memoryStorage(); // 파일을 메모리에 저장
 const upload = multer({ storage });

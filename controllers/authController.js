@@ -296,7 +296,7 @@ exports.deleteAccount = async (req, res) => { // 추가
 //=============================Token========================
 
 const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불러오기
-const { generateToken } = require('../utils/jwt'); // jwt 토큰 생성 파일 불러오기
+const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
 exports.loginToken = async (req, res) => { 
     // 유저 아이디, 비밀번호 받아옴
     const { userId, password } = req;

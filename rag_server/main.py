@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from langchain_community.llms import OllamaLLM  # langchain-community에서 제공
-from langchain_community.vectorstores import Chroma  # langchain-community에서 제공
-from langchain_community.embeddings import OllamaEmbeddings  # langchain-community에서 제공
+from langchain_community.llms import Ollama  # OllamaLLM 대신 Ollama를 사용
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import OllamaEmbeddings
 from langchain.chains import RetrievalQA
 
 app = FastAPI()
@@ -11,7 +11,7 @@ embedding = OllamaEmbeddings()
 db = Chroma(persist_directory="db", embedding_function=embedding)
 retriever = db.as_retriever()
 
-llm = OllamaLLM(model="llama3")  # langchain-community에서 제공
+llm = Ollama(model="llama3")  # Ollama 모델 사용
 
 qa = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
 

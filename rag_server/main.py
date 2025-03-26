@@ -7,11 +7,11 @@ from langchain.chains import RetrievalQA
 
 app = FastAPI()
 
-embedding = OllamaEmbeddings(model="llama3")  # 모델 명을 추가
+embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")  # 모델 명을 추가
 db = Chroma(persist_directory="db", embedding_function=embedding)
 retriever = db.as_retriever()
 
-llm = OllamaLLM(model="llama3")  # Ollama 모델 사용
+llm = OllamaLLM(base_url="http://ollama:11434", model="llama3")  # Ollama 모델 사용
 
 qa = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
 

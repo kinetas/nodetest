@@ -2,7 +2,7 @@ const admin = require('firebase-admin');
 const path = require('path');
 
 // Firebase Admin SDK 초기화
-const serviceAccountPath = path.join('/test/nodetest/firebase-adminsdk.json');
+const serviceAccountPath = path.join(__dirname, '..', process.env.FIREBASE_CREDENTIAL);
 let serviceAccount;
 
 try {

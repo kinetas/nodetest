@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: gogi0529!
+      MYSQL_DATABASE: mission
+
+  nodetest:
+    build: ./nodetest
+    container_name: nodetest
+    restart: always
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    depends_on:
+      - mysql
+    env_file:
+      - ./nodetest/.env
+
+  rag_server:
+    build: ./rag_server
+    container_name: rag_server
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - chroma
+      - ollama
+
+  chroma:
+    image: chromadb/chroma
+    container_name: chroma
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./chroma-data:/chroma
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  mysql-data:
+  chroma-data:
+  ollama_data:

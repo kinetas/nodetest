@@ -56,7 +56,7 @@ services:
     container_name: webRTC_server
     restart: always
     ports:
-      - "8500:8000"  # WebRTC 서버 포트 매핑
+      - "8500:8500"  # WebRTC 서버 포트 매핑
     depends_on:
       - turnserver
 

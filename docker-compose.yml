@@ -68,7 +68,7 @@ services:
       - "3478:3478/tcp"
       - "5349:5349/tcp"  # TLS 지원
     volumes:
-      - ./turnserver/turnserver.conf:/etc/turnserver.conf    
+      - ./turnserver/turnserver.conf:/etc/turnserver.conf
 volumes:
   mysql-data:
   chroma-data:

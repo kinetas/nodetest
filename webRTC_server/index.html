@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Client</title>
+</head>
+<body>
+    <h2>WebRTC 테스트</h2>
+    <video id="localVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <button id="startCall">Start Call</button>
+    <script>
+        const ws = new WebSocket("ws://localhost:8500/ws"); // WebRTC 시그널링 서버
+        let localStream;
+        let peerConnection;
+        const iceServers = {
+            iceServers: [
+                { urls: "stun:yourdomain.com:3478" },  // STUN/TURN 서버 설정
+                { urls: "turn:yourdomain.com:3478", username: "your_turn_user", credential: "your_turn_password" }
+            ]
+        };
+
+        ws.onopen = () => console.log("Connected to signaling server");
+        ws.onmessage = async (message) => {
+            const data = JSON.parse(message.data);
+            if (data.offer) {
+                peerConnection = createPeerConnection();
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                ws.send(JSON.stringify({ answer }));
+            } else if (data.answer) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            } else if (data.candidate) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            }
+        };
+
+        async function startCall() {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById("localVideo").srcObject = localStream;
+            peerConnection = createPeerConnection();
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            ws.send(JSON.stringify({ offer }));
+        }
+
+        function createPeerConnection() {
+            const pc = new RTCPeerConnection(iceServers);
+            pc.ontrack = (event) => {
+                document.getElementById("remoteVideo").srcObject = event.streams[0];
+            };
+            pc.onicecandidate = (event) => {
+                if (event.candidate) ws.send(JSON.stringify({ candidate: event.candidate }));
+            };
+            return pc;
+        }
+
+        document.getElementById("startCall").addEventListener("click", startCall);
+    </script>
+</body>
+</html>

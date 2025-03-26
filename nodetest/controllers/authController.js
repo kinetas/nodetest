@@ -299,10 +299,10 @@ const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불�
 const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
 exports.loginToken = async (req, res) => { 
     // 유저 아이디, 비밀번호 받아옴
-    const { userId, password } = req;
+    const { userId, password } = req.body;
 
     // 아이디로 해당 유저 검색
-    const user = await userModel.findByUserId(userId);
+    const user = await User.findOne({ where: { u_id: userId } })
 
     // 아이디가 db에 없을 경우 에러 메세지 전송
     if (!user) {
@@ -310,7 +310,7 @@ exports.loginToken = async (req, res) => {
     }
 
     // 비밀번호 일치 여부 확인
-    const isMatched = await bcrypt.compare(password, user.password);
+    const isMatched = await comparePassword(password, user.u_password);
 
     // 일치하지 않을 경우 에러 메세지 전송
     if (!isMatched) {
@@ -333,14 +333,14 @@ exports.loginToken = async (req, res) => {
 
 // 로그아웃 로직 구현
 exports.logoutToken = async (req, res) => { 
-    const token = req.cookies.token;
+    const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
         res.status(400).json({ message: '토큰이 없습니다. 로그인 상태를 확안하세요.' });
         return;
     }
 
-    const decoded = jwt.decode(token);
+    const decoded = jwt.verify(token, secretKey);
 
     if (!decoded) {
         res.status(401).json({ message: '잘못된 토큰입니다. 로그인 상태를 확인하세요.' });

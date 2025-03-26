@@ -49,7 +49,26 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    
+  webRTC_server:
+    build: ./webRTC_server  # FastAPI 기반 WebRTC 시그널링 서버
+    container_name: webRTC_server
+    restart: always
+    ports:
+      - "8500:8000"  # WebRTC 서버 포트 매핑
+    depends_on:
+      - turnserver
 
+  turnserver:
+    image: coturn/coturn
+    container_name: turnserver
+    restart: always
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      - "5349:5349/tcp"  # TLS 지원
+    volumes:
+      - ./turnserver/turnserver.conf:/etc/turnserver.conf
 volumes:
   mysql-data:
   chroma-data:

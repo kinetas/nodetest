@@ -36,12 +36,12 @@ services:
       - ollama
 
   chroma:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.5.0
     container_name: chroma
     ports:
       - "8001:8000"
     volumes:
-      - ./chroma-data:/chroma
+      - ./chroma-data:/chroma/chroma
     environment:
     - IS_PERSISTENT=TRUE
     - ALLOW_RESET=TRUE

@@ -21,7 +21,7 @@ const path = require('path');
 const User = require('./models/userModel');
 const NotificationLog = require('./models/notificationModel')
 // Firebase Admin SDK 초기화
-const serviceAccountPath = path.join(__dirname, '..', process.env.FIREBASE_CREDENTIAL);
+const serviceAccountPath = path.join(__dirname, 'firebase-adminsdk.json');
 let serviceAccount;
 
 try {

@@ -1,5 +1,7 @@
 fastapi
 uvicorn
-langchain_community
+langchain
+langchain-ollama
+langchain-chroma
 chromadb
 ollama

@@ -27,10 +27,10 @@ const loginRequired = require('../middleware/loginRequired'); // 로그인 확�
 // 로그인 라우터
 router.post('/loginToken', async (req, res) => {
     try {
-        await autoController.loginToken(req.body, res);
+        await authController.loginToken(req.body, res);
     } catch (err) {
         console.log(err);
-        res.status(400).json({ message: err.message }); // JSON 형식으로 에러 메시지 반환
+        res.status(400).json({ message: err.message });
     }
 });
 

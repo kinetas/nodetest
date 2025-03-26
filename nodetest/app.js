@@ -168,13 +168,13 @@ app.get('/recommendationMission', (req, res) => {
 });
 
 // app.use('/chat', chatRoutes);
-app.use('/chat', timeConverterMiddleware, chatRoutes);
+app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes);
 
 // app.use('/api/auth', authRoutes);
-app.use('/api/auth', timeConverterMiddleware, authRoutes);
+app.use('/api/auth', timeConverterMiddleware, requireAuth, authRoutes);
 
 // app.use('/dashboard', missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
-app.use('/dashboard', timeConverterMiddleware, missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
+app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
 
 // app.use('/api/rooms', roomRoutes);
 app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes);
@@ -183,21 +183,21 @@ app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes);
 app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); // 미션 �????�� ?��?��?�� ?���???
 
 // app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
-app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
+app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
 
 // userInfoRoutes ?���??
 // app.use('/api/user-info', userInfoRoutes);
-app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
+app.use('/api/user-info', timeConverterMiddleware, requireAuth, userInfoRoutes);
 
 // 친구 리스?�� ?��?��?�� 추�??
 // app.use('/dashboard/friends', friendRoutes);
-app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
+app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes);
 
 // app.use('/api/cVote', cVoteRoutes);
-app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
+app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
 
 // app.use('/api/comumunity_missions', c_missionRoutes);
-app.use('/api/comumunity_missions', timeConverterMiddleware, c_missionRoutes);
+app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
 
 // cron.schedule('* * * * *', () => { // �?? �?? ?��?�� 
 cron.schedule('0 0 * * *', () => {
@@ -257,3 +257,105 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 
+
+//=========================Token==============================
+
+// // app.js
+// const express = require('express');
+// const cors = require('cors');
+// const path = require('path');
+// const chatRoutes = require('./routes/chatRoutes');
+// const authRoutes = require('./routes/authRoutes');
+// const missionRoutes = require('./routes/missionRoutes');
+// const roomRoutes = require('./routes/roomRoutes');
+// const friendRoutes = require('./routes/friendRoutes');
+// const cVoteRoutes = require('./routes/cVoteRoutes');
+// const c_missionRoutes = require('./routes/c_missionRoutes');
+// const resultRoutes = require('./routes/resultRoutes');
+// const userInfoRoutes = require('./routes/userInfoRoutes');
+// const recommendationMissionRoutes = require('./routes/recommendationMissionRoutes');
+// const requireAuth = require('./middleware/loginRequired');
+// const db = require('./config/db');
+// const { checkMissionStatus } = require('./controllers/c_missionController');
+// const { checkMissionDeadline } = require('./controllers/missionController');
+// const { checkAndUpdateMissions } = require('./controllers/cVoteController');
+
+// const app = express();
+// const PORT = 3002;
+
+// app.use(cors());
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+// app.use(express.static('public'));
+
+// app.use('/api/auth', timeConverterMiddleware, authRoutes);
+// app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes);
+// app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes);
+// app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes);
+// app.use('/api/user-info', timeConverterMiddleware, requireAuth, userInfoRoutes);
+// app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes);
+// app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
+// app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
+// app.use('/api/recommendationMission', timeConverterMiddleware, requireAuth, recommendationMissionRoutes);
+
+// app.use((req, res) => {
+//     res.status(404).send('404 Not Found');
+// });
+
+// app.listen(PORT, '0.0.0.0', () => {
+//     console.log(`Server running on http://0.0.0.0:${PORT}`);
+// });
+
+// // authController.js
+// const User = require('../models/userModel');
+// const { hashPassword, comparePassword } = require('../utils/passwordUtils');
+// const { generateToken } = require('../middleware/jwt');
+
+// exports.login = async (req, res) => {
+//     const { u_id, u_password } = req.body;
+//     try {
+//         const user = await User.findOne({ where: { u_id } });
+//         if (!user || !(await comparePassword(u_password, user.u_password))) {
+//             return res.status(401).json({ message: '아이디 또는 비밀번호가 일치하지 않습니다.' });
+//         }
+
+//         const token = generateToken({ id: user.u_id, nickname: user.u_nickname });
+//         res.status(200).json({
+//             message: 'Login successful',
+//             token,
+//             user: { id: user.u_id, nickname: user.u_nickname },
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: '서버 오류' });
+//     }
+// };
+
+// exports.logOut = (req, res) => {
+//     res.status(200).json({ message: '로그아웃은 클라이언트에서 토큰 삭제로 처리됩니다.' });
+// };
+
+// exports.deleteAccount = async (req, res) => {
+//     const userId = req.currentUserId;
+//     try {
+//         const deleted = await User.destroy({ where: { u_id: userId } });
+//         if (deleted) {
+//             return res.status(200).json({ message: '계정이 삭제되었습니다.' });
+//         } else {
+//             return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+//         }
+//     } catch (error) {
+//         return res.status(500).json({ message: '서버 오류' });
+//     }
+// };
+
+// // authRoutes.js
+// const express = require('express');
+// const router = express.Router();
+// const authController = require('../controllers/authController');
+// const loginRequired = require('../middleware/loginRequired');
+
+// router.post('/login', authController.login);
+// router.post('/logout', authController.logOut);
+// router.delete('/deleteAccount', loginRequired, authController.deleteAccount);
+
+// module.exports = router;

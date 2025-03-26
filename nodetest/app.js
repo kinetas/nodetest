@@ -12,25 +12,25 @@ const c_missionRoutes = require('./routes/c_missionRoutes');
 const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?�� 추�??
 const userInfoRoutes = require('./routes/userInfoRoutes');
 const recommendationMissionRoutes = require('./routes/recommendationMissionRoutes'); // 라우트 파일 가져오기
-const { checkMissionStatus } = require('../controllers/c_missionController');
-const { checkMissionDeadline } = require('../controllers/missionController');
-const { checkAndUpdateMissions } = require('../controllers/cVoteController');
+const { checkMissionStatus } = require('./controllers/c_missionController');
+const { checkMissionDeadline } = require('./controllers/missionController');
+const { checkAndUpdateMissions } = require('./controllers/cVoteController');
 
-const timeConverterMiddleware = require('../middleware/timeConverterMiddleware');
+const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
 
-const db = require('../config/db');
-const { Room, Mission } = require('../models/relations'); // �??�?? ?��?�� 불러?���??
+const db = require('./config/db');
+const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
 
 const app = express();
 const PORT = 3002;
-const roomController = require('../controllers/roomController');
+const roomController = require('./controllers/roomController');
 //=====================추�??========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 // // ======== ?��?�� JWT ============
 const jwt = require('jsonwebtoken'); // JWT 추�??
-const requireAuth = require('../middleware/loginRequired'); // JWT 미들웨어 추가
+const requireAuth = require('./middleware/loginRequired'); // JWT 미들웨어 추가
 // const requireAuth = require('./middleware/authMiddleware');
 
 const cors = require('cors');
@@ -228,7 +228,7 @@ cron.schedule('0 0 * * *', async () => {
 // app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
 //const { sendNotificationController } = require('./controllers/sendNotificationController');
-const {sendNotificationController} = require('../controllers/notificationController');
+const {sendNotificationController} = require('./controllers/notificationController');
 
 // FCM ?���?? ?��?�� API ?��?��?��?��?��
 app.post('/api/send-notification', sendNotificationController);

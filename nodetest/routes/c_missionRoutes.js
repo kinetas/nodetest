@@ -1,12 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const { createCommunityMission, acceptCommunityMission, deleteCommunityMission } = require('../controllers/c_missionController');
-const requireAuth = require('../middleware/authMiddleware'); // 인증 미들웨어
+// const requireAuth = require('../middleware/authMiddleware'); // 인증 미들웨어
+const loginRequired = require('../middleware/loginRequired'); // JWT 기반 인증 미들웨어
 const CRoom = require('../models/comunity_roomModel');
 
-router.post('/create', requireAuth, createCommunityMission);
-router.post('/accept', requireAuth, acceptCommunityMission);
-router.delete('/delete', requireAuth, deleteCommunityMission);
+// router.post('/create', requireAuth, createCommunityMission);
+// router.post('/accept', requireAuth, acceptCommunityMission);
+// router.delete('/delete', requireAuth, deleteCommunityMission);
+
+router.post('/create', loginRequired, createCommunityMission);
+router.post('/accept', loginRequired, acceptCommunityMission);
+router.delete('/delete', loginRequired, deleteCommunityMission);
 
 router.get('/list', requireAuth, async (req, res) => {
     try {

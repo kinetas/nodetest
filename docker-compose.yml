@@ -36,7 +36,7 @@ services:
       - ollama
 
   chroma:
-    image: chromadb/chroma
+    image: chromadb/chroma:latest
     container_name: chroma
     ports:
       - "8001:8000"

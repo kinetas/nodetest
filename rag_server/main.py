@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from langchain.llms import Ollama
-from langchain.vectorstores import Chroma
-from langchain.embeddings import OllamaEmbeddings
+from langchain_community.llms import Ollama  # langchain_community로 변경
+from langchain_community.vectorstores import Chroma  # langchain_community로 변경
+from langchain_community.embeddings import OllamaEmbeddings  # langchain_community로 변경
 from langchain.chains import RetrievalQA
 
 app = FastAPI()

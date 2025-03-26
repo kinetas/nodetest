@@ -1,7 +1,7 @@
 import hashlib
 import os
 from langchain_community.document_loaders import TextLoader
-from langchain_community.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import CharacterTextSplitter
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 

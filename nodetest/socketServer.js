@@ -4,24 +4,24 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 const cors = require('cors');
-const chatController = require('./nodetest/controllers/chatController');
-const db = require('./nodetest/config/db');
-const authRoutes = require('./nodetest/routes/authRoutes');
-const chatRoutes = require('./nodetest/routes/chatRoutes');
-const missionRoutes = require('./nodetest/routes/missionRoutes');
-const logger = require('./nodetest/logger');
-const RMessage  = require('./nodetest/models/messageModel');
+const chatController = require('./controllers/chatController');
+const db = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const missionRoutes = require('./routes/missionRoutes');
+const logger = require('./logger');
+const RMessage  = require('./models/messageModel');
 const multer = require('multer');
-const Room  = require('./nodetest/models/roomModel');
+const Room  = require('./models/roomModel');
 const app = express();
 const server = http.createServer(app);
 const admin = require('firebase-admin');
 const { getMessaging } = require('firebase-admin/messaging');
 const path = require('path');
-const User = require('./nodetest/models/userModel');
-const NotificationLog = require('./nodetest/models/notificationModel')
+const User = require('./models/userModel');
+const NotificationLog = require('./models/notificationModel')
 // Firebase Admin SDK 초기화
-const serviceAccountPath = path.join('/home/ubuntu/nodetest/firebase-adminsdk.json');
+const serviceAccountPath = path.join(__dirname, '..', process.env.FIREBASE_CREDENTIAL);
 let serviceAccount;
 
 try {

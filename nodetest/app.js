@@ -15,6 +15,7 @@ const recommendationMissionRoutes = require('./routes/recommendationMissionRoute
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const { checkAndUpdateMissions } = require('./controllers/cVoteController');
+const aiRoutes = require('./routes/aiRoutes');
 
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
@@ -198,6 +199,8 @@ app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
 
 // app.use('/api/comumunity_missions', c_missionRoutes);
 app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
+
+app.use('/api/ai', aiRoutes);
 
 // cron.schedule('* * * * *', () => { // �?? �?? ?��?�� 
 cron.schedule('0 0 * * *', () => {

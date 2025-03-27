@@ -23,7 +23,7 @@ class RAGRequest(BaseModel):
 
 @app.post("/recommend")
 async def recommend(req: RAGRequest):
-    query = f"{req.category} 오늘 해볼 만한 활동 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
+    query = f"{req.category} 오늘 해볼 만한 미션 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
     response = qa.run(query)
     return {"message": response}
 

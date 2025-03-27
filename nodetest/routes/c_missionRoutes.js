@@ -13,7 +13,8 @@ router.post('/create', loginRequired, createCommunityMission);
 router.post('/accept', loginRequired, acceptCommunityMission);
 router.delete('/delete', loginRequired, deleteCommunityMission);
 
-router.get('/list', requireAuth, async (req, res) => {
+// router.get('/list', requireAuth, async (req, res) => {
+router.get('/list', loginRequired, async (req, res) => {
     try {
         const missions = await CRoom.findAll({
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬

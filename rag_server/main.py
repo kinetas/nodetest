@@ -161,11 +161,13 @@ async def recommend(req: RAGRequest):
     relevant_docs = retriever.get_relevant_documents(query)
     context = "\n\n".join([doc.page_content for doc in relevant_docs])
 
-    # 2. 프롬프트 구성
-    final_prompt = (
-        f"다음은 참고 문서입니다:\n\n{context}\n\n"
-        f"위 문서를 참고하여 다음 질문에 대해 한국어로 짧게 추천해주세요:\n\n{query}"
-    )
+    if not context.strip():
+        final_prompt = query
+    else:
+        final_prompt = (
+            f"다음은 참고 문서입니다:\n\n{context}\n\n"
+            f"위 문서를 참고하여 다음 질문에 대해 한국어로 짧게 추천해주세요:\n\n{query}"
+        )
 
     # 3. Groq API 호출
     headers = {

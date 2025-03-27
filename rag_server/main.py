@@ -150,7 +150,6 @@ from langchain_ollama import OllamaEmbeddings
 # ⚠️ Ollama는 임베딩용으로만 사용됨 (서버 필요)
 embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
-retriever = db.as_retriever()
 
 # ✅ 추천 API (RAG 구조 적용)
 @app.post("/recommend")
@@ -158,8 +157,7 @@ async def recommend(req: RAGRequest):
     query = f"{req.category} 카테고리와 관련된 오늘 해볼 만한 미션 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
 
     # 1. 문서 검색
-    relevant_docs = retriever.get_relevant_documents(query)
-    context = "\n\n".join([doc.page_content for doc in relevant_docs])
+    docs_with_scores = db.similarity_search_with_score(query, k=4)
 
     # 2. 유사도 필터링 (점수 낮을수록 관련 있음)
     filtered_docs = [doc for doc, score in docs_with_scores if score < 0.6]

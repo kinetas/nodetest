@@ -5,8 +5,8 @@ const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMi
         getGivenCompletedMissions, getFriendAssignedMissions, getFriendCompletedMissions, getMissionsWithGrantedAuthority, 
         requestMissionApproval, createMission, deleteMission, successMission, failureMission, printRoomMission,
         requestVoteForMission, getRequestedSelfMissions, getCreatedMissionsReq  } = require('../controllers/missionController');
-// const requireAuth = require('../middleware/authMiddleware'); // 세션 인증 미들웨어
-const loginRequired = require('../middleware/loginRequired'); // JWT 인증 미들웨어
+ const requireAuth = require('../middleware/authMiddleware'); // 세션 인증 미들웨어
+// const loginRequired = require('../middleware/loginRequired'); // JWT 인증 미들웨어
 
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });

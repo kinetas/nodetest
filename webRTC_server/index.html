@@ -11,7 +11,7 @@
     <video id="remoteVideo" autoplay playsinline></video>
     <button id="startCall">Start Call</button>
     <script>
-        const ws = new WebSocket("ws://27.113.11.48:8500/ws"); // WebRTC 시그널링 서버
+        const ws = new WebSocket("ws://192.168.0.10:8500/ws"); // WebRTC 시그널링 서버
         let localStream;
         let peerConnection;
         const iceServers = {

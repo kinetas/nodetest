@@ -6,9 +6,6 @@ import os
 
 app = FastAPI()
 
-# 정적 파일 static 폴더 경로 설정
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
-
 # WebSocket 연결 저장소
 active_connections: List[WebSocket] = []
 
@@ -28,3 +25,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     await connection.send_text(json.dumps(data))
     except Exception:
         active_connections.remove(websocket)
+        
+# 정적 파일 static 폴더 경로 설정
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")

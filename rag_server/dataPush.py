@@ -13,7 +13,7 @@ persist_directory = "db"
 embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 
 # DB 로드 또는 생성
-db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
+db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 # 해시값 생성 함수 (중복 방지)
 def get_doc_hash(text):

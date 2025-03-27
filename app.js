@@ -171,7 +171,6 @@ app.get('/recommendationMission', (req, res) => {
 app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes);
 
 // // app.use('/api/auth', authRoutes);
-// app.use('/api/auth', timeConverterMiddleware, requireAuth, authRoutes);
 // 인증이 필요 없는 API (로그인, 회원가입, 아이디 찾기, 비밀번호 변경)
 app.use('/api/auth/login', timeConverterMiddleware, authRoutes);
 app.use('/api/auth/register', timeConverterMiddleware, authRoutes);

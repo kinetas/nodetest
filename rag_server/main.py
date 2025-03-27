@@ -155,21 +155,28 @@ retriever = db.as_retriever()
 # ✅ 추천 API (RAG 구조 적용)
 @app.post("/recommend")
 async def recommend(req: RAGRequest):
-    query = f"{req.category} 오늘 해볼 만한 미션 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
+    query = f"{req.category} 카테고리와 관련된 오늘 해볼 만한 미션 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
 
     # 1. 문서 검색
     relevant_docs = retriever.get_relevant_documents(query)
     context = "\n\n".join([doc.page_content for doc in relevant_docs])
 
-    if not context.strip():
-        final_prompt = query
-    else:
+    # 2. 유사도 필터링 (점수 낮을수록 관련 있음)
+    filtered_docs = [doc for doc, score in docs_with_scores if score < 0.6]
+    context = "\n\n".join([doc.page_content for doc in filtered_docs])
+
+    # 3. 문서가 충분하면 RAG, 아니면 Groq 단독
+    is_rag = len(filtered_docs) >= 1 and len(context) > 50
+
+    if is_rag:
         final_prompt = (
             f"다음은 참고 문서입니다:\n\n{context}\n\n"
             f"위 문서를 참고하여 다음 질문에 대해 한국어로 짧게 추천해주세요:\n\n{query}"
         )
+    else:
+        final_prompt = query
 
-    # 3. Groq API 호출
+    # 4. Groq API 호출
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"

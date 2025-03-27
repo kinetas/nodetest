@@ -58,3 +58,15 @@ android/app/build/
 *.log
 *.hive
 .flutter-plugins-dependencies
+
+# 로컬 개발 설정 무시-버전이 달라서 수정
+android/local.properties
+android/gradle.properties
+
+# 민감한 Firebase 설정 무시-따로 추가한 파일, 로컬에서 필요한 파일입니다
+android/app/google-services.json
+
+# 플랫폼별 자동 생성 파일 무시-버전이 달라서 추가함
+linux/flutter/
+macos/Flutter/
+windows/flutter/

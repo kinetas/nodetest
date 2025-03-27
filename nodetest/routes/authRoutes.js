@@ -25,14 +25,7 @@ router.delete('/deleteAccount', authController.deleteAccount); // 추가: 계정
 const loginRequired = require('../middleware/loginRequired'); // 로그인 확인 미들웨어 불러오기 (로그인이 필요한 기능이 있을시 해당 라우터에 사용됨)
 
 // 로그인 라우터
-router.post('/loginToken', async (req, res) => {
-    try {
-        await authController.loginToken(req.body, res);
-    } catch (err) {
-        console.log(err);
-        res.status(400).json({ message: err.message });
-    }
-});
+router.post('/loginToken', authController.loginToken);
 
 // 로그아웃 라우터
 // 쿠키에서 토큰을 제거하는 작업은 동기적인 작업이므로, async 처리 불필요

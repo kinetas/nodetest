@@ -6,7 +6,7 @@ import os
 
 app = FastAPI()
 
-# WebSocket 연결 저장소
+# WebSocket 연결 저장소 설정
 active_connections: List[WebSocket] = []
 
 # WebSocket 엔드포인트

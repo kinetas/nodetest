@@ -44,3 +44,8 @@ if new_docs:
     print(f"✅ {len(new_docs)}개의 새로운 문서가 DB에 추가되었습니다.")
 else:
     print("🚨 추가할 새로운 문서가 없습니다.")
+collection.delete(ids=[
+    "2b074d7d-22d7-46c4-95ee-1bc987fb93bb", # 걷기 기존버전 (짧음)
+    "1bed72a7-ee0e-4d62-bba0-0be1524d2413"  # 공부 기존버전 (짧음)
+])
+

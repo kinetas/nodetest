@@ -3,14 +3,12 @@ const TFriend = require('../models/t_friendModel'); // t_friend 모델
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 
-// const jwt = require('jsonwebtoken'); // JWT 추가
-
 // i_friend 테이블의 f_id 리스트 출력
 exports.printIFriend = async (req, res) => {
     try {
         const iFriends = await IFriend.findAll({
             attributes: ['f_id'],
-            where: { u_id: req.session.user.id }, // 세션 사용자 ID 기준
+            where: { u_id: req.currentUserId }, // 세션 사용자 ID 기준
         });
         const friendList = iFriends.map(friend => friend.f_id);
         res.json({ success: true, iFriends: friendList });
@@ -29,11 +27,11 @@ exports.printTFriend = async (req, res) => {
         });
 
         const sentRequests = tFriends
-            .filter(friend => friend.u_id === req.session.user.id)
+            .filter(friend => friend.u_id === req.currentUserId)
             .map(friend => friend.f_id);
 
         const receivedRequests = tFriends
-            .filter(friend => friend.f_id === req.session.user.id)
+            .filter(friend => friend.f_id === req.currentUserId)
             .map(friend => friend.u_id);
 
         res.json({
@@ -57,7 +55,7 @@ exports.friendDelete = async (req, res) => {
         // u_id와 f_id 관계 삭제
         const result1 = await IFriend.destroy({
             where: {
-                u_id: req.session.user.id,
+                u_id: req.currentUserId,
                 f_id: f_id,
             },
         });
@@ -66,7 +64,7 @@ exports.friendDelete = async (req, res) => {
         const result2 = await IFriend.destroy({
             where: {
                 u_id: f_id,
-                f_id: req.session.user.id,
+                f_id: req.currentUserId,
             },
         });
 
@@ -85,7 +83,7 @@ exports.friendDelete = async (req, res) => {
 // 친구 요청 보내기 함수
 exports.friendRequestSend = async (req, res) => {
     const { f_id } = req.body; // 친구 요청할 ID
-    const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
+    const u_id = req.currentUserId; // 현재 로그인한 사용자 ID
 
     try {
 
@@ -227,7 +225,7 @@ exports.friendRequestSend = async (req, res) => {
 // // 친구 요청 수락 함수
 // exports.friendRequestAccept = async (req, res) => {
 //     const { f_id } = req.body; // 친구 요청한 ID
-//     const u_id = req.session.user.id; // 현재 로그인한 사용자 ID
+//     const u_id = req.currentUserId; // 현재 로그인한 사용자 ID
 
 //     try {
 //         // t_friend 테이블에서 유효한 친구 요청 확인
@@ -290,7 +288,7 @@ exports.friendRequestSend = async (req, res) => {
 //             {
 //                 where: {
 //                     u_id: f_id,
-//                     f_id: req.session.user.id,
+//                     f_id: req.currentUserId,
 //                 },
 //             }
 //         );
@@ -311,16 +309,16 @@ exports.friendRequestSend = async (req, res) => {
 // 친구 요청 수락
 exports.friendRequestAccept = async (req, res) => {
     const { f_id } = req.body;
-    const u_id = req.session?.user?.id;
+    const u_id = req.currentUserId;
 
     console.log('Accept Request:', { f_id, u_id }); // 디버깅용 로그
 
-    if (!u_id) {
-        return res.status(401).json({
-            success: false,
-            message: '세션이 유효하지 않습니다. 다시 로그인하세요.',
-        });
-    }
+    // if (!u_id) {
+    //     return res.status(401).json({
+    //         success: false,
+    //         message: '세션이 유효하지 않습니다. 다시 로그인하세요.',
+    //     });
+    // }
 
     try {
         const existingRequest = await TFriend.findOne({
@@ -367,16 +365,16 @@ exports.friendRequestAccept = async (req, res) => {
 
 exports.friendRequestReject = async (req, res) => {
     const { f_id } = req.body;
-    const u_id = req.session?.user?.id;
+    const u_id = req.currentUserId;
 
     console.log('Reject Request:', { f_id, u_id }); // 디버깅용 로그
 
-    if (!u_id) {
-        return res.status(401).json({
-            success: false,
-            message: '세션이 유효하지 않습니다. 다시 로그인하세요.',
-        });
-    }
+    // if (!u_id) {
+    //     return res.status(401).json({
+    //         success: false,
+    //         message: '세션이 유효하지 않습니다. 다시 로그인하세요.',
+    //     });
+    // }
 
     try {
         const result = await TFriend.update(

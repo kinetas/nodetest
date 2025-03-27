@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Chroma RAG 테스트</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 5px; }
+    input, button { font-size: 1rem; margin: 0.5rem 0; padding: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>🧠 RAG 추천 요청</h1>
+  <input type="text" id="category" placeholder="예: 여행, 공부, 운동" />
+  <button onclick="getRecommendation()">추천 요청</button>
+  <p><strong>추천 결과:</strong></p>
+  <pre id="result">아직 결과가 없습니다.</pre>
+
+  <hr />
+
+  <h2>📄 Chroma DB 문서 목록</h2>
+  <button onclick="loadDocuments()">문서 불러오기</button>
+  <pre id="docList">문서 목록을 불러오세요.</pre>
+
+  <script>
+    async function getRecommendation() {
+      const category = document.getElementById('category').value;
+      const res = await fetch('/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category })
+      });
+      const data = await res.json();
+      document.getElementById('result').textContent = data.message;
+    }
+
+    async function loadDocuments() {
+      const res = await fetch('/documents');
+      const data = await res.json();
+      document.getElementById('docList').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

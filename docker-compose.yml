@@ -34,14 +34,19 @@ services:
     depends_on:
       - chroma
       - ollama
+    volumes:
+      - ./chroma-data:/chroma/chroma
 
   chroma:
-    image: chromadb/chroma
+    image: chromadb/chroma:0.5.0
     container_name: chroma
     ports:
       - "8001:8000"
     volumes:
-      - ./chroma-data:/chroma
+      - ./chroma-data:/chroma/chroma
+    environment:
+    - IS_PERSISTENT=TRUE
+    - ALLOW_RESET=TRUE
   ollama:
     image: ollama/ollama
     container_name: ollama

@@ -159,8 +159,12 @@ async def recommend(req: RAGRequest):
     # 1. 문서 검색
     docs_with_scores = db.similarity_search_with_score(query, k=4)
 
+    for doc, score in docs_with_scores:
+        print(f"문서 유사도 점수: {score:.4f} / 문서: {doc.page_content[:30]}...")
+
+
     # 2. 유사도 필터링 (점수 낮을수록 관련 있음)
-    filtered_docs = [doc for doc, score in docs_with_scores if score < 0.6]
+    filtered_docs = [doc for doc, score in docs_with_scores if score < 0.625]
     context = "\n\n".join([doc.page_content for doc in filtered_docs])
 
     # 3. 문서가 충분하면 RAG, 아니면 Groq 단독

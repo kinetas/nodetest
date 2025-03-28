@@ -170,7 +170,7 @@ async def recommend(req: RAGRequest):
     context = "\n\n".join([doc.page_content for doc in filtered_docs])
 
     # 3. 문서가 충분하면 RAG, 아니면 Groq 단독
-    is_rag = len(filtered_docs) >= 1 and len(context) > 50
+    is_rag = len(filtered_docs) >= 1 #and len(context) > 50
 
     if is_rag:
         final_prompt = (

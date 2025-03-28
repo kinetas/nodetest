@@ -62,7 +62,11 @@ persist_directory = "/chroma/chroma"
 embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
-db._collection.delete()
+existing = db.get()
+ids = existing["ids"]
+if ids:
+    db.delete(ids=ids)
+    print(f"🧹 기존 문서 {len(ids)}개 삭제 완료")
 
 # JSON 불러오기
 with open(json_file, "r", encoding="utf-8") as f:

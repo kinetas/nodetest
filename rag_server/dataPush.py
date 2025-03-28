@@ -62,6 +62,8 @@ persist_directory = "/chroma/chroma"
 embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
+db._collection.delete()
+
 # JSON 불러오기
 with open(json_file, "r", encoding="utf-8") as f:
     data = json.load(f)

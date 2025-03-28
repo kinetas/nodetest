@@ -166,7 +166,7 @@ async def recommend(req: RAGRequest):
 
 
     # 2. 유사도 필터링 (점수 낮을수록 관련 있음)
-    filtered_docs = [doc for doc, score in docs_with_scores if score < 0.625]
+    filtered_docs = [doc for doc, score in docs_with_scores if score < 0.53]
     context = "\n\n".join([doc.page_content for doc in filtered_docs])
 
     # 3. 문서가 충분하면 RAG, 아니면 Groq 단독

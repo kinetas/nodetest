@@ -152,7 +152,7 @@ from langchain_ollama import OllamaEmbeddings
 embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
-✅ 추천 API (RAG 구조 적용)
+# ✅ 추천 API (RAG 구조 적용)
 @app.post("/recommend")
 async def recommend(req: RAGRequest):
     start_time = time.time()
@@ -204,31 +204,31 @@ async def recommend(req: RAGRequest):
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-# @app.post("/recommend")
-# async def recommend(req: RAGRequest):
-#     start_time = time.time()
-#     query = f"{req.category} 오늘 해볼 만한 미션 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
+@app.post("/recommend")
+async def recommend(req: RAGRequest):
+    start_time = time.time()
+    query = f"{req.category} 오늘 해볼 만한 미션 2가지 추천해줘. 반드시 한국어로 짧게 말해줘."
 
-#     headers = {
-#         "Authorization": f"Bearer {GROQ_API_KEY}",
-#         "Content-Type": "application/json"
-#     }
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-#     body = {
-#         "model": "llama3-8b-8192",
-#         "messages": [{"role": "user", "content": query}],
-#         "temperature": 0.7
-#     }
+    body = {
+        "model": "llama3-8b-8192",
+        "messages": [{"role": "user", "content": query}],
+        "temperature": 0.7
+    }
 
-#     try:
-#         response = requests.post(GROQ_API_URL, headers=headers, json=body)
-#         result = response.json()
-#         message = result["choices"][0]["message"]["content"]
-#         end_time = time.time()  # ⏱️ 끝 시각
-#         elapsed_time = round(end_time - start_time, 2)  # 소수 2자리까지
-#         return {"message": message, "response_time_sec": elapsed_time}
-#     except Exception as e:
-#         return JSONResponse(status_code=500, content={"error": str(e)})
+    try:
+        response = requests.post(GROQ_API_URL, headers=headers, json=body)
+        result = response.json()
+        message = result["choices"][0]["message"]["content"]
+        end_time = time.time()  # ⏱️ 끝 시각
+        elapsed_time = round(end_time - start_time, 2)  # 소수 2자리까지
+        return {"message": message, "response_time_sec": elapsed_time}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ✅ Chroma 문서 리스트 확인용
 @app.get("/documents")

@@ -121,36 +121,36 @@
 # def serve_index():
 #     return FileResponse("static/index.html")
 
-# from fastapi import FastAPI
-# from fastapi.responses import JSONResponse, FileResponse
-# from fastapi.staticfiles import StaticFiles
-# from pydantic import BaseModel
-# import os
-# import requests
-# from dotenv import load_dotenv
-# import time
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+import os
+import requests
+from dotenv import load_dotenv
+import time
 
-# # ✅ .env 파일 로드
-# load_dotenv()
+# ✅ .env 파일 로드
+load_dotenv()
 
-# # ✅ Groq API 설정
-# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-# GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+# ✅ Groq API 설정
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# # ✅ FastAPI 인스턴스 생성
-# app = FastAPI()
+# ✅ FastAPI 인스턴스 생성
+app = FastAPI()
 
-# # ✅ Pydantic 모델
-# class RAGRequest(BaseModel):
-#     category: str
+# ✅ Pydantic 모델
+class RAGRequest(BaseModel):
+    category: str
 
-# # ✅ Chroma (문서 검색용)
-# from langchain_chroma import Chroma
-# from langchain_ollama import OllamaEmbeddings
+# ✅ Chroma (문서 검색용)
+from langchain_chroma import Chroma
+from langchain_ollama import OllamaEmbeddings
 
-# # ⚠️ Ollama는 임베딩용으로만 사용됨 (서버 필요)
-# embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
-# db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
+# ⚠️ Ollama는 임베딩용으로만 사용됨 (서버 필요)
+embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
+db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 # # ✅ 추천 API (RAG 구조 적용)
 # @app.post("/recommend")

@@ -48,6 +48,11 @@ import json
 from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
 from langchain_ollama import OllamaEmbeddings
+import hashlib
+import os
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_chroma import Chroma
 
 # 경로 설정
 json_file = "documents/data.json"  # 👈 여기에 JSON 저장

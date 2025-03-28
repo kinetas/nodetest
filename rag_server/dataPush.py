@@ -70,9 +70,8 @@ if ids:
 
 # JSON 불러오기
 with open(json_file, "r", encoding="utf-8") as f:
-    data = json.load(f)
+    data = json.load(f)["documents"]  # 👈 이 부분만 바꾸면 바로 해결됨!
 
-# Document 객체로 변환
 docs = [
     Document(page_content=item["document"], metadata=item["metadata"])
     for item in data

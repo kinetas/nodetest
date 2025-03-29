@@ -204,7 +204,7 @@ db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 #     except Exception as e:
 #         return JSONResponse(status_code=500, content={"error": str(e)})
 
-RAG만 사용용
+# RAG만 사용용
 @app.post("/recommend")
 async def recommend(req: RAGRequest):
     start_time = time.time()

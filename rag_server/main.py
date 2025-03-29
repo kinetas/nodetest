@@ -153,6 +153,7 @@ embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 # # ✅ 추천 API (RAG 구조 적용)
+
 # @app.post("/recommend")
 # async def recommend(req: RAGRequest):
 #     start_time = time.time()
@@ -205,6 +206,7 @@ db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 #         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # RAG만 사용용
+
 @app.post("/recommend")
 async def recommend(req: RAGRequest):
     start_time = time.time()
@@ -232,6 +234,7 @@ async def recommend(req: RAGRequest):
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # CoT
+
 # @app.post("/recommend")
 # async def recommend(req: RAGRequest):
 #     start_time = time.time()
@@ -265,22 +268,22 @@ async def recommend(req: RAGRequest):
 #     except Exception as e:
 #         return JSONResponse(status_code=500, content={"error": str(e)})
 
-# # ✅ Chroma 문서 리스트 확인용
-# @app.get("/documents")
-# async def get_documents():
-#     try:
-#         data = db.get()
-#         documents_info = []
-#         for i in range(len(data['ids'])):
-#             doc = {
-#                 "id": data['ids'][i],
-#                 "document": data['documents'][i],
-#                 "metadata": data['metadatas'][i]
-#             }
-#             documents_info.append(doc)
-#         return JSONResponse(content={"documents": documents_info})
-#     except Exception as e:
-#         return JSONResponse(status_code=500, content={"error": str(e)})
+# ✅ Chroma 문서 리스트 확인용
+@app.get("/documents")
+async def get_documents():
+    try:
+        data = db.get()
+        documents_info = []
+        for i in range(len(data['ids'])):
+            doc = {
+                "id": data['ids'][i],
+                "document": data['documents'][i],
+                "metadata": data['metadatas'][i]
+            }
+            documents_info.append(doc)
+        return JSONResponse(content={"documents": documents_info})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ✅ 정적 파일 서빙 (HTML 포함)
 app.mount("/static", StaticFiles(directory="static"), name="static")

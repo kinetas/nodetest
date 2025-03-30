@@ -319,8 +319,7 @@ exports.loginToken = async (req, res) => {
 
     // 유저 id, 관리자 여부 객체로 토큰 페이로드 정보 생성
     const payload = {
-        userId: user.u_id,
-        isAdmin: user.isAdmin,
+        userId: user.u_id
     }; 
     // jwt.js에서 작성된 토큰 생성 코드 실행
     const token = generateToken(payload);

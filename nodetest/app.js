@@ -16,6 +16,7 @@ const recommendationMissionRoutes = require('./routes/recommendationMissionRoute
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const { checkAndUpdateMissions } = require('./controllers/cVoteController');
+require('dotenv').config();
 
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 

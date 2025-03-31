@@ -298,36 +298,41 @@ exports.deleteAccount = async (req, res) => { // 추가
 const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불러오기
 const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
 exports.loginToken = async (req, res) => { 
-    // 유저 아이디, 비밀번호 받아옴
-    const { userId, password } = req.body;
+    try {
+        // 유저 아이디, 비밀번호 받아옴
+        const { userId, password } = req.body;
 
-    // 아이디로 해당 유저 검색
-    const user = await User.findOne({ where: { u_id: userId } })
+        // 아이디로 해당 유저 검색
+        const user = await User.findOne({ where: { u_id: userId } })
 
-    // 아이디가 db에 없을 경우 에러 메세지 전송
-    if (!user) {
-        throw new Error('가입되지 않은 아이디 입니다.');
+        // 아이디가 db에 없을 경우 에러 메세지 전송
+        if (!user) {
+            throw new Error('가입되지 않은 아이디 입니다.');
+        }
+
+        // 비밀번호 일치 여부 확인
+        const isMatched = await comparePassword(password, user.u_password);
+
+        // 일치하지 않을 경우 에러 메세지 전송
+        if (!isMatched) {
+            throw new Error('비밀번호가 일치하지 않습니다.');
+        }
+
+        // 유저 id로 토큰 페이로드 정보 생성
+        const payload = {
+            userId: user.u_id
+        };
+        // jwt.js에서 작성된 토큰 생성 코드 실행
+        const token = generateToken(payload);
+
+        // 'token' 이라는 쿠키 이름으로 토큰 저장, 'httpOnly' 옵션으로 접근 보호
+        // 'maxAge' 옵션을 3600000(1시간, 밀리초) 설정
+        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
+        res.json({ message: '성공적으로 로그인 되었습니다.', user, token });
+    } catch (error) {
+        console.error('loginToken error:', error);
+        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
-
-    // 비밀번호 일치 여부 확인
-    const isMatched = await comparePassword(password, user.u_password);
-
-    // 일치하지 않을 경우 에러 메세지 전송
-    if (!isMatched) {
-        throw new Error('비밀번호가 일치하지 않습니다.');
-    }
-
-    // 유저 id로 토큰 페이로드 정보 생성
-    const payload = {
-        userId: user.u_id
-    };
-    // jwt.js에서 작성된 토큰 생성 코드 실행
-    const token = generateToken(payload);
-
-    // 'token' 이라는 쿠키 이름으로 토큰 저장, 'httpOnly' 옵션으로 접근 보호
-    // 'maxAge' 옵션을 3600000(1시간, 밀리초) 설정
-    res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
-    res.json({ message: '성공적으로 로그인 되었습니다.', user, token });
 };
 
 // 로그아웃 로직 구현

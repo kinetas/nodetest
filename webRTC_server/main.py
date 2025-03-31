@@ -1,5 +1,6 @@
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import Response
 from typing import List
 import json
 import os
@@ -28,3 +29,8 @@ async def websocket_endpoint(websocket: WebSocket):
         
 # 정적 파일 static 폴더 경로 설정
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+# favicon.ico 요청을 처리 (빈 응답 반환)
+@app.get("/favicon.ico")
+async def favicon():
+    return Response(status_code=204)  # No Content (빈 응답)

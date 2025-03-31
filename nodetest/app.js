@@ -209,8 +209,8 @@ app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
 // app.use('/api/comumunity_missions', c_missionRoutes);
 app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
 
-//AI관련
-app.use('/api/ai', aiRoutes);
+// //AI관련
+// app.use('/api/ai', aiRoutes);
 
 // cron.schedule('* * * * *', () => { // �?? �?? ?��?�� 
 cron.schedule('0 0 * * *', () => {

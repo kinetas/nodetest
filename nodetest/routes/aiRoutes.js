@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const aiController = require('../controllers/aiController');
 
 // FastAPI 주소
 const RAG_SERVER_URL = 'http://rag_server:8000/recommend'; // Docker 내부 주소
@@ -18,5 +19,7 @@ router.post('/recommend', async (req, res) => {
         return res.status(500).json({ error: '추천 요청 실패' });
     }
 });
+
+router.post('/ask', aiController.askQuestion);
 
 module.exports = router;

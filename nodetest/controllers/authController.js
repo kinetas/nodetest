@@ -307,7 +307,7 @@ exports.loginToken = async (req, res) => {
 
         // 아이디가 db에 없을 경우 에러 메세지 전송
         if (!user) {
-            throw new Error('가입되지 않은 아이디 입니다.');
+            return res.status(400).json({ message: '가입되지 않은 아이디입니다.' });
         }
 
         // 비밀번호 일치 여부 확인
@@ -315,7 +315,7 @@ exports.loginToken = async (req, res) => {
 
         // 일치하지 않을 경우 에러 메세지 전송
         if (!isMatched) {
-            throw new Error('비밀번호가 일치하지 않습니다.');
+            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
         }
 
         // 유저 id로 토큰 페이로드 정보 생성

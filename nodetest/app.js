@@ -171,17 +171,17 @@ app.get('/recommendationMission', (req, res) => {
 // app.use('/chat', chatRoutes);
 app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes);
 
-// // app.use('/api/auth', authRoutes);
+app.use('/api/auth', timeConverterMiddleware, authRoutes);
 // 인증이 필요 없는 API (로그인, 회원가입, 아이디 찾기, 비밀번호 변경)
-app.use('/api/auth/login', timeConverterMiddleware, authRoutes);
-app.use('/api/auth/register', timeConverterMiddleware, authRoutes);
-app.use('/api/auth/findUid', timeConverterMiddleware, authRoutes);
-app.use('/api/auth/changePassword', timeConverterMiddleware, authRoutes);
-app.use('/api/auth/loginToken', timeConverterMiddleware, authRoutes);
+// app.use('/api/auth/login', timeConverterMiddleware, authRoutes);
+// app.use('/api/auth/register', timeConverterMiddleware, authRoutes);
+// app.use('/api/auth/findUid', timeConverterMiddleware, authRoutes);
+// app.use('/api/auth/changePassword', timeConverterMiddleware, authRoutes);
+// app.use('/api/auth/loginToken', timeConverterMiddleware, authRoutes);
 
-// 인증이 필요한 API (로그아웃, 계정 삭제)
-app.use('/api/auth/logoutToken', timeConverterMiddleware, requireAuth, authRoutes);
-app.use('/api/auth/deleteAccount', timeConverterMiddleware, requireAuth, authRoutes);
+// // 인증이 필요한 API (로그아웃, 계정 삭제)
+// app.use('/api/auth/logoutToken', timeConverterMiddleware, requireAuth, authRoutes);
+// app.use('/api/auth/deleteAccount', timeConverterMiddleware, requireAuth, authRoutes);
 
 // app.use('/dashboard', missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
 app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙

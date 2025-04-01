@@ -29,7 +29,8 @@ const Sequelize = require('sequelize');
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
     const { u2_id, authenticationAuthority, m_title, m_deadline, m_reword } = req.body;
-    const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
+    // const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
+    const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
 
@@ -206,44 +207,11 @@ exports.createMission = async (req, res) => {
     }
 };
 
-// // 미션 생성 함수도 JWT 기반으로 변경
-// exports.createMission = async (req, res) => {
-//     const token = req.headers.authorization?.split(' ')[1];
-//     if (!token) {
-//         return res.status(401).json({ message: '로그인이 필요합니다.' });
-//     }
-
-//     try {
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//         const u1_id = decoded.id; // 토큰에서 u1_id 추출
-//         const { u2_id, m_title, m_deadline, m_reword } = req.body;
-
-//         const missionId = uuidv4();
-//         if (!uuidValidate(missionId)) {
-//             return res.status(500).json({ message: '유효하지 않은 UUID 생성' });
-//         }
-
-//         await Mission.create({
-//             m_id: missionId,
-//             u1_id,
-//             u2_id,
-//             m_title,
-//             m_deadline,
-//             m_reword,
-//             m_status: '진행중',
-//         });
-
-//         res.json({ message: '미션이 성공적으로 생성되었습니다.' });
-//     } catch (error) {
-//         res.status(500).json({ message: '미션 생성 중 오류가 발생했습니다.' });
-//     }
-// };
-
-
 // 미션 삭제 함수
 exports.deleteMission = async (req, res) => {
     const { m_id } = req.body;
-    const u1_id = req.session.user.id; // 세션에서 로그인한 사용자 ID 가져오기
+    // const u1_id = req.session.user.id; // 세션에서 로그인한 사용자 ID 가져오기
+    const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     if (!m_id) {
         return res.json({ success: false, message: '미션 ID는 필수 항목입니다.' });
@@ -268,7 +236,8 @@ exports.deleteMission = async (req, res) => {
 // 미션 리스트 조회 함수
 exports.getUserMissions = async (req, res) => {
     try {
-        const userId = req.session.user.id;
+        // const userId = req.session.user.id;
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
         
         // 사용자 ID에 해당하는 미션 리스트 조회
         const missions = await Mission.findAll({
@@ -286,7 +255,8 @@ exports.getUserMissions = async (req, res) => {
 // 자신이 수행해야 할 미션 목록 (u2_id = userId)(방 이름 포함)
 exports.getAssignedMissions = async (req, res) => {
     try {
-        const userId = req.session.user.id;
+        // const userId = req.session.user.id;
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 자신이 수행해야 할 미션 가져오기
         const assignedMissions = await Mission.findAll({
@@ -328,7 +298,8 @@ exports.getAssignedMissions = async (req, res) => {
 // 자신이 부여한 미션 목록 (u1_id = userId)(방 이름 포함)
 exports.getCreatedMissions = async (req, res) => {
     try {
-        const userId = req.session.user.id;
+        // const userId = req.session.user.id;
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 자신이 부여한 미션 가져오기
         const createdMissions = await Mission.findAll({
@@ -370,7 +341,8 @@ exports.getCreatedMissions = async (req, res) => {
 // 자신이 부여한 미션 목록 / 요청 (u1_id = userId)(방 이름 포함)
 exports.getCreatedMissionsReq = async (req, res) => {
     try {
-        const userId = req.session.user.id;
+        // const userId = req.session.user.id;
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 자신이 부여한 미션 가져오기
         const createdMissions = await Mission.findAll({
@@ -412,7 +384,8 @@ exports.getCreatedMissionsReq = async (req, res) => {
 // 자신이 완료한 미션 목록 
 exports.getCompletedMissions = async (req, res) => {
     try {
-        const userId = req.session.user.id;
+        // const userId = req.session.user.id;
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 완료한 미션 가져오기
         const completedMissions = await Mission.findAll({
@@ -449,7 +422,8 @@ exports.getCompletedMissions = async (req, res) => {
 // 자신이 부여한 미션 중 상대가 완료한 미션 목록 
 exports.getGivenCompletedMissions = async (req, res) => {
     try {
-        const userId = req.session.user.id;
+        // const userId = req.session.user.id;
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 부여한 완료된 미션 가져오기
         const givenCompletedMissions = await Mission.findAll({
@@ -484,7 +458,8 @@ exports.getGivenCompletedMissions = async (req, res) => {
 
 // ====== 1. 친구가 수행해야 하는 미션 (추가된 코드) ======
 exports.getFriendAssignedMissions = async (req, res) => {
-    const userId = req.session.user.id;
+    // const userId = req.session.user.id;
+    const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
         // 1. 로그인한 사용자의 친구 목록 조회
@@ -513,7 +488,8 @@ exports.getFriendAssignedMissions = async (req, res) => {
 
 // ====== 2. 친구가 완료한 미션 (추가된 코드) ======
 exports.getFriendCompletedMissions = async (req, res) => {
-    const userId = req.session.user.id;
+    // const userId = req.session.user.id;
+    const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
         // 1. 로그인한 사용자의 친구 목록 조회
@@ -539,9 +515,10 @@ exports.getFriendCompletedMissions = async (req, res) => {
     }
 };
 
-// ======= 3. 인증 권한을 부여한 미션 조회 (추가된 코드) =======
+// ======= 3. 인증 권한을 부여한 미션 조회 =======
 exports.getMissionsWithGrantedAuthority = async (req, res) => {
-    const userId = req.session.user.id;
+    // const userId = req.session.user.id;
+    const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
         // 로그인한 사용자가 인증 권한을 부여한 미션 조회
@@ -556,34 +533,11 @@ exports.getMissionsWithGrantedAuthority = async (req, res) => {
     }
 };
 
-
-
-// // ===== JWT 기반 미션 조회 =====
-// exports.getUserMissions = async (req, res) => {
-//     const token = req.headers.authorization?.split(' ')[1];
-//     if (!token) {
-//         return res.status(401).json({ message: '로그인이 필요합니다.' });
-//     }
-
-//     try {
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//         const userId = decoded.id;
-
-//         const missions = await Mission.findAll({
-//             where: { u1_id: userId },
-//         });
-
-//         res.json({ missions });
-//     } catch (error) {
-//         return res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
-//     }
-// };
-
-
 // 미션 인증 요청 함수
 exports.requestMissionApproval = async (req, res) => {
     const { m_id } = req.body; // 클라이언트에서 미션 ID 전달
-    const userId = req.session?.user?.id; // 세션에서 로그인된 사용자 ID 가져오기
+    // const userId = req.session?.user?.id; // 세션에서 로그인된 사용자 ID 가져오기
+    const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
         // 미션이 존재하는지 확인
@@ -660,7 +614,8 @@ exports.requestMissionApproval = async (req, res) => {
 // 미션 성공 처리 함수
 exports.successMission = async (req, res) => {
     const { m_id } = req.body;
-    const u1_id = req.session.user.id;
+    // const u1_id = req.session.user.id;
+    const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
     
     try {
         const mission = await Mission.findOne({ where: { m_id, u1_id } });
@@ -750,7 +705,8 @@ exports.successMission = async (req, res) => {
 // 미션 실패 처리 함수
 exports.failureMission = async (req, res) => {
     const { m_id } = req.body;
-    const u1_id = req.session.user.id;
+    // const u1_id = req.session.user.id;
+    const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
     try {
         const mission = await Mission.findOne({ where: { m_id, u1_id } });
 
@@ -838,7 +794,8 @@ exports.failureMission = async (req, res) => {
 //방미션출력
 exports.printRoomMission = async (req, res) => {
     const { u2_id } = req.body; // 클라이언트에서 상대방 ID 전달
-    const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID (세션)
+    // const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID (세션)
+    const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     if (!u2_id) {
         return res.status(400).json({ success: false, message: '상대방 ID(u2_id)는 필수입니다.' });
@@ -1035,7 +992,8 @@ exports.checkMissionDeadline = async () => {
 
 // 자신이 만든 미션 목록, 상태 : 진행중
 exports.getRequestedSelfMissions = async (req, res) => {
-    const userId = req.session.user.id; // 현재 로그인한 사용자 ID
+    // const userId = req.session.user.id; // 현재 로그인한 사용자 ID
+    const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
         // 자신이 자기 자신에게 생성한 상태가 "진행중"인 미션 조회
@@ -1110,7 +1068,8 @@ exports.requestVoteForMission = async (req, res) => {
 // 추천 미션 기반으로 미션 생성
 exports.createMissionFromRecommendation = async (req, res) => {
     const { m_title } = req.body; // 추천 미션 제목
-    const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID
+    // const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID
+    const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     if (!u1_id || !m_title) {
         return res.status(400).json({ success: false, message: '필수 데이터가 누락되었습니다.' });

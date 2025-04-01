@@ -105,16 +105,11 @@
 
     <script>
 
-        // const token = localStorage.getItem('token'); // ✅ JWT 토큰 가져오기
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-        const token = getCookie('token');
-        console.log('🔑 저장된 토큰:', token); // ✅ 추가: 토큰 제대로 불러오는지 확인
+        const token = localStorage.getItem('token');
+        console.log('🔑 저장된 토큰:', token);
+
         if (!token) {
-            alert("로그인이 필요합니다.");
+        alert("로그인이 필요합니다.");
             window.location.href = '/';
         }
 

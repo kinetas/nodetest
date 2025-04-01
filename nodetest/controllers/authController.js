@@ -297,41 +297,46 @@ exports.deleteAccount = async (req, res) => { // 추가
 
 const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불러오기
 const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
-exports.loginToken = async (req, res) => { 
+exports.loginToken = async (req, res) => {
     try {
-        // 유저 아이디, 비밀번호 받아옴
         const { userId, password } = req.body;
 
-        // 아이디로 해당 유저 검색
-        const user = await User.findOne({ where: { u_id: userId } })
+        // 사용자 조회
+        const user = await User.findOne({ where: { u_id: userId } });
 
-        // 아이디가 db에 없을 경우 에러 메세지 전송
         if (!user) {
-            return res.status(400).json({ message: '가입되지 않은 아이디입니다.' });
+            return res.status(400).json({ success: false, message: '가입되지 않은 아이디입니다.' });
         }
 
-        // 비밀번호 일치 여부 확인
         const isMatched = await comparePassword(password, user.u_password);
 
-        // 일치하지 않을 경우 에러 메세지 전송
         if (!isMatched) {
-            return res.status(401).json({ message: '비밀번호가 일치하지 않습니다.' });
+            return res.status(401).json({ success: false, message: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // 유저 id로 토큰 페이로드 정보 생성
+        // JWT 페이로드 설정
         const payload = {
-            userId: user.u_id
+            userId: user.u_id,  // 클레임 이름은 loginRequired.js와 일치시켜야 함
         };
-        // jwt.js에서 작성된 토큰 생성 코드 실행
-        const token = generateToken(payload);
 
-        // 'token' 이라는 쿠키 이름으로 토큰 저장, 'httpOnly' 옵션으로 접근 보호
-        // 'maxAge' 옵션을 3600000(1시간, 밀리초) 설정
-        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });
-        res.json({ message: '성공적으로 로그인 되었습니다.', user, token });
+        // 토큰 생성
+        const token = generateToken(payload); // 1시간 유효 토큰 발급
+
+        // 클라이언트로 토큰 전달
+        return res.status(200).json({
+            success: true,
+            message: '성공적으로 로그인 되었습니다.',
+            token, // ✅ 클라이언트는 이걸 localStorage에 저장
+            user: {
+                u_id: user.u_id,
+                u_name: user.u_name,
+                // 추가 정보 필요한 경우 여기에 포함
+            }
+        });
+
     } catch (error) {
         console.error('loginToken error:', error);
-        res.status(500).json({ message: '서버 오류가 발생했습니다.' });
+        return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
     }
 };
 

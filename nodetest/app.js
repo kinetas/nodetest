@@ -115,7 +115,7 @@ app.post('/api/rooms/enter', roomController.enterRoom);
 
 
 // �삁�떆: ����?��蹂�??�??? �씪�슦�듃 蹂댄?��
-app.get('/dashboard', requireAuth, (req, res) => {
+app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
     // const userId = req.session.user.id;
     // res.json({ userId });

@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const findInfoController = require('../controllers/findInfoController');
 
-router.post('/login', authController.login);
+// router.post('/login', authController.login);
 
 // // ===== JWT 기반 로그인 =====
 // router.post('/login', authController.login);

@@ -42,6 +42,7 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log("🔁 로그인 응답:", data); // ✅ 응답 전체 보기
                 if (data.token) {
                     // localStorage에 토큰 저장
                     localStorage.setItem('token', data.token);

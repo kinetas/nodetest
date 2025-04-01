@@ -322,6 +322,13 @@ exports.loginToken = async (req, res) => {
         // 토큰 생성
         const token = generateToken(payload); // 1시간 유효 토큰 발급
 
+        // 쿠키 설정
+        res.cookie('token', token, {
+            httpOnly: true,   // JavaScript에서 쿠키 접근 방지
+            secure: false,     // true: HTTPS에서만 쿠키 전송
+            sameSite: 'None'  // 크로스 오리진 요청 허용
+        });
+
         // 클라이언트로 토큰 전달
         return res.status(200).json({
             success: true,

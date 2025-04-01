@@ -203,7 +203,7 @@ app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/res
 
 // userInfoRoutes ?���??
 // app.use('/api/user-info', userInfoRoutes);
-app.use('/api/user-info', timeConverterMiddleware, requireAuth, userInfoRoutes);
+app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 
 // 친구 리스?�� ?��?��?�� 추�??
 // app.use('/dashboard/friends', friendRoutes);

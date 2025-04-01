@@ -42,7 +42,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log("🔁 로그인 응답:", data); // ✅ 응답 전체 보기
+                console.log("🔁 로그인 응답 데이터:", data); // ✅ 이게 핵심
+                console.log("🔐 응답 토큰:", data.token);   // ✅ undefined면 서버 응답 문제
                 if (data.token) {
                     // localStorage에 토큰 저장
                     localStorage.setItem('token', data.token);
@@ -50,7 +51,7 @@
 
                     setTimeout(() => {
                         window.location.href = '/dashboard';
-                    }, 100); // 100ms 지연 후 이동
+                    }, 10000); // 100ms 지연 후 이동
 
                     // 로그인 성공 시 리디렉션
                     window.location.href = '/dashboard';

@@ -3,6 +3,8 @@ const axios = require('axios');
 // AI 서버 주소 (내부 주소 기반 - 실제 환경에 맞게 수정)
 const AI_SERVER_URL = 'http://27.113.11.48:8000/recommend';
 
+let latestAiMessage = null;
+
 exports.askQuestion = async (req, res) => {
   const { question } = req.body;
   if (!question) {
@@ -36,4 +38,11 @@ exports.receiveAiMessage = (req, res) => {
 
   // 일단 응답만 간단하게
   res.status(200).json({ success: true, message: "메시지 수신 완료" });
+};
+
+exports.getLatestAiMessage = (req, res) => {
+  if (!latestAiMessage) {
+    return res.status(404).json({ error: '아직 메시지가 없습니다.' });
+  }
+  res.status(200).json(latestAiMessage);
 };

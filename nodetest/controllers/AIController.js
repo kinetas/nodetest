@@ -10,7 +10,10 @@ exports.askQuestion = async (req, res) => {
   }
   try {
     // AI 서버에 질문을 전송 (JSON 형식)
-    const response = await axios.post(AI_SERVER_URL, { question });
+    // const response = await axios.post(AI_SERVER_URL, { question });
+    const response = await axios.post(`${AI_SERVER_URL}/recommend`, {
+      category: question
+    });
     // AI 서버의 응답을 클라이언트(플러터)로 전달
     res.status(200).json({ result: response.data });
   } catch (error) {

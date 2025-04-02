@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.responses import FileResponse  # FileResponse 임포트 추가
 from fastapi.staticfiles import StaticFiles
 from typing import List
@@ -7,7 +7,7 @@ import json
 app = FastAPI()
 
 # WebSocket 연결 저장소
-active_connections: List[Websocket] = []
+active_connections: List[WebSocket] = []
 
 # WebSocket 엔드포인트
 @app.websocket("/ws")

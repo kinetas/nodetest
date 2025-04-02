@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-sanitizer": "^1.0.6"
+  }
+}

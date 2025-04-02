@@ -56,7 +56,6 @@ services:
       - ollama_data:/root/.ollama
     
   webRTC_server:
-    image: webrtc-server
     build: ./webRTC_server  # FastAPI 기반 WebRTC 시그널링 서버
     container_name: webRTC_server
     restart: always
@@ -64,7 +63,8 @@ services:
       - "8500:8500"  # WebRTC 서버 포트 매핑
     depends_on:
       - turnserver
-
+    volumes:
+      - ./docker/WEBRTC_SERVER/SECRETE:/app/cert  # 인증서 파일 경로를 마운트
   turnserver:
     image: coturn/coturn
     container_name: turnserver

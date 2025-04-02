@@ -17,4 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 6. FastAPI 서버 실행 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8500"]
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8500"]
+
+# uvicorn을 사용해 HTTPS로 FastAPI 실행
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8500", "--ssl-keyfile", "/app/cert/cert.key", "--ssl-certfile", "/app/cert/cert.crt"]

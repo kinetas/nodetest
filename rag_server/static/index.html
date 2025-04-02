@@ -80,6 +80,16 @@
       const data = await res.json();
       document.getElementById('result').textContent = data.message;
       document.getElementById('responseTime').textContent = data.response_time_sec + "초";
+
+      console.log("전체 JSON 응답:", data);
+      const fullJson = document.createElement('pre');
+      fullJson.textContent = JSON.stringify(data, null, 2);
+
+      const oldDebug = document.getElementById("jsonDebug");
+      if (oldDebug) oldDebug.replaceWith(fullJson);
+      fullJson.id = "jsonDebug";
+      
+      document.body.appendChild(fullJson);
     }
 
     async function loadDocuments() {

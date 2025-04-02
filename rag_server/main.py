@@ -276,6 +276,9 @@ from dotenv import load_dotenv
 import os, requests, re, json, time
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 
 # 환경 설정
 load_dotenv()

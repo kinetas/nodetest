@@ -3,7 +3,7 @@ const sequelize = require('../config/db');
 
 const Mission = sequelize.define('Mission', {
   m_id: {
-    type: DataTypes.STRING(20),
+    type: DataTypes.STRING(40),
     allowNull: false,
     unique: true,
   },

@@ -27,17 +27,10 @@ async def websocket_endpoint(websocket: WebSocket):
         active_connections.remove(websocket)
 
 # 정적 파일 static 폴더 경로 설정
-<<<<<<< HEAD
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # 루트 경로에서 index.html 파일 서빙
 @app.get("/")
 async def serve_index():
     return FileResponse("static/index.html")
-=======
-    app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
-@app.get("/")
-def serve_index():
-    return FileResponse("static/index.html")
->>>>>>> 416da54df02abb93c356d6a5f9e899fbcbe370c0

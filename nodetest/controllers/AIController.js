@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // AI 서버 주소 (내부 주소 기반 - 실제 환경에 맞게 수정)
-const AI_SERVER_URL = 'http://27.113.11.48:8000';
+const AI_SERVER_URL = 'http://27.113.11.48:8000/recommend';
 
 exports.askQuestion = async (req, res) => {
   const { question } = req.body;
@@ -20,4 +20,20 @@ exports.askQuestion = async (req, res) => {
     console.error('AI 서버 요청 실패:', error.message);
     res.status(500).json({ error: 'AI 서버와 통신 실패' });
   }
+};
+
+exports.receiveAiMessage = (req, res) => {
+  const { message, category } = req.body;
+
+  if (!message || !category) {
+    return res.status(400).json({ error: "message와 category가 필요합니다." });
+  }
+
+  // 콘솔 로그로 확인
+  console.log(`📩 AI 서버로부터 메시지 수신됨`);
+  console.log(`- category: ${category}`);
+  console.log(`- message: ${message}`);
+
+  // 일단 응답만 간단하게
+  res.status(200).json({ success: true, message: "메시지 수신 완료" });
 };

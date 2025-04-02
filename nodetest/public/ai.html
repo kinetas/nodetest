@@ -21,6 +21,13 @@
   <button onclick="askAI()">질문 보내기</button>
   <p id="responseText">AI 응답이 여기에 표시됩니다.</p>
 
+  <hr />
+  <h2>📩 AI 서버로부터 받은 메시지</h2>
+  <div class="box">
+    <strong>카테고리:</strong> <span id="latestCategory">(없음)</span><br />
+    <strong>메시지:</strong> <span id="latestMessage">(아직 없음)</span>
+  </div>
+
   <script>
     // async function sendMessage() {
     //   const message = document.getElementById('userInput').value;
@@ -56,6 +63,18 @@
               responseElement.textContent = "오류 발생: " + err.message;
           }
       }
+
+    async function loadLatestAiMessage() {
+      try {
+        const res = await fetch('/api/ai/receiveAiMessage');
+        const data = await res.json();
+        document.getElementById('latestCategory').textContent = data.category || '(없음)';
+        document.getElementById('latestMessage').textContent = data.message || '(없음)';
+      } catch (e) {
+        document.getElementById('latestCategory').textContent = '(에러 발생)';
+        document.getElementById('latestMessage').textContent = '(에러 발생)';
+      }
+    }
   </script>
 </body>
 </html>

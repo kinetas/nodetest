@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse  # FileResponse 임포트 추가
 from fastapi.staticfiles import StaticFiles
 from typing import List
 import json
+import uvicorn
 
 app = FastAPI()
 
@@ -34,3 +35,7 @@ app.mount("/", StaticFiles(directory="static", html=True), name="static")
 async def serve_index():
     return FileResponse("static/index.html")
 
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8500, 
+                ssl_keyfile="/docker/WEBRTC_SERVER/SECRETE/cert.key", 
+                ssl_certfile="/docker/WEBRTC_SERVER/SECRETE/cert.crt")

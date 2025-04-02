@@ -64,9 +64,9 @@
           }
       }
 
-    async function loadLatestAiMessage() {
+      async function loadLatestAiMessage() {
       try {
-        const res = await fetch('/api/ai/receiveAiMessage');
+        const res = await fetch('/api/ai/latest');
         const data = await res.json();
         document.getElementById('latestCategory').textContent = data.category || '(없음)';
         document.getElementById('latestMessage').textContent = data.message || '(없음)';
@@ -75,6 +75,9 @@
         document.getElementById('latestMessage').textContent = '(에러 발생)';
       }
     }
+
+    setInterval(loadLatestAiMessage, 3000);
+    window.onload = loadLatestAiMessage;
   </script>
 </body>
 </html>

@@ -56,6 +56,7 @@ services:
       - ollama_data:/root/.ollama
     
   webRTC_server:
+    image: webrtc-server
     build: ./webRTC_server  # FastAPI 기반 WebRTC 시그널링 서버
     container_name: webRTC_server
     restart: always

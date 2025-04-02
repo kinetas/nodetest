@@ -21,5 +21,6 @@ const aiController = require('../controllers/aiController');
 // });
 
 router.post('/ask', aiController.askQuestion);
+router.post('/receiveAiMessage', aiController.receiveAiMessage);
 
 module.exports = router;

@@ -7,7 +7,7 @@ import json
 app = FastAPI()
 
 # WebSocket 연결 저장소
-active_connections: List[WebSocket] = []
+active_connections: List[Websocket] = []
 
 # WebSocket 엔드포인트
 @app.websocket("/ws")

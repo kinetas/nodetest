@@ -27,4 +27,8 @@ async def websocket_endpoint(websocket: WebSocket):
         active_connections.remove(websocket)
         
 # 정적 파일 static 폴더 경로 설정
-    app.mount("/", StaticFiles(directory="static", html=True), name="static")
+    app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+
+@app.get("/")
+def serve_index():
+    return FileResponse("static/index.html")

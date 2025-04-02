@@ -10,11 +10,11 @@
   </style>
 </head>
 <body>
-  <!-- <h1>AI 챗봇 미션 추천</h1>
+  <h1>AI 챗봇 미션 추천</h1>
   <textarea id="userInput" rows="4" placeholder="예: 나 운동 추천해줘"></textarea>
   <button onclick="sendMessage()">추천 요청</button>
 
-  <pre id="result">결과가 여기에 표시됩니다.</pre> -->
+  <pre id="result">결과가 여기에 표시됩니다.</pre>
 
   <h1>AI에게 질문하기</h1>
   <input type="text" id="questionInput" placeholder="질문을 입력하세요">
@@ -22,18 +22,18 @@
   <p id="responseText">AI 응답이 여기에 표시됩니다.</p>
 
   <script>
-    // async function sendMessage() {
-    //   const message = document.getElementById('userInput').value;
+    async function sendMessage() {
+      const message = document.getElementById('userInput').value;
 
-    //   const res = await fetch('/api/ai/recommend', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ message })
-    //   });
+      const res = await fetch('/api/ai/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
 
-    //   const data = await res.json();
-    //   document.getElementById('result').textContent = data.result || data.error || "오류 발생";
-    // }
+      const data = await res.json();
+      document.getElementById('result').textContent = data.result || data.error || "오류 발생";
+    }
 
     async function askAI() {
           const question = document.getElementById('questionInput').value;

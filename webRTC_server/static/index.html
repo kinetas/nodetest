@@ -37,34 +37,29 @@
             }
         };
 
-        async function startCall() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById("localVideo").srcObject = localStream;
-                peerConnection = createPeerConnection();
-                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-    
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-                ws.send(JSON.stringify({ offer }));
-            } catch (error) {
-                console.error("Error accessing media devices.", error);  // 오류 출력
-                alert("Camera and microphone permissions are required for this app!");
-            }
-        }
+    async function startCall() {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById("localVideo").srcObject = localStream;
+        peerConnection = createPeerConnection();
+        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
-        function createPeerConnection() {
-            const pc = new RTCPeerConnection(iceServers);
-            pc.ontrack = (event) => {
-                document.getElementById("remoteVideo").srcObject = event.streams[0];
-            };
-            pc.onicecandidate = (event) => {
-                if (event.candidate) ws.send(JSON.stringify({ candidate: event.candidate }));
-            };
-            return pc;
-        }
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        ws.send(JSON.stringify({ offer }));
+    }
 
-        document.getElementById("startCall").addEventListener("click", startCall);
-    </script>
+    function createPeerConnection() {
+        const pc = new RTCPeerConnection(iceServers);
+        pc.ontrack = (event) => {
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+        };
+        pc.onicecandidate = (event) => {
+            if (event.candidate) ws.send(JSON.stringify({ candidate: event.candidate }));
+        };
+        return pc;
+    }
+
+    document.getElementById("startCall").addEventListener("click", startCall);
+</script>
 </body>
 </html>

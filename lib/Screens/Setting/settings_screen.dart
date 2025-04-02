@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../Login_page/StartLogin_screen.dart'; // StartLogin_screen.dart 경로 확인
-import '../../SessionCookieManager.dart'; // SessionCookieManager 경로 확인
-import '../../DeviceTokenManager.dart'; // DeviceTokenManager 경로 확인
+import '../../SessionCookieManager.dart';
+import '../../DeviceTokenManager.dart';
+import '../Login_page/StartLogin_screen.dart';
+import 'SettingWidgets/SettingOptionsList.dart';
 
 class SettingsScreen extends StatelessWidget {
   final VoidCallback onNavigateToHome;
@@ -10,40 +11,33 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback onNavigateToMission;
   final VoidCallback onNavigateToCommunity;
 
-  SettingsScreen({
+  const SettingsScreen({
+    Key? key,
     required this.onNavigateToHome,
     required this.onNavigateToChat,
     required this.onNavigateToMission,
     required this.onNavigateToCommunity,
-  });
+  }) : super(key: key);
 
+  // 로그아웃 처리 함수
   Future<void> _logout(BuildContext context) async {
     try {
-      // 로그아웃 API 호출
       final response = await SessionCookieManager.post(
         'http://27.113.11.48:3000/api/auth/logout',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200) {
-        print("[DEBUG] Logout API called successfully.");
+        print("[DEBUG] Logout API Success");
       } else {
-        print("[DEBUG] Logout API failed with status: ${response.statusCode}");
+        print("[DEBUG] Logout Failed: ${response.statusCode}");
       }
 
-      // 모든 SharedPreferences 데이터 삭제
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      // 세션 쿠키 삭제
       await SessionCookieManager.clearSessionCookie();
-      print("[DEBUG] Session cookie cleared during logout.");
-
-      // 디바이스 토큰 삭제
       DeviceTokenManager().clearToken();
-      print("[DEBUG] Device token cleared during logout.");
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('로그아웃되었습니다.')),
@@ -51,14 +45,13 @@ class SettingsScreen extends StatelessWidget {
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => StartLoginScreen()),
+        MaterialPageRoute(builder: (_) => StartLoginScreen()),
             (route) => false,
       );
     } catch (e) {
-      print("[ERROR] Logout process failed: $e");
-
+      print("[ERROR] Logout Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그아웃에 실패했습니다. 다시 시도해주세요.')),
+        SnackBar(content: Text('로그아웃에 실패했습니다.')),
       );
     }
   }
@@ -66,66 +59,95 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // 배경을 흰색으로 고정
       appBar: AppBar(
-        title: Text('Settings'),
-        backgroundColor: Colors.lightBlue,
+        title: const Text('설정'),
+        centerTitle: false,
+        backgroundColor: Colors.white,
         elevation: 0,
+        foregroundColor: Colors.black,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.lightBlue.shade100, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+
+          // ✅ 상단 네 가지 주요 이동 버튼 (2x2 레이아웃 + 터치 피드백)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 2.8,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                _buildTopButton(context, '홈 이동', onNavigateToHome),
+                _buildTopButton(context, '채팅 이동', onNavigateToChat),
+                _buildTopButton(context, '미션 이동', onNavigateToMission),
+                _buildTopButton(context, '커뮤니티 이동', onNavigateToCommunity),
+              ],
+            ),
           ),
-        ),
-        child: ListView(
-          padding: EdgeInsets.all(16.0),
-          children: [
-            _buildCustomButton('홈 화면으로 이동', onNavigateToHome),
-            SizedBox(height: 10),
-            _buildCustomButton('채팅 화면으로 이동', onNavigateToChat),
-            SizedBox(height: 10),
-            _buildCustomButton('미션 화면으로 이동', onNavigateToMission),
-            SizedBox(height: 10),
-            _buildCustomButton('커뮤니티 화면으로 이동', onNavigateToCommunity),
-            SizedBox(height: 20),
-            ElevatedButton(
+
+          const SizedBox(height: 16),
+
+          const Divider(thickness: 1, height: 16),
+
+          // ✅ 중단 기능 버튼 목록 (모듈화)
+          const SettingOptionsList(),
+
+          const Spacer(),
+
+          // ✅ 하단 로그아웃 버튼
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: ElevatedButton(
               onPressed: () => _logout(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
-                padding: EdgeInsets.symmetric(vertical: 14.0),
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                minimumSize: Size(double.infinity, 50),
               ),
-              child: Text(
+              child: const Text(
                 '로그아웃',
-                style: TextStyle(fontSize: 16.0, color: Colors.white),
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildCustomButton(String text, VoidCallback onPressed) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.lightBlue,
-        shadowColor: Colors.lightBlueAccent,
-        elevation: 3,
-        padding: EdgeInsets.symmetric(vertical: 14.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
+  /// ✅ 상단 주요 버튼 하나 생성 (InkWell로 터치 피드백 적용)
+  Widget _buildTopButton(
+      BuildContext context,
+      String label,
+      VoidCallback onTap,
+      ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      splashColor: Colors.blue.withOpacity(0.2),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(8),
         ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+        child: Center(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // AI 서버 주소 (내부 주소 기반 - 실제 환경에 맞게 수정)
-const AI_SERVER_URL = 'http://27.113.11.48:8000/recommend';
+const AI_SERVER_URL = 'http://27.113.11.48:8000';
 
 let latestAiMessage = null;
 

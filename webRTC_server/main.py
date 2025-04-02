@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket
 from fastapi.responses import FileResponse  # FileResponse 임포트 추가
 from fastapi.staticfiles import StaticFiles
 from typing import List

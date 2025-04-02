@@ -23,7 +23,7 @@ exports.askQuestion = async (req, res) => {
     res.status(500).json({ error: 'AI 서버와 통신 실패' });
   }
 };
-
+  
 exports.receiveAiMessage = (req, res) => {
   const { message, category } = req.body;
 

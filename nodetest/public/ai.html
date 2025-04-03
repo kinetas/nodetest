@@ -53,15 +53,18 @@
                   },
                   body: JSON.stringify({ question })
               });
-              const data = await response.json();
               if (data.result) {
-                  responseElement.textContent = data.result.message || JSON.stringify(data.result);
+                responseElement.textContent = data.result.message || "(메시지 없음)";
+                // ✅ 전체 JSON을 보기 좋게 출력
+                fullJsonElement.textContent = JSON.stringify(data.result, null, 2);
               } else {
-                  responseElement.textContent = "오류: 응답 없음";
+                responseElement.textContent = "오류: 응답 없음";
+                fullJsonElement.textContent = "(오류 발생)";
               }
-          } catch (err) {
+            } catch (err) {
               responseElement.textContent = "오류 발생: " + err.message;
-          }
+              fullJsonElement.textContent = "(예외 발생)";
+            }
       }
 
     //   async function loadLatestAiMessage() {

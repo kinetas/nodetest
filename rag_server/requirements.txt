@@ -7,3 +7,5 @@ langchain-chroma
 chromadb
 ollama
 python-dotenv
+beautifulsoup4
+requests

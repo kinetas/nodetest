@@ -59,9 +59,14 @@
                 await peerConnection.setLocalDescription(answer);
                 ws.send(JSON.stringify({ answer }));
             } else if (data.answer) {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                if (peerConnection) {
+                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                    console.log("Answer 설정 완료");
+                }
             } else if (data.candidate) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                if (peerConnection) {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                }
             }
         };
 

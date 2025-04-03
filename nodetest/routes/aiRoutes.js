@@ -22,6 +22,6 @@ const aiController = require('../controllers/AIController');
 
 router.post('/ask', aiController.askQuestion);
 router.post('/receiveAiMessage', aiController.receiveAiMessage);
-router.get('/latest', aiController.getLatestAiMessage);
+// router.get('/latest', aiController.getLatestAiMessage);
 
 module.exports = router;

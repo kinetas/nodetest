@@ -33,7 +33,7 @@ router.post('/logoutToken', (req, res) => {
 });
 
 // ✅ 비밀번호 변경 라우터는 JWT 인증 필요
-router.post('/changePassword', loginRequired, findInfoController.changePassword);
+router.post('/changePassword', findInfoController.changePassword);
 
 
 

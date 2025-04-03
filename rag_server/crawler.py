@@ -104,58 +104,14 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-import time, json, uuid
+import time
+import json
+import uuid
 
-# ✅ Selenium 설정 (Headless 모드)
-options = Options()
-options.add_argument('--headless')
-options.add_argument('--no-sandbox')
-options.add_argument('--disable-dev-shm-usage')
-
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-# ✅ 블로그 링크 크롤링 함수
-def get_blog_links(keyword, max_links=3):
-    print(f"\n🔍 '{keyword}' 키워드로 블로그 검색 시작...")
-    query = keyword.replace(" ", "+")
-    url = f"https://search.naver.com/search.naver?where=view&query={query}&sm=tab_opt"
-    driver.get(url)
-    time.sleep(2)  # 렌더링 대기
-
-    anchors = driver.find_elements(By.CSS_SELECTOR, "a.api_txt_lines.total_tit")
-    links = []
-    for a in anchors:
-        href = a.get_attribute("href")
-        if href and href.startswith("https://blog.naver.com"):
-            links.append(href)
-        if len(links) >= max_links:
-            break
-
-    print(f"🔗 수집된 블로그 링크 수: {len(links)}")
-    return links
-
-# ✅ 블로그 본문 크롤링 함수 (iframe 내부 접근)
-def crawl_naver_blog(url):
-    try:
-        driver.get(url)
-        time.sleep(2)
-
-        # iframe으로 전환
-        iframe = driver.find_element(By.ID, "mainFrame")
-        driver.switch_to.frame(iframe)
-        time.sleep(2)
-
-        content_divs = driver.find_elements(By.CSS_SELECTOR, "div.se-main-container")
-        content = "\n".join([div.text for div in content_divs])
-        driver.switch_to.default_content()
-        return content.strip()
-    except Exception as e:
-        print(f"❌ 크롤링 실패: {e}")
-        return ""
-
-# ✅ 키워드와 카테고리 정의
 keywords = [
     ("미라클 모닝 루틴", "자기관리"),
     ("자기개발 루틴", "자기개발"),
@@ -163,27 +119,58 @@ keywords = [
     ("요리 루틴", "생활습관")
 ]
 
+options = Options()
+options.add_argument("--headless")  # 창 없이 실행
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
 collected = []
 
 for keyword, category in keywords:
-    links = get_blog_links(keyword)
-    for link in links:
-        time.sleep(3)
-        content = crawl_naver_blog(link)
-        if content:
-            collected.append({
-                "id": str(uuid.uuid4()),
-                "document": content[:2000],
-                "metadata": {
-                    "tag": keyword,
-                    "category": category,
-                    "source": link
-                }
-            })
+    print(f"\n🔍 '{keyword}' 키워드로 블로그 검색 시작...")
+    search_url = f"https://search.naver.com/search.naver?where=view&query={keyword}"
+    driver.get(search_url)
 
-# ✅ JSON 저장
+    try:
+        WebDriverWait(driver, 5).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.api_txt_lines.total_tit"))
+        )
+        link_elements = driver.find_elements(By.CSS_SELECTOR, "a.api_txt_lines.total_tit")
+        links = [a.get_attribute("href") for a in link_elements if "blog.naver.com" in a.get_attribute("href")][:3]
+
+        print(f"🔗 수집된 블로그 링크 수: {len(links)}")
+
+        for link in links:
+            driver.get(link)
+            time.sleep(3)  # iframe 로딩 대기
+
+            try:
+                driver.switch_to.frame("mainFrame")
+                content_elem = driver.find_element(By.CSS_SELECTOR, "div.se-main-container")
+                content = content_elem.text.strip()
+            except:
+                content = ""
+
+            if content:
+                collected.append({
+                    "id": str(uuid.uuid4()),
+                    "document": content[:2000],
+                    "metadata": {
+                        "tag": keyword,
+                        "category": category,
+                        "source": link
+                    }
+                })
+
+    except Exception as e:
+        print(f"⚠ 블로그 링크 수집 실패: {e}")
+    time.sleep(2)
+
+driver.quit()
+
 with open("blog_data.json", "w", encoding="utf-8") as f:
     json.dump(collected, f, ensure_ascii=False, indent=2)
 
 print(f"\n✅ {len(collected)}개의 블로그 문서 저장 완료 → blog_data.json")
-driver.quit()

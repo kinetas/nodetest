@@ -5,15 +5,9 @@ const findInfoController = require('../controllers/findInfoController');
 
 // router.post('/login', authController.login);
 
-// // ===== JWT 기반 로그인 =====
-// router.post('/login', authController.login);
-// router.post('/register', authController.register);
-// router.post('/findUid', findInfoController.findUid);
-// router.post('/changePassword', findInfoController.changePassword);
-
 router.post('/register', authController.register);
 router.post('/findUid', findInfoController.findUid); // 아이디 찾기 경로 추가
-router.post('/changePassword', findInfoController.changePassword); // 비밀번호 변경 경로 추가
+// router.post('/changePassword', findInfoController.changePassword); // 비밀번호 변경 경로 추가
 router.post('/logout', authController.logOut); // 로그아웃 경로 추가
 
 router.delete('/deleteAccount', authController.deleteAccount); // 추가: 계정 탈퇴 경로
@@ -37,6 +31,9 @@ router.post('/logoutToken', (req, res) => {
         res.status(400).json({ message: err.message }); // JSON 형식으로 에러 메시지 반환
     }
 });
+
+// ✅ 비밀번호 변경 라우터는 JWT 인증 필요
+router.post('/changePassword', loginRequired, findInfoController.changePassword);
 
 
 

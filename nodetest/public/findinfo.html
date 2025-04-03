@@ -21,12 +21,7 @@
     </form>
     <script>
 
-        // // JWT 토큰 가져오기
-        // const token = localStorage.getItem('jwt'); // JWT 기반으로 토큰 가져오기
-        // if (!token) {
-        //     alert("로그인이 필요합니다.");
-        //     window.location.href = '/'; // 로그인 페이지로 리디렉션
-        // }
+        const token = localStorage.getItem('jwt'); // ✅ JWT 토큰 가져오기
 
         //아이디 찾기
         document.getElementById('findIdButton').addEventListener('click', function() {
@@ -40,12 +35,6 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-
-                // headers: {
-                //     'Content-Type': 'application/json',
-                //     Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
-                // },
-
                 body: JSON.stringify({ name, nickname, birthdate, email })
             })
             .then(response => response.json())
@@ -62,33 +51,61 @@
             });
         });
 
-        //비밀번호 변경
-        document.getElementById('changePasswordButton').addEventListener('click', function() {
-        const userId = document.getElementById('userId').value;
-        const newPassword = document.getElementById('newPassword').value;
+    //     //비밀번호 변경
+    //     document.getElementById('changePasswordButton').addEventListener('click', function() {
+    //     const userId = document.getElementById('userId').value;
+    //     const newPassword = document.getElementById('newPassword').value;
 
-        fetch('/api/auth/changePassword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+    //     fetch('/api/auth/changePassword', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
 
-            // headers: {
-            //         'Content-Type': 'application/json',
-            //         Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
-            //     },
+    //         // headers: {
+    //         //         'Content-Type': 'application/json',
+    //         //         Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+    //         //     },
 
-            body: JSON.stringify({ userId, newPassword })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-        })
-        .catch(error => {
-            console.error('오류:', error);
-            alert('비밀번호 변경 중 오류가 발생했습니다.');
+    //         body: JSON.stringify({ userId, newPassword })
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         alert(data.message);
+    //     })
+    //     .catch(error => {
+    //         console.error('오류:', error);
+    //         alert('비밀번호 변경 중 오류가 발생했습니다.');
+    //     });
+    // });
+
+        // 비밀번호 변경 (✅ JWT 사용)
+        document.getElementById('changePasswordButton').addEventListener('click', function () {
+            const userId = document.getElementById('userId').value; // 현재는 필요 없음
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                window.location.href = '/';
+                return;
+            }
+
+            fetch('/api/auth/changePassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}` // ✅ JWT 인증 헤더 추가
+                },
+                body: JSON.stringify({ newPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                alert('비밀번호 변경 중 오류가 발생했습니다.');
+            });
         });
-    });
     </script>
 </body>
 </html>

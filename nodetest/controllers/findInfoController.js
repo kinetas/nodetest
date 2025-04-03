@@ -7,6 +7,13 @@ const jwt = require('jsonwebtoken'); // ✅ JWT 모듈 추가
 exports.findUid = async (req, res) => {
     const { name, nickname, birthdate, email } = req.body;
 
+    // ✅ 입력값이 하나라도 누락되었는지 검사
+    if (!name || !nickname || !birthdate || !email) {
+        return res.status(400).json({
+            message: '모든 필드를 입력해주세요: 이름, 닉네임, 생년월일, 이메일이 필요합니다.'
+        });
+    }
+
     try {
 
         // DB에서 조건에 맞는 사용자 조회

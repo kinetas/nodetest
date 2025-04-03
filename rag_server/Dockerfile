@@ -9,6 +9,21 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 RUN apt install -y nodejs
 RUN npm install -g pm2
 
+# ✅ 크롬 및 크롤링에 필요한 시스템 패키지 추가
+RUN apt-get update && apt-get install -y \
+    wget gnupg2 unzip fonts-liberation libappindicator3-1 libasound2 libatk-bridge2.0-0 \
+    libatk1.0-0 libcups2 libdbus-1-3 libgdk-pixbuf2.0-0 libnspr4 libnss3 libx11-xcb1 libxcomposite1 \
+    libxdamage1 libxrandr2 xdg-utils libu2f-udev libvulkan1 libxss1 libgbm1 libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# ✅ 크롬 설치
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google-chrome.list && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

@@ -44,6 +44,11 @@ exports.findUid = async (req, res) => {
 exports.changePassword = async (req, res) => {
     const { userId, newPassword } = req.body; // userId와 새 비밀번호 입력받기
 
+    // ✅ 비밀번호가 비어있는 경우 에러 반환
+    if (!newPassword || newPassword.trim() === '') {
+        return res.status(400).json({ message: '새 비밀번호를 입력해주세요.' });
+    }
+
     try {
         // 입력받은 새 비밀번호를 해시화
         const hashedPassword = await hashPassword(newPassword);

@@ -32,10 +32,22 @@ def crawl_naver_blog(url):
         return ""
     iframe_url = "https://blog.naver.com" + iframe["src"]
     res2 = requests.get(iframe_url, headers=headers)
+
+    if res2.status_code != 200:
+        return ""
+
     soup2 = BeautifulSoup(res2.text, "html.parser")
+
+    # ✅ 새 에디터용
     content_div = soup2.select_one("div.se-main-container")
+
+    # ✅ 구버전 블로그용
+    if not content_div:
+        content_div = soup2.select_one("div#postViewArea")
+
     if content_div:
         return content_div.get_text("\n", strip=True)
+
     return ""
 
 # 여러 키워드로 수집

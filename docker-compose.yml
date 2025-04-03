@@ -76,6 +76,7 @@ services:
       - "5349:5349/tcp"  # TLS 지원
     volumes:
       - ./turnserver/turnserver.conf:/etc/turnserver.conf
+      - ./webRTC_server/SECRETE:/app/cert
 volumes:
   mysql-data:
   chroma-data:

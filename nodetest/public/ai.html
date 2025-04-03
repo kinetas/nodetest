@@ -39,6 +39,7 @@
     async function askAI() {
           const question = document.getElementById('questionInput').value;
           const responseElement = document.getElementById('responseText');
+          const fullJsonElement = document.getElementById('fullJsonResult');
           try {
               const response = await fetch('/api/ai/ask', {
                   method: 'POST',

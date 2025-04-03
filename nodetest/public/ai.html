@@ -20,13 +20,7 @@
   <input type="text" id="questionInput" placeholder="질문을 입력하세요">
   <button onclick="askAI()">질문 보내기</button>
   <p id="responseText">AI 응답이 여기에 표시됩니다.</p>
-
-  <hr />
-  <h2>📩 AI 서버로부터 받은 메시지</h2>
-  <div class="box">
-    <strong>카테고리:</strong> <span id="latestCategory">(없음)</span><br />
-    <strong>메시지:</strong> <span id="latestMessage">(아직 없음)</span>
-  </div>
+  <pre id="fullJsonResult">전체 JSON 응답: (없음)</pre>
 
   <script>
     // async function sendMessage() {

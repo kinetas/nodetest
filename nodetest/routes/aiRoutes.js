@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const aiController = require('../controllers/aiController');
+const aiController = require('../controllers/AIController');
 
 // // FastAPI 주소
 // const RAG_SERVER_URL = 'http://rag_server:8000/recommend'; // Docker 내부 주소

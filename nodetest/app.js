@@ -125,10 +125,10 @@ app.get('/community_missions', (req, res) => {
 });
 
 // ��??���??? �젙蹂�??�� 諛섑?���븯�뒗 �씪�슦�듃 ?��붽��???
-app.get('/user-info', (req, res) => {
-    // res.json({ userId: req.session.user.id }); //세션기반
-    res.json({ userId: req.currentUserId });    //토큰기반
-});
+// app.get('/user-info', (req, res) => {
+//     // res.json({ userId: req.session.user.id }); //세션기반
+//     res.json({ userId: req.currentUserId });    //토큰기반
+// });
 
 
 

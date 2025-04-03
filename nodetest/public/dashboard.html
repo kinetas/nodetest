@@ -484,6 +484,11 @@
             const token = localStorage.getItem('token'); // ✅ 토큰 다시 불러오기
             const f_id = document.getElementById('tf_id_input').value;
 
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+
             if (!f_id) {
                 alert("요청할 친구 ID를 입력하세요.");
                 return;

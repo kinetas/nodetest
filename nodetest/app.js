@@ -12,7 +12,7 @@ const c_missionRoutes = require('./routes/c_missionRoutes');
 const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?�� 추�??
 const userInfoRoutes = require('./routes/userInfoRoutes');
 const recommendationMissionRoutes = require('./routes/recommendationMissionRoutes'); // 라우트 파일 가져오기
-// const aiRoutes = require('./routes/aiRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const { checkMissionStatus } = require('./controllers/c_missionController');
 const { checkMissionDeadline } = require('./controllers/missionController');
 const { checkAndUpdateMissions } = require('./controllers/cVoteController');
@@ -215,7 +215,7 @@ app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
 app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
 
 // //AI관련
-// app.use('/api/ai', aiRoutes);
+app.use('/api/ai', aiRoutes);
 
 // cron.schedule('* * * * *', () => { // �?? �?? ?��?�� 
 cron.schedule('0 0 * * *', () => {

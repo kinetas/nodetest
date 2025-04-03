@@ -298,7 +298,7 @@ class ChatRequest(BaseModel):
 @app.post("/recommend")
 async def recommend(req: ChatRequest):
     start_time = time.time()
-    query = f"{req.category} 오늘 해볼 만한 미션 2가지 추천해줘."
+    query = f"{req.category} 오늘 해볼 만한 미션 하나 추천해줘."
 
     # 🔍 문서 검색
     docs_with_scores = db.similarity_search_with_score(query, k=4)
@@ -325,7 +325,7 @@ async def recommend(req: ChatRequest):
         # ✅ CoT 프롬프트
         final_prompt = (
             "너는 미션 추천 AI야. 아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n\n"
-            "message 항목은 사용자에게 자연스럽고 부드러운 문장이어야 해. \n"
+            "message 항목은 사용자의 요청에 맞는 카테고리를 분석하고 그 카테고리가 어떤 특징과 효과가 있는지 알려주고 그에 따른 미션을 추천해주고 그게 왜 카테고리의 특징이나 효과와 관련있는지 근거를 자연스럽고 부드러운 문장으로 말해줘. \n"
             "단, 아래는 예시일 뿐이니 절대로 복사하지 마:\n"
             '예시: "책상 정리를 해보는 건 어때요? 마음도 함께 정리될 거예요."\n\n'
             "category 항목은 해당 미션의 카테고리를 하나로 요약해서 넣어. (예: 운동, 감정관리, 자기관리, 집중 등)\n\n"

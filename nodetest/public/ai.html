@@ -48,6 +48,9 @@
                   },
                   body: JSON.stringify({ question })
               });
+
+              const data = await response.json();
+              
               if (data.result) {
                 responseElement.textContent = data.result.message || "(메시지 없음)";
                 // ✅ 전체 JSON을 보기 좋게 출력

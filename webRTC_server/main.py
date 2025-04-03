@@ -1,4 +1,4 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket,  WebSocketDisconnect
 from fastapi.responses import FileResponse  # FileResponse 임포트 추가
 from fastapi.staticfiles import StaticFiles
 from typing import List
@@ -26,9 +26,11 @@ async def websocket_endpoint(websocket: WebSocket):
                 if connection != websocket:
                     print(f"Sending data: {data}")  # 보내는 데이터 확인
                     await connection.send_text(json.dumps(data))
-    except Exception:
-        print(f"Error in WebSocket connection: {e}")  # 예외 처리
+    except WebSocketDisconnect as e:
+        print(f"WebSocket disconnected: {e.code}, {e.reason}")  # 연결 종료 이유 로그 출력
         active_connections.remove(websocket)
+    except Exception as e:
+        print(f"Error in WebSocket connection: {str(e)}")  # 예외 메시지 출력
 
 # 정적 파일 static 폴더 경로 설정
 app.mount("/", StaticFiles(directory="static", html=True), name="static")

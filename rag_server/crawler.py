@@ -112,6 +112,7 @@ import time
 import json
 import uuid
 
+# 검색 키워드
 keywords = [
     ("미라클 모닝 루틴", "자기관리"),
     ("자기개발 루틴", "자기개발"),
@@ -119,8 +120,9 @@ keywords = [
     ("요리 루틴", "생활습관")
 ]
 
+# 크롬 옵션 설정
 options = Options()
-options.add_argument("--headless")  # 창 없이 실행
+options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
@@ -165,7 +167,7 @@ for keyword, category in keywords:
                 })
 
     except Exception as e:
-        print(f"⚠ 블로그 링크 수집 실패: {e}")
+        print(f"⚠ 블로그 링크 수집 실패: {e.__class__.__name__}: {e}")
     time.sleep(2)
 
 driver.quit()
@@ -174,3 +176,4 @@ with open("blog_data.json", "w", encoding="utf-8") as f:
     json.dump(collected, f, ensure_ascii=False, indent=2)
 
 print(f"\n✅ {len(collected)}개의 블로그 문서 저장 완료 → blog_data.json")
+

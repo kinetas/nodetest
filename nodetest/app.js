@@ -130,8 +130,6 @@ app.get('/user-info', (req, res) => {
     res.json({ userId: req.currentUserId });    //토큰기반
 });
 
-
-
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));

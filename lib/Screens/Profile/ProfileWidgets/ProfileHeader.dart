@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
 
 /// 프로필 상단 영역 위젯
-/// - 프로필 사진과 사용자 이름을 표시함
-/// - 세팅 영역에서 사진과 이름 수정 가능하게 변경
+/// - 외부에서 사용자 이름과 프로필 이미지를 전달받아 표시함
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({Key? key}) : super(key: key);
+  final String userName;
+  final ImageProvider profileImage;
+
+  const ProfileHeader({
+    Key? key,
+    required this.userName,
+    required this.profileImage,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
+      children: [
         /// 프로필 사진
         CircleAvatar(
           radius: 40,
-          backgroundColor: Colors.grey,
-          child: Icon(
-            Icons.person,
-            size: 40,
-            color: Colors.white,
-          ),
+          backgroundImage: profileImage,
         ),
 
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
 
         /// 사용자 이름
         Text(
-          '사용자 이름',
-          style: TextStyle(
+          userName,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
 
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
       ],
     );
   }

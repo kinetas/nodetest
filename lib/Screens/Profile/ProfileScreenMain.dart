@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import '../Setting/settings_screen.dart';
-import 'ProfileWidgets/ProfileHeader.dart'; // 프로필아이콘(헤더) 위젯 임포트
-import 'ProfileWidgets/ProfileCompletedTab.dart'; // 완료된 미션 위젯 임포트
-import 'ProfileWidgets/ProfileInProgressTab.dart'; // 진행중 미션 위젯 임포트
+import 'ProfileWidgets/ProfileHeader.dart'; // 프로필 아이콘(헤더) 위젯
+import 'ProfileWidgets/ProfileCompletedTab.dart';
+import 'ProfileWidgets/ProfileInProgressTab.dart';
 
-/// 프로필 메인 스크린
-/// - 사용자 프로필 정보, 완료된/진행중 미션을 탭으로 나누어 표시
-/// - 각 UI 구성 요소는 별도 파일로 모듈화되어 있음
 class ProfileScreenMain extends StatefulWidget {
-  const ProfileScreenMain({Key? key}) : super(key: key);
+  final VoidCallback onNavigateToHome;
+  final VoidCallback onNavigateToChat;
+  final VoidCallback onNavigateToMission;
+  final VoidCallback onNavigateToCommunity;
+
+  const ProfileScreenMain({
+    Key? key,
+    required this.onNavigateToHome,
+    required this.onNavigateToChat,
+    required this.onNavigateToMission,
+    required this.onNavigateToCommunity,
+  }) : super(key: key);
 
   @override
   State<ProfileScreenMain> createState() => _ProfileScreenMainState();
@@ -16,21 +24,31 @@ class ProfileScreenMain extends StatefulWidget {
 
 class _ProfileScreenMainState extends State<ProfileScreenMain>
     with SingleTickerProviderStateMixin {
-  /// 탭 컨트롤러 (탭바 및 탭 뷰 전환용)
   late TabController _tabController;
+
+  // ✅ 현재 사용자 이름과 프로필 이미지 상태
+  String _userName = '사용자 이름';
+  ImageProvider _profileImage = const AssetImage('assets/default_profile.png');
 
   @override
   void initState() {
     super.initState();
-    // 탭 2개 (완료된 미션 / 진행중 미션)로 초기화
     _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    // 탭 컨트롤러 해제 → 메모리 누수 방지
     _tabController.dispose();
     super.dispose();
+  }
+
+  /// ✅ SettingsScreen → SettingOptionsList → ProfileEditScreen
+  /// 에서 수정된 사용자 정보를 콜백으로 받아와 상태 업데이트
+  void _handleProfileUpdated(String name, ImageProvider image) {
+    setState(() {
+      _userName = name;
+      _profileImage = image;
+    });
   }
 
   @override
@@ -43,7 +61,6 @@ class _ProfileScreenMainState extends State<ProfileScreenMain>
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
-          // 우측 상단 설정 아이콘 → SettingsScreen 이동
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -51,10 +68,11 @@ class _ProfileScreenMainState extends State<ProfileScreenMain>
                 context,
                 MaterialPageRoute(
                   builder: (context) => SettingsScreen(
-                    onNavigateToHome: () {},
-                    onNavigateToChat: () {},
-                    onNavigateToMission: () {},
-                    onNavigateToCommunity: () {},
+                    onNavigateToHome: widget.onNavigateToHome,
+                    onNavigateToChat: widget.onNavigateToChat,
+                    onNavigateToMission: widget.onNavigateToMission,
+                    onNavigateToCommunity: widget.onNavigateToCommunity,
+                    onProfileEdited: _handleProfileUpdated, // ✅ 콜백 전달
                   ),
                 ),
               );
@@ -66,10 +84,12 @@ class _ProfileScreenMainState extends State<ProfileScreenMain>
         children: [
           const SizedBox(height: 10),
 
-          /// 상단 프로필 정보 (아이콘 + 사용자 이름)
-          const ProfileHeader(),
+          /// ✅ 사용자 정보 전달
+          ProfileHeader(
+            userName: _userName,
+            profileImage: _profileImage,
+          ),
 
-          /// 탭바 (완료된 미션 / 진행중 미션)
           Container(
             decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.grey)),
@@ -86,15 +106,11 @@ class _ProfileScreenMainState extends State<ProfileScreenMain>
             ),
           ),
 
-          /// 탭 내용 영역 (TabBarView)
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: const [
-                /// 완료된 미션 탭 위젯
                 ProfileCompletedTab(),
-
-                /// 진행중 미션 탭 위젯
                 ProfileInProgressTab(),
               ],
             ),

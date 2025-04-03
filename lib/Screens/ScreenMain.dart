@@ -25,7 +25,12 @@ class _MainScreenState extends State<MainScreen> {
       ChatScreen(),
       MissionScreen(),
       CommunityScreen(),
-      ProfileScreenMain(),
+      ProfileScreenMain(
+        onNavigateToHome: () => _onItemTapped(0),
+        onNavigateToChat: () => _onItemTapped(1),
+        onNavigateToMission: () => _onItemTapped(2),
+        onNavigateToCommunity: () => _onItemTapped(3),
+      ),
       /*SettingsScreen(
         onNavigateToHome: () => _onItemTapped(0),
         onNavigateToChat: () => _onItemTapped(1),

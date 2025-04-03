@@ -11,15 +11,18 @@ class SettingsScreen extends StatelessWidget {
   final VoidCallback onNavigateToMission;
   final VoidCallback onNavigateToCommunity;
 
+  /// ✅ 프로필 편집 시 콜백
+  final Function(String newName, ImageProvider newImage)? onProfileEdited;
+
   const SettingsScreen({
     Key? key,
     required this.onNavigateToHome,
     required this.onNavigateToChat,
     required this.onNavigateToMission,
     required this.onNavigateToCommunity,
+    this.onProfileEdited,
   }) : super(key: key);
 
-  // 로그아웃 처리 함수
   Future<void> _logout(BuildContext context) async {
     try {
       final response = await SessionCookieManager.post(
@@ -40,18 +43,18 @@ class SettingsScreen extends StatelessWidget {
       DeviceTokenManager().clearToken();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그아웃되었습니다.')),
+        const SnackBar(content: Text('로그아웃되었습니다.')),
       );
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => StartLoginScreen()),
+        MaterialPageRoute(builder: (_) => const StartLoginScreen()),
             (route) => false,
       );
     } catch (e) {
       print("[ERROR] Logout Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('로그아웃에 실패했습니다.')),
+        const SnackBar(content: Text('로그아웃에 실패했습니다.')),
       );
     }
   }
@@ -59,7 +62,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // 배경을 흰색으로 고정
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('설정'),
         centerTitle: false,
@@ -71,7 +74,7 @@ class SettingsScreen extends StatelessWidget {
         children: [
           const SizedBox(height: 8),
 
-          // ✅ 상단 네 가지 주요 이동 버튼 (2x2 레이아웃 + 터치 피드백)
+          // ✅ 상단 네 가지 주요 이동 버튼
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: GridView.count(
@@ -80,26 +83,39 @@ class SettingsScreen extends StatelessWidget {
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               childAspectRatio: 2.8,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               children: [
-                _buildTopButton(context, '홈 이동', onNavigateToHome),
-                _buildTopButton(context, '채팅 이동', onNavigateToChat),
-                _buildTopButton(context, '미션 이동', onNavigateToMission),
-                _buildTopButton(context, '커뮤니티 이동', onNavigateToCommunity),
+                _buildTopButton(context, '홈 이동', () {
+                  Navigator.pop(context); // 세팅창 닫기
+                  onNavigateToHome();
+                }),
+                _buildTopButton(context, '채팅 이동', () {
+                  Navigator.pop(context);
+                  onNavigateToChat();
+                }),
+                _buildTopButton(context, '미션 이동', () {
+                  Navigator.pop(context);
+                  onNavigateToMission();
+                }),
+                _buildTopButton(context, '커뮤니티 이동', () {
+                  Navigator.pop(context);
+                  onNavigateToCommunity();
+                }),
               ],
             ),
           ),
 
           const SizedBox(height: 16),
-
           const Divider(thickness: 1, height: 16),
 
-          // ✅ 중단 기능 버튼 목록 (모듈화)
-          const SettingOptionsList(),
+          /// ✅ 중단 기능 버튼 (프로필 편집 포함)
+          SettingOptionsList(
+            onProfileEdited: onProfileEdited,
+          ),
 
           const Spacer(),
 
-          // ✅ 하단 로그아웃 버튼
+          /// ✅ 하단 로그아웃 버튼
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: ElevatedButton(
@@ -110,7 +126,7 @@ class SettingsScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
               ),
               child: const Text(
                 '로그아웃',
@@ -123,7 +139,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  /// ✅ 상단 주요 버튼 하나 생성 (InkWell로 터치 피드백 적용)
   Widget _buildTopButton(
       BuildContext context,
       String label,

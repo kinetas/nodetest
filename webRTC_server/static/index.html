@@ -4,11 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebRTC Client</title>
+    <style>
+        /* 전체 비디오 화면 설정 */
+        #localVideo, #remoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 내 비디오를 작은 화면으로 오른쪽 아래에 배치 */
+        #localVideo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 20%;  /* 작은 화면 크기 조정 */
+            height: 20%; /* 작은 화면 크기 조정 */
+            z-index: 10; /* 상대방 영상 위에 표시 */
+            border-radius: 8px; /* 비디오 모서리 둥글게 */
+            border: 2px solid white; /* 테두리 추가 */
+        }
+
+        /* 상대방 비디오는 화면 전체 */
+        #remoteVideo {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
     <h2>WebRTC 테스트</h2>
-    <video id="localVideo" autoplay playsinline></video>
-    <video id="remoteVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video> <!-- 상대방 화면 -->
+    <video id="localVideo" autoplay playsinline muted></video> <!-- 내 화면 -->
     <button id="startCall">Start Call</button>
     <script>
         const ws = new WebSocket("wss://27.113.11.48:8500/ws"); // WebRTC 시그널링 서버
@@ -38,6 +64,7 @@
         };
 
     async function startCall() {
+        // 사용자 미디어 요청
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         document.getElementById("localVideo").srcObject = localStream;
         peerConnection = createPeerConnection();

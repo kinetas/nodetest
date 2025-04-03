@@ -40,10 +40,11 @@
         const ws = new WebSocket("wss://27.113.11.48:8500/ws"); // WebRTC 시그널링 서버
         let localStream;
         let peerConnection;
+        
         const iceServers = {
             iceServers: [
                 { urls: "stun:27.113.11.48:3478" },  // STUN/TURN 서버 설정
-                { urls: "turn:27.113.11.48:3478", username: "turn_user", credential: "turn_password" }
+                { urls: "turn:27.113.11.48:3478", username: "gogi", credential: "gogi0529" }
             ]
         };
 
@@ -86,7 +87,10 @@
         // 상대방 비디오 트랙을 받아서 remoteVideo에 표시
     pc.ontrack = (event) => {
         console.log('Remote stream added:', event.streams[0]);
-        document.getElementById("remoteVideo").srcObject = event.streams[0];
+        // 상대방 스트림이 존재하는지 확인하고 remoteVideo에 할당
+        if (event.streams[0]) {
+            document.getElementById("remoteVideo").srcObject = event.streams[0];
+        }
     };
     
      // ICE 후보가 발생할 때마다 로그 출력하고 서버로 전송

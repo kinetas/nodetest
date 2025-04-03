@@ -18,13 +18,16 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             message = await websocket.receive_text()
+            print(f"Received message: {message}")  # 메시지 확인
             data = json.loads(message)
 
             # Offer, Answer, ICE Candidate 전송
             for connection in active_connections:
                 if connection != websocket:
+                    print(f"Sending data: {data}")  # 보내는 데이터 확인
                     await connection.send_text(json.dumps(data))
     except Exception:
+        print(f"Error in WebSocket connection: {e}")  # 예외 처리
         active_connections.remove(websocket)
 
 # 정적 파일 static 폴더 경로 설정

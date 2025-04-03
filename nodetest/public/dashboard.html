@@ -480,6 +480,8 @@
 
         // 친구 요청 보내기 함수
         function friendRequestSend() {
+
+            const token = localStorage.getItem('token'); // ✅ 토큰 다시 불러오기
             const f_id = document.getElementById('tf_id_input').value;
 
             if (!f_id) {

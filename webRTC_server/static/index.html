@@ -100,6 +100,7 @@
             ws.send(JSON.stringify({ candidate: event.candidate }));
         }
     };
+    return pc;
     }
 
     document.getElementById("startCall").addEventListener("click", startCall);

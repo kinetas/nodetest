@@ -55,7 +55,8 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain_chroma import Chroma
 
 # 경로 설정
-json_file = "documents/data.json"  # 👈 여기에 JSON 저장
+#json_file = "documents/data.json"  # 👈 여기에 JSON 저장
+json_file="blog_data.json" #크롤링버전전
 persist_directory = "/chroma/chroma"
 
 # 임베딩 초기화
@@ -70,7 +71,7 @@ if ids:
 
 # JSON 불러오기
 with open(json_file, "r", encoding="utf-8") as f:
-    data = json.load(f)["documents"]  # 👈 이 부분만 바꾸면 바로 해결됨!
+    data = json.load(f)#["documents"]  # 👈 이 부분만 바꾸면 바로 해결됨!
 
 docs = [
     Document(page_content=item["document"], metadata=item["metadata"])

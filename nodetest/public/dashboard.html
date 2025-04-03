@@ -489,7 +489,10 @@
 
             fetch('/dashboard/friends/request', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가!
+                 },
                 body: JSON.stringify({ f_id })
             })
             .then(response => response.json())

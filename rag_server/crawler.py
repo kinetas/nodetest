@@ -122,7 +122,7 @@ keywords = [
 
 # 크롬 옵션 설정
 options = Options()
-options.add_argument("--headless")
+# options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
@@ -136,7 +136,7 @@ for keyword, category in keywords:
     driver.get(search_url)
 
     try:
-        WebDriverWait(driver, 10).until(  # 대기시간 10초로 설정
+        WebDriverWait(driver, 15).until(  # 대기시간 10초로 설정
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.api_txt_lines.total_tit"))
         )
         link_elements = driver.find_elements(By.CSS_SELECTOR, "a.api_txt_lines.total_tit")

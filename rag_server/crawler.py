@@ -122,10 +122,10 @@ keywords = [
 
 # 크롬 옵션 설정
 options = Options()
-# options.add_argument("--headless")
+options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--user-data-dir=/tmp/chrome_data")
+
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 collected = []
@@ -136,7 +136,7 @@ for keyword, category in keywords:
     driver.get(search_url)
 
     try:
-        WebDriverWait(driver, 15).until(  # 대기시간 10초로 설정
+        WebDriverWait(driver, 5).until(
             EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.api_txt_lines.total_tit"))
         )
         link_elements = driver.find_elements(By.CSS_SELECTOR, "a.api_txt_lines.total_tit")
@@ -152,9 +152,8 @@ for keyword, category in keywords:
                 driver.switch_to.frame("mainFrame")
                 content_elem = driver.find_element(By.CSS_SELECTOR, "div.se-main-container")
                 content = content_elem.text.strip()
-            except Exception as e:
+            except:
                 content = ""
-                print(f"❌ 본문 추출 실패: {e}")
 
             if content:
                 collected.append({
@@ -177,5 +176,4 @@ with open("blog_data.json", "w", encoding="utf-8") as f:
     json.dump(collected, f, ensure_ascii=False, indent=2)
 
 print(f"\n✅ {len(collected)}개의 블로그 문서 저장 완료 → blog_data.json")
-
 

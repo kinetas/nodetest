@@ -132,7 +132,8 @@ collected = []
 
 for keyword, category in keywords:
     print(f"\n🔍 '{keyword}' 키워드로 블로그 검색 시작...")
-    search_url = f"https://search.naver.com/search.naver?where=view&query={keyword}"
+    search_url = f"https://search.naver.com/search.naver?where=blog&query={keyword}&sm=tab_opt"
+
     driver.get(search_url)
 
     try:

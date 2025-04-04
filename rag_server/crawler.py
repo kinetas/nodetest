@@ -178,55 +178,53 @@
 
 # print(f"\n✅ {len(collected)}개의 블로그 문서 저장 완료 → blog_data.json")
 
-import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-import json
-import uuid
-import time
+import time, json, uuid
 
-def get_blog_links(keyword, max_links=5):
-    search_url = f"https://section.blog.naver.com/Search/Post.naver?keyword={keyword}"
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+# 셀레니움 옵션 설정
+options = Options()
+options.add_argument('--headless')  # GUI 없이 실행
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--disable-gpu')
+options.add_argument('--window-size=1920x1080')
 
-    res = requests.get(search_url, headers=headers)
-    soup = BeautifulSoup(res.text, "html.parser")
-
-    links = []
-    for a in soup.select("a.desc_inner"):
-        href = a.get("href")
-        if href and href.startswith("https://blog.naver.com/"):
-            links.append(href)
-        if len(links) >= max_links:
-            break
-
-    return links
-
-def crawl_blog_text(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    try:
-        res = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(res.text, "html.parser")
-        text = soup.get_text(separator="\n")
-        return text.strip()[:2000]
-    except:
-        return ""
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 keywords = ["미라클 모닝 루틴", "자기개발 루틴", "운동 루틴", "요리 루틴"]
 collected = []
 
 for keyword in keywords:
     print(f"🔍 '{keyword}' 블로그 검색 시작...")
-    links = get_blog_links(keyword)
+    search_url = f"https://section.blog.naver.com/Search/Post.naver?keyword={keyword}"
+    driver.get(search_url)
+    time.sleep(3)  # 페이지 로딩 대기
+
+    soup = BeautifulSoup(driver.page_source, "html.parser")
+    cards = soup.select("div.desc > a")
+
+    links = []
+    for a in cards:
+        href = a.get("href")
+        if href and "blog.naver.com" in href:
+            links.append(href)
+
     print(f"🔗 수집된 블로그 링크 수: {len(links)}")
+
     for link in links:
-        time.sleep(2)  # 딜레이 넣기
-        content = crawl_blog_text(link)
+        driver.get(link)
+        time.sleep(2)
+        blog_soup = BeautifulSoup(driver.page_source, "html.parser")
+        content = blog_soup.get_text(separator="\n").strip()
         if content:
             collected.append({
                 "id": str(uuid.uuid4()),
-                "document": content,
+                "document": content[:2000],
                 "metadata": {
                     "tag": keyword,
                     "category": "루틴",
@@ -234,7 +232,9 @@ for keyword in keywords:
                 }
             })
 
+driver.quit()
+
 with open("blog_data.json", "w", encoding="utf-8") as f:
     json.dump(collected, f, ensure_ascii=False, indent=2)
 
-print(f"\n✅ {len(collected)}개의 블로그 문서 저장 완료 → blog_data.json")
+print(f"✅ {len(collected)}개의 블로그 문서 저장 완료 → blog_data.json")

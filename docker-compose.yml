@@ -68,6 +68,7 @@ services:
       - ./webRTC_server/SECRETE:/app/cert  # 인증서 파일 경로를 마운트
   turnserver:
     image: coturn/coturn
+    network_mode: host
     container_name: turnserver
     restart: always
     ports:

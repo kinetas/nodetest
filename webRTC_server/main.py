@@ -7,10 +7,9 @@ import uvicorn
 
 app = FastAPI()
 
-# user_id -> websocket 매핑
-active_users = {}  # Dict[str, WebSocket]
+app = FastAPI()
+active_users = {}
 
-# WebSocket 엔드포인트
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -31,7 +30,12 @@ async def websocket_endpoint(websocket: WebSocket):
             elif msg_type in ("offer", "answer", "candidate"):
                 target_id = data.get("to")
                 if target_id in active_users:
-                    await active_users[target_id].send_text(json.dumps(data))
+                    try:
+                        await active_users[target_id].send_text(json.dumps(data))
+                    except Exception as e:
+                        print(f"Send failed to {target_id}: {e}")
+                        del active_users[target_id]
+                        await broadcast_user_list()
                 else:
                     print(f"Target {target_id} not connected.")
 
@@ -47,15 +51,16 @@ async def websocket_endpoint(websocket: WebSocket):
             del active_users[user_id]
             await broadcast_user_list()
 
-
 async def broadcast_user_list():
     user_list = list(active_users.keys())
     for ws in active_users.values():
-        await ws.send_text(json.dumps({
-            "type": "user-list",
-            "users": user_list
-        }))
-
+        try:
+            await ws.send_text(json.dumps({
+                "type": "user-list",
+                "users": user_list
+            }))
+        except:
+            continue
 # 정적 파일 static 폴더 경로 설정
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 

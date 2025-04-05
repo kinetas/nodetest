@@ -49,11 +49,13 @@
     let localStream = null;
     let peerConnection = null;
     let isCaller = false;
+    let isConnectionPrepared = false;
 
     const statusBox = document.getElementById("status");
 
     const ws = new WebSocket("wss://27.113.11.48:8500/ws");
-    const iceServers = {
+
+    const config = {
       iceServers: [
         {
           urls: ["turn:27.113.11.48:3478?transport=udp"],
@@ -61,6 +63,7 @@
           credential: "gogi0529",
         },
       ],
+      iceTransportPolicy: "relay"
     };
 
     ws.onopen = () => {
@@ -89,6 +92,7 @@
 
       } else if (type === "candidate") {
         if (peerConnection && payload?.candidate) {
+          console.log("수신된 ICE:", payload);
           try {
             await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
           } catch (err) {
@@ -114,6 +118,9 @@
     };
 
     async function prepareConnection() {
+      if (isConnectionPrepared) return;
+      isConnectionPrepared = true;
+
       if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -129,7 +136,7 @@
         return;
       }
 
-      peerConnection = new RTCPeerConnection(iceServers);
+      peerConnection = new RTCPeerConnection(config);
 
       localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);
@@ -146,8 +153,12 @@
 
       peerConnection.ontrack = (event) => {
         console.log("상대방 스트림 수신", event.streams);
-        document.getElementById("remoteVideo").srcObject = event.streams[0];
-        statusBox.innerText = "📺 상대방 화면 수신 중...";
+        const remoteStream = event.streams[0];
+        if (remoteStream) {
+          const remoteVideo = document.getElementById("remoteVideo");
+          remoteVideo.srcObject = remoteStream;
+          statusBox.innerText = "📺 상대방 화면 수신 중...";
+        }
       };
 
       peerConnection.oniceconnectionstatechange = () => {

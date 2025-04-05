@@ -77,7 +77,7 @@ services:
     volumes:
       -  /home/gogi/docker/webRTC_server/turnserver/turnserver.conf:/etc/turnserver.conf
       - ./webRTC_server/SECRETE:/app/cert
-    command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli"]
+    command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli", "--verbose"]
 volumes:
   mysql-data:
   chroma-data:

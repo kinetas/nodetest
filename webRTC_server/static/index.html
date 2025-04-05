@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WebRTC 테스트</title>
   <style>
     #localVideo, #remoteVideo {
@@ -28,7 +28,7 @@
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
       color: white;
       padding: 10px;
       border-radius: 8px;
@@ -49,13 +49,12 @@
     let localStream = null;
     let peerConnection = null;
     let isCaller = false;
-    let isConnectionPrepared = false;
+    let remoteCandidates = [];
 
     const statusBox = document.getElementById("status");
 
     const ws = new WebSocket("wss://27.113.11.48:8500/ws");
-
-    const config = {
+    const iceServers = {
       iceServers: [
         {
           urls: ["turn:27.113.11.48:3478?transport=udp"],
@@ -63,7 +62,6 @@
           credential: "gogi0529",
         },
       ],
-      iceTransportPolicy: "relay"
     };
 
     ws.onopen = () => {
@@ -75,28 +73,36 @@
       const { type, from, payload, users } = JSON.parse(message.data);
 
       if (type === "offer") {
-        if (!isCaller) {
-          statusBox.innerText = "📩 연결 요청을 받았습니다. 자동으로 연결 중...";
+        if (!isCaller && (!peerConnection || peerConnection.signalingState === "stable")) {
+          statusBox.innerText = "📩 연결 요청 수신. 연결 중...";
           await prepareConnection();
           await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+
+          for (const candidate of remoteCandidates) {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+          }
+          remoteCandidates = [];
+
           const answer = await peerConnection.createAnswer();
           await peerConnection.setLocalDescription(answer);
           ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
-        } else {
-          console.warn("동시 연결 방지: 내가 Offerer 이므로 수신 Offer 무시");
         }
 
       } else if (type === "answer") {
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
-        statusBox.innerText = "✅ 연결이 완료되었습니다.";
+        if (peerConnection) {
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+          statusBox.innerText = "✅ 연결 완료";
+        }
 
       } else if (type === "candidate") {
-        if (peerConnection && payload?.candidate) {
-          console.log("수신된 ICE:", payload);
+        if (!peerConnection || !peerConnection.remoteDescription) {
+          remoteCandidates.push(payload);
+        } else {
           try {
             await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
+            console.log("수신된 ICE:", payload);
           } catch (err) {
-            console.warn("ICE 후보 처리 중 오류", err);
+            console.warn("ICE 후보 처리 실패:", err);
           }
         }
 
@@ -118,9 +124,6 @@
     };
 
     async function prepareConnection() {
-      if (isConnectionPrepared) return;
-      isConnectionPrepared = true;
-
       if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -132,11 +135,11 @@
         console.log("카메라 스트림 시작");
       } catch (err) {
         console.error("getUserMedia 실패", err);
-        alert("카메라/마이크 접근 오류");
+        alert("카메라/마이크 접근 실패");
         return;
       }
 
-      peerConnection = new RTCPeerConnection(config);
+      peerConnection = new RTCPeerConnection(iceServers);
 
       localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);
@@ -145,7 +148,12 @@
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
           console.log("ICE candidate:", event.candidate);
-          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: event.candidate }));
+          ws.send(JSON.stringify({
+            type: "candidate",
+            from: userId,
+            to: targetUserId,
+            payload: event.candidate
+          }));
         } else {
           console.log("ICE 후보 수집 완료");
         }
@@ -153,40 +161,49 @@
 
       peerConnection.ontrack = (event) => {
         console.log("상대방 스트림 수신", event.streams);
-        const remoteStream = event.streams[0];
-        if (remoteStream) {
-          const remoteVideo = document.getElementById("remoteVideo");
-          remoteVideo.srcObject = remoteStream;
-          statusBox.innerText = "📺 상대방 화면 수신 중...";
-        }
+        document.getElementById("remoteVideo").srcObject = event.streams[0];
+        statusBox.innerText = "📺 상대방 화면 수신 중...";
       };
 
       peerConnection.oniceconnectionstatechange = () => {
         console.log("ICE 상태 변경:", peerConnection.iceConnectionState);
         if (peerConnection.iceConnectionState === "connected") {
           statusBox.innerText = "✅ 연결 성공!";
-        } else if (peerConnection.iceConnectionState === "disconnected") {
-          statusBox.innerText = "❌ 연결 끊김";
+        } else if (peerConnection.iceConnectionState === "disconnected" || peerConnection.iceConnectionState === "failed") {
+          statusBox.innerText = "❌ 연결 끊김 또는 실패";
         }
       };
     }
 
     async function startCall() {
       console.log("Start Call 호출");
+
       if (!targetUserId) {
         alert("연결할 상대를 선택하세요.");
         return;
       }
 
+      if (peerConnection && peerConnection.signalingState !== "stable") {
+        console.warn("이미 연결 요청 중입니다.");
+        return;
+      }
+
       isCaller = true;
-      statusBox.innerText = "연결 요청을 보냈습니다...";
+      remoteCandidates = [];
+      statusBox.innerText = "📤 연결 요청 전송 중...";
+
       await prepareConnection();
 
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
       console.log("Offer 생성 및 전송");
 
-      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
+      ws.send(JSON.stringify({
+        type: "offer",
+        from: userId,
+        to: targetUserId,
+        payload: offer
+      }));
     }
 
     document.getElementById("startCall").addEventListener("click", startCall);

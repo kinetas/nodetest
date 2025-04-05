@@ -118,8 +118,15 @@
         localStream = null;
     }
     
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById("localVideo").srcObject = localStream;
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById("localVideo").srcObject = localStream;
+        console.log("카메라 스트림 시작");
+        } catch (err) {
+        console.error("getUserMedia 실패:", err);
+        alert("카메라/마이크 접근이 거부되었거나 사용할 수 없습니다.");
+        return;
+        }
     
     peerConnection = new RTCPeerConnection(iceServers);
     
@@ -134,14 +141,18 @@
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
           console.log("ICE candidate:", event.candidate); // 타입: host / srflx / relay
+        } else {
+            console.log("ICE 후보 수집 완료");
+        }
+        
         ws.send(JSON.stringify({
             type: "candidate",
             from: userId,
             to: targetUserId,
             payload: event.candidate
         }));
-        }
-    };
+        };
+    
     
     
     await prepareConnection();

@@ -140,26 +140,40 @@
     
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log("ICE candidate:", event.candidate); // 타입: host / srflx / relay
+          console.log("ICE candidate:", event.candidate);
         } else {
-            console.log("ICE 후보 수집 완료");
+          console.log("ICE 후보 수집 완료");
         }
-        
+      
         ws.send(JSON.stringify({
-            type: "candidate",
-            from: userId,
-            to: targetUserId,
-            payload: event.candidate
+          type: "candidate",
+          from: userId,
+          to: targetUserId,
+          payload: event.candidate
         }));
-        };
+      };
+    };
+      
+      async function startCall() {
+        console.log("Start Call 호출");
+      
+        if (!targetUserId) {
+          alert("연결할 상대를 선택하세요.");
+          return;
+        }
     
+        await prepareConnection();
     
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        console.log("📡 Offer 생성 및 전송");
     
-    await prepareConnection();
-    
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
+    ws.send(JSON.stringify({
+        type: "offer",
+        from: userId,
+        to: targetUserId,
+        payload: offer
+        }));
     }
     
     document.getElementById("startCall").addEventListener("click", startCall);

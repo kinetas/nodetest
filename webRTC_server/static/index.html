@@ -72,6 +72,15 @@
     } else if (type === "answer") {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
     
+        if (!localStream || !localStream.active) {
+            console.log("answer 수신 후 스트림 미존재로 재시도");
+            await prepareConnection();
+    
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            ws.send(JSON.stringify({ type: "offer", from: userId, to: from, payload: offer }));
+        }
+    
     } else if (type === "candidate") {
         if (peerConnection) {
         await peerConnection.addIceCandidate(new RTCIceCandidate(payload));

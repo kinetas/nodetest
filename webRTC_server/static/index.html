@@ -133,16 +133,16 @@
     
     peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-            ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: event.candidate }));
+          console.log("ICE candidate:", event.candidate); // 타입: host / srflx / relay
+        ws.send(JSON.stringify({
+            type: "candidate",
+            from: userId,
+            to: targetUserId,
+            payload: event.candidate
+        }));
         }
     };
-    }
     
-    async function startCall() {
-        if (!targetUserId) {
-        alert("연결할 상대를 선택하세요.");
-        return;
-    }
     
     await prepareConnection();
     

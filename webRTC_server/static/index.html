@@ -47,10 +47,14 @@
     const ws = new WebSocket("wss://27.113.11.48:8500/ws");
     
     const iceServers = {
-    iceServers: [
+        iceServers: [
         { urls: "stun:27.113.11.48:3478" },
-        { urls: "turn:27.113.11.48:3478", username: "gogi", credential: "gogi0529" }
-    ]
+        {
+            urls: "turn:27.113.11.48:3478?transport=udp",
+            username: "gogi",
+            credential: "gogi0529"
+        }
+        ]
     };
     
     ws.onopen = () => {

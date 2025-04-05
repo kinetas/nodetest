@@ -55,7 +55,10 @@
             if (data.offer) {
                 peerConnection = createPeerConnection();
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                const answer = await peerConnection.createAnswer();
+                const answer = await peerConnection.createAnswer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: true
+                });
                 await peerConnection.setLocalDescription(answer);
                 ws.send(JSON.stringify({ answer }));
             } else if (data.answer) {
@@ -78,7 +81,10 @@
         peerConnection = createPeerConnection();
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
-        const offer = await peerConnection.createOffer();
+        const offer = await peerConnection.createOffer({
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: true
+        });
         await peerConnection.setLocalDescription(offer);
         ws.send(JSON.stringify({ offer }));
         } catch (err) {

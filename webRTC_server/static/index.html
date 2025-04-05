@@ -32,102 +32,108 @@
     </style>
 </head>
 <body>
-    <h2>WebRTC 테스트</h2>
-    <video id="remoteVideo" autoplay playsinline></video> <!-- 상대방 화면 -->
-    <video id="localVideo" autoplay playsinline muted></video> <!-- 내 화면 -->
-    <button id="startCall">Start Call</button>
-    <script>
-        const ws = new WebSocket("wss://27.113.11.48:8500/ws"); // WebRTC 시그널링 서버
-        let localStream;
-        let peerConnection;
-        
-        const iceServers = {
-            iceServers: [
-                { urls: "stun:27.113.11.48:3478" },  // STUN/TURN 서버 설정
-                { urls: "turn:27.113.11.48:3478", username: "gogi", credential: "gogi0529" }
-            ]
-        };
+    <h2>WebRTC ID 기반 테스트</h2>
+<video id="remoteVideo" autoplay playsinline></video>
+<video id="localVideo" autoplay playsinline muted></video>
+<select id="targetSelect"></select>
+<button id="startCall">Start Call</button>
 
-        ws.onopen = () => console.log("Connected to signaling server");
-        
-        ws.onmessage = async (message) => {
-            const data = JSON.parse(message.data);
-            console.log('Received data from server:', data);
-            
-            if (data.offer) {
-                peerConnection = createPeerConnection();
-                
-                // 상대방에게서 offer를 받았을 때도 localStream 설정
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById("localVideo").srcObject = localStream;
-                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+<script>
+const userId = crypto.randomUUID();
+let targetUserId = null;
+let localStream;
+let peerConnection;
 
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                
-                const answer = await peerConnection.createAnswer({
-                    offerToReceiveAudio: true,
-                    offerToReceiveVideo: true
-                });
+const ws = new WebSocket("wss://27.113.11.48:8500/ws");
 
-                await peerConnection.setLocalDescription(answer);
-                ws.send(JSON.stringify({ answer }));
+const iceServers = {
+    iceServers: [
+        { urls: "stun:27.113.11.48:3478" },
+        { urls: "turn:27.113.11.48:3478", username: "gogi", credential: "gogi0529" }
+    ]
+};
 
-            } else if (data.answer) {
-                if (peerConnection) {
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                    console.log("Answer 설정 완료");
-                }
-            } else if (data.candidate) {
-                if (peerConnection) {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                }
-            }
-        };
+ws.onopen = () => {
+    console.log("Connected to signaling server");
+    ws.send(JSON.stringify({ type: "join", userId }));
+};
 
-    async function startCall() {
-        // 사용자 미디어 요청
-        try {
+ws.onmessage = async (message) => {
+    const data = JSON.parse(message.data);
+    const { type, from, payload, users } = data;
+
+    if (type === "offer") {
+        peerConnection = createPeerConnection();
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         document.getElementById("localVideo").srcObject = localStream;
-        
-        peerConnection = createPeerConnection();
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
-        const offer = await peerConnection.createOffer({
-            offerToReceiveAudio: true,
-            offerToReceiveVideo: true
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+        ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
+
+    } else if (type === "answer") {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+
+    } else if (type === "candidate") {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
+
+    } else if (type === "user-list") {
+        const select = document.getElementById("targetSelect");
+        select.innerHTML = "";
+        users.forEach(uid => {
+            if (uid !== userId) {
+                const option = document.createElement("option");
+                option.value = uid;
+                option.text = uid;
+                select.appendChild(option);
+            }
         });
-        await peerConnection.setLocalDescription(offer);
-        ws.send(JSON.stringify({ offer }));
-        
-    } catch (err) {
-        console.error("Error accessing media devices: ", err);
-        alert("Error accessing media devices: " + err.message);  // 사용자에게 알림
+        if (select.options.length > 0) {
+            targetUserId = select.options[0].value;
+        }
     }
+};
+
+async function startCall() {
+    if (!targetUserId) {
+        alert("연결할 상대를 선택하세요.");
+        return;
+    }
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById("localVideo").srcObject = localStream;
+
+    peerConnection = createPeerConnection();
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
 }
 
-    function createPeerConnection() {
-        const pc = new RTCPeerConnection(iceServers);
-        // 상대방 비디오 트랙을 받아서 remoteVideo에 표시
+function createPeerConnection() {
+    const pc = new RTCPeerConnection(iceServers);
+
     pc.ontrack = (event) => {
-        console.log('Remote stream added:', event.streams[0]);
-        // 상대방 스트림이 존재하는지 확인하고 remoteVideo에 할당
         if (event.streams[0]) {
             document.getElementById("remoteVideo").srcObject = event.streams[0];
         }
     };
-    
-     // ICE 후보가 발생할 때마다 로그 출력하고 서버로 전송
+
     pc.onicecandidate = (event) => {
         if (event.candidate) {
-            console.log('Sending ICE candidate:', event.candidate);
-            ws.send(JSON.stringify({ candidate: event.candidate }));
+            ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: event.candidate }));
         }
     };
-    return pc;
-    }
 
-    document.getElementById("startCall").addEventListener("click", startCall);
+    return pc;
+}
+
+document.getElementById("startCall").addEventListener("click", startCall);
+document.getElementById("targetSelect").addEventListener("change", (e) => {
+    targetUserId = e.target.value;
+});
 </script>
 </body>
 </html>

@@ -39,109 +39,109 @@
 <button id="startCall">Start Call</button>
 
 <script>
-const userId = crypto.randomUUID();
-let targetUserId = null;
-let localStream;
-let peerConnection;
-
-const ws = new WebSocket("wss://27.113.11.48:8500/ws");
-
-const iceServers = {
+    const userId = crypto.randomUUID();
+    let targetUserId = null;
+    let localStream = null;
+    let peerConnection = null;
+    
+    const ws = new WebSocket("wss://27.113.11.48:8500/ws");
+    
+    const iceServers = {
     iceServers: [
         { urls: "stun:27.113.11.48:3478" },
         { urls: "turn:27.113.11.48:3478", username: "gogi", credential: "gogi0529" }
     ]
-};
-
-ws.onopen = () => {
-    console.log("Connected to signaling server");
-    ws.send(JSON.stringify({ type: "join", userId }));
-};
-
-ws.onmessage = async (message) => {
-    const data = JSON.parse(message.data);
-    const { type, from, payload, users } = data;
-
+    };
+    
+    ws.onopen = () => {
+        console.log("Connected to signaling server");
+        ws.send(JSON.stringify({ type: "join", userId }));
+    };
+    
+    ws.onmessage = async (message) => {
+        const data = JSON.parse(message.data);
+        const { type, from, payload, users } = data;
+    
     if (type === "offer") {
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        peerConnection = createPeerConnection();
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById("localVideo").srcObject = localStream;
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
+        await prepareConnection();
         await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
         ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
-
+    
     } else if (type === "answer") {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
-
+    
     } else if (type === "candidate") {
+        if (peerConnection) {
         await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
-
+        }
+    
     } else if (type === "user-list") {
         const select = document.getElementById("targetSelect");
         select.innerHTML = "";
         users.forEach(uid => {
-            if (uid !== userId) {
-                const option = document.createElement("option");
-                option.value = uid;
-                option.text = uid;
-                select.appendChild(option);
-            }
+        if (uid !== userId) {
+            const option = document.createElement("option");
+            option.value = uid;
+            option.text = uid;
+            select.appendChild(option);
+        }
         });
         if (select.options.length > 0) {
             targetUserId = select.options[0].value;
         }
     }
-};
-
-async function startCall() {
-    if (!targetUserId) {
-        alert("연결할 상대를 선택하세요.");
-        return;
-    }
-    if (peerConnection) {
+    };
+    
+    async function prepareConnection() {
+        if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
     }
+    
+        if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+    
     localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     document.getElementById("localVideo").srcObject = localStream;
-
-    peerConnection = createPeerConnection();
+    
+    peerConnection = new RTCPeerConnection(iceServers);
+    
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
-
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
-}
-
-function createPeerConnection() {
-    const pc = new RTCPeerConnection(iceServers);
-
-    pc.ontrack = (event) => {
+    
+    peerConnection.ontrack = (event) => {
         if (event.streams[0]) {
-            document.getElementById("remoteVideo").srcObject = event.streams[0];
+        document.getElementById("remoteVideo").srcObject = event.streams[0];
         }
     };
-
-    pc.onicecandidate = (event) => {
+    
+    peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
             ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: event.candidate }));
         }
     };
-
-    return pc;
-}
-
-document.getElementById("startCall").addEventListener("click", startCall);
-document.getElementById("targetSelect").addEventListener("change", (e) => {
-    targetUserId = e.target.value;
-});
-</script>
-</body>
-</html>
+    }
+    
+    async function startCall() {
+        if (!targetUserId) {
+        alert("연결할 상대를 선택하세요.");
+        return;
+    }
+    
+    await prepareConnection();
+    
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
+    }
+    
+    document.getElementById("startCall").addEventListener("click", startCall);
+    document.getElementById("targetSelect").addEventListener("change", (e) => {
+        targetUserId = e.target.value;
+    });
+    </script>
+    </body>
+    </html>

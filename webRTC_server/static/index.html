@@ -109,8 +109,16 @@
         alert("카메라/마이크 접근 오류");
         return;
       }
-
-      peerConnection = new RTCPeerConnection(iceServers);
+      peerConnection = new RTCPeerConnection({
+        iceServers: [
+          {
+            urls: ["turn:27.113.11.48:3478?transport=udp"],
+            username: "gogi",
+            credential: "gogi0529",
+          }
+        ],
+        iceTransportPolicy: "relay"
+      });
 
       localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);

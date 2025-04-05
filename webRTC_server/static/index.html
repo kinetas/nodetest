@@ -63,6 +63,10 @@ ws.onmessage = async (message) => {
     const { type, from, payload, users } = data;
 
     if (type === "offer") {
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
         peerConnection = createPeerConnection();
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         document.getElementById("localVideo").srcObject = localStream;
@@ -100,6 +104,10 @@ async function startCall() {
     if (!targetUserId) {
         alert("연결할 상대를 선택하세요.");
         return;
+    }
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
     }
     localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
     document.getElementById("localVideo").srcObject = localStream;

@@ -49,18 +49,29 @@
         };
 
         ws.onopen = () => console.log("Connected to signaling server");
+        
         ws.onmessage = async (message) => {
             const data = JSON.parse(message.data);
             console.log('Received data from server:', data);
+            
             if (data.offer) {
                 peerConnection = createPeerConnection();
+                
+                // 상대방에게서 offer를 받았을 때도 localStream 설정
+                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById("localVideo").srcObject = localStream;
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                
                 const answer = await peerConnection.createAnswer({
                     offerToReceiveAudio: true,
                     offerToReceiveVideo: true
                 });
+
                 await peerConnection.setLocalDescription(answer);
                 ws.send(JSON.stringify({ answer }));
+
             } else if (data.answer) {
                 if (peerConnection) {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
@@ -78,6 +89,7 @@
         try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         document.getElementById("localVideo").srcObject = localStream;
+        
         peerConnection = createPeerConnection();
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
@@ -87,7 +99,8 @@
         });
         await peerConnection.setLocalDescription(offer);
         ws.send(JSON.stringify({ offer }));
-        } catch (err) {
+        
+    } catch (err) {
         console.error("Error accessing media devices: ", err);
         alert("Error accessing media devices: " + err.message);  // 사용자에게 알림
     }

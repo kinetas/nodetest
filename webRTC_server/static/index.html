@@ -131,6 +131,10 @@
     
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
     
+    peerConnection.addEventListener('icecandidateerror', event => {
+        console.error('ICE Candidate Error:', event.errorText, event.url);
+    });
+    
     peerConnection.ontrack = (event) => {
         if (event.streams[0]) {
         document.getElementById("remoteVideo").srcObject = event.streams[0];

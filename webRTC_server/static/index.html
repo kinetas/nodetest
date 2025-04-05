@@ -24,10 +24,20 @@
       width: 100%;
       height: 100%;
     }
+    #status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h2>WebRTC Test</h2>
+  <div id="status">🟡 서버에 연결 중...</div>
   <video id="remoteVideo" autoplay playsinline></video>
   <video id="localVideo" autoplay playsinline muted></video>
   <select id="targetSelect"></select>
@@ -38,6 +48,9 @@
     let targetUserId = null;
     let localStream = null;
     let peerConnection = null;
+    let isCaller = false;
+
+    const statusBox = document.getElementById("status");
 
     const ws = new WebSocket("wss://27.113.11.48:8500/ws");
     const iceServers = {
@@ -51,7 +64,7 @@
     };
 
     ws.onopen = () => {
-      console.log("Connected to signaling server");
+      statusBox.innerText = "🟢 서버 연결됨. 상대방을 선택하세요.";
       ws.send(JSON.stringify({ type: "join", userId }));
     };
 
@@ -59,17 +72,23 @@
       const { type, from, payload, users } = JSON.parse(message.data);
 
       if (type === "offer") {
-        await prepareConnection();
-        await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
-        const answer = await peerConnection.createAnswer();
-        await peerConnection.setLocalDescription(answer);
-        ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
+        if (!isCaller) {
+          statusBox.innerText = "📩 연결 요청을 받았습니다. 자동으로 연결 중...";
+          await prepareConnection();
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+          ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
+        } else {
+          console.warn("동시 연결 방지: 내가 Offerer 이므로 수신 Offer 무시");
+        }
 
       } else if (type === "answer") {
         await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+        statusBox.innerText = "✅ 연결이 완료되었습니다.";
 
       } else if (type === "candidate") {
-        if (peerConnection && payload && payload.candidate) {
+        if (peerConnection && payload?.candidate) {
           try {
             await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
           } catch (err) {
@@ -109,16 +128,8 @@
         alert("카메라/마이크 접근 오류");
         return;
       }
-      peerConnection = new RTCPeerConnection({
-        iceServers: [
-          {
-            urls: ["turn:27.113.11.48:3478?transport=udp"],
-            username: "gogi",
-            credential: "gogi0529",
-          }
-        ],
-        iceTransportPolicy: "relay"
-      });
+
+      peerConnection = new RTCPeerConnection(iceServers);
 
       localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);
@@ -136,10 +147,16 @@
       peerConnection.ontrack = (event) => {
         console.log("상대방 스트림 수신", event.streams);
         document.getElementById("remoteVideo").srcObject = event.streams[0];
+        statusBox.innerText = "📺 상대방 화면 수신 중...";
       };
 
       peerConnection.oniceconnectionstatechange = () => {
         console.log("ICE 상태 변경:", peerConnection.iceConnectionState);
+        if (peerConnection.iceConnectionState === "connected") {
+          statusBox.innerText = "✅ 연결 성공!";
+        } else if (peerConnection.iceConnectionState === "disconnected") {
+          statusBox.innerText = "❌ 연결 끊김";
+        }
       };
     }
 
@@ -150,7 +167,10 @@
         return;
       }
 
+      isCaller = true;
+      statusBox.innerText = "연결 요청을 보냈습니다...";
       await prepareConnection();
+
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
       console.log("Offer 생성 및 전송");

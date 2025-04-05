@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebRTC 테스트</title>
   <style>
+    body { margin: 0; font-family: sans-serif; background: #111; color: #fff; }
     #localVideo, #remoteVideo {
       width: 100%;
       height: 100%;
@@ -21,18 +22,39 @@
       border: 2px solid white;
     }
     #remoteVideo {
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
     }
     #status {
       position: absolute;
       top: 10px;
       left: 10px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0,0,0,0.7);
       color: white;
       padding: 10px;
       border-radius: 8px;
       font-weight: bold;
+      z-index: 100;
+    }
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+    #controls > button, select {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+    #controls > button:hover {
+      background: #555;
     }
   </style>
 </head>
@@ -40,8 +62,14 @@
   <div id="status">🟡 서버에 연결 중...</div>
   <video id="remoteVideo" autoplay playsinline></video>
   <video id="localVideo" autoplay playsinline muted></video>
-  <select id="targetSelect"></select>
-  <button id="startCall">Start Call</button>
+
+  <div id="controls">
+    <select id="targetSelect"></select>
+    <button id="startCall">📞 통화 시작</button>
+    <button id="hangUp">❌ 연결 끊기</button>
+    <button id="toggleMic">🎤 마이크 끄기</button>
+    <button id="toggleCam">🎥 카메라 끄기</button>
+  </div>
 
   <script>
     const userId = crypto.randomUUID();
@@ -49,10 +77,10 @@
     let localStream = null;
     let peerConnection = null;
     let isCaller = false;
-    let remoteCandidates = [];
+    let micEnabled = true;
+    let camEnabled = true;
 
     const statusBox = document.getElementById("status");
-
     const ws = new WebSocket("wss://27.113.11.48:8500/ws");
     const iceServers = {
       iceServers: [
@@ -73,39 +101,26 @@
       const { type, from, payload, users } = JSON.parse(message.data);
 
       if (type === "offer") {
-        if (!isCaller && (!peerConnection || peerConnection.signalingState === "stable")) {
-          statusBox.innerText = "📩 연결 요청 수신. 연결 중...";
+        if (!isCaller) {
+          statusBox.innerText = "📩 연결 요청을 받았습니다. 자동 연결 중...";
           await prepareConnection();
           await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
-
-          for (const candidate of remoteCandidates) {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-          }
-          remoteCandidates = [];
-
           const answer = await peerConnection.createAnswer();
           await peerConnection.setLocalDescription(answer);
           ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
         }
-
       } else if (type === "answer") {
-        if (peerConnection) {
-          await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
-          statusBox.innerText = "✅ 연결 완료";
-        }
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+        statusBox.innerText = "✅ 연결이 완료되었습니다.";
 
       } else if (type === "candidate") {
-        if (!peerConnection || !peerConnection.remoteDescription) {
-          remoteCandidates.push(payload);
-        } else {
+        if (peerConnection && payload?.candidate) {
           try {
             await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
-            console.log("수신된 ICE:", payload);
           } catch (err) {
-            console.warn("ICE 후보 처리 실패:", err);
+            console.warn("ICE 후보 처리 중 오류", err);
           }
         }
-
       } else if (type === "user-list") {
         const select = document.getElementById("targetSelect");
         select.innerHTML = "";
@@ -132,84 +147,68 @@
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         document.getElementById("localVideo").srcObject = localStream;
-        console.log("카메라 스트림 시작");
       } catch (err) {
         console.error("getUserMedia 실패", err);
-        alert("카메라/마이크 접근 실패");
+        alert("카메라/마이크 접근 오류");
         return;
       }
 
       peerConnection = new RTCPeerConnection(iceServers);
-
-      localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
-      });
+      localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
       peerConnection.onicecandidate = (event) => {
         if (event.candidate) {
-          console.log("ICE candidate:", event.candidate);
-          ws.send(JSON.stringify({
-            type: "candidate",
-            from: userId,
-            to: targetUserId,
-            payload: event.candidate
-          }));
-        } else {
-          console.log("ICE 후보 수집 완료");
+          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: event.candidate }));
         }
       };
 
       peerConnection.ontrack = (event) => {
-        console.log("상대방 스트림 수신", event.streams);
         document.getElementById("remoteVideo").srcObject = event.streams[0];
         statusBox.innerText = "📺 상대방 화면 수신 중...";
       };
 
       peerConnection.oniceconnectionstatechange = () => {
-        console.log("ICE 상태 변경:", peerConnection.iceConnectionState);
-        if (peerConnection.iceConnectionState === "connected") {
-          statusBox.innerText = "✅ 연결 성공!";
-        } else if (peerConnection.iceConnectionState === "disconnected" || peerConnection.iceConnectionState === "failed") {
-          statusBox.innerText = "❌ 연결 끊김 또는 실패";
-        }
+        const state = peerConnection.iceConnectionState;
+        console.log("ICE 상태 변경:", state);
+        if (state === "connected") statusBox.innerText = "✅ 연결 성공!";
+        else if (state === "disconnected" || state === "failed") statusBox.innerText = "❌ 연결 끊김";
       };
     }
 
     async function startCall() {
-      console.log("Start Call 호출");
-
-      if (!targetUserId) {
-        alert("연결할 상대를 선택하세요.");
-        return;
-      }
-
-      if (peerConnection && peerConnection.signalingState !== "stable") {
-        console.warn("이미 연결 요청 중입니다.");
-        return;
-      }
-
+      if (!targetUserId) return alert("상대방을 선택하세요");
       isCaller = true;
-      remoteCandidates = [];
-      statusBox.innerText = "📤 연결 요청 전송 중...";
-
       await prepareConnection();
-
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
-      console.log("Offer 생성 및 전송");
+      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
+    }
 
-      ws.send(JSON.stringify({
-        type: "offer",
-        from: userId,
-        to: targetUserId,
-        payload: offer
-      }));
+    function hangUp() {
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+        statusBox.innerText = "📴 연결 종료됨";
+      }
+    }
+
+    function toggleMic() {
+      micEnabled = !micEnabled;
+      localStream?.getAudioTracks().forEach(track => track.enabled = micEnabled);
+      document.getElementById("toggleMic").innerText = micEnabled ? "🎤 마이크 끄기" : "🔇 마이크 켜기";
+    }
+
+    function toggleCam() {
+      camEnabled = !camEnabled;
+      localStream?.getVideoTracks().forEach(track => track.enabled = camEnabled);
+      document.getElementById("toggleCam").innerText = camEnabled ? "🎥 카메라 끄기" : "📷 카메라 켜기";
     }
 
     document.getElementById("startCall").addEventListener("click", startCall);
-    document.getElementById("targetSelect").addEventListener("change", (e) => {
-      targetUserId = e.target.value;
-    });
+    document.getElementById("hangUp").addEventListener("click", hangUp);
+    document.getElementById("toggleMic").addEventListener("click", toggleMic);
+    document.getElementById("toggleCam").addEventListener("click", toggleCam);
+    document.getElementById("targetSelect").addEventListener("change", e => targetUserId = e.target.value);
   </script>
 </body>
 </html>

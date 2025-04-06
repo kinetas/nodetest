@@ -406,7 +406,9 @@ from dotenv import load_dotenv
 import os, requests, json, re, time
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
-from langchain_ollama import OllamaEmbeddings
+# from langchain_ollama import OllamaEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # ✅ 환경 변수 로딩
 load_dotenv()
@@ -421,8 +423,16 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 def serve_index():
     return FileResponse("static/index.html")
 
-# ✅ 벡터 DB 및 임베딩
-embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="nomic-embed-text")
+# ✅ 벡터 DB 및 임베딩 올라마버전
+# embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="nomic-embed-text")
+# db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
+
+embedding = HuggingFaceEmbeddings(
+    model_name="BM-K/KoSimCSE-roberta-base",
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True}
+)
+
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 # ✅ 블로그 본문 크롤링 함수

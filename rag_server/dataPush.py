@@ -47,20 +47,30 @@
 import json
 from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
-from langchain_ollama import OllamaEmbeddings
+# from langchain_ollama import OllamaEmbeddings
 import hashlib
 import os
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_chroma import Chroma
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # 경로 설정
 #json_file = "documents/data.json"  # 👈 여기에 JSON 저장
 json_file="naver_blog_data.json" #크롤링버전전
 persist_directory = "/chroma/chroma"
 
-# 임베딩 초기화
-embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
+# 임베딩 초기화 올라마 버전전
+# embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
+# db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
+
+embedding = HuggingFaceEmbeddings(
+    model_name="BM-K/KoSimCSE-roberta-base",
+    model_kwargs={"device": "cpu"},
+    encode_kwargs={"normalize_embeddings": True}
+)
+
 db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
 existing = db.get()

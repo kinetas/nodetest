@@ -64,7 +64,11 @@ persist_directory = "/chroma/chroma"
 # embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")
 # db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
-embedding = HuggingFaceEmbeddings(model_name="BAAI/bge-small-ko")
+embedding = HuggingFaceEmbeddings(
+    model_name="BAAI/bge-m3",
+    model_kwargs={"device": "cpu"},  # GPU 없음 고려
+    encode_kwargs={"normalize_embeddings": True}
+)
 db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
 existing = db.get()

@@ -17,7 +17,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # ✅ JSON 파일 경로
-json_file = "blog_data.json"
+json_file = "naver_blog_data.json"
 
 # ✅ Chroma 설정
 persist_directory = "/chroma/chroma"

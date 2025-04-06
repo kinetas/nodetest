@@ -11,8 +11,10 @@ import 'dart:convert';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  final bool isLoggedIn = await checkLoginStatus(); // 로그인 상태 확인
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  final bool isLoggedIn = await checkLoginStatus();
+  runApp(
+    MyApp(isLoggedIn: isLoggedIn),
+  );
 }
 
 // 세션 쿠키를 활용한 로그인 상태 확인 함수

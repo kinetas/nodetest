@@ -1,0 +1,2 @@
+C:/Users/gth99/StudioProjects/nodetest/android/app/.cxx/Debug/3r406491/x86/CMakeFiles/edit_cache.dir
+C:/Users/gth99/StudioProjects/nodetest/android/app/.cxx/Debug/3r406491/x86/CMakeFiles/rebuild_cache.dir

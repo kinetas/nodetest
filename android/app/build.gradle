@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.capstone_1_project"
-    compileSdk = 34 // compileSdkVersion 명시
+    compileSdk = 35 // compileSdkVersion 명시
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId = "com.example.capstone_1_project"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
@@ -49,3 +49,5 @@ dependencies {
     implementation "androidx.camera:camera-view:1.3.0"
     implementation "androidx.camera:camera-video:1.3.0"
 }
+
+apply plugin: 'com.google.gms.google-services'

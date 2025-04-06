@@ -24,6 +24,8 @@ if ids:
 with open(json_file, "r", encoding="utf-8") as f:
     data = json.load(f)
 
+documents = data["documents"]
+
 # 문서 가공
 docs = [
     Document(page_content=item["document"], metadata=item["metadata"])

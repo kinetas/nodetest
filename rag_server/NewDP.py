@@ -33,7 +33,7 @@ if ids:
 
 # ✅ 요약 함수 (Groq 호출)
 def summarize(text):
-    prompt = f"다음 글을 간결하게 요약해줘. 한국어로 2~3문장 정도로.\n\n{text[:2000]}"
+    prompt = f"다음 글을 간결하게 요약해줘. 한국어로 4~5문장 정도로.\n\n{text[:2000]}"
 
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -56,7 +56,7 @@ def summarize(text):
 
 # ✅ JSON 불러오기
 with open(json_file, "r", encoding="utf-8") as f:
-    data = json.load(f)
+    data = json.load(f)["documents"]
 
 # ✅ 문서 가공 및 요약 삽입
 processed_docs = []

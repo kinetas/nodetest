@@ -428,7 +428,7 @@ def serve_index():
 # db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 embedding = HuggingFaceEmbeddings(
-    model_name="BAAI/bge-m3",
+    model_name="BM-K/KoSimCSE-roberta-base",
     model_kwargs={"device": "cpu"},  # GPU 없음 고려
     encode_kwargs={"normalize_embeddings": True}
 )

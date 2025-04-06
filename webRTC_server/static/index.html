@@ -1,109 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebRTC Client</title>
-    <style>
-        /* 전체 비디오 화면 설정 */
-        #localVideo, #remoteVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 내 비디오를 작은 화면으로 오른쪽 아래에 배치 */
-        #localVideo {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 20%;  /* 작은 화면 크기 조정 */
-            height: 20%; /* 작은 화면 크기 조정 */
-            z-index: 10; /* 상대방 영상 위에 표시 */
-            border-radius: 8px; /* 비디오 모서리 둥글게 */
-            border: 2px solid white; /* 테두리 추가 */
-        }
-
-        /* 상대방 비디오는 화면 전체 */
-        #remoteVideo {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WebRTC 확장 버전</title>
+  <style>
+    body { margin: 0; background: black; color: white; font-family: sans-serif; }
+    #localVideo, #remoteVideo {
+      object-fit: cover;
+      background: #000;
+    }
+    #localVideo {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 20%;
+      height: 20%;
+      z-index: 10;
+      border-radius: 8px;
+      border: 2px solid white;
+    }
+    #remoteVideo {
+      width: 100%;
+      height: 100vh;
+    }
+    #status {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    #controls button, select {
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <h2>WebRTC 테스트</h2>
-    <video id="remoteVideo" autoplay playsinline></video> <!-- 상대방 화면 -->
-    <video id="localVideo" autoplay playsinline muted></video> <!-- 내 화면 -->
-    <button id="startCall">Start Call</button>
-    <script>
-        const ws = new WebSocket("wss://27.113.11.48:8500/ws"); // WebRTC 시그널링 서버
-        let localStream;
-        let peerConnection;
-        
-        const iceServers = {
-            iceServers: [
-                { urls: "stun:27.113.11.48:3478" },  // STUN/TURN 서버 설정
-                { urls: "turn:27.113.11.48:3478", username: "gogi", credential: "gogi0529" }
-            ]
-        };
+  <div id="status">🟡 서버 연결 중...</div>
+  <video id="remoteVideo" autoplay playsinline></video>
+  <video id="localVideo" autoplay playsinline muted></video>
 
-        ws.onopen = () => console.log("Connected to signaling server");
-        ws.onmessage = async (message) => {
-            const data = JSON.parse(message.data);
-            console.log('Received data from server:', data);
-            if (data.offer) {
-                peerConnection = createPeerConnection();
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                const answer = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(answer);
-                ws.send(JSON.stringify({ answer }));
-            } else if (data.answer) {
-                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-            } else if (data.candidate) {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-            }
-        };
+  <div id="controls">
+    <select id="targetSelect"></select>
+    <button id="startCall">📞 통화 시작</button>
+    <button id="hangUp">❌ 종료</button>
+    <button id="toggleMic">🔇 음소거</button>
+    <button id="toggleCam">📷 캠 끄기</button>
+  </div>
+
+  <script>
+    const userId = crypto.randomUUID();
+    let targetUserId = null;
+    let localStream = null;
+    let peerConnection = null;
+    let isCaller = false;
+    let remoteCandidates = [];
+    let micMuted = false;
+    let camHidden = false;
+
+    const statusBox = document.getElementById("status");
+    const remoteVideo = document.getElementById("remoteVideo");
+    const localVideo = document.getElementById("localVideo");
+
+    const ws = new WebSocket("wss://27.113.11.48:8500/ws");
+    const iceServers = {
+      iceServers: [{
+        urls: ["turn:27.113.11.48:3478?transport=udp"],
+        username: "gogi",
+        credential: "gogi0529",
+      }],
+    };
+
+    ws.onopen = () => {
+      statusBox.innerText = "🟢 서버 연결됨. 상대방을 선택하세요.";
+      ws.send(JSON.stringify({ type: "join", userId }));
+    };
+
+    ws.onmessage = async (message) => {
+      const { type, from, payload, users } = JSON.parse(message.data);
+
+      if (type === "offer") {
+        if (!isCaller && (!peerConnection || peerConnection.signalingState === "stable")) {
+          statusBox.innerText = "📩 연결 요청 수신. 연결 중...";
+          await prepareConnection();
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+
+          for (const c of remoteCandidates) {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(c));
+          }
+          remoteCandidates = [];
+
+          const answer = await peerConnection.createAnswer();
+          await peerConnection.setLocalDescription(answer);
+          ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
+        }
+
+      } else if (type === "answer") {
+        if (peerConnection) {
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(payload));
+          statusBox.innerText = "✅ 연결 완료";
+        }
+
+      } else if (type === "candidate") {
+        if (!peerConnection || !peerConnection.remoteDescription) {
+          remoteCandidates.push(payload);
+        } else {
+          try {
+            await peerConnection.addIceCandidate(new RTCIceCandidate(payload));
+          } catch (err) {
+            console.warn("ICE 추가 실패", err);
+          }
+        }
+
+      } else if (type === "user-list") {
+        const select = document.getElementById("targetSelect");
+        select.innerHTML = "";
+        users.forEach(uid => {
+          if (uid !== userId) {
+            const option = document.createElement("option");
+            option.value = uid;
+            option.text = uid;
+            select.appendChild(option);
+          }
+        });
+        if (select.options.length > 0) {
+          targetUserId = select.options[0].value;
+        }
+      }
+    };
+
+    async function prepareConnection() {
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+      } catch (err) {
+        alert("카메라/마이크 접근 실패");
+        return;
+      }
+
+      peerConnection = new RTCPeerConnection(iceServers);
+
+      localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+      });
+
+      peerConnection.onicecandidate = (e) => {
+        if (e.candidate) {
+          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: e.candidate }));
+        }
+      };
+
+      peerConnection.ontrack = (event) => {
+        remoteVideo.srcObject = event.streams[0];
+        statusBox.innerText = "📺 상대방 화면 수신 중...";
+      };
+
+      peerConnection.oniceconnectionstatechange = () => {
+        const state = peerConnection.iceConnectionState;
+        if (state === "connected") {
+          statusBox.innerText = "✅ 연결 성공";
+        } else if (state === "disconnected" || state === "failed") {
+          statusBox.innerText = "❌ 연결 끊김";
+        }
+      };
+    }
 
     async function startCall() {
-        // 사용자 미디어 요청
-        try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        document.getElementById("localVideo").srcObject = localStream;
-        peerConnection = createPeerConnection();
-        localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+      if (!targetUserId) return alert("상대 선택하세요.");
+      if (peerConnection && peerConnection.signalingState !== "stable") return;
 
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        ws.send(JSON.stringify({ offer }));
-        } catch (err) {
-        console.error("Error accessing media devices: ", err);
-        alert("Error accessing media devices: " + err.message);  // 사용자에게 알림
+      isCaller = true;
+      remoteCandidates = [];
+      statusBox.innerText = "📤 연결 요청 전송 중...";
+      await prepareConnection();
+
+      const offer = await peerConnection.createOffer();
+      await peerConnection.setLocalDescription(offer);
+      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
     }
-}
 
-    function createPeerConnection() {
-        const pc = new RTCPeerConnection(iceServers);
-        // 상대방 비디오 트랙을 받아서 remoteVideo에 표시
-    pc.ontrack = (event) => {
-        console.log('Remote stream added:', event.streams[0]);
-        // 상대방 스트림이 존재하는지 확인하고 remoteVideo에 할당
-        if (event.streams[0]) {
-            document.getElementById("remoteVideo").srcObject = event.streams[0];
-        }
-    };
-    
-     // ICE 후보가 발생할 때마다 로그 출력하고 서버로 전송
-    pc.onicecandidate = (event) => {
-        if (event.candidate) {
-            console.log('Sending ICE candidate:', event.candidate);
-            ws.send(JSON.stringify({ candidate: event.candidate }));
-        }
-    };
-    return pc;
+    function hangUp() {
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+        statusBox.innerText = "🔌 연결 종료됨";
+        remoteVideo.srcObject = null;
+      }
+    }
+
+    function toggleMic() {
+      micMuted = !micMuted;
+      localStream.getAudioTracks().forEach(track => track.enabled = !micMuted);
+      document.getElementById("toggleMic").innerText = micMuted ? "🎤 음소거 해제" : "🔇 음소거";
+    }
+
+    function toggleCam() {
+      camHidden = !camHidden;
+      localStream.getVideoTracks().forEach(track => track.enabled = !camHidden);
+      document.getElementById("toggleCam").innerText = camHidden ? "📸 캠 켜기" : "📷 캠 끄기";
     }
 
     document.getElementById("startCall").addEventListener("click", startCall);
-</script>
+    document.getElementById("hangUp").addEventListener("click", hangUp);
+    document.getElementById("toggleMic").addEventListener("click", toggleMic);
+    document.getElementById("toggleCam").addEventListener("click", toggleCam);
+    document.getElementById("targetSelect").addEventListener("change", (e) => {
+      targetUserId = e.target.value;
+    });
+  </script>
 </body>
 </html>

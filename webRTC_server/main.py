@@ -7,31 +7,60 @@ import uvicorn
 
 app = FastAPI()
 
-# WebSocket 연결 저장소
-active_connections: List[WebSocket] = []
+app = FastAPI()
+active_users = {}
 
-# WebSocket 엔드포인트
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    active_connections.append(websocket)
+    user_id = None
+
     try:
         while True:
             message = await websocket.receive_text()
-            print(f"Received message: {message}")  # 메시지 확인
             data = json.loads(message)
+            msg_type = data.get("type")
 
-            # Offer, Answer, ICE Candidate 전송
-            for connection in active_connections:
-                if connection != websocket:
-                    print(f"Sending data: {data}")  # 보내는 데이터 확인
-                    await connection.send_text(json.dumps(data))
-    except WebSocketDisconnect as e:
-        print(f"WebSocket disconnected: {e.code}, {e.reason}")  # 연결 종료 이유 로그 출력
-        active_connections.remove(websocket)
+            if msg_type == "join":
+                user_id = data["userId"]
+                active_users[user_id] = websocket
+                print(f"User joined: {user_id}")
+                await broadcast_user_list()
+
+            elif msg_type in ("offer", "answer", "candidate"):
+                target_id = data.get("to")
+                if target_id in active_users:
+                    try:
+                        await active_users[target_id].send_text(json.dumps(data))
+                    except Exception as e:
+                        print(f"Send failed to {target_id}: {e}")
+                        del active_users[target_id]
+                        await broadcast_user_list()
+                else:
+                    print(f"Target {target_id} not connected.")
+
+    except WebSocketDisconnect:
+        print(f"Disconnected: {user_id}")
+        if user_id and user_id in active_users:
+            del active_users[user_id]
+            await broadcast_user_list()
+
     except Exception as e:
-        print(f"Error in WebSocket connection: {str(e)}")  # 예외 메시지 출력
+        print(f"Error: {e}")
+        if user_id and user_id in active_users:
+            del active_users[user_id]
+            await broadcast_user_list()
 
+async def broadcast_user_list():
+    user_list = list(active_users.keys())
+    for ws in active_users.values():
+        try:
+            await ws.send_text(json.dumps({
+                "type": "user-list",
+                "users": user_list
+            }))
+        except:
+            continue
 # 정적 파일 static 폴더 경로 설정
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 

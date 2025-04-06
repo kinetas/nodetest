@@ -69,15 +69,24 @@ if ids:
     db.delete(ids=ids)
     print(f"🧹 기존 문서 {len(ids)}개 삭제 완료")
 
-# JSON 불러오기
-with open(json_file, "r", encoding="utf-8") as f:
-    data = json.load(f)#["documents"]  # 👈 이 부분만 바꾸면 바로 해결됨!
+# # JSON 불러오기
+# with open(json_file, "r", encoding="utf-8") as f:
+#     data = json.load(f)#["documents"]  # 👈 이 부분만 바꾸면 바로 해결됨!
 
+# docs = [
+#     Document(page_content=item["document"], metadata=item["metadata"])
+#     for item in data
+# ]
+with open(json_file, "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+documents = data["documents"]  # 이걸로 리스트 추출
+
+# 문서 가공
 docs = [
     Document(page_content=item["document"], metadata=item["metadata"])
-    for item in data
+    for item in documents
 ]
-
 # DB에 추가
 db.add_documents(docs)
 print(f"✅ {len(docs)}개의 문서가 DB에 추가되었습니다.")

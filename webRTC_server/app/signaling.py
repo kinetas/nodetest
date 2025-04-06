@@ -1,7 +1,7 @@
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 import json
-from user_manager import active_users
-from config import SECRET_KEY, ALGORITHM
+from app.user_manager import active_users
+from app.config import SECRET_KEY, ALGORITHM
 from jose import jwt, JWTError
 
 signaling_router = APIRouter()

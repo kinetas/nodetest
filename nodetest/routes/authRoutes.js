@@ -23,16 +23,12 @@ router.post('/loginToken', authController.loginToken);
 
 // 로그아웃 라우터
 // 쿠키에서 토큰을 제거하는 작업은 동기적인 작업이므로, async 처리 불필요
-router.post('/logoutToken', (req, res) => {
-    try {
-        authController.logoutToken(req, res);
-    } catch (err) {
-        console.log(err);
-        res.status(400).json({ message: err.message }); // JSON 형식으로 에러 메시지 반환
-    }
-});
+router.post('/logoutToken', loginRequired, authController.logoutToken);
 
-// ✅ 비밀번호 변경 라우터는 JWT 인증 필요
+// ✅ 계정탈퇴 
+router.delete('/deleteAccountToken', loginRequired, authController.deleteAccount);
+
+// 비밀번호 변경
 router.post('/changePassword', findInfoController.changePassword);
 
 

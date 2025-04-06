@@ -780,6 +780,40 @@
             alert("로그아웃되었습니다.");
             window.location.href = '/';
         }
+
+        // ✅ 계정탈퇴
+        function deleteAccountToken() {
+            const token = localStorage.getItem('token'); // ✅ JWT 토큰 가져오기
+
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+
+            if (confirm("정말 계정을 탈퇴하시겠습니까?")) {
+                fetch('/api/auth/deleteAccountToken', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}` // ✅ JWT 인증 적용
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        localStorage.removeItem('token'); // ✅ 토큰 제거
+                        window.location.href = '/'; // 로그인 페이지로 이동
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('계정 탈퇴 중 오류:', error);
+                    alert(`계정 탈퇴 중 오류(${error})가 발생했습니다.`);
+                });
+            }
+        }
     </script>
 </body>
 </html>

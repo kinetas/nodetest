@@ -341,21 +341,79 @@ exports.loginToken = async (req, res) => {
 };
 
 // 로그아웃 로직 구현
-exports.logoutToken = async (req, res) => { 
-    const token = req.headers.authorization?.split(" ")[1];
+// exports.logoutToken = async (req, res) => { 
+//     const token = req.headers.authorization?.split(" ")[1];
 
-    if (!token) {
-        res.status(400).json({ message: '토큰이 없습니다. 로그인 상태를 확안하세요.' });
-        return;
-    }
+//     if (!token) {
+//         res.status(400).json({ message: '토큰이 없습니다. 로그인 상태를 확안하세요.' });
+//         return;
+//     }
 
-    const decoded = jwt.verify(token, secretKey);
+//     const decoded = jwt.verify(token, secretKey);
 
-    if (!decoded) {
-        res.status(401).json({ message: '잘못된 토큰입니다. 로그인 상태를 확인하세요.' });
-        return;
-    }
+//     if (!decoded) {
+//         res.status(401).json({ message: '잘못된 토큰입니다. 로그인 상태를 확인하세요.' });
+//         return;
+//     }
 
-    res.clearCookie('token'); // 로그아웃시 쿠키 삭제
+//     res.clearCookie('token'); // 로그아웃시 쿠키 삭제
+//     res.json({ message: '로그아웃 되었습니다.' });
+// };
+// ✅ JWT 기반 로그아웃 로직 (간소화 버전)
+exports.logoutToken = async (req, res) => {
+    res.clearCookie('token'); // 만약 쿠키 기반이라면 의미 있음
     res.json({ message: '로그아웃 되었습니다.' });
+};
+
+// ✅ JWT 기반 계정 탈퇴 함수
+exports.deleteAccountToken = async (req, res) => {
+    const userId = req.currentUserId; // ✅ JWT로부터 추출한 사용자 ID
+
+    if (!userId) {
+        return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    }
+
+    try {
+        // 1. 메시지 삭제
+        await RMessage.destroy({
+            where: {
+                [Op.or]: [{ u1_id: userId }, { u2_id: userId }]
+            }
+        });
+
+        // 2. 미션 삭제
+        await Mission.destroy({
+            where: {
+                [Op.or]: [{ u1_id: userId }, { u2_id: userId }]
+            }
+        });
+
+        // 3. 방 삭제
+        await Room.destroy({
+            where: {
+                [Op.or]: [{ u1_id: userId }, { u2_id: userId }]
+            }
+        });
+
+        // 4. 유저 삭제
+        const deleted = await User.destroy({ where: { u_id: userId } });
+
+        if (deleted) {
+            return res.status(200).json({
+                success: true,
+                message: '계정이 성공적으로 삭제되었습니다.'
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: '사용자를 찾을 수 없습니다.'
+            });
+        }
+    } catch (error) {
+        console.error('계정 삭제 오류:', error);
+        return res.status(500).json({
+            success: false,
+            message: `서버 오류(${error.message})가 발생했습니다.`
+        });
+    }
 };

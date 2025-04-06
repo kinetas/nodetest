@@ -65,23 +65,23 @@ const upload = multer({ storage: multer.memoryStorage() });
 //=======================token=========================
 
 // ✅ 모든 API에 JWT 인증 적용
-router.get('/missions', requireAuth, getUserMissions);
-router.get('/missions/assigned', requireAuth, getAssignedMissions);
-router.get('/missions/created', requireAuth, getCreatedMissions);
-router.get('/missions/created_req', requireAuth, getCreatedMissionsReq);
-router.get('/missions/completed', requireAuth, getCompletedMissions);
-router.get('/missions/givenCompleted', requireAuth, getGivenCompletedMissions);
-router.get('/missions/friendAssigned', requireAuth, getFriendAssignedMissions);
-router.get('/missions/friendCompleted', requireAuth, getFriendCompletedMissions);
-router.get('/missions/grantedAuthority', requireAuth, getMissionsWithGrantedAuthority);
-router.get('/missions/selfRequested', requireAuth, getRequestedSelfMissions);
+router.get('/missions', loginRequired, getUserMissions);
+router.get('/missions/assigned', loginRequired, getAssignedMissions);
+router.get('/missions/created', loginRequired, getCreatedMissions);
+router.get('/missions/created_req', loginRequired, getCreatedMissionsReq);
+router.get('/missions/completed', loginRequired, getCompletedMissions);
+router.get('/missions/givenCompleted', loginRequired, getGivenCompletedMissions);
+router.get('/missions/friendAssigned', loginRequired, getFriendAssignedMissions);
+router.get('/missions/friendCompleted', loginRequired, getFriendCompletedMissions);
+router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAuthority);
+router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions);
 
-router.post('/missionVote', requireAuth, upload.single('c_image'), requestVoteForMission);
-router.post('/missioncreate', requireAuth, createMission);
-router.delete('/missiondelete', requireAuth, deleteMission);
-router.post('/successMission', requireAuth, successMission);
-router.post('/failureMission', requireAuth, failureMission);
-router.post('/printRoomMission', requireAuth, printRoomMission);
-router.post('/missionRequest', requireAuth, requestMissionApproval);
+router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission);
+router.post('/missioncreate', loginRequired, createMission);
+router.delete('/missiondelete', loginRequired, deleteMission);
+router.post('/successMission', loginRequired, successMission);
+router.post('/failureMission', loginRequired, failureMission);
+router.post('/printRoomMission', loginRequired, printRoomMission);
+router.post('/missionRequest', loginRequired, requestMissionApproval);
 
 module.exports = router;

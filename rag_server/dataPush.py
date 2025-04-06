@@ -56,7 +56,7 @@ from langchain_chroma import Chroma
 
 # 경로 설정
 #json_file = "documents/data.json"  # 👈 여기에 JSON 저장
-json_file="blog_data.json" #크롤링버전전
+json_file="naver_blog_data.json" #크롤링버전전
 persist_directory = "/chroma/chroma"
 
 # 임베딩 초기화

@@ -781,7 +781,8 @@
             window.location.href = '/';
         }
 
-        function deleteAccount() {
+        // ✅ 계정탈퇴
+        function deleteAccountToken() {
             const token = localStorage.getItem('token'); // ✅ JWT 토큰 가져오기
 
             if (!token) {
@@ -790,7 +791,7 @@
             }
 
             if (confirm("정말 계정을 탈퇴하시겠습니까?")) {
-                fetch('/api/auth/deleteAccount', {
+                fetch('/api/auth/deleteAccountToken', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

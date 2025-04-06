@@ -406,8 +406,9 @@ from dotenv import load_dotenv
 import os, requests, json, re, time
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
-from langchain_ollama import OllamaEmbeddings
+# from langchain_ollama import OllamaEmbeddings
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # ✅ 환경 변수 로딩
 load_dotenv()

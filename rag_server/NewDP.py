@@ -24,17 +24,17 @@ if ids:
 with open(json_file, "r", encoding="utf-8") as f:
     data = json.load(f)
 
+# ✅ 문서 파싱
 documents = data.get("documents", [])
 
-# ✅ 문서 가공
 docs = []
 for item in documents:
-    doc_text = item.get("document")
+    content = item.get("document")
     metadata = item.get("metadata", {})
-    if doc_text:  # 빈 문서 제외
-        docs.append(Document(page_content=doc_text, metadata=metadata))
+    if content:  # 빈 문서 제외
+        docs.append(Document(page_content=content, metadata=metadata))
 
-# ✅ Chroma에 추가
+# ✅ Chroma에 저장
 if docs:
     db.add_documents(docs)
     print(f"✅ {len(docs)}개의 문서가 DB에 추가되었습니다.")

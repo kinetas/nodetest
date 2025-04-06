@@ -107,99 +107,99 @@
 
     <script>
 
-        const token = localStorage.getItem('token');
-        console.log('🔑 저장된 토큰:', token);
+        // const token = localStorage.getItem('token');
+        // console.log('🔑 저장된 토큰:', token);
 
-        if (!token) {
-        alert("로그인이 필요합니다.");
-            window.location.href = '/';
-        }
+        // if (!token) {
+        // alert("로그인이 필요합니다.");
+        //     window.location.href = '/';
+        // }
 
-        // ✅ JWT 기반 사용자 정보 가져오기
-        fetch('/user-info', {
-            headers: {
-                Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('로그인이 필요합니다.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            document.getElementById('greeting').textContent = `Hello, ${data.userId}`;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('greeting').textContent = error.message;
-            alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
-            window.location.href = '/';
-        });
+        // // ✅ JWT 기반 사용자 정보 가져오기
+        // fetch('/user-info', {
+        //     headers: {
+        //         Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가
+        //     }
+        // })
+        // .then(response => {
+        //     if (!response.ok) {
+        //         throw new Error('로그인이 필요합니다.');
+        //     }
+        //     return response.json();
+        // })
+        // .then(data => {
+        //     document.getElementById('greeting').textContent = `Hello, ${data.userId}`;
+        // })
+        // .catch(error => {
+        //     console.error('Error:', error);
+        //     document.getElementById('greeting').textContent = error.message;
+        //     alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+        //     window.location.href = '/';
+        // });
 
-        // ✅ JWT 기반 미션 목록 가져오기
-        fetch('/dashboard/missions', {
-            headers: {
-                Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const missionListElement = document.getElementById('missionList');
-            missionListElement.innerHTML = '';
+        // // ✅ JWT 기반 미션 목록 가져오기
+        // fetch('/dashboard/missions', {
+        //     headers: {
+        //         Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가
+        //     }
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     const missionListElement = document.getElementById('missionList');
+        //     missionListElement.innerHTML = '';
 
-            if (data.missions && data.missions.length > 0) {
-                data.missions.forEach(mission => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `MID: ${mission.m_id}, U2ID: ${mission.u2_id}, Title: ${mission.m_title}, Status: ${mission.m_status}`;
-                missionListElement.appendChild(listItem);
-                });
-            } else {
-                missionListElement.textContent = '미션이 없습니다.';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            document.getElementById('missionList').textContent = '미션 목록을 불러오는데 실패했습니다.';
-        });
+        //     if (data.missions && data.missions.length > 0) {
+        //         data.missions.forEach(mission => {
+        //         const listItem = document.createElement('li');
+        //         listItem.textContent = `MID: ${mission.m_id}, U2ID: ${mission.u2_id}, Title: ${mission.m_title}, Status: ${mission.m_status}`;
+        //         missionListElement.appendChild(listItem);
+        //         });
+        //     } else {
+        //         missionListElement.textContent = '미션이 없습니다.';
+        //     }
+        // })
+        // .catch(error => {
+        //     console.error('Error:', error);
+        //     document.getElementById('missionList').textContent = '미션 목록을 불러오는데 실패했습니다.';
+        // });
 
-        // ✅ JWT 기반 미션 생성 함수
-        function createMission() {
-            const u2_id = document.getElementById('u2_id').value;
-            const authenticationAuthority = document.getElementById('authenticationAuthority').value;
-            const m_title = document.getElementById('m_title').value;
-            const m_deadline = document.getElementById('m_deadline').value;
-            const m_reword = document.getElementById('m_reword').value;
+        // // ✅ JWT 기반 미션 생성 함수
+        // function createMission() {
+        //     const u2_id = document.getElementById('u2_id').value;
+        //     const authenticationAuthority = document.getElementById('authenticationAuthority').value;
+        //     const m_title = document.getElementById('m_title').value;
+        //     const m_deadline = document.getElementById('m_deadline').value;
+        //     const m_reword = document.getElementById('m_reword').value;
 
-            fetch('/dashboard/missioncreate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가
-                },
-                body: JSON.stringify({ u2_id, authenticationAuthority, m_title, m_deadline, m_reword })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('미션이 성공적으로 생성되었습니다.');
-                    location.reload(); // 새로고침
-                } else {
-                    document.getElementById('errorMessage').textContent = data.message;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('errorMessage').textContent = '미션 생성 중 오류가 발생했습니다.';
-            });
-        }
+        //     fetch('/dashboard/missioncreate', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가
+        //         },
+        //         body: JSON.stringify({ u2_id, authenticationAuthority, m_title, m_deadline, m_reword })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             alert('미션이 성공적으로 생성되었습니다.');
+        //             location.reload(); // 새로고침
+        //         } else {
+        //             document.getElementById('errorMessage').textContent = data.message;
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error:', error);
+        //         document.getElementById('errorMessage').textContent = '미션 생성 중 오류가 발생했습니다.';
+        //     });
+        // }
 
-        // ✅ 로그아웃 처리 (로컬 스토리지에서 토큰 제거)
-        function logout() {
-            localStorage.removeItem('token'); // ✅ 토큰 제거
-            localStorage.removeItem('userId');
-            window.location.href = '/';
-        }
+        // // ✅ 로그아웃 처리 (로컬 스토리지에서 토큰 제거)
+        // function logout() {
+        //     localStorage.removeItem('token'); // ✅ 토큰 제거
+        //     localStorage.removeItem('userId');
+        //     window.location.href = '/';
+        // }
 
         //====================== 세션 기반 (실제 사용하던 거) ==============================
         // fetch('/user-info')
@@ -394,200 +394,391 @@
         // }
         //====================== 세션 기반 (실제 사용하던 거) ==============================
         
-        // i_friend 리스트 가져오기
-        fetch('/dashboard/friends/ifriends')
+        // // i_friend 리스트 가져오기
+        // fetch('/dashboard/friends/ifriends')
 
-            .then(response => response.json())
-            .then(data => {
-                const iFriendsListElement = document.getElementById('iFriendsList');
-                iFriendsListElement.innerHTML = '';
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         const iFriendsListElement = document.getElementById('iFriendsList');
+        //         iFriendsListElement.innerHTML = '';
 
-                if (data.iFriends && data.iFriends.length > 0) {
-                    data.iFriends.forEach(fId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `친구 아이디: ${fId}`;
-                        iFriendsListElement.appendChild(listItem);
-                    });
-                } else {
-                    iFriendsListElement.textContent = 'i_friend 목록이 없습니다.';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching i_friend list:', error);
-                document.getElementById('iFriendsList').textContent = 'i_friend 목록을 불러오는 중 오류가 발생했습니다.';
+        //         if (data.iFriends && data.iFriends.length > 0) {
+        //             data.iFriends.forEach(fId => {
+        //                 const listItem = document.createElement('li');
+        //                 listItem.textContent = `친구 아이디: ${fId}`;
+        //                 iFriendsListElement.appendChild(listItem);
+        //             });
+        //         } else {
+        //             iFriendsListElement.textContent = 'i_friend 목록이 없습니다.';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching i_friend list:', error);
+        //         document.getElementById('iFriendsList').textContent = 'i_friend 목록을 불러오는 중 오류가 발생했습니다.';
+        //     });
+
+        // // t_friend 리스트 가져오기
+        // fetch('/dashboard/friends/tfriends')
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         const sentListElement = document.getElementById('sentRequestsList');
+        //         const receivedListElement = document.getElementById('receivedRequestsList');
+        //         sentListElement.innerHTML = '';
+        //         receivedListElement.innerHTML = '';
+
+        //         if (data.sentRequests && data.sentRequests.length > 0) {
+        //             data.sentRequests.forEach(fId => {
+        //                 const listItem = document.createElement('li');
+        //                 listItem.textContent = `요청을 보낸 친구 아이디: ${fId}`;
+        //                 sentListElement.appendChild(listItem);
+        //             });
+        //         } else {
+        //             sentListElement.textContent = '보낸 친구 요청이 없습니다.';
+        //         }
+
+        //         if (data.receivedRequests && data.receivedRequests.length > 0) {
+        //             data.receivedRequests.forEach(uId => {
+        //                 const listItem = document.createElement('li');
+        //                 listItem.textContent = `요청 온 친구 아이디: ${uId}`;
+        //                 receivedListElement.appendChild(listItem);
+        //             });
+        //         } else {
+        //             receivedListElement.textContent = '받은 친구 요청이 없습니다.';
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error('Error fetching t_friend list:', error);
+        //         document.getElementById('sentRequestsList').textContent = 't_friend 목록을 불러오는 중 오류가 발생했습니다.';
+        //         document.getElementById('receivedRequestsList').textContent = 't_friend 목록을 불러오는 중 오류가 발생했습니다.';
+        //     });
+
+        // // 친구 삭제 함수
+        // function friendDelete() {
+        //     const f_id = document.getElementById('if_id_input').value;
+
+        //     if (!f_id) {
+        //         alert("삭제할 친구 ID를 입력하세요.");
+        //         return;
+        //     }
+
+        //     fetch('/dashboard/friends/delete', {
+        //         method: 'DELETE',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ f_id })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             alert(data.message);
+        //             location.reload();
+        //         } else {
+        //             alert(data.message);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error:', error));
+        // }
+
+        // // 친구 요청 보내기 함수
+        // function friendRequestSend() {
+
+        //     const token = localStorage.getItem('token'); // ✅ 토큰 다시 불러오기
+        //     const f_id = document.getElementById('tf_id_input').value;
+
+        //     if (!token) {
+        //         alert("로그인이 필요합니다.");
+        //         return;
+        //     }
+
+        //     if (!f_id) {
+        //         alert("요청할 친구 ID를 입력하세요.");
+        //         return;
+        //     }
+
+        //     fetch('/dashboard/friends/request', {
+        //         method: 'POST',
+        //         headers: { 
+        //             'Content-Type': 'application/json',
+        //             Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가!
+        //          },
+        //         body: JSON.stringify({ f_id })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             alert(data.message);
+        //             location.reload();
+        //         } else {
+        //             alert(data.message);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error:', error));
+        // }
+
+        // // 친구 요청 수락 함수
+        // function friendRequestAccept() {
+        //     const f_id = document.getElementById('tf_id_input').value;
+
+        //     if (!f_id) {
+        //         alert("수락할 친구 ID를 입력하세요.");
+        //         return;
+        //     }
+
+        //     fetch('/dashboard/friends/accept', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ f_id })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             alert(data.message);
+        //             location.reload();
+        //         } else {
+        //             alert(data.message);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error:', error));
+        // }
+
+        // // 친구 요청 거절 함수
+        // function friendRequestReject() {
+        //     const f_id = document.getElementById('tf_id_input').value;
+
+        //     if (!f_id) {
+        //         alert("거절할 친구 ID를 입력하세요.");
+        //         return;
+        //     }
+
+        //     fetch('/dashboard/friends/reject', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ f_id })
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         if (data.success) {
+        //             alert(data.message);
+        //             location.reload();
+        //         } else {
+        //             alert(data.message);
+        //         }
+        //     })
+        //     .catch(error => console.error('Error:', error));
+        // }
+
+
+        // // 계정 탈퇴 함수
+        // function deleteAccount() {
+        //     if (confirm("정말 계정을 탈퇴하시겠습니까?")) { // 사용자 확인
+        //         fetch('/api/auth/deleteAccount', {
+        //             method: 'DELETE',
+        //             headers: { 'Content-Type': 'application/json' }
+        //         })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 alert(data.message);
+        //                 window.location.href = '/'; // 로그인 화면으로 리디렉션
+        //             } else {
+        //                 alert(data.message);
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('계정 탈퇴 중 오류:', error);
+        //             alert(`계정 탈퇴 중 오류(${error})가 발생했습니다. html`);
+        //         });
+        //     }
+        // }
+
+        //=================token=================
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            window.location.href = '/';
+        }
+
+        // ✅ 사용자 정보
+        fetch('/user-info', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('greeting').textContent = `Hello, ${data.userId}`;
+        })
+        .catch(() => {
+            alert('인증 실패. 로그인 페이지로 이동합니다.');
+            window.location.href = '/';
+        });
+
+        // ✅ 미션 목록
+        fetch('/dashboard/missions', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('missionList');
+            list.innerHTML = '';
+            (data.missions || []).forEach(m => {
+                const li = document.createElement('li');
+                li.textContent = `${m.m_title} (받는이: ${m.u2_id})`;
+                list.appendChild(li);
+            });
+        });
+
+        // ✅ i_friend 목록
+        fetch('/dashboard/friends/ifriends', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('iFriendsList');
+            list.innerHTML = '';
+            (data.iFriends || []).forEach(id => {
+                const li = document.createElement('li');
+                li.textContent = `친구 ID: ${id}`;
+                list.appendChild(li);
+            });
+        });
+
+        // ✅ t_friend 목록
+        fetch('/dashboard/friends/tfriends', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const sent = document.getElementById('sentRequestsList');
+            const received = document.getElementById('receivedRequestsList');
+            sent.innerHTML = '';
+            received.innerHTML = '';
+
+            (data.sentRequests || []).forEach(id => {
+                const li = document.createElement('li');
+                li.textContent = `보낸 요청: ${id}`;
+                sent.appendChild(li);
             });
 
-        // t_friend 리스트 가져오기
-        fetch('/dashboard/friends/tfriends')
-            .then(response => response.json())
-            .then(data => {
-                const sentListElement = document.getElementById('sentRequestsList');
-                const receivedListElement = document.getElementById('receivedRequestsList');
-                sentListElement.innerHTML = '';
-                receivedListElement.innerHTML = '';
-
-                if (data.sentRequests && data.sentRequests.length > 0) {
-                    data.sentRequests.forEach(fId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `요청을 보낸 친구 아이디: ${fId}`;
-                        sentListElement.appendChild(listItem);
-                    });
-                } else {
-                    sentListElement.textContent = '보낸 친구 요청이 없습니다.';
-                }
-
-                if (data.receivedRequests && data.receivedRequests.length > 0) {
-                    data.receivedRequests.forEach(uId => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `요청 온 친구 아이디: ${uId}`;
-                        receivedListElement.appendChild(listItem);
-                    });
-                } else {
-                    receivedListElement.textContent = '받은 친구 요청이 없습니다.';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching t_friend list:', error);
-                document.getElementById('sentRequestsList').textContent = 't_friend 목록을 불러오는 중 오류가 발생했습니다.';
-                document.getElementById('receivedRequestsList').textContent = 't_friend 목록을 불러오는 중 오류가 발생했습니다.';
+            (data.receivedRequests || []).forEach(id => {
+                const li = document.createElement('li');
+                li.textContent = `받은 요청: ${id}`;
+                received.appendChild(li);
             });
+        });
 
-        // 친구 삭제 함수
+        // ✅ 미션 생성
+        function createMission() {
+            const payload = {
+                u2_id: document.getElementById('u2_id').value,
+                authenticationAuthority: document.getElementById('authenticationAuthority').value,
+                m_title: document.getElementById('m_title').value,
+                m_deadline: document.getElementById('m_deadline').value,
+                m_reword: document.getElementById('m_reword').value
+            };
+
+            fetch('/dashboard/missioncreate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('생성 완료');
+                    location.reload();
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message;
+                }
+            });
+        }
+
+        // ✅ 친구 삭제
         function friendDelete() {
             const f_id = document.getElementById('if_id_input').value;
 
-            if (!f_id) {
-                alert("삭제할 친구 ID를 입력하세요.");
-                return;
-            }
-
             fetch('/dashboard/friends/delete', {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify({ f_id })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                alert(data.message);
+                if (data.success) location.reload();
+            });
         }
 
-        // 친구 요청 보내기 함수
+        // ✅ 친구 요청 보내기
         function friendRequestSend() {
-
-            const token = localStorage.getItem('token'); // ✅ 토큰 다시 불러오기
             const f_id = document.getElementById('tf_id_input').value;
-
-            if (!token) {
-                alert("로그인이 필요합니다.");
-                return;
-            }
-
-            if (!f_id) {
-                alert("요청할 친구 ID를 입력하세요.");
-                return;
-            }
 
             fetch('/dashboard/friends/request', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}` // ✅ JWT 토큰 추가!
-                 },
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify({ f_id })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                alert(data.message);
+                if (data.success) location.reload();
+            });
         }
 
-        // 친구 요청 수락 함수
+        // ✅ 친구 요청 수락
         function friendRequestAccept() {
             const f_id = document.getElementById('tf_id_input').value;
 
-            if (!f_id) {
-                alert("수락할 친구 ID를 입력하세요.");
-                return;
-            }
-
             fetch('/dashboard/friends/accept', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify({ f_id })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                alert(data.message);
+                if (data.success) location.reload();
+            });
         }
 
-        // 친구 요청 거절 함수
+        // ✅ 친구 요청 거절
         function friendRequestReject() {
             const f_id = document.getElementById('tf_id_input').value;
 
-            if (!f_id) {
-                alert("거절할 친구 ID를 입력하세요.");
-                return;
-            }
-
             fetch('/dashboard/friends/reject', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify({ f_id })
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                alert(data.message);
+                if (data.success) location.reload();
+            });
         }
 
-
-        // 계정 탈퇴 함수
-        function deleteAccount() {
-            if (confirm("정말 계정을 탈퇴하시겠습니까?")) { // 사용자 확인
-                fetch('/api/auth/deleteAccount', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                        window.location.href = '/'; // 로그인 화면으로 리디렉션
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('계정 탈퇴 중 오류:', error);
-                    alert(`계정 탈퇴 중 오류(${error})가 발생했습니다. html`);
-                });
-            }
+        // ✅ 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            alert("로그아웃되었습니다.");
+            window.location.href = '/';
         }
     </script>
 </body>

@@ -12,6 +12,3 @@ def get_config():
             "credential": "gogi0529"
         }
     }
-
-SECRET_KEY = "your_secret_key"
-ALGORITHM = "HS256"

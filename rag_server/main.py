@@ -428,11 +428,10 @@ def serve_index():
 # db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 embedding = HuggingFaceEmbeddings(
-    model_name="BM-K/KoSimCSE-roberta-base",
+    model_name="bge-small-ko",
     model_kwargs={"device": "cpu"},
     encode_kwargs={"normalize_embeddings": True}
 )
-
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 # ✅ 블로그 본문 크롤링 함수

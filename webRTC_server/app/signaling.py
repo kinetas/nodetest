@@ -17,6 +17,7 @@ def verify_token(token: str, user_id: str) -> bool:
         if sub != user_id:
             print(f"Token user_id mismatch: token={sub}, actual={user_id}")
             return False
+        print(f"Token verified for user_id: {user_id}")
         return True
     except JWTError as e:
         print(f"Invalid token: {e}")
@@ -25,7 +26,7 @@ def verify_token(token: str, user_id: str) -> bool:
 @signaling_router.websocket("/ws")
 async def signaling(websocket: WebSocket):
     await websocket.accept()
-    print("connection open")
+    print("🔗 WebSocket connection open")
     user_id = None
 
     try:
@@ -37,11 +38,17 @@ async def signaling(websocket: WebSocket):
                 user_id = data.get("userId")
                 token = data.get("token")
 
-                if not token or not verify_token(token, user_id):
+                if not token:
+                    print("No token provided")
+                    await websocket.close()
+                    return
+
+                if not verify_token(token, user_id):
                     await websocket.close()
                     return
 
                 active_users[user_id] = websocket
+                print(f"{user_id} joined WebRTC signaling")
                 await broadcast_user_list()
 
             elif msg_type == "offer":
@@ -62,7 +69,7 @@ async def signaling(websocket: WebSocket):
     except WebSocketDisconnect:
         disconnect_user(websocket)
         await broadcast_user_list()
-        print("connection closed")
+        print("WebSocket disconnected")
     except Exception as e:
         print(f"WebSocket error: {e}")
         disconnect_user(websocket)
@@ -70,5 +77,6 @@ async def signaling(websocket: WebSocket):
 
 async def broadcast_user_list():
     user_list = list(active_users.keys())
+    print(f"Broadcasting user list: {user_list}")
     for ws in active_users.values():
         await ws.send_json({"type": "userlist", "users": user_list})

@@ -87,7 +87,7 @@
 
     ws.onopen = () => {
       statusBox.innerText = "🟢 서버 연결됨. 상대방을 선택하세요.";
-      ws.send(JSON.stringify({ type: "join", userId }));
+      ws.send(JSON.stringify({ type: "join", userId, token }));
     };
 
     ws.onmessage = async (message) => {

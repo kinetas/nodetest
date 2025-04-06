@@ -6,7 +6,7 @@ from langchain_chroma import Chroma
 import os
 
 # 경로 설정
-json_file = "blog_data.json"
+json_file = "naver_blog_data.json"
 persist_directory = "/chroma/chroma"
 
 # 임베딩 초기화 (로컬 서버의 llama3 사용)

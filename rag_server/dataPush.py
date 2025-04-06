@@ -67,9 +67,10 @@ persist_directory = "/chroma/chroma"
 
 embedding = HuggingFaceEmbeddings(
     model_name="BM-K/KoSimCSE-roberta-base",
-    model_kwargs={"device": "cpu"},  # GPU 없음 고려
+    model_kwargs={"device": "cpu"},
     encode_kwargs={"normalize_embeddings": True}
 )
+
 db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
 existing = db.get()

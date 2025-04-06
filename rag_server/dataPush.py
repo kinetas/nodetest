@@ -66,7 +66,7 @@ persist_directory = "/chroma/chroma"
 # db = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
 embedding = HuggingFaceEmbeddings(
-    model_name="bge-small-ko",
+    model_name="jhgan/ko-sroberta-multitask",
     model_kwargs={"device": "cpu"},
     encode_kwargs={"normalize_embeddings": True}
 )

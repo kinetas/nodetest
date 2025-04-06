@@ -428,7 +428,7 @@ def serve_index():
 # db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
 embedding = HuggingFaceEmbeddings(
-    model_name="bge-small-ko",
+    model_name="jhgan/ko-sroberta-multitask",
     model_kwargs={"device": "cpu"},
     encode_kwargs={"normalize_embeddings": True}
 )

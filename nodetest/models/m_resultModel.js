@@ -3,7 +3,7 @@ const sequelize = require('../config/db');
 
 const MResult = sequelize.define('MResult', {
   m_id: {
-    type: DataTypes.STRING(20),
+    type: DataTypes.STRING(40),
     primaryKey: true,
     allowNull: false,
   },

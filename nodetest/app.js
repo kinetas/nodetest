@@ -148,7 +148,7 @@ app.get('/rooms', (req, res) => {
 app.get('/findinfo', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  //?��?��?��/비�??번호 찾기 ?��?���???
 });
-app.get('/cVote', requireAuth, (req, res) => {
+app.get('/cVote', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
 });
 

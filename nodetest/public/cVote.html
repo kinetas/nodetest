@@ -130,100 +130,92 @@
         // loadMyVotes();
 
         //====================================token==================================================
-        document.addEventListener("DOMContentLoaded", () => {
-        const token = localStorage.getItem("token");
 
+        // ✅ JWT 토큰 가져오기
+        const token = localStorage.getItem('token');
+        
         if (!token) {
             alert("로그인이 필요합니다.");
             location.href = "/";
-            return;
         }
 
-        // ✅ 투표 목록 불러오기 - 명시적으로 분리
-        function loadVotes() {
-            fetch("/api/cVote", {
+        // ✅ 투표 목록 불러오기
+        fetch("/api/cVote", {
             headers: {
                 "Authorization": `Bearer ${token}`
             }
-            })
-            .then((res) => res.json())
-            .then((data) => {
+        })
+        .then((res) => res.json())
+        .then((data) => {
             const voteList = document.getElementById("voteList");
             voteList.innerHTML = "";
 
             data.votes.forEach((vote) => {
                 const div = document.createElement("div");
                 div.innerHTML = `
-                <h3>${vote.c_title}</h3>
-                <p>${vote.c_contents}</p>
-                <p>좋아요: ${vote.c_good} / 싫어요: ${vote.c_bad}</p>
-                <button onclick="vote('${vote.c_number}', 'good')">좋아요</button>
-                <button onclick="vote('${vote.c_number}', 'bad')">싫어요</button>
-                <hr />
+                    <h3>${vote.c_title}</h3>
+                    <p>${vote.c_contents}</p>
+                    <p>좋아요: ${vote.c_good} / 싫어요: ${vote.c_bad}</p>
+                    <button onclick="vote('${vote.c_number}', 'good')">좋아요</button>
+                    <button onclick="vote('${vote.c_number}', 'bad')">싫어요</button>
+                    <hr />
                 `;
                 voteList.appendChild(div);
             });
-            })
-            .catch((err) => {
+        })
+        .catch((err) => {
             console.error("투표 목록 오류:", err);
-            });
-        }
+        });
 
-        // ✅ 투표 액션 (좋아요/싫어요)
-        window.vote = function (c_number, action) {
-            fetch("/api/cVote/action", {
+        // ✅ 투표 등록 (좋아요/싫어요)
+        function vote(c_number, action) {
+        fetch("/api/cVote/action", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${token}` // ✅ JWT 적용
             },
             body: JSON.stringify({ c_number, action }),
-            })
+        })
             .then((res) => res.json())
             .then((data) => {
-            alert(data.message || "투표 성공!");
-            loadVotes(); // 목록 갱신
+                alert(data.message || "투표 성공!");
+                location.reload();
             })
             .catch((err) => {
-            console.error("투표 실패:", err);
+                console.error("투표 실패:", err);
             });
-        };
+        }
 
-        // ✅ 투표 등록 이벤트 핸들러
+        // ✅ 투표 생성 폼
         const voteForm = document.getElementById("voteForm");
         voteForm.addEventListener("submit", (e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            const formData = new FormData();
-            formData.append("c_title", document.getElementById("c_title").value);
-            formData.append("c_contents", document.getElementById("c_contents").value);
-            const file = document.getElementById("c_image").files[0];
-            if (file) {
+        const formData = new FormData();
+        formData.append("c_title", document.getElementById("c_title").value);
+        formData.append("c_contents", document.getElementById("c_contents").value);
+        const file = document.getElementById("c_image").files[0];
+        if (file) {
             formData.append("c_image", file);
-            }
+        }
 
-            fetch("/api/cVote/create", {
+        fetch("/api/cVote/create", {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${token}` // ✅ JWT 적용
             },
-            body: formData
-            })
+            body: formData,
+        })
             .then((res) => res.json())
             .then((data) => {
-            alert(data.message || "투표가 생성되었습니다.");
-            voteForm.reset();
-            loadVotes(); // 목록 갱신
+                alert(data.message || "투표가 생성되었습니다.");
+                location.reload();
             })
             .catch((err) => {
-            console.error("투표 생성 오류:", err);
+                console.error("투표 생성 오류:", err);
             });
         });
-
-        // ✅ 최초 실행
-        loadVotes();
-        });
-        
     </script>
 </body>
 </html>

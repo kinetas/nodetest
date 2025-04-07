@@ -207,29 +207,56 @@ exports.createMission = async (req, res) => {
     }
 };
 
-// 미션 삭제 함수
+// // 미션 삭제 함수
+// exports.deleteMission = async (req, res) => {
+//     const { m_id } = req.body;
+//     // const u1_id = req.session.user.id; // 세션에서 로그인한 사용자 ID 가져오기
+//     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
+
+//     if (!m_id) {
+//         return res.json({ success: false, message: '미션 ID는 필수 항목입니다.' });
+//     }
+
+//     try {
+//         // 특정 m_id와 u1_id로 삭제할 미션을 직접 지정하여 삭제
+//         const deletedCount = await Mission.destroy({ where: { m_id, u1_id } });
+
+//         if (deletedCount === 0) {
+//             // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
+//             return res.json({ success: false, message: '해당 미션이 존재하지 않거나 삭제 권한이 없습니다.' });
+//         }
+        
+//         res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
+//     } catch (error) {
+//         console.error('미션 삭제 오류:', error);
+//         res.status(500).json({ success: false, message: '미션 삭제 중 오류가 발생했습니다.' });
+//     }
+// };
+// 미션 삭제
 exports.deleteMission = async (req, res) => {
     const { m_id } = req.body;
-    // const u1_id = req.session.user.id; // 세션에서 로그인한 사용자 ID 가져오기
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
-    if (!m_id) {
-        return res.json({ success: false, message: '미션 ID는 필수 항목입니다.' });
-    }
-
     try {
-        // 특정 m_id와 u1_id로 삭제할 미션을 직접 지정하여 삭제
-        const deletedCount = await Mission.destroy({ where: { m_id, u1_id } });
+        const mission = await Mission.findOne({ where: { m_id } }); // ✅ m_id 기준으로 조회
 
-        if (deletedCount === 0) {
-            // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
-            return res.json({ success: false, message: '해당 미션이 존재하지 않거나 삭제 권한이 없습니다.' });
+        if (!mission) {
+            return res.status(404).json({ message: '미션을 찾을 수 없습니다.' });
         }
-        
-        res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
+
+        if (mission.u2_id !== u1_id) {
+            return res.status(403).json({ success: false, message: '미션 삭제 권한이 없습니다.' });
+        }
+
+        if (mission.m_status !== '진행중') {
+            return res.status(403).json({ success: false, message: '완료된 미션은 삭제할 수 없습니다.' });
+        }
+
+        await mission.destroy();
+        res.json({ message: '미션이 성공적으로 삭제되었습니다.' });
     } catch (error) {
         console.error('미션 삭제 오류:', error);
-        res.status(500).json({ success: false, message: '미션 삭제 중 오류가 발생했습니다.' });
+        res.status(500).json({ message: '미션 삭제 중 오류가 발생했습니다.' });
     }
 };
 
@@ -618,7 +645,8 @@ exports.successMission = async (req, res) => {
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
     
     try {
-        const mission = await Mission.findOne({ where: { m_id, u1_id } });
+        // const mission = await Mission.findOne({ where: { m_id, u1_id } });
+        const mission = await Mission.findOne({ where: { m_id } }); // ✅ m_id로 조회
 
         if (!mission) {
             return res.json({ success: false, message: '해당 미션이 존재하지 않습니다.' });

@@ -24,133 +24,196 @@
     </form>
 
     <script>
-
-        // // JWT 토큰 가져오기
-        // const token = localStorage.getItem('jwt');
-        // if (!token) {
-        //     alert("로그인이 필요합니다.");
-        //     window.location.href = '/';
+        // function loadVotes() {
+        //     fetch('/api/cVote')
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             const voteList = document.getElementById('voteList');
+        //             voteList.innerHTML = '';
+        //             if (data.success && data.votes && Array.isArray(data.votes)) {
+        //                 data.votes.forEach((vote, index) => {
+        //                     const voteDiv = document.createElement('div');
+        //                     voteDiv.className = 'vote-item';
+        //                     voteDiv.innerHTML = `
+        //                         ${index + 1}. 
+        //                         <a href="/cVote/details?c_number=${vote.c_number}" target="_blank">${vote.c_title}</a>
+        //                         - 작성자: ${vote.u_id}
+        //                         (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
+        //                     `;
+        //                     voteList.appendChild(voteDiv);
+        //                 });
+        //             } else {
+        //                 voteList.innerHTML = '투표가 없습니다.';
+        //             }
+        //         })
+        //         .catch(error => console.error("Error loading votes:", error));
         // }
 
-        function loadVotes() {
-            fetch('/api/cVote')
-                .then(response => response.json())
-                .then(data => {
-                    const voteList = document.getElementById('voteList');
-                    voteList.innerHTML = '';
-                    if (data.success && data.votes && Array.isArray(data.votes)) {
-                        data.votes.forEach((vote, index) => {
-                            const voteDiv = document.createElement('div');
-                            voteDiv.className = 'vote-item';
-                            voteDiv.innerHTML = `
-                                ${index + 1}. 
-                                <a href="/cVote/details?c_number=${vote.c_number}" target="_blank">${vote.c_title}</a>
-                                - 작성자: ${vote.u_id}
-                                (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
-                            `;
-                            voteList.appendChild(voteDiv);
-                        });
-                    } else {
-                        voteList.innerHTML = '투표가 없습니다.';
-                    }
-                })
-                .catch(error => console.error("Error loading votes:", error));
+        // function loadMyVotes() {
+        //     fetch('/api/cVote/myVotes')
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             const myVoteList = document.getElementById('myVoteList');
+        //             myVoteList.innerHTML = '';
+        //             if (data.success && data.myVotes && Array.isArray(data.myVotes)) {
+        //                 data.myVotes.forEach((vote, index) => {
+        //                     const voteDiv = document.createElement('div');
+        //                     voteDiv.className = 'vote-item';
+        //                     voteDiv.innerHTML = `
+        //                         ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
+        //                         <p>${vote.c_contents}</p>
+        //                         <button onclick="deleteVote('${vote.c_number}')">삭제</button>
+        //                     `;
+        //                     myVoteList.appendChild(voteDiv);
+        //                 });
+        //             } else {
+        //                 myVoteList.innerHTML = '내가 생성한 투표가 없습니다.';
+        //             }
+        //         })
+        //         .catch(error => console.error("Error loading my votes:", error));
+        // }
+
+        // document.getElementById('createVoteForm').addEventListener('submit', (e) => {
+        //     e.preventDefault();
+        //     const c_title = document.getElementById('c_title').value.trim();
+        //     const c_contents = document.getElementById('c_contents').value.trim();
+        //     const c_image = document.getElementById('c_image').files[0];
+
+        //     if (!c_title || !c_contents) {
+        //         alert("제목과 내용을 입력해주세요.");
+        //         return;
+        //     }
+
+        //     if (c_image && c_image.size > 64 * 1024) { // 64KB 제한
+        //         alert("이미지 파일 크기는 64KB를 초과할 수 없습니다.");
+        //         return;
+        //     }
+
+        //     const formData = new FormData();
+        //     formData.append('c_title', c_title);
+        //     formData.append('c_contents', c_contents);
+        //     if (c_image) {
+        //         formData.append('c_image', c_image);
+        //     }
+
+        //     fetch('/api/cVote/create', {
+        //         method: 'POST',
+        //         body: formData,
+        //     })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 alert('투표가 생성되었습니다.');
+        //                 location.reload();
+        //             } else {
+        //                 alert(data.message);
+        //             }
+        //         })
+        //         .catch(error => console.error("Error creating vote:", error));
+        // });
+
+        // function deleteVote(c_number) {
+        //     fetch(`/api/cVote/delete/${c_number}`, { method: 'DELETE' })
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success) {
+        //                 alert('투표가 삭제되었습니다.');
+        //                 loadMyVotes();
+        //             } else {
+        //                 alert(data.message);
+        //             }
+        //         })
+        //         .catch(error => console.error("Error deleting vote:", error));
+        // }
+
+        // loadVotes();
+        // loadMyVotes();
+
+        //====================================token==================================================
+        // ✅ JWT 토큰 가져오기
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            location.href = "/";
         }
 
-        function loadMyVotes() {
-            fetch('/api/cVote/myVotes')
-
-            // fetch('/api/cVote/myVotes', {
-            //     method: 'GET',
-            //     headers: {
-            //         Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
-            //     }
-            // })
-                .then(response => response.json())
-                .then(data => {
-                    const myVoteList = document.getElementById('myVoteList');
-                    myVoteList.innerHTML = '';
-                    if (data.success && data.myVotes && Array.isArray(data.myVotes)) {
-                        data.myVotes.forEach((vote, index) => {
-                            const voteDiv = document.createElement('div');
-                            voteDiv.className = 'vote-item';
-                            voteDiv.innerHTML = `
-                                ${index + 1}. ${vote.c_title} (${vote.c_good} 좋음 / ${vote.c_bad} 싫음)
-                                <p>${vote.c_contents}</p>
-                                <button onclick="deleteVote('${vote.c_number}')">삭제</button>
-                            `;
-                            myVoteList.appendChild(voteDiv);
-                        });
-                    } else {
-                        myVoteList.innerHTML = '내가 생성한 투표가 없습니다.';
-                    }
-                })
-                .catch(error => console.error("Error loading my votes:", error));
-        }
-
-        document.getElementById('createVoteForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const c_title = document.getElementById('c_title').value.trim();
-            const c_contents = document.getElementById('c_contents').value.trim();
-            const c_image = document.getElementById('c_image').files[0];
-
-            if (!c_title || !c_contents) {
-                alert("제목과 내용을 입력해주세요.");
-                return;
+        // ✅ 투표 목록 불러오기
+        fetch("/api/cVote", {
+            headers: {
+                "Authorization": `Bearer ${token}`
             }
+        })
+        .then((res) => res.json())
+        .then((data) => {
+            const voteList = document.getElementById("voteList");
+            voteList.innerHTML = "";
 
-            if (c_image && c_image.size > 64 * 1024) { // 64KB 제한
-                alert("이미지 파일 크기는 64KB를 초과할 수 없습니다.");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('c_title', c_title);
-            formData.append('c_contents', c_contents);
-            if (c_image) {
-                formData.append('c_image', c_image);
-            }
-
-            fetch('/api/cVote/create', {
-                method: 'POST',
-                body: formData,
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('투표가 생성되었습니다.');
-                        location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => console.error("Error creating vote:", error));
+            data.votes.forEach((vote) => {
+                const div = document.createElement("div");
+                div.innerHTML = `
+                    <h3>${vote.c_title}</h3>
+                    <p>${vote.c_contents}</p>
+                    <p>좋아요: ${vote.c_good} / 싫어요: ${vote.c_bad}</p>
+                    <button onclick="vote('${vote.c_number}', 'good')">좋아요</button>
+                    <button onclick="vote('${vote.c_number}', 'bad')">싫어요</button>
+                    <hr />
+                `;
+                voteList.appendChild(div);
+            });
+        })
+        .catch((err) => {
+            console.error("투표 목록 오류:", err);
         });
 
-        function deleteVote(c_number) {
-            fetch(`/api/cVote/delete/${c_number}`, { method: 'DELETE' })
-
-            // fetch(`/api/cVote/delete/${c_number}`, {
-            //     method: 'DELETE',
-            //     headers: {
-            //         Authorization: `Bearer ${token}` // JWT 기반 인증 헤더 추가
-            //     }
-            // })
-
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('투표가 삭제되었습니다.');
-                        loadMyVotes();
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => console.error("Error deleting vote:", error));
+        // ✅ 투표 등록 (좋아요/싫어요)
+        function vote(c_number, action) {
+        fetch("/api/cVote/action", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}` // ✅ JWT 적용
+            },
+            body: JSON.stringify({ c_number, action }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                alert(data.message || "투표 성공!");
+                location.reload();
+            })
+            .catch((err) => {
+                console.error("투표 실패:", err);
+            });
         }
 
-        loadVotes();
-        loadMyVotes();
+        // ✅ 투표 생성 폼
+        const voteForm = document.getElementById("voteForm");
+        voteForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("c_title", document.getElementById("c_title").value);
+        formData.append("c_contents", document.getElementById("c_contents").value);
+        const file = document.getElementById("c_image").files[0];
+        if (file) {
+            formData.append("c_image", file);
+        }
+
+        fetch("/api/cVote/create", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}` // ✅ JWT 적용
+            },
+            body: formData,
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                alert(data.message || "투표가 생성되었습니다.");
+                location.reload();
+            })
+            .catch((err) => {
+                console.error("투표 생성 오류:", err);
+            });
+        });
     </script>
 </body>
 </html>

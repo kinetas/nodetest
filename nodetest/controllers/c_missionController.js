@@ -1,3 +1,4 @@
+const axios = require('axios'); // 내부 API 호출을 위해 추가
 const CRoom = require('../models/comunity_roomModel'); // comunity_room 모델 가져오기
 const Room = require('../models/roomModel'); // room 모델
 const Mission = require('../models/missionModel'); // mission 모델
@@ -212,10 +213,87 @@ exports.createCommunityMission = async (req, res) => {
     }
 };
 
-// 커뮤니티 미션 수락 (JWT 적용)
+// // 커뮤니티 미션 수락 (JWT 적용)
+// exports.acceptCommunityMission = async (req, res) => {
+//     const { cr_num } = req.body;
+//     const u2_id = req.currentUserId; // JWT 인증된 사용자 ID 사용
+
+//     try {
+//         const mission = await CRoom.findOne({ where: { cr_num } });
+
+//         if (!mission) {
+//             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+//         }
+
+//         if (mission.u_id === u2_id) {
+//             return res.status(403).json({ success: false, message: '본인이 생성한 미션은 수락할 수 없습니다.' });
+//         }
+//         if (mission.cr_status == 'acc') {
+//             return res.status(403).json({ success: false, message: '이미 수락된 미션입니다.' });
+//         }
+
+//         // 기존 방 조회 후 없으면 방 생성
+//         const existingRooms = await Room.findAll({
+//             where: {
+//                 r_type: 'open',
+//                 [Op.or]: [
+//                     { u1_id: mission.u_id, u2_id },
+//                     { u1_id: u2_id, u2_id: mission.u_id }
+//                 ]
+//             }
+//         });
+
+//         let rid_open = uuidv4();
+
+//         if (existingRooms.length === 0) {
+//             await Room.create({ u1_id: mission.u_id, u2_id, r_id: rid_open, r_type: 'open' });
+//             await Room.create({ u1_id: u2_id, u2_id: mission.u_id, r_id: rid_open, r_type: 'open' });
+//         } else {
+//             rid_open = existingRooms[0].r_id;
+//         }
+
+//         // 커뮤니티 미션 상태 업데이트
+//         await mission.update({ u2_id, cr_status: 'acc' });
+
+//         // Mission 테이블에 미션 생성
+//         const newMissionId1 = uuidv4();
+//         const newMissionId2 = uuidv4();
+//         const missionTitle = mission.cr_title;
+//         const deadline = mission.deadline ? mission.deadline : new Date();
+
+//         await Mission.create({
+//             m_id: newMissionId1,
+//             u1_id: mission.u_id,
+//             u2_id,
+//             m_title: missionTitle,
+//             m_deadline: deadline,
+//             m_status: '진행중',
+//             r_id: rid_open,
+//             m_extended: false,
+//         });
+
+//         await Mission.create({
+//             m_id: newMissionId2,
+//             u1_id: u2_id,
+//             u2_id: mission.u_id,
+//             m_title: missionTitle,
+//             m_deadline: deadline,
+//             m_status: '진행중',
+//             r_id: rid_open,
+//             m_extended: false,
+//         });
+
+//         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
+//     } catch (error) {
+//         console.error('커뮤니티 미션 수락 오류:', error);
+//         res.status(500).json({ success: false, message: `커뮤니티 미션 수락 중 오류(${error})가 발생했습니다.` });
+//     }
+// };
+
+// ✅ 커뮤니티 미션 수락 (roomController의 addRoom 사용)
 exports.acceptCommunityMission = async (req, res) => {
     const { cr_num } = req.body;
-    const u2_id = req.currentUserId; // JWT 인증된 사용자 ID 사용
+    const u2_id = req.currentUserId;
 
     try {
         const mission = await CRoom.findOne({ where: { cr_num } });
@@ -227,12 +305,12 @@ exports.acceptCommunityMission = async (req, res) => {
         if (mission.u_id === u2_id) {
             return res.status(403).json({ success: false, message: '본인이 생성한 미션은 수락할 수 없습니다.' });
         }
-        if (mission.cr_status == 'acc') {
+        if (mission.cr_status === 'acc') {
             return res.status(403).json({ success: false, message: '이미 수락된 미션입니다.' });
         }
 
-        // 기존 방 조회 후 없으면 방 생성
-        const existingRooms = await Room.findAll({
+        // ✅ 1. 기존 open방 존재 여부 확인
+        let openRoom = await Room.findOne({
             where: {
                 r_type: 'open',
                 [Op.or]: [
@@ -242,50 +320,61 @@ exports.acceptCommunityMission = async (req, res) => {
             }
         });
 
-        let rid_open = uuidv4();
+        // ✅ 2. 없으면 roomController의 addRoom 함수 호출 (내부 API 요청)
+        if (!openRoom) {
+            const addRoomRes = await axios.post(
+                'http://27.113.11.48:3000/api/rooms',
+                {
+                    u2_id: mission.u_id,
+                    r_type: 'open'
+                },
+                {
+                    headers: {
+                        Authorization: req.headers.authorization // JWT 토큰 그대로 전달
+                    }
+                }
+            );
 
-        if (existingRooms.length === 0) {
-            await Room.create({ u1_id: mission.u_id, u2_id, r_id: rid_open, r_type: 'open' });
-            await Room.create({ u1_id: u2_id, u2_id: mission.u_id, r_id: rid_open, r_type: 'open' });
-        } else {
-            rid_open = existingRooms[0].r_id;
+            if (addRoomRes.data && addRoomRes.data.room) {
+                openRoom = addRoomRes.data.room;
+            }
         }
 
-        // 커뮤니티 미션 상태 업데이트
+        const rid_open = openRoom?.r_id;
+
+        // ✅ 3. 상태 변경
         await mission.update({ u2_id, cr_status: 'acc' });
 
-        // Mission 테이블에 미션 생성
-        const newMissionId1 = uuidv4();
-        const newMissionId2 = uuidv4();
-        const missionTitle = mission.cr_title;
-        const deadline = mission.deadline ? mission.deadline : new Date();
+        const deadline = mission.deadline || new Date();
 
-        await Mission.create({
-            m_id: newMissionId1,
-            u1_id: mission.u_id,
-            u2_id,
-            m_title: missionTitle,
-            m_deadline: deadline,
-            m_status: '진행중',
-            r_id: rid_open,
-            m_extended: false,
-        });
-
-        await Mission.create({
-            m_id: newMissionId2,
-            u1_id: u2_id,
-            u2_id: mission.u_id,
-            m_title: missionTitle,
-            m_deadline: deadline,
-            m_status: '진행중',
-            r_id: rid_open,
-            m_extended: false,
-        });
+        // ✅ 4. 양방향 미션 생성
+        await Mission.bulkCreate([
+            {
+                m_id: uuidv4(),
+                u1_id: mission.u_id,
+                u2_id,
+                m_title: mission.cr_title,
+                m_deadline: deadline,
+                m_status: '진행중',
+                r_id: rid_open,
+                m_extended: false,
+            },
+            {
+                m_id: uuidv4(),
+                u1_id: u2_id,
+                u2_id: mission.u_id,
+                m_title: mission.cr_title,
+                m_deadline: deadline,
+                m_status: '진행중',
+                r_id: rid_open,
+                m_extended: false,
+            }
+        ]);
 
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 수락 오류:', error);
-        res.status(500).json({ success: false, message: `커뮤니티 미션 수락 중 오류(${error})가 발생했습니다.` });
+        res.status(500).json({ success: false, message: `커뮤니티 미션 수락 중 오류: ${error.message}` });
     }
 };
 
@@ -298,7 +387,7 @@ exports.deleteCommunityMission = async (req, res) => {
         const mission = await CRoom.findOne({ where: { cr_num, u_id } });
 
         if (!mission) {
-            return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
+            return res.status(404).json({ success: false, message: '타인이 생성한 미션은 삭제할 수 없습니다.' });
         }
 
         if (mission.cr_status !== 'match') {

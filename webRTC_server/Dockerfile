@@ -20,4 +20,4 @@ COPY . .
 #CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8500"]
 
 # uvicorn을 사용해 HTTPS로 FastAPI 실행
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8500", "--ssl-keyfile", "/app/cert/cert.key", "--ssl-certfile", "/app/cert/cert.crt"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8500", "--ssl-keyfile", "/app/cert/cert.key", "--ssl-certfile", "/app/cert/cert.crt"]

@@ -76,8 +76,8 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from signaling import signaling_router
-from config import get_config
+from app.signaling import signaling_router
+from app.config import get_config
 
 app = FastAPI()
 

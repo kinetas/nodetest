@@ -1,8 +1,9 @@
 fastapi
 uvicorn
-langchain
-langchain-community
-langchain-ollama
+langchain==0.1.16
+langchain-community==0.0.34
+langchain-core==0.1.46
+# langchain-ollama
 langchain-chroma
 chromadb
 ollama
@@ -11,6 +12,6 @@ beautifulsoup4
 requests
 selenium
 webdriver-manager
-sentence-transformers
-transformers
+sentence-transformers==2.6.1
+transformers==4.38.2
 

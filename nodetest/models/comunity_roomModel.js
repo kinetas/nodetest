@@ -8,7 +8,7 @@ const CRoom = sequelize.define('CRoom', {
         primaryKey: true,
     },
     cr_num: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.STRING(40),
         allowNull: false,
         primaryKey: true,
     },

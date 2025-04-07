@@ -208,7 +208,7 @@ app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes);
 
 // app.use('/api/cVote', cVoteRoutes);
-app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
+app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
 
 // app.use('/api/comumunity_missions', c_missionRoutes);
 app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);

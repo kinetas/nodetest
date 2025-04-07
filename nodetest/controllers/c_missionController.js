@@ -358,6 +358,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 m_status: '진행중',
                 r_id: rid_open,
                 m_extended: false,
+                missionAuthenticationAuthority: mission.u_id
             },
             {
                 m_id: uuidv4(),
@@ -368,6 +369,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 m_status: '진행중',
                 r_id: rid_open,
                 m_extended: false,
+                missionAuthenticationAuthority: u2_id
             }
         ]);
 

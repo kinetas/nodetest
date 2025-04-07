@@ -187,12 +187,61 @@ exports.getRooms = async (req, res) => {
     res.json({ rooms });
 };
 
+// exports.addRoom = async (req, res) => {
+//     const u1_id = req.currentUserId;
+//     const { u2_id, roomName, r_type } = req.body;
+//     const type = r_type || "general";
+
+//     try {
+//         const existingRoom = await Room.findOne({
+//             where: {
+//                 [Op.or]: [
+//                     { u1_id, u2_id, r_type: type },
+//                     { u1_id: u2_id, u2_id: u1_id, r_type: type }
+//                 ]
+//             }
+//         });
+
+//         if (existingRoom) {
+//             return res.status(400).json({ success: false, message: '해당 타입의 방이 이미 존재합니다.' });
+//         }
+
+//         if (u1_id === u2_id) {
+//             await exports.initAddRoom({ body: { u1_id, roomName } });
+//             return res.json({ message: '자기자신 방이 생성되었습니다.' });
+//         }
+
+//         const roomId = uuidv4();
+//         if (!uuidValidate(roomId)) {
+//             console.error("생성된 UUID가 유효하지 않습니다.");
+//             return res.status(500).json({ message: '유효하지 않은 UUID' });
+//         }
+
+//         const r_title = roomName?.trim() || `${u1_id}-${u2_id}`;
+
+//         await Room.create({ u1_id, u2_id, r_id: roomId, r_title, r_type: type });
+//         await Room.create({ u1_id: u2_id, u2_id: u1_id, r_id: roomId, r_title, r_type: type });
+
+//         res.json({ message: '방이 성공적으로 추가되었습니다.' });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: `방 추가 중 오류: ${error}` });
+//     }
+// };
+// ✅ JWT 기반 addRoom 함수 (중복 방 체크 포함)
 exports.addRoom = async (req, res) => {
-    const u1_id = req.currentUserId;
+    const u1_id = req.currentUserId; // JWT에서 추출한 로그인 유저 ID
     const { u2_id, roomName, r_type } = req.body;
     const type = r_type || "general";
 
     try {
+        // ✅ 1. 자기 자신에게 방 생성 요청일 경우
+        if (u1_id === u2_id) {
+            await exports.initAddRoom({ body: { u1_id, roomName } });
+            return res.json({ message: '자기자신 방이 생성되었습니다.' });
+        }
+
+        // ✅ 2. 중복 방 존재 여부 확인
         const existingRoom = await Room.findOne({
             where: {
                 [Op.or]: [
@@ -203,29 +252,35 @@ exports.addRoom = async (req, res) => {
         });
 
         if (existingRoom) {
-            return res.status(400).json({ success: false, message: '해당 타입의 방이 이미 존재합니다.' });
+            return res.status(400).json({
+                success: false,
+                message: '해당 타입의 방이 이미 존재합니다.',
+                room: existingRoom
+            });
         }
 
-        if (u1_id === u2_id) {
-            await exports.initAddRoom({ body: { u1_id, roomName } });
-            return res.json({ message: '자기자신 방이 생성되었습니다.' });
-        }
-
+        // ✅ 3. 방 ID(UUID) 생성 및 유효성 확인
         const roomId = uuidv4();
         if (!uuidValidate(roomId)) {
             console.error("생성된 UUID가 유효하지 않습니다.");
-            return res.status(500).json({ message: '유효하지 않은 UUID' });
+            return res.status(500).json({ message: '유효하지 않은 UUID 생성' });
         }
 
+        // ✅ 4. 방 이름 설정
         const r_title = roomName?.trim() || `${u1_id}-${u2_id}`;
 
+        // ✅ 5. 양방향 방 생성
         await Room.create({ u1_id, u2_id, r_id: roomId, r_title, r_type: type });
         await Room.create({ u1_id: u2_id, u2_id: u1_id, r_id: roomId, r_title, r_type: type });
 
         res.json({ message: '방이 성공적으로 추가되었습니다.' });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: `방 추가 중 오류: ${error}` });
+        console.error("❌ 방 생성 중 오류:", error);
+        res.status(500).json({
+            message: `방 추가 중 오류가 발생했습니다.`,
+            error: error.message
+        });
     }
 };
 

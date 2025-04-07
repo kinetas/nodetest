@@ -39,7 +39,8 @@ const cors = require('cors');
 app.use(cors());  // 모든 출처?�� ?���????�� ?��?��
 app.use(cors({
     origin: 'http://27.113.11.48:3000',
-    credentials: true // 쿠키 방식 사용 시 필요, 지금은 무관
+    allowedHeaders: ['Authorization', 'Content-Type'],
+    // credentials: true // 쿠키 방식 사용 시 필요, 지금은 무관
   }));
 
 app.use(express.json()); // JSON �뙆�떛�쓣 �쐞�븳 誘몃뱾�?���뼱 �꽕�젙

@@ -167,6 +167,40 @@
             console.error("투표 목록 오류:", err);
         });
 
+
+        function loadMyVotes() {
+            fetch("/api/cVote/myVotes", {
+                headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const myVoteList = document.getElementById("myVoteList");
+                myVoteList.innerHTML = "";
+
+                if (data.success && Array.isArray(data.myVotes) && data.myVotes.length > 0) {
+                data.myVotes.forEach((vote, index) => {
+                    const div = document.createElement("div");
+                    div.innerHTML = `
+                    <strong>${index + 1}. ${vote.c_title}</strong>
+                    <p>${vote.c_contents}</p>
+                    <p>👍 ${vote.c_good} / 👎 ${vote.c_bad}</p>
+                    <button onclick="deleteVote('${vote.c_number}')">삭제</button>
+                    <hr />
+                    `;
+                    myVoteList.appendChild(div);
+                });
+                } else {
+                myVoteList.innerHTML = "내가 생성한 투표가 없습니다.";
+                }
+            })
+            .catch(err => {
+                console.error("내 투표 목록 불러오기 실패:", err);
+                document.getElementById("myVoteList").innerText = "불러오기 실패";
+            });
+            }
+
         // ✅ 투표 등록 (좋아요/싫어요)
         function vote(c_number, action) {
         fetch("/api/cVote/action", {
@@ -216,6 +250,31 @@
                 console.error("투표 생성 오류:", err);
             });
         });
+
+        function deleteVote(c_number) {
+            const token = localStorage.getItem("token");
+
+            fetch(`/api/cVote/delete/${c_number}`, {
+                method: "DELETE",
+                headers: {
+                "Authorization": `Bearer ${token}`
+                }
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                alert("투표가 삭제되었습니다.");
+                loadMyVotes(); // ✅ 삭제 후 목록 새로고침
+                } else {
+                alert(data.message || "삭제 실패");
+                }
+            })
+            .catch((err) => {
+                console.error("투표 삭제 오류:", err);
+            });
+            }
+
+        loadMyVotes()
     </script>
 </body>
 </html>

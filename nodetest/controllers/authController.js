@@ -318,7 +318,7 @@ exports.loginToken = async (req, res) => {
 
         // 생년월일 처리: 일반 버전과 DP 버전 선택 가능하게
         let birthDate;
-        const useDP = true; // ✅ 실험 시 여기만 true/false 바꿔서 비교 가능
+        const useDP = false; // ✅ 실험 시 여기만 true/false 바꿔서 비교 가능
 
         if (useDP) {
             const birth = new Date(user.u_birth);

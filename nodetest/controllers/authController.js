@@ -318,12 +318,12 @@ exports.loginToken = async (req, res) => {
 
         // 생년월일 처리: 일반 버전과 DP 버전 선택 가능하게
         let birthDate;
-        const useDP = false; // ✅ 실험 시 여기만 true/false 바꿔서 비교 가능
+        const useDP = true; // ✅ 실험 시 여기만 true/false 바꿔서 비교 가능
 
         if (useDP) {
             const birth = new Date(user.u_birth);
             const birthDays = Math.floor(birth.getTime() / (1000 * 60 * 60 * 24));
-            const epsilon = 0.1;
+            const epsilon = 0.5;
             const noisyDays = Math.floor(addLaplaceNoise(birthDays, epsilon));
             birthDate = new Date(noisyDays * 24 * 60 * 60 * 1000);
         } else {

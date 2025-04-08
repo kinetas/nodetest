@@ -297,7 +297,9 @@ exports.deleteAccount = async (req, res) => { // 추가
 
 const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불러오기
 const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
+const { addLaplaceNoise } = require('../utils/dpUtils');
 exports.loginToken = async (req, res) => {
+    console.time("LoginResponseTime"); // 시작 지점
     try {
         const { userId, password } = req.body;
 
@@ -314,25 +316,59 @@ exports.loginToken = async (req, res) => {
             return res.status(401).json({ success: false, message: '비밀번호가 일치하지 않습니다.' });
         }
 
-        // JWT 페이로드 설정
+        // 생년월일 처리: 일반 버전과 DP 버전 선택 가능하게
+        let birthDate;
+        const useDP = true; // ✅ 실험 시 여기만 true/false 바꿔서 비교 가능
+
+        if (useDP) {
+            const birth = new Date(user.u_birth);
+            const birthDays = Math.floor(birth.getTime() / (1000 * 60 * 60 * 24));
+            const epsilon = 0.5;
+            const noisyDays = Math.floor(addLaplaceNoise(birthDays, epsilon));
+            birthDate = new Date(noisyDays * 24 * 60 * 60 * 1000);
+        } else {
+            birthDate = user.u_birth;
+        }
+
         const payload = {
-            userId: user.u_id,  // 클레임 이름은 loginRequired.js와 일치시켜야 함
+            userId: user.u_id,
+            birth: birthDate.toISOString().split('T')[0],
         };
 
-        // 토큰 생성
-        const token = generateToken(payload); // 1시간 유효 토큰 발급
+        const token = generateToken(payload);
 
-        // 클라이언트로 토큰 전달
+        console.timeEnd("LoginResponseTime"); // 응답 시간 측정 끝
+
         return res.status(200).json({
             success: true,
             message: '성공적으로 로그인 되었습니다.',
-            token, // ✅ 클라이언트는 이걸 localStorage에 저장
+            token,
             user: {
                 u_id: user.u_id,
                 u_name: user.u_name,
-                // 추가 정보 필요한 경우 여기에 포함
+                birth_sent: birthDate.toISOString().split('T')[0],
             }
         });
+
+        // // JWT 페이로드 설정
+        // const payload = {
+        //     userId: user.u_id,  // 클레임 이름은 loginRequired.js와 일치시켜야 함
+        // };
+
+        // // 토큰 생성
+        // const token = generateToken(payload); // 1시간 유효 토큰 발급
+
+        // // 클라이언트로 토큰 전달
+        // return res.status(200).json({
+        //     success: true,
+        //     message: '성공적으로 로그인 되었습니다.',
+        //     token, // ✅ 클라이언트는 이걸 localStorage에 저장
+        //     user: {
+        //         u_id: user.u_id,
+        //         u_name: user.u_name,
+        //         // 추가 정보 필요한 경우 여기에 포함
+        //     }
+        // });
 
     } catch (error) {
         console.error('loginToken error:', error);

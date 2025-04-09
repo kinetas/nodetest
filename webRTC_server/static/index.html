@@ -246,6 +246,12 @@
             const fps = report.framesPerSecond;
             console.log(`🖥️ 수신 해상도: ${width}x${height}, FPS: ${fps}`);
           }
+          if (report.type === "candidate-pair" && report.state === "succeeded" && report.nominated) {
+            const rtt = report.currentRoundTripTime;
+            if (rtt !== undefined) {
+              console.log(`🌐 RTT (왕복 시간): ${(rtt * 1000).toFixed(2)} ms`);
+            }
+          }
         });
       }, 3000);
     }

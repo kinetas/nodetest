@@ -209,51 +209,56 @@
           const duration = performance.now() - connectionStartTime;
           console.log("연결까지 걸린 시간(ms):", duration);
           statusBox.innerText = `✅ 연결 성공 (${duration.toFixed(2)}ms)`;
+
+          startStatsMonitoring();
         }
       };
 
-      setInterval(async () => {
-        if (!peerConnection) return;
-        const stats = await peerConnection.getStats();
+      function startStatsMonitoring() {
+        setInterval(async () => {
+          if (!peerConnection) return;
+          const stats = await peerConnection.getStats();
       
-        stats.forEach(report => {
-          if (report.type === "outbound-rtp" && report.kind === "video") {
-            const now = report.timestamp;
-            const bytesSent = report.bytesSent;
+          stats.forEach(report => {
+            if (report.type === "outbound-rtp" && report.kind === "video") {
+              const now = report.timestamp;
+              const bytesSent = report.bytesSent;
       
-            if (lastTimestamp && lastBytesSent) {
-              const bitrate = 8 * (bytesSent - lastBytesSent) / ((now - lastTimestamp) / 1000);
-              console.log(`📤 보낸 비디오 비트레이트: ${Math.round(bitrate)} bps`);
+              if (lastTimestamp && lastBytesSent) {
+                const bitrate = 8 * (bytesSent - lastBytesSent) / ((now - lastTimestamp) / 1000);
+                console.log(`📤 보낸 비디오 비트레이트: ${Math.round(bitrate)} bps`);
+              }
+      
+              lastBytesSent = bytesSent;
+              lastTimestamp = now;
             }
       
-            lastBytesSent = bytesSent;
-            lastTimestamp = now;
-          }
+            if (report.type === "inbound-rtp" && report.kind === "video") {
+              const received = report.packetsReceived || 0;
+              const lost = report.packetsLost || 0;
+              const total = received + lost;
+              const lossRate = total > 0 ? (lost / total) * 100 : 0;
       
-          if (report.type === "inbound-rtp" && report.kind === "video") {
-            const received = report.packetsReceived || 0;
-            const lost = report.packetsLost || 0;
-            const total = received + lost;
-            const lossRate = total > 0 ? (lost / total) * 100 : 0;
-      
-            console.log(`📦 수신 패킷 손실: ${lost} / ${total} (${lossRate.toFixed(2)}%)`);
-            console.log(`📶 수신 지터(ms): ${(report.jitter * 1000).toFixed(2)}`);
-          }
-      
-          if (report.type === "track" && report.kind === "video") {
-            const width = report.frameWidth;
-            const height = report.frameHeight;
-            const fps = report.framesPerSecond;
-            console.log(`🖥️ 수신 해상도: ${width}x${height}, FPS: ${fps}`);
-          }
-          if (report.type === "candidate-pair" && report.state === "succeeded" && report.nominated) {
-            const rtt = report.currentRoundTripTime;
-            if (rtt !== undefined) {
-              console.log(`🌐 RTT (왕복 시간): ${(rtt * 1000).toFixed(2)} ms`);
+              console.log(`📦 수신 패킷 손실: ${lost} / ${total} (${lossRate.toFixed(2)}%)`);
+              console.log(`📶 수신 지터(ms): ${(report.jitter * 1000).toFixed(2)}`);
             }
-          }
-        });
-      }, 3000);
+      
+            if (report.type === "track" && report.kind === "video") {
+              const width = report.frameWidth;
+              const height = report.frameHeight;
+              const fps = report.framesPerSecond;
+              console.log(`🖥️ 수신 해상도: ${width}x${height}, FPS: ${fps}`);
+            }
+      
+            if (report.type === "candidate-pair" && report.state === "succeeded" && report.nominated) {
+              const rtt = report.currentRoundTripTime;
+              if (rtt !== undefined) {
+                console.log(`🌐 RTT (왕복 시간): ${(rtt * 1000).toFixed(2)} ms`);
+              }
+            }
+          });
+        }, 3000);
+      }
     }
 
 

@@ -64,7 +64,7 @@
 
   <script>
     const userId = crypto.randomUUID();
-    let targetId = null;
+    let targetUserId = null;
     let localStream = null;
     let peerConnection = null;
     let isCaller = false;
@@ -84,8 +84,6 @@
         credential: "gogi0529",
       }],
     };
-
-    const token = "test_token";  // 테스트용 토큰
 
     ws.onopen = () => {
       statusBox.innerText = "🟢 서버 연결됨. 상대방을 선택하세요.";
@@ -108,7 +106,7 @@
 
           const answer = await peerConnection.createAnswer();
           await peerConnection.setLocalDescription(answer);
-          ws.send(JSON.stringify({ type: "answer", from: userId, targetId: from, payload: answer }));
+          ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
         }
 
       } else if (type === "answer") {
@@ -128,30 +126,22 @@
           }
         }
 
-      } else if (type === "userlist") {
+      } else if (type === "user-list") {
         const select = document.getElementById("targetSelect");
         select.innerHTML = "";
-      
-        const filteredUsers = users.filter(uid => uid !== userId);
-      
-        if (filteredUsers.length === 0) {
-          const option = document.createElement("option");
-          option.disabled = true;
-          option.selected = true;
-          option.text = "🔍 상대방 없음";
-          select.appendChild(option);
-          targetId = null;
-        } else {
-          filteredUsers.forEach(uid => {
+        users.forEach(uid => {
+          if (uid !== userId) {
             const option = document.createElement("option");
             option.value = uid;
             option.text = uid;
             select.appendChild(option);
-          });
-          targetId = filteredUsers[0];
+          }
+        });
+        if (select.options.length > 0) {
+          targetUserId = select.options[0].value;
         }
       }
-    }
+    };
 
     async function prepareConnection() {
       if (peerConnection) {
@@ -175,8 +165,7 @@
 
       peerConnection.onicecandidate = (e) => {
         if (e.candidate) {
-          ws.send(JSON.stringify({ type: "candidate", from: userId, targetId: targetId, payload: e.candidate }));
-          console.log("Candidate 타입:", e.candidate.type);
+          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: e.candidate }));
         }
       };
 
@@ -184,8 +173,7 @@
         remoteVideo.srcObject = event.streams[0];
         statusBox.innerText = "📺 상대방 화면 수신 중...";
       };
-    
-      /*
+
       peerConnection.oniceconnectionstatechange = () => {
         const state = peerConnection.iceConnectionState;
         if (state === "connected") {
@@ -194,51 +182,10 @@
           statusBox.innerText = "❌ 연결 끊김";
         }
       };
-      */
-      
-      //실험용 코드
-      let connectionStartTime = null;
-
-      peerConnection.oniceconnectionstatechange = () => {
-        const state = peerConnection.iceConnectionState;
-        if (state === "checking") {
-          connectionStartTime = performance.now();
-        } else if (state === "connected") {
-          const duration = performance.now() - connectionStartTime;
-          console.log("연결까지 걸린 시간(ms):", duration);
-          statusBox.innerText = `✅ 연결 성공 (${duration.toFixed(2)}ms)`;
-        }
-      };
-
-      setInterval(async () => {
-        if (!peerConnection) return;
-      
-        // 📊 RTCStats 수집
-        const stats = await peerConnection.getStats(null);
-        stats.forEach(report => {
-          if (report.type === "outbound-rtp" && report.kind === "video") {
-            console.log("📤 보낸 비디오 비트레이트:", report.bitrateMean);
-            console.log("📦 패킷 손실:", report.packetsLost);
-          }
-          if (report.type === "remote-inbound-rtp" && report.kind === "video") {
-            console.log("📶 받은 비디오 지터(ms):", (report.jitter * 1000).toFixed(2));
-          }
-        });
-      
-        // 🎥 수신 영상 해상도 & 프레임레이트
-        const track = remoteVideo.srcObject?.getVideoTracks()[0];
-        const settings = track?.getSettings();
-        if (settings) {
-          console.log(`🖥️ 수신 해상도: ${settings.width}x${settings.height}, 프레임레이트: ${settings.frameRate}`);
-        }
-      }, 5000);
-      //끝나고 삭제
     }
-      
-
 
     async function startCall() {
-      if (!targetId) return alert("상대 선택하세요.");
+      if (!targetUserId) return alert("상대 선택하세요.");
       if (peerConnection && peerConnection.signalingState !== "stable") return;
 
       isCaller = true;
@@ -248,7 +195,7 @@
 
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
-      ws.send(JSON.stringify({ type: "offer", from: userId, targetId: targetId, payload: offer }));
+      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
     }
 
     function hangUp() {
@@ -277,7 +224,7 @@
     document.getElementById("toggleMic").addEventListener("click", toggleMic);
     document.getElementById("toggleCam").addEventListener("click", toggleCam);
     document.getElementById("targetSelect").addEventListener("change", (e) => {
-      targetId = e.target.value;
+      targetUserId = e.target.value;
     });
   </script>
 </body>

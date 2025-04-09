@@ -131,19 +131,27 @@
       } else if (type === "userlist") {
         const select = document.getElementById("targetSelect");
         select.innerHTML = "";
-        users.forEach(uid => {
-          if (uid !== userId) {
+      
+        const filteredUsers = users.filter(uid => uid !== userId);
+      
+        if (filteredUsers.length === 0) {
+          const option = document.createElement("option");
+          option.disabled = true;
+          option.selected = true;
+          option.text = "🔍 상대방 없음";
+          select.appendChild(option);
+          targetId = null;
+        } else {
+          filteredUsers.forEach(uid => {
             const option = document.createElement("option");
             option.value = uid;
             option.text = uid;
             select.appendChild(option);
-          }
-        });
-        if (select.options.length > 0) {
-          targetId = select.options[0].value;
+          });
+          targetId = filteredUsers[0];
         }
       }
-    };
+    }
 
     async function prepareConnection() {
       if (peerConnection) {

@@ -87,6 +87,25 @@
 
     const token = "test_token";  // 테스트용 토큰
 
+    // 브라우저 로그를 서버로 전송하는 함수
+    function reportLogToServer(msg) {
+      fetch("/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+      }).catch(e => console.warn("로그 전송 실패:", e));
+    }
+
+    // console.log 오버라이드
+    (function () {
+      const originalLog = console.log;
+      console.log = function (...args) {
+        const msg = args.join(" ");
+        originalLog.apply(console, args);
+        reportLogToServer(msg);
+      };
+    })();
+    
     ws.onopen = () => {
       statusBox.innerText = "🟢 서버 연결됨. 상대방을 선택하세요.";
       ws.send(JSON.stringify({ type: "join", userId, token }));

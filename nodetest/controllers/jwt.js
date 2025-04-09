@@ -16,7 +16,6 @@ const refreshToken = (token) => {
     // 새로운 페이로드 생성
     const payload = {
       userId: decoded.userId,
-      isAdmin: decoded.isAdmin,
     };
     
     // 새로운 토큰 생성

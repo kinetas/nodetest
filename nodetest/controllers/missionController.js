@@ -457,6 +457,10 @@ exports.getGivenCompletedMissions = async (req, res) => {
             where: {
                 u1_id: userId,
                 m_status: '완료',
+                // ✅ u1_id !== u2_id 조건 추가 (Sequelize 방식)
+                [Op.not]: {
+                    u2_id: userId
+                }
             },
         });
 
@@ -483,7 +487,7 @@ exports.getGivenCompletedMissions = async (req, res) => {
     }
 };
 
-// ====== 1. 친구가 수행해야 하는 미션 (추가된 코드) ======
+// ====== 1. 친구가 수행해야 하는 미션 ======
 exports.getFriendAssignedMissions = async (req, res) => {
     // const userId = req.session.user.id;
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
@@ -513,7 +517,7 @@ exports.getFriendAssignedMissions = async (req, res) => {
     }
 };
 
-// ====== 2. 친구가 완료한 미션 (추가된 코드) ======
+// ====== 2. 친구가 완료한 미션 ======
 exports.getFriendCompletedMissions = async (req, res) => {
     // const userId = req.session.user.id;
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용

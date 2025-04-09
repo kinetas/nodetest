@@ -71,8 +71,6 @@
     let remoteCandidates = [];
     let micMuted = false;
     let camHidden = false;
-    let statsInterval = null;
-
 
     const statusBox = document.getElementById("status");
     const remoteVideo = document.getElementById("remoteVideo");
@@ -167,7 +165,6 @@
 
       peerConnection.onicecandidate = (e) => {
         if (e.candidate) {
-          console.log(`[CANDIDATE] type=${event.candidate.type}, protocol=${event.candidate.protocol}`);
           ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: e.candidate }));
         }
       };
@@ -177,19 +174,12 @@
         statusBox.innerText = "📺 상대방 화면 수신 중...";
       };
 
-      peerConnection.onconnectionstatechange = () => {
-        console.log(`[PEER STATE] ${peerConnection.connectionState}`);
-      };
-
       peerConnection.oniceconnectionstatechange = () => {
         const state = peerConnection.iceConnectionState;
-        console.log(`[ICE STATE] ${state} @ ${new Date().toISOString()}`);
         if (state === "connected") {
           statusBox.innerText = "✅ 연결 성공";
-          startStatsMonitor();
         } else if (state === "disconnected" || state === "failed") {
           statusBox.innerText = "❌ 연결 끊김";
-          startStatsMonitor();
         }
       };
     }
@@ -214,7 +204,6 @@
         peerConnection = null;
         statusBox.innerText = "🔌 연결 종료됨";
         remoteVideo.srcObject = null;
-        startStatsMonitor();
       }
     }
 
@@ -229,52 +218,3 @@
       localStream.getVideoTracks().forEach(track => track.enabled = !camHidden);
       document.getElementById("toggleCam").innerText = camHidden ? "📸 캠 켜기" : "📷 캠 끄기";
     }
-
-    function startStatsMonitor() {
-      if (statsInterval) clearInterval(statsInterval);
-    
-      statsInterval = setInterval(async () => {
-        if (!peerConnection) return;
-    
-        const stats = await peerConnection.getStats();
-        stats.forEach(report => {
-          if (report.type === "outbound-rtp" && report.kind === "video") {
-            console.log(`[📤 Video Out] bitrate=${(report.bytesSent / report.timestamp * 1000).toFixed(2)} bps, packetsSent=${report.packetsSent}`);
-          }
-    
-          if (report.type === "inbound-rtp" && report.kind === "video") {
-            console.log(`[📥 Video In] frameRate=${report.framesPerSecond || "-"} FPS, width=${report.frameWidth || "-"}, height=${report.frameHeight || "-"}`);
-            console.log(`[📥 Video In] jitter=${report.jitter || "-"}, packetLoss=${report.packetsLost || 0}`);
-          }
-    
-          if (report.type === "candidate-pair" && report.state === "succeeded" && report.nominated) {
-            console.log(`[🌐 Connection] RTT=${report.currentRoundTripTime * 1000} ms`);
-          }
-          if (report.type === "inbound-rtp" && report.kind === "video") {
-            const packetsReceived = report.packetsReceived || 0;
-            const packetsLost = report.packetsLost || 0;
-            const totalPackets = packetsLost + packetsReceived;
-            const lossRate = totalPackets > 0 ? (packetsLost / totalPackets) * 100 : 0;
-          
-            console.log(`[📥 Video In] loss=${packetsLost}, received=${packetsReceived}, 🔻 LossRate=${lossRate.toFixed(2)}%`);
-            console.log(`[🎧 Audio In] loss=${packetsLost}, received=${packetsReceived}, 🔻 LossRate=${lossRate.toFixed(2)}%`);
-          }
-        });
-      }, 3000);
-    }
-    
-    function stopStatsMonitor() {
-      if (statsInterval) clearInterval(statsInterval);
-      statsInterval = null;
-    }
-
-    document.getElementById("startCall").addEventListener("click", startCall);
-    document.getElementById("hangUp").addEventListener("click", hangUp);
-    document.getElementById("toggleMic").addEventListener("click", toggleMic);
-    document.getElementById("toggleCam").addEventListener("click", toggleCam);
-    document.getElementById("targetSelect").addEventListener("change", (e) => {
-      targetUserId = e.target.value;
-    });
-  </script>
-</body>
-</html>

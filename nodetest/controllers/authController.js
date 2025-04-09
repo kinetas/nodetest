@@ -323,7 +323,7 @@ exports.loginToken = async (req, res) => {
         if (useDP) {
             const birth = new Date(user.u_birth);
             const birthDays = Math.floor(birth.getTime() / (1000 * 60 * 60 * 24));
-            const epsilon = 0.01;
+            const epsilon = 0.9;
             const noisyDays = Math.floor(addLaplaceNoise(birthDays, epsilon));
             birthDate = new Date(noisyDays * 24 * 60 * 60 * 1000);
         } else {

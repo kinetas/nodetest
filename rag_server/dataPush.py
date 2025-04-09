@@ -58,8 +58,15 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # 경로 설정
 #json_file = "documents/data.json"  # 👈 여기에 JSON 저장
-json_file="naver_blog_data.json" #크롤링버전전
+json_file="naver_blog_data.json" #크롤링버전
 persist_directory = "/chroma/chroma"
+
+try:
+    if os.path.exists(persist_directory):
+        shutil.rmtree(persist_directory)
+        print("✅ 기존 Chroma DB 디렉토리 삭제 완료")
+except Exception as e:
+    print(f"⚠️ 디렉토리 삭제 실패: {e}")
 
 # 임베딩 초기화 올라마 버전전
 # embedding = OllamaEmbeddings(base_url="http://ollama:11434", model="llama3")

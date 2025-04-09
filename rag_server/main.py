@@ -469,6 +469,16 @@ async def recommend(req: ChatRequest):
 
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=4)
+    print("🔍 유사도 검색 결과:")
+    for i, (doc, score) in enumerate(docs_with_scores):
+        content = doc.page_content or "(⚠️ 내용 없음)"
+        try:
+            preview = content[:100].replace('\n', ' ')
+        except Exception as e:
+            preview = f"(⚠️ 출력 실패: {e})"
+        print(f"  {i+1}. 점수: {score:.4f}")
+        print(f"     요약: {preview}")
+        print(f"     출처: {doc.metadata.get('source', '(없음)')}")
     filtered_docs = [doc for doc, score in docs_with_scores if score < 0.53]
 
     if not filtered_docs:

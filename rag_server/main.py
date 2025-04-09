@@ -498,6 +498,11 @@ async def recommend(req: ChatRequest):
         # ✅ 첫 문서에서 본문 크롤링
         url = filtered_docs[0].metadata.get("source")
         blog_text = crawl_naver_blog(url) or ""
+        print(f"\n🌐 선택된 문서 URL: {url}")
+
+        blog_text = crawl_naver_blog(url) or ""
+        print(f"📄 크롤링된 블로그 본문 길이: {len(blog_text)}자")
+        print(f"📄 본문 일부:\n{blog_text[:500]}...\n")  # ← 이게 핵심!
 
         prompt = (
             "너는 사용자의 요청을 참고 문서를 바탕으로 미션을 추천하는 AI야.\n"

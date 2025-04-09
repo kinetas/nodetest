@@ -469,20 +469,20 @@ async def recommend(req: ChatRequest):
 
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=4)
-
     print("🔍 유사도 검색 결과:")
     for i, (doc, score) in enumerate(docs_with_scores):
+        content = doc.page_content or "(⚠️ 내용 없음)"
+        try:
+            preview = content[:100].replace('\n', ' ')
+        except Exception as e:
+            preview = f"(⚠️ 출력 실패: {e})"
         print(f"  {i+1}. 점수: {score:.4f}")
-        print(f"     내용 요약: {doc.page_content[:100].replace('\n', ' ')}")
-        print(f"     출처: {doc.metadata.get('source')}")
-
-    filtered_docs = [doc for doc, score in docs_with_scores if score < 0.53]
-    print(f"\n🧹 필터링 후 문서 개수: {len(filtered_docs)}")
-
+        print(f"     요약: {preview}")
+        print(f"     출처: {doc.metadata.get('source', '(없음)')}")
+    filtered_docs = [doc for doc, score in docs_with_scores if score < 1.1]
 
     if not filtered_docs:
         # ✅ fallback - CoT 방식
-        print("⚠️ 관련 문서가 없어 fallback(CoT) 사용")
         prompt = (
             "너는 미션 추천 AI야. 아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n"
             '예시: "책상 정리를 해보는 건 어때요? 마음도 함께 정리될 거예요."\n\n'
@@ -497,16 +497,18 @@ async def recommend(req: ChatRequest):
     else:
         # ✅ 첫 문서에서 본문 크롤링
         url = filtered_docs[0].metadata.get("source")
+        blog_text = crawl_naver_blog(url) or ""
         print(f"\n🌐 선택된 문서 URL: {url}")
+
         blog_text = crawl_naver_blog(url) or ""
         print(f"📄 크롤링된 블로그 본문 길이: {len(blog_text)}자")
-        print(f"📄 본문 일부:\n{blog_text[:300]}...\n")
+        print(f"📄 본문 일부:\n{blog_text[:500]}...\n")  # ← 이게 핵심!
 
         prompt = (
             "너는 사용자의 요청을 참고 문서를 바탕으로 미션을 추천하는 AI야.\n"
             "아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n\n"
-            "message 항목은 자연스럽고 부드러운 문장이어야 해.\n"
-            '예시: "책상 정리를 해보는 건 어때요? 마음도 함께 정리될 거예요."\n\n'
+            "message 항목은 참고 블로그 본문의 내용을 읽고 그게 왜 카테고리와 어떤 관련이 있고 어떤 효과가 있는지 자연스럽고 부드러운 문장으로 작성해야해.\n"
+            # '예시: "책상 정리를 해보는 건 어때요? 마음도 함께 정리될 거예요."\n\n'
             "다음 JSON 형식으로만 응답해:\n"
             '{\n'
             '  "message": "자연어 문장",\n'

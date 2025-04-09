@@ -64,13 +64,15 @@
 
   <script>
     const userId = crypto.randomUUID();
-    let targetUserId = null;
+    let targetId = null;
     let localStream = null;
     let peerConnection = null;
     let isCaller = false;
     let remoteCandidates = [];
     let micMuted = false;
     let camHidden = false;
+    let lastBytesSent = 0;
+    let lastTimestamp = 0;
 
     const statusBox = document.getElementById("status");
     const remoteVideo = document.getElementById("remoteVideo");
@@ -84,6 +86,8 @@
         credential: "gogi0529",
       }],
     };
+
+    const token = "test_token";  // 테스트용 토큰
 
     ws.onopen = () => {
       statusBox.innerText = "🟢 서버 연결됨. 상대방을 선택하세요.";
@@ -106,7 +110,7 @@
 
           const answer = await peerConnection.createAnswer();
           await peerConnection.setLocalDescription(answer);
-          ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
+          ws.send(JSON.stringify({ type: "answer", from: userId, targetId: from, payload: answer }));
         }
 
       } else if (type === "answer") {
@@ -126,22 +130,30 @@
           }
         }
 
-      } else if (type === "user-list") {
+      } else if (type === "userlist") {
         const select = document.getElementById("targetSelect");
         select.innerHTML = "";
-        users.forEach(uid => {
-          if (uid !== userId) {
+      
+        const filteredUsers = users.filter(uid => uid !== userId);
+      
+        if (filteredUsers.length === 0) {
+          const option = document.createElement("option");
+          option.disabled = true;
+          option.selected = true;
+          option.text = "🔍 상대방 없음";
+          select.appendChild(option);
+          targetId = null;
+        } else {
+          filteredUsers.forEach(uid => {
             const option = document.createElement("option");
             option.value = uid;
             option.text = uid;
             select.appendChild(option);
-          }
-        });
-        if (select.options.length > 0) {
-          targetUserId = select.options[0].value;
+          });
+          targetId = filteredUsers[0];
         }
       }
-    };
+    }
 
     async function prepareConnection() {
       if (peerConnection) {
@@ -165,7 +177,8 @@
 
       peerConnection.onicecandidate = (e) => {
         if (e.candidate) {
-          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: e.candidate }));
+          ws.send(JSON.stringify({ type: "candidate", from: userId, targetId: targetId, payload: e.candidate }));
+          console.log("Candidate 타입:", e.candidate.type);
         }
       };
 
@@ -173,7 +186,8 @@
         remoteVideo.srcObject = event.streams[0];
         statusBox.innerText = "📺 상대방 화면 수신 중...";
       };
-
+    
+      /*
       peerConnection.oniceconnectionstatechange = () => {
         const state = peerConnection.iceConnectionState;
         if (state === "connected") {
@@ -182,10 +196,74 @@
           statusBox.innerText = "❌ 연결 끊김";
         }
       };
+      */
+      
+      //실험용 코드
+      let connectionStartTime = null;
+
+      peerConnection.oniceconnectionstatechange = () => {
+        const state = peerConnection.iceConnectionState;
+        if (state === "checking") {
+          connectionStartTime = performance.now();
+        } else if (state === "connected") {
+          const duration = performance.now() - connectionStartTime;
+          console.log("연결까지 걸린 시간(ms):", duration);
+          statusBox.innerText = `✅ 연결 성공 (${duration.toFixed(2)}ms)`;
+
+          startStatsMonitoring();
+        }
+      };
+
+      function startStatsMonitoring() {
+        setInterval(async () => {
+          if (!peerConnection) return;
+          const stats = await peerConnection.getStats();
+      
+          stats.forEach(report => {
+            if (report.type === "outbound-rtp" && report.kind === "video") {
+              const now = report.timestamp;
+              const bytesSent = report.bytesSent;
+      
+              if (lastTimestamp && lastBytesSent) {
+                const bitrate = 8 * (bytesSent - lastBytesSent) / ((now - lastTimestamp) / 1000);
+                console.log(`📤 보낸 비디오 비트레이트: ${Math.round(bitrate)} bps`);
+              }
+      
+              lastBytesSent = bytesSent;
+              lastTimestamp = now;
+            }
+      
+            if (report.type === "inbound-rtp" && report.kind === "video") {
+              const received = report.packetsReceived || 0;
+              const lost = report.packetsLost || 0;
+              const total = received + lost;
+              const lossRate = total > 0 ? (lost / total) * 100 : 0;
+      
+              console.log(`📦 수신 패킷 손실: ${lost} / ${total} (${lossRate.toFixed(2)}%)`);
+              console.log(`📶 수신 지터(ms): ${(report.jitter * 1000).toFixed(2)}`);
+            }
+      
+            if (report.type === "track" && report.kind === "video") {
+              const width = report.frameWidth;
+              const height = report.frameHeight;
+              const fps = report.framesPerSecond;
+              console.log(`🖥️ 수신 해상도: ${width}x${height}, FPS: ${fps}`);
+            }
+      
+            if (report.type === "candidate-pair" && report.state === "succeeded" && report.nominated) {
+              const rtt = report.currentRoundTripTime;
+              if (rtt !== undefined) {
+                console.log(`🌐 RTT (왕복 시간): ${(rtt * 1000).toFixed(2)} ms`);
+              }
+            }
+          });
+        }, 3000);
+      }
     }
 
+
     async function startCall() {
-      if (!targetUserId) return alert("상대 선택하세요.");
+      if (!targetId) return alert("상대 선택하세요.");
       if (peerConnection && peerConnection.signalingState !== "stable") return;
 
       isCaller = true;
@@ -193,9 +271,13 @@
       statusBox.innerText = "📤 연결 요청 전송 중...";
       await prepareConnection();
 
+      peerConnection.getSenders().forEach(sender => {
+        console.log("🚀 송신 중 트랙:", sender.track?.kind, sender.track?.enabled);
+      });
+
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
-      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
+      ws.send(JSON.stringify({ type: "offer", from: userId, targetId: targetId, payload: offer }));
     }
 
     function hangUp() {
@@ -224,7 +306,7 @@
     document.getElementById("toggleMic").addEventListener("click", toggleMic);
     document.getElementById("toggleCam").addEventListener("click", toggleCam);
     document.getElementById("targetSelect").addEventListener("change", (e) => {
-      targetUserId = e.target.value;
+      targetId = e.target.value;
     });
   </script>
 </body>

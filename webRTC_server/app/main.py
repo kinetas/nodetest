@@ -76,7 +76,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from fastapi import Request
 from app.signaling import signaling_router
 from app.config import get_config
 
@@ -95,9 +94,3 @@ async def root():
 @app.get("/config")
 async def config():
     return get_config()
-
-@app.post("/log")
-async def log_client_message(request: Request):
-    data = await request.json()
-    print("[CLIENT LOG]", data.get("message"))
-    return {"status": "ok"}

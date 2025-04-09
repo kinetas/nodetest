@@ -64,7 +64,7 @@
 
   <script>
     const userId = crypto.randomUUID();
-    let targetUserId = null;
+    let targetId = null;
     let localStream = null;
     let peerConnection = null;
     let isCaller = false;
@@ -140,7 +140,7 @@
           }
         });
         if (select.options.length > 0) {
-          targetUserId = select.options[0].value;
+          targetId = select.options[0].value;
         }
       }
     };
@@ -167,7 +167,7 @@
 
       peerConnection.onicecandidate = (e) => {
         if (e.candidate) {
-          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetUserId, payload: e.candidate }));
+          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetId, payload: e.candidate }));
           console.log("Candidate 타입:", e.candidate.type);
         }
       };
@@ -230,7 +230,7 @@
 
 
     async function startCall() {
-      if (!targetUserId) return alert("상대 선택하세요.");
+      if (!targetId) return alert("상대 선택하세요.");
       if (peerConnection && peerConnection.signalingState !== "stable") return;
 
       isCaller = true;
@@ -240,7 +240,7 @@
 
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
-      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetUserId, payload: offer }));
+      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetId, payload: offer }));
     }
 
     function hangUp() {
@@ -269,7 +269,7 @@
     document.getElementById("toggleMic").addEventListener("click", toggleMic);
     document.getElementById("toggleCam").addEventListener("click", toggleCam);
     document.getElementById("targetSelect").addEventListener("change", (e) => {
-      targetUserId = e.target.value;
+      targetId = e.target.value;
     });
   </script>
 </body>

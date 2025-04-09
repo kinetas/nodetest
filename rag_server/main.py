@@ -472,6 +472,7 @@ async def recommend(req: ChatRequest):
 
     print("🔍 유사도 검색 결과:")
     for i, (doc, score) in enumerate(docs_with_scores):
+        content = doc.page_content or ""
         print(f"  {i+1}. 점수: {score:.4f}")
         print(f"     내용 요약: {doc.page_content[:100].replace('\n', ' ')}")
         print(f"     출처: {doc.metadata.get('source')}")

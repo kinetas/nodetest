@@ -271,6 +271,10 @@
       statusBox.innerText = "📤 연결 요청 전송 중...";
       await prepareConnection();
 
+      peerConnection.getSenders().forEach(sender => {
+        console.log("🚀 송신 중 트랙:", sender.track?.kind, sender.track?.enabled);
+      });
+
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
       ws.send(JSON.stringify({ type: "offer", from: userId, targetId: targetId, payload: offer }));

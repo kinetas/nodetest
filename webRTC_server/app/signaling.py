@@ -6,28 +6,22 @@ from app.config import SECRET_KEY, ALGORITHM
 from jose import jwt, JWTError
 
 signaling_router = APIRouter()
-#테스트 후 복구
-
-# def verify_token(token: str, user_id: str) -> bool:
-#     if not token:
-#         print("No token provided")
-#         return False
-#     try:
-#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         sub = payload.get("sub")
-#         if sub != user_id:
-#             print(f"Token user_id mismatch: token={sub}, actual={user_id}")
-#             return False
-#         print(f"Token verified for user_id: {user_id}")
-#         return True
-#     except JWTError as e:
-#         print(f"Invalid token: {e}")
-#         return False
 
 def verify_token(token: str, user_id: str) -> bool:
-    # ✅ 테스트용: 인증 우회
-    print(f"[테스트모드] 토큰 검증 생략 - user_id: {user_id}")
-    return True
+    if not token:
+        print("No token provided")
+        return False
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        sub = payload.get("sub")
+        if sub != user_id:
+            print(f"Token user_id mismatch: token={sub}, actual={user_id}")
+            return False
+        print(f"Token verified for user_id: {user_id}")
+        return True
+    except JWTError as e:
+        print(f"Invalid token: {e}")
+        return False
 
 @signaling_router.websocket("/ws")
 async def signaling(websocket: WebSocket):

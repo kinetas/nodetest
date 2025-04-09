@@ -108,7 +108,7 @@
 
           const answer = await peerConnection.createAnswer();
           await peerConnection.setLocalDescription(answer);
-          ws.send(JSON.stringify({ type: "answer", from: userId, to: from, payload: answer }));
+          ws.send(JSON.stringify({ type: "answer", from: userId, targetId: from, payload: answer }));
         }
 
       } else if (type === "answer") {
@@ -167,7 +167,7 @@
 
       peerConnection.onicecandidate = (e) => {
         if (e.candidate) {
-          ws.send(JSON.stringify({ type: "candidate", from: userId, to: targetId, payload: e.candidate }));
+          ws.send(JSON.stringify({ type: "candidate", from: userId, targetId: targetId, payload: e.candidate }));
           console.log("Candidate 타입:", e.candidate.type);
         }
       };
@@ -240,7 +240,7 @@
 
       const offer = await peerConnection.createOffer();
       await peerConnection.setLocalDescription(offer);
-      ws.send(JSON.stringify({ type: "offer", from: userId, to: targetId, payload: offer }));
+      ws.send(JSON.stringify({ type: "offer", from: userId, targetId: targetId, payload: offer }));
     }
 
     function hangUp() {

@@ -80,15 +80,9 @@ async def recommend(req: ChatRequest):
         print(f"  {i+1}. 점수: {score:.4f}")
         print(f"     요약: {preview}")
         print(f"     출처: {doc.metadata.get('source', '(없음)')}")
-    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.1]
+    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.15]
 
-    # 2. 점수 차이가 거의 없다면 랜덤 선택
-    if len(filtered_docs_with_scores) >= 2 and abs(filtered_docs_with_scores[0][1] - filtered_docs_with_scores[1][1]) < 0.03:
-        selected_doc = random.choice(filtered_docs_with_scores)[0]
-    else:
-        selected_doc = filtered_docs_with_scores[0][0]  # 유사도 1등 문서
-
-    if not selected_doc:
+    if not filtered_docs_with_scores:
         # ✅ fallback - CoT 방식
         prompt = (
             "너는 미션 추천 AI야. 아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n"
@@ -103,6 +97,11 @@ async def recommend(req: ChatRequest):
         )
     else:
         # ✅ 첫 문서에서 본문 크롤링
+        # 2. 점수 차이가 거의 없다면 랜덤 선택
+        if len(filtered_docs_with_scores) >= 2 and abs(filtered_docs_with_scores[0][1] - filtered_docs_with_scores[1][1]) < 0.03:
+            selected_doc = random.choice(filtered_docs_with_scores)[0]
+        else:
+            selected_doc = filtered_docs_with_scores[0][0]  # 유사도 1등 문서
         url = selected_doc.metadata.get("source")
         blog_text = crawl_naver_blog(url) or ""
         print(f"\n🌐 선택된 문서 URL: {url}")

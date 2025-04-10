@@ -88,7 +88,7 @@ async def recommend(req: ChatRequest):
     else:
         selected_doc = filtered_docs_with_scores[0][0]  # 유사도 1등 문서
 
-    if not filtered_docs:
+    if not selected_doc:
         # ✅ fallback - CoT 방식
         prompt = (
             "너는 미션 추천 AI야. 아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n"

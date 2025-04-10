@@ -80,7 +80,7 @@ async def recommend(req: ChatRequest):
         print(f"  {i+1}. 점수: {score:.4f}")
         print(f"     요약: {preview}")
         print(f"     출처: {doc.metadata.get('source', '(없음)')}")
-    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.15]
+    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.2]
 
     if not filtered_docs_with_scores:
         # ✅ fallback - CoT 방식

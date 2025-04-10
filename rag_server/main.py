@@ -69,7 +69,7 @@ async def recommend(req: ChatRequest):
     query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
 
     # 🔍 RAG 검색
-    docs_with_scores = db.similarity_search_with_score(query, k=4)
+    docs_with_scores = db.similarity_search_with_score(query, k=10)
     print("🔍 유사도 검색 결과:")
     for i, (doc, score) in enumerate(docs_with_scores):
         content = doc.page_content or "(⚠️ 내용 없음)"
@@ -113,7 +113,7 @@ async def recommend(req: ChatRequest):
         prompt = (
             "너는 사용자의 요청을 참고 문서를 바탕으로 미션을 추천하는 AI야.\n"
             "아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n\n"
-            "message 항목은 참고 블로그 본문의 내용을 보고 그게 왜 카테고리와 어떤 관련이 있고 어떤 효과가 있는지 말해야 하며 4~5줄 정도 되도록 길고 자연스럽고 부드러운 문장으로 미션을 추천해야해.\n"
+            "message 항목은 참고 블로그 본문의 내용을 보고 그게 왜 카테고리와 어떤 관련이 있고 어떤 효과가 있는지 말해야 하며 4~5줄 정도 되도록 반드시 길고 자연스럽고 부드러운 문장으로 미션을 추천해야해. 또한 왜 카테고리가 해당 답변이 어떤 관련이 있는지 분석 후 말하는 것도 있어야해.\n"
             # '예시: "책상 정리를 해보는 건 어때요? 마음도 함께 정리될 거예요."\n\n'
             "다음 JSON 형식으로만 응답해:\n"
             '{\n'

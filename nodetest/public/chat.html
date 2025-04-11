@@ -409,7 +409,11 @@
         socket.on("receiveMessage", (data) => {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+            const utcDate = new Date(data.send_date);
+            const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000));
+            const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
+            // messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+            messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
 
             if (data.image) {
                 const img = document.createElement("img");

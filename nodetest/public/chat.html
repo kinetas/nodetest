@@ -24,316 +24,477 @@
 
     <script>
         
-        // URL에서 roomId 가져오기
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomId = urlParams.get('r_id'); // URL 파라미터에서 roomId 추출
-        const socket = io("http://27.113.11.48:3001",{
-            path: '/socket.io'
-        });
-         // 페이지 로드 시 기존 메시지 불러오기
-        window.onload = function() {
-            fetch(`/chat/messages/${roomId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok. Status: ${response.status}');
-                    }
-                    return response.json();
-                })
-                .then(messages => {
-                    const chatMessages = document.getElementById("chatMessages");
-                    if (messages.length === 0) {
-                        chatMessages.textContent = "이 방에 메시지가 없습니다.";
-                    } else {
-                        messages.forEach(data => {
-                            const messageElement = document.createElement("div");
+    //     // URL에서 roomId 가져오기
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const roomId = urlParams.get('r_id'); // URL 파라미터에서 roomId 추출
+    //     const socket = io("http://27.113.11.48:3001",{
+    //         path: '/socket.io'
+    //     });
+    //      // 페이지 로드 시 기존 메시지 불러오기
+    //     window.onload = function() {
+    //         fetch(`/chat/messages/${roomId}`)
+    //             .then(response => {
+    //                 if (!response.ok) {
+    //                     throw new Error('Network response was not ok. Status: ${response.status}');
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then(messages => {
+    //                 const chatMessages = document.getElementById("chatMessages");
+    //                 if (messages.length === 0) {
+    //                     chatMessages.textContent = "이 방에 메시지가 없습니다.";
+    //                 } else {
+    //                     messages.forEach(data => {
+    //                         const messageElement = document.createElement("div");
 
-                            // 서버에서 받은 시간을 KST로 되돌림
-                            const utcDate = new Date(data.send_date); // 서버에서 UTC로 처리됨
-                            const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000)); // UTC + 9시간
+    //                         // 서버에서 받은 시간을 KST로 되돌림
+    //                         const utcDate = new Date(data.send_date); // 서버에서 UTC로 처리됨
+    //                         const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000)); // UTC + 9시간
 
-                            // 시간 형식으로 변환
-                            const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
+    //                         // 시간 형식으로 변환
+    //                         const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
                             
-                            messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
+    //                         messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
 
-                            // messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
-                            chatMessages.appendChild(messageElement);
+    //                         // messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+    //                         chatMessages.appendChild(messageElement);
 
-                            if (data.image) {
-                                const imageElement = document.createElement("img");
-                                imageElement.src = `data:image/jpeg;base64,${data.image}`;
-                                imageElement.style.maxWidth = "200px";
-                                messageElement.appendChild(imageElement);
-                            }
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading messages:', error);
-                    const chatMessages = document.getElementById("chatMessages");
-                    chatMessages.textContent = `메시지를 불러오는 중 오류(${error})가 발생했습니다.`;
+    //                         if (data.image) {
+    //                             const imageElement = document.createElement("img");
+    //                             imageElement.src = `data:image/jpeg;base64,${data.image}`;
+    //                             imageElement.style.maxWidth = "200px";
+    //                             messageElement.appendChild(imageElement);
+    //                         }
+    //                     });
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error loading messages:', error);
+    //                 const chatMessages = document.getElementById("chatMessages");
+    //                 chatMessages.textContent = `메시지를 불러오는 중 오류(${error})가 발생했습니다.`;
+    //             });
+    //     };
+
+    //     socket.on("connect", () => {
+    //         console.log("서버에 연결되었습니다.");
+    //         socket.emit('joinRoom', { r_id: roomId, u1_id: sessionStorage.getItem('user_id') });
+    //     });
+        
+    //     socket.on("receiveMessage", (data) => {
+    //         console.log("Received message from server:", data); // 수신 확인 로그
+
+    //         const chatMessages = document.getElementById("chatMessages");
+    //         const messageElement = document.createElement("div");
+    //          // 메시지가 있는 경우
+    // if (data.message_contents) {
+    //     messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
+    // } 
+    // // 메시지가 없고 파일만 있는 경우
+    // else if (!data.message_contents && data.image) {
+    //     messageElement.textContent = `[${data.send_date}] ${data.u1_id}: [파일 전송]`;
+
+    //     const imageElement = document.createElement("img");
+    //     imageElement.src = `data:image/jpeg;base64,${data.image}`;
+    //     imageElement.style.maxWidth = "200px";
+    //     messageElement.appendChild(imageElement);
+    // }
+
+    // chatMessages.appendChild(messageElement);
+
+    // // 이미지가 포함된 경우 이미지를 추가적으로 처리
+    // if (data.image && data.message_contents) {
+    //     const imageElement = document.createElement("img");
+    //     imageElement.src = `data:image/jpeg;base64,${data.image}`;
+    //     imageElement.style.maxWidth = "200px";
+    //     messageElement.appendChild(imageElement);
+    // }
+
+    // if (data.u1_id !== sessionStorage.getItem('user_id')) { // 사용자가 보낸 메시지가 아니면
+    //     socket.emit('markAsRead', { r_id: data.r_id, u1_id: sessionStorage.getItem('user_id') });
+    // }
+    //     });
+
+    //     function sendMessage() {
+    //         // 메시지 입력 필드와 파일 입력 필드 가져오기
+    //         const messageInput = document.getElementById("messageInput");
+    //         const fileInput = document.getElementById("fileInput");
+    //         const file = fileInput.files[0]; // 선택된 파일 가져오기
+    //         const message = messageInput.value.trim(); // 메시지 내용 가져오기
+        
+    //         // 로그인된 사용자 ID 및 URL 파라미터 가져오기
+    //         const u1_id = sessionStorage.getItem('user_id');
+    //         const urlParams = new URLSearchParams(window.location.search);
+    //         const r_id = urlParams.get('r_id');
+    //         const u2_id = urlParams.get('u2_id');
+        
+    //         // 사용자 ID 확인
+    //         if (!u1_id) {
+    //             console.error("User ID not found in session storage.");
+    //             return;
+    //         }
+        
+    //         // 메시지와 파일이 모두 없는 경우 전송 차단
+    //         if (!message && !file) {
+    //             alert('메시지나 파일 중 하나는 반드시 포함되어야 합니다.');
+    //             return;
+    // }
+        
+    //         // 파일이 있는 경우 파일을 읽고 소켓으로 전송
+    //         if (file) {
+    //             const reader = new FileReader();
+    //             reader.onload = function(event) {
+    //                 const base64Image = event.target.result.split(',')[1]; // Base64 인코딩
+    //                 /*console.log("Sending data to server:", {
+    //                     message_contents: message,
+    //                     //message_contents: message || "", // 메시지가 없으면 빈 문자열로 처리
+    //                     r_id,
+    //                     u1_id,
+    //                     u2_id,
+    //                     image: base64Image,
+    //                     image_type: file.type,
+    //                     is_read:1
+    //                 });
+    //                 */
+        
+    //                 //socketServer.js
+    //                 // 소켓으로 메시지와 이미지 전송
+    //                 socket.emit('sendMessage', {
+    //                     message_contents: message || null, // 메시지가 없으면 null
+    //                     r_id,
+    //                     u1_id,
+    //                     u2_id,
+    //                     image: base64Image,
+    //                     image_type: file.type,
+    //                     is_read:1
+    //                 });
+        
+    //                 // 입력 필드 초기화
+    //                 messageInput.value = "";
+    //                 fileInput.value = null; // 파일 입력 필드 초기화
+    //             };
+    //             reader.readAsDataURL(file); // 파일 읽기 시작
+    //         } else {
+    //             // 파일이 없는 경우 메시지만 전송
+    //             socket.emit('sendMessage', {
+    //                 message_contents: message,
+    //                 r_id,
+    //                 u1_id,
+    //                 u2_id,
+    //                 is_read:1
+    //             });
+        
+    //             // 메시지 입력란 초기화
+    //             messageInput.value = "";
+    //         }
+    //     }
+
+    //      // 읽음 처리
+    //     function markMessagesAsRead() {
+    //         socket.emit('markAsRead', { r_id: roomId, u1_id });
+    //     }
+    //     /*function sendMessage() {
+    //         // 메시지 입력 필드를 불러오기
+    //         const messageInput = document.getElementById("messageInput");
+    //         const fileInput = document.getElementById("fileInput"); // 파일 입력 필드 가져오기
+    //         const file = fileInput.files[0]; // 선택된 파일 가져오기
+    //         const message = messageInput.value;
+
+
+    //         // 로그인된 사용자 ID 가져오기
+    //         const u1_id = sessionStorage.getItem('user_id'); // =========== 수정 JWT ui_id 제거 =============
+    //         const urlParams = new URLSearchParams(window.location.search);
+    //         const r_id = urlParams.get('r_id');
+    //         const u2_id = urlParams.get('u2_id');
+            
+    //         if (!u1_id) {
+    //             console.error("User ID not found in session storage.");
+    //             return;
+    //         }
+    //         if (!messageInput) {
+    //             console.error("Cannot find message input element.");
+    //             return;
+    //         }
+    //         // 메시지가 비어 있는지 확인
+    //         if (message.trim() === "") {
+    //             alert("메시지를 입력하세요.");
+    //             return;
+    //         }
+    //         if (fileInput.files.length > 0) {
+    //             const reader = new FileReader();
+    //             reader.onload = function(event) {
+    //               const base64Image = event.target.result.split(',')[1]; // 이미지 파일을 Base64로 인코딩
+    //             console.log("Sending data to server:", {
+    //                 message_contents: message,
+    //                 r_id,
+    //                 u1_id,
+    //                 u2_id,
+    //                 image: base64Image,
+    //                 image_type: fileInput.files[0].type
+    //             });
+    //         // 소켓으로 메시지와 이미지 전송
+    //         socket.emit('sendMessage', {
+    //             message_contents: message,
+    //             r_id,
+    //             u1_id,
+    //             u2_id,
+    //             image: base64Image,
+    //             image_type: fileInput.files[0].type
+    //                 });
+    //             };
+    //         reader.readAsDataURL(fileInput.files[0]);
+    //             } else {
+    //             // 파일이 없을 경우 메시지만 전송
+    //         socket.emit('sendMessage', {
+    //             message_contents: message,
+    //             r_id,
+    //             u1_id,
+    //             u2_id
+    //             });
+    //             }
+    //         messageInput.value = "";
+    //         }*/
+            
+    //         // // =========== 수정 JWT =============
+    //         // if (!message.trim()) {
+    //         //     alert("메시지를 입력하세요.");
+    //         //     return;
+    //         // }
+
+    //         // 방 목록으로 나가기 함수
+    //         function goBackToRoomList() {
+    //             window.location.href = '/rooms.html';
+    //         // 메시지 전송
+    //         socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
+
+
+    //         // // =========== 수정 JWT =============
+    //         // if (!message.trim()) {
+    //         //     alert("메시지를 입력하세요.");
+    //         //     return;
+    //         // }
+    //     // FormData를 사용하여 메시지와 파일을 함께 전송
+    //         const formData = new FormData();
+    //         formData.append('message_contents', message);
+    //         formData.append('u1_id', u1_id);
+    //         formData.append('u2_id', u2_id);
+    //         formData.append('r_id', r_id);
+    //         formData.append('file', file);
+            
+
+    //         fetch('/chat/send-message', {
+    //             method: 'POST',
+    //             body: formData
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.message) {
+    //                 console.log(data.message);
+    //             }
+    //         })
+    //         .catch(error => console.error('Error:', error));
+    //     // 메시지 입력란 비우기
+    //         messageInput.value = "";
+    //     }
+
+        
+    //         //방미션출력
+    //     function printRoomMission() {
+    //         const u2_id = document.getElementById('u2_id_input').value;
+    //         fetch('/api/missions/printRoomMission', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 // Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+    //             },
+    //             body: JSON.stringify({ u2_id }),
+    //         })
+    //             .then(response => {
+    //                 if (!response.ok) {
+    //                     return response.json().then(err => { throw new Error(err.message); });
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then(data => {
+    //                 const roomMissionListElement = document.getElementById('roomMissionList');
+    //                 roomMissionListElement.innerHTML = '';
+
+    //                 if (data.missions && data.missions.length > 0) {
+    //                     data.missions.forEach(mission => {
+    //                         const listItem = document.createElement('li');
+    //                         listItem.textContent = `미션: ${mission.title}, 마감일: ${mission.deadline}, 수행자: ${mission.performer}`;
+    //                         roomMissionListElement.appendChild(listItem);
+    //                     });
+    //                 } else {
+    //                     roomMissionListElement.textContent = '해당 방에 미션이 없습니다.';
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.error('미션 출력 오류:', error);
+    //                 document.getElementById('roomMissionList').textContent = `오류 발생: ${error.message}`;
+    //             });
+    //     }
+
+        //========================================token=========================================
+
+        // JWT 디코딩 함수 추가
+        function parseJwt(token) {
+            try {
+                const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+                const json = decodeURIComponent(atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(json);
+            } catch (e) {
+                return null;
+            }
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('r_id');
+        const u2_id = urlParams.get('u2_id');
+        const token = localStorage.getItem('token');
+        const decoded = parseJwt(token);
+        const u1_id = decoded?.userId;
+
+        // 이 토큰과 u1_id가 실제로 있는지 콘솔에 출력
+        console.log("📦 JWT:", token);
+        console.log("👤 유저 ID:", u1_id);
+
+        // ✅ Socket.io 연결: auth로 JWT 토큰 전달
+        const socket = io("http://27.113.11.48:3001", {
+            path: '/socket.io',
+            auth: { token, u1_id, u2_id }
+        });
+
+        // ✅ 페이지 로드시 메시지 불러오기
+        window.onload = function() {
+            fetch(`/chat/messages/${roomId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(messages => {
+                const chatMessages = document.getElementById("chatMessages");
+                chatMessages.innerHTML = "";
+
+                messages.forEach(data => {
+                const messageElement = document.createElement("div");
+                const utcDate = new Date(data.send_date);
+                const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000));
+                const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
+
+                messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
+
+                if (data.image) {
+                    const img = document.createElement("img");
+                    img.src = `data:image/jpeg;base64,${data.image}`;
+                    img.style.maxWidth = "200px";
+                    messageElement.appendChild(img);
+                }
+
+                chatMessages.appendChild(messageElement);
                 });
+            });
         };
 
+        // ✅ 서버 연결 후 방 입장
         socket.on("connect", () => {
-            console.log("서버에 연결되었습니다.");
-            // socketServer.js에 있는 joinRoom
-            socket.emit('joinRoom', { r_id: roomId, u1_id: sessionStorage.getItem('user_id') });
+            socket.emit("joinRoom", {
+                r_id: roomId,
+                u2_id
+            });
         });
-        
-        // socketServer.js에 있는 receiveMessage
-        socket.on("receiveMessage", (data) => {
-            console.log("Received message from server:", data); // 수신 확인 로그
 
+        // ✅ 서버로부터 메시지 수신 시 출력
+        socket.on("receiveMessage", (data) => {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-             // 메시지가 있는 경우
-    if (data.message_contents) {
-        messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
-    } 
-    // 메시지가 없고 파일만 있는 경우
-    else if (!data.message_contents && data.image) {
-        messageElement.textContent = `[${data.send_date}] ${data.u1_id}: [파일 전송]`;
+            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;
 
-        const imageElement = document.createElement("img");
-        imageElement.src = `data:image/jpeg;base64,${data.image}`;
-        imageElement.style.maxWidth = "200px";
-        messageElement.appendChild(imageElement);
-    }
+            if (data.image) {
+                const img = document.createElement("img");
+                img.src = `data:image/jpeg;base64,${data.image}`;
+                img.style.maxWidth = "200px";
+                messageElement.appendChild(img);
+            }
 
-    chatMessages.appendChild(messageElement);
-
-    // 이미지가 포함된 경우 이미지를 추가적으로 처리
-    if (data.image && data.message_contents) {
-        const imageElement = document.createElement("img");
-        imageElement.src = `data:image/jpeg;base64,${data.image}`;
-        imageElement.style.maxWidth = "200px";
-        messageElement.appendChild(imageElement);
-    }
-
-    if (data.u1_id !== sessionStorage.getItem('user_id')) { // 사용자가 보낸 메시지가 아니면
-        socket.emit('markAsRead', { r_id: data.r_id, u1_id: sessionStorage.getItem('user_id') });
-    }
+            chatMessages.appendChild(messageElement);
         });
 
+        // ✅ 메시지 전송 (소켓 기반)
         function sendMessage() {
-            // 메시지 입력 필드와 파일 입력 필드 가져오기
             const messageInput = document.getElementById("messageInput");
             const fileInput = document.getElementById("fileInput");
-            const file = fileInput.files[0]; // 선택된 파일 가져오기
-            const message = messageInput.value.trim(); // 메시지 내용 가져오기
-        
-            // 로그인된 사용자 ID 및 URL 파라미터 가져오기
-            const u1_id = sessionStorage.getItem('user_id');
-            const urlParams = new URLSearchParams(window.location.search);
-            const r_id = urlParams.get('r_id');
-            const u2_id = urlParams.get('u2_id');
-        
-            // 사용자 ID 확인
-            if (!u1_id) {
-                console.error("User ID not found in session storage.");
+            const message = messageInput.value.trim();
+            const file = fileInput.files[0];
+
+            if (!message && !file) {
+                alert("메시지나 파일 중 하나는 입력해야 합니다.");
                 return;
             }
-        
-            // 메시지와 파일이 모두 없는 경우 전송 차단
-            if (!message && !file) {
-                alert('메시지나 파일 중 하나는 반드시 포함되어야 합니다.');
-                return;
-    }
-        
-            // 파일이 있는 경우 파일을 읽고 소켓으로 전송
+
+            // 파일이 있으면 base64로 인코딩 후 전송
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    const base64Image = event.target.result.split(',')[1]; // Base64 인코딩
-                    /*console.log("Sending data to server:", {
-                        message_contents: message,
-                        //message_contents: message || "", // 메시지가 없으면 빈 문자열로 처리
-                        r_id,
-                        u1_id,
-                        u2_id,
-                        image: base64Image,
-                        image_type: file.type,
-                        is_read:1
-                    });
-                    */
-        
-                    //socketServer.js
-                    // 소켓으로 메시지와 이미지 전송
+                reader.onload = function (event) {
+                    const base64Image = event.target.result.split(',')[1]; // base64만 추출
+
                     socket.emit('sendMessage', {
-                        message_contents: message || null, // 메시지가 없으면 null
-                        r_id,
+                        message: message || null,
+                        r_id: roomId,
                         u1_id,
                         u2_id,
                         image: base64Image,
-                        image_type: file.type,
-                        is_read:1
+                        image_type: file.type
                     });
-        
-                    // 입력 필드 초기화
-                    messageInput.value = "";
-                    fileInput.value = null; // 파일 입력 필드 초기화
                 };
-                reader.readAsDataURL(file); // 파일 읽기 시작
+                reader.readAsDataURL(file);
             } else {
-                // 파일이 없는 경우 메시지만 전송
+                // 파일 없으면 텍스트 메시지만 전송
                 socket.emit('sendMessage', {
-                    message_contents: message,
-                    r_id,
+                    message: message,
+                    r_id: roomId,
                     u1_id,
-                    u2_id,
-                    is_read:1
+                    u2_id
                 });
-        
-                // 메시지 입력란 초기화
-                messageInput.value = "";
             }
-        }
 
-         // 읽음 처리
-        function markMessagesAsRead() {
-            socket.emit('markAsRead', { r_id: roomId, u1_id });
-        }
-        /*function sendMessage() {
-            // 메시지 입력 필드를 불러오기
-            const messageInput = document.getElementById("messageInput");
-            const fileInput = document.getElementById("fileInput"); // 파일 입력 필드 가져오기
-            const file = fileInput.files[0]; // 선택된 파일 가져오기
-            const message = messageInput.value;
-
-
-            // 로그인된 사용자 ID 가져오기
-            const u1_id = sessionStorage.getItem('user_id'); // =========== 수정 JWT ui_id 제거 =============
-            const urlParams = new URLSearchParams(window.location.search);
-            const r_id = urlParams.get('r_id');
-            const u2_id = urlParams.get('u2_id');
-            
-            if (!u1_id) {
-                console.error("User ID not found in session storage.");
-                return;
-            }
-            if (!messageInput) {
-                console.error("Cannot find message input element.");
-                return;
-            }
-            // 메시지가 비어 있는지 확인
-            if (message.trim() === "") {
-                alert("메시지를 입력하세요.");
-                return;
-            }
-            if (fileInput.files.length > 0) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                  const base64Image = event.target.result.split(',')[1]; // 이미지 파일을 Base64로 인코딩
-                console.log("Sending data to server:", {
-                    message_contents: message,
-                    r_id,
-                    u1_id,
-                    u2_id,
-                    image: base64Image,
-                    image_type: fileInput.files[0].type
-                });
-            // 소켓으로 메시지와 이미지 전송
-            socket.emit('sendMessage', {
-                message_contents: message,
-                r_id,
-                u1_id,
-                u2_id,
-                image: base64Image,
-                image_type: fileInput.files[0].type
-                    });
-                };
-            reader.readAsDataURL(fileInput.files[0]);
-                } else {
-                // 파일이 없을 경우 메시지만 전송
-            socket.emit('sendMessage', {
-                message_contents: message,
-                r_id,
-                u1_id,
-                u2_id
-                });
-                }
+            // 입력 초기화
             messageInput.value = "";
-            }*/
-            
-            // // =========== 수정 JWT =============
-            // if (!message.trim()) {
-            //     alert("메시지를 입력하세요.");
-            //     return;
-            // }
-
-            // 방 목록으로 나가기 함수
-            function goBackToRoomList() {
-                window.location.href = '/rooms.html';
-            // 메시지 전송
-            socket.emit("sendMessage", { message_contents: message,r_id:r_id, u1_id:u1_id,u2_id:u2_id });
-
-
-            // // =========== 수정 JWT =============
-            // if (!message.trim()) {
-            //     alert("메시지를 입력하세요.");
-            //     return;
-            // }
-        // FormData를 사용하여 메시지와 파일을 함께 전송
-            const formData = new FormData();
-            formData.append('message_contents', message);
-            formData.append('u1_id', u1_id);
-            formData.append('u2_id', u2_id);
-            formData.append('r_id', r_id);
-            formData.append('file', file);
-            
-
-            fetch('/chat/send-message', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    console.log(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        // 메시지 입력란 비우기
-            messageInput.value = "";
+            fileInput.value = null;
         }
 
-        
-            //방미션출력
+        // ✅ 방 나가기
+        function goBackToRoomList() {
+            window.location.href = "/rooms.html";
+        }
+
+        // ✅ 방 미션 출력
         function printRoomMission() {
             const u2_id = document.getElementById('u2_id_input').value;
+
             fetch('/api/missions/printRoomMission', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({ u2_id }),
             })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message); });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const roomMissionListElement = document.getElementById('roomMissionList');
-                    roomMissionListElement.innerHTML = '';
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById("roomMissionList");
+                list.innerHTML = "";
 
-                    if (data.missions && data.missions.length > 0) {
-                        data.missions.forEach(mission => {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `미션: ${mission.title}, 마감일: ${mission.deadline}, 수행자: ${mission.performer}`;
-                            roomMissionListElement.appendChild(listItem);
-                        });
-                    } else {
-                        roomMissionListElement.textContent = '해당 방에 미션이 없습니다.';
-                    }
-                })
-                .catch(error => {
-                    console.error('미션 출력 오류:', error);
-                    document.getElementById('roomMissionList').textContent = `오류 발생: ${error.message}`;
+                data.missions?.forEach(m => {
+                    const li = document.createElement("li");
+                    li.textContent = `미션: ${m.title}, 마감일: ${m.deadline}, 수행자: ${m.performer}`;
+                    list.appendChild(li);
                 });
+            })
+            .catch(error => {
+                console.error("미션 출력 오류:", error);
+            });
         }
     </script>
 </body>

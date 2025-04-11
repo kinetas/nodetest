@@ -143,8 +143,25 @@ const Room = require('../models/roomModel');
 // };
 
 // =========================================token================================================
-
-// ✅ JWT 기반 인증이 적용된 경우를 위한 로직은 서버(app.js)와 route에서 처리됨.
+const jwt = require('jsonwebtoken');
+// ✅ JWT 토큰에서 userId 추출하는 유틸 함수
+function getUserIdFromSocket(socket) {
+  try {
+    const token = socket.handshake.auth?.token;
+    console.log("🔑 수신된 토큰:", token); // 로그 추가
+    if (!token) {
+      console.error("❌ 토큰 누락");
+      return null;
+    }
+    const secretKey = process.env.JWT_SECRET_KEY || "secret-key";
+    const decoded = jwt.verify(token, secretKey);
+    console.log("✅ 디코딩된 유저 ID:", decoded.userId); // 로그 추가
+    return decoded.userId;
+  } catch (err) {
+    console.error("❌ JWT 디코딩 실패:", err.message);
+    return null;
+  }
+}
 
 exports.createRoom = (socket, roomName) => {
   const r_id = Math.random().toString(36).substr(2, 9);
@@ -156,18 +173,17 @@ exports.createRoom = (socket, roomName) => {
   socket.emit('roomCreated', r_id);
 };
 
+
 exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
-    const u1_id = socket.handshake.query.u1_id || socket.handshake.auth.u1_id;
-    const u2_id = socket.handshake.query.u1_id || socket.handshake.auth.u2_id;
-
+    const u1_id = getUserIdFromSocket(socket);
+    console.log("🧾 joinRoom - r_id:", r_id, " / u1_id:", u1_id, " / u2_id:", u2_id);
     if (!r_id || !u1_id) {
-      console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
+      console.error(`Missing r_id or u1_id:`, { r_id, u1_id });
       return;
     }
 
     const room = await Room.findOne({ where: { r_id } });
-
     if (!room) {
       console.error(`Room with ID ${r_id} not found.`);
       return;
@@ -182,23 +198,22 @@ exports.joinRoom = async (socket, { r_id, u2_id }) => {
     }
 
     socket.join(r_id);
-    console.log(`joined room ${r_id}`);
+    console.log(`joined room ${r_id} by user ${u1_id}`);
   } catch (error) {
     console.error('Error joining room with Sequelize:', error);
   }
 };
 
-exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
+exports.sendMessage = async (io, socket, { message, r_id, u2_id, image, image_type }) => {
+  const u1_id = getUserIdFromSocket(socket);
   const send_date = new Date();
   const is_read = 1;
   const message_num = Math.random().toString(36).substr(2, 9);
 
-  if (!r_id || !u1_id || !u2_id || !message) {
-    console.error('Missing r_id or u1_id:', { r_id, u1_id, u2_id, message });
+  if (!r_id || !u1_id || !u2_id || (!message && !image)) {
+    console.error('Missing required fields:', { r_id, u1_id, u2_id, message });
     return;
   }
-
-  console.log('Debugging variables:', { r_id, u1_id, u2_id, message, message_num, send_date });
 
   try {
     const newMessage = await RMessage.create({
@@ -207,7 +222,9 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
       r_id,
       message_num,
       send_date,
-      message_contents: message,
+      message_contents: message || null,
+      image: image ? Buffer.from(image, 'base64') : null,
+      image_type: image_type || null,
       is_read
     });
 
@@ -215,47 +232,13 @@ exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
 
     socket.emit('receiveMessage', {
       u1_id,
-      message,
+      message: message || '[파일 전송]',
+      image,
       is_read,
       send_date: send_date.toISOString().slice(0, 19).replace('T', ' ')
     });
   } catch (error) {
     console.error('Error saving message with Sequelize:', error);
-  }
-};
-
-exports.sendMessageWithFile = async (req, res) => {
-  const { u1_id, u2_id, r_id, message_contents, is_read } = req.body;
-  const file = req.file;
-
-  if (!u1_id || !u2_id || !r_id || !is_read || (!message_contents && !file)) {
-    return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
-  }
-
-  try {
-    let fileBuffer = null;
-    let fileType = null;
-
-    if (file) {
-      fileBuffer = file.buffer;
-      fileType = file.mimetype;
-    }
-
-    const newMessage = await RMessage.create({
-      u1_id,
-      u2_id,
-      r_id,
-      message_contents,
-      send_date: new Date(),
-      image: fileBuffer,
-      image_type: fileType,
-      is_read
-    });
-
-    res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.', newMessage });
-  } catch (error) {
-    console.error('Error saving message to DB:', error);
-    res.status(500).json({ message: '메시지 저장 실패' });
   }
 };
 
@@ -265,9 +248,7 @@ exports.getMessages = async (r_id) => {
       where: { r_id },
       order: [['send_date', 'ASC']]
     });
-
-    const jsonMessages = messages.map(msg => msg.toJSON());
-    return jsonMessages;
+    return messages.map(msg => msg.toJSON());
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);
     throw error;
@@ -287,3 +268,136 @@ exports.markMessageAsRead = async ({ r_id }) => {
     return false;
   }
 };
+
+
+// exports.joinRoom = async (socket, { r_id, u2_id }) => {
+//   try {
+//     const u1_id = socket.handshake.query.u1_id || socket.handshake.auth.u1_id;
+//     const u2_id = socket.handshake.query.u1_id || socket.handshake.auth.u2_id;
+
+//     if (!r_id || !u1_id) {
+//       console.error(`Missing r_id or u2_id:`, { r_id, u2_id });
+//       return;
+//     }
+
+//     const room = await Room.findOne({ where: { r_id } });
+
+//     if (!room) {
+//       console.error(`Room with ID ${r_id} not found.`);
+//       return;
+//     }
+
+//     const updatedCount = await RMessage.update(
+//       { is_read: 0 },
+//       { where: { r_id, u2_id: u1_id, is_read: 1 } }
+//     );
+//     if (updatedCount[0] === 0) {
+//       console.warn(`No unread messages found for room ${r_id} and user ${u1_id}`);
+//     }
+
+//     socket.join(r_id);
+//     console.log(`joined room ${r_id}`);
+//   } catch (error) {
+//     console.error('Error joining room with Sequelize:', error);
+//   }
+// };
+
+// exports.sendMessage = async (io, socket, { message, r_id, u1_id, u2_id }) => {
+//   const send_date = new Date();
+//   const is_read = 1;
+//   const message_num = Math.random().toString(36).substr(2, 9);
+
+//   if (!r_id || !u1_id || !u2_id || !message) {
+//     console.error('Missing r_id or u1_id:', { r_id, u1_id, u2_id, message });
+//     return;
+//   }
+
+//   console.log('Debugging variables:', { r_id, u1_id, u2_id, message, message_num, send_date });
+
+//   try {
+//     const newMessage = await RMessage.create({
+//       u1_id,
+//       u2_id,
+//       r_id,
+//       message_num,
+//       send_date,
+//       message_contents: message,
+//       is_read
+//     });
+
+//     console.log('Message saved:', newMessage);
+
+//     socket.emit('receiveMessage', {
+//       u1_id,
+//       message,
+//       is_read,
+//       send_date: send_date.toISOString().slice(0, 19).replace('T', ' ')
+//     });
+//   } catch (error) {
+//     console.error('Error saving message with Sequelize:', error);
+//   }
+// };
+
+// exports.sendMessageWithFile = async (req, res) => {
+//   const { u1_id, u2_id, r_id, message_contents, is_read } = req.body;
+//   const file = req.file;
+
+//   if (!u1_id || !u2_id || !r_id || !is_read || (!message_contents && !file)) {
+//     return res.status(400).json({ message: '필수 값이 누락되었습니다.' });
+//   }
+
+//   try {
+//     let fileBuffer = null;
+//     let fileType = null;
+
+//     if (file) {
+//       fileBuffer = file.buffer;
+//       fileType = file.mimetype;
+//     }
+
+//     const newMessage = await RMessage.create({
+//       u1_id,
+//       u2_id,
+//       r_id,
+//       message_contents,
+//       send_date: new Date(),
+//       image: fileBuffer,
+//       image_type: fileType,
+//       is_read
+//     });
+
+//     res.json({ message: '메시지와 파일이 성공적으로 저장되었습니다.', newMessage });
+//   } catch (error) {
+//     console.error('Error saving message to DB:', error);
+//     res.status(500).json({ message: '메시지 저장 실패' });
+//   }
+// };
+
+// exports.getMessages = async (r_id) => {
+//   try {
+//     const messages = await RMessage.findAll({
+//       where: { r_id },
+//       order: [['send_date', 'ASC']]
+//     });
+
+//     const jsonMessages = messages.map(msg => msg.toJSON());
+//     return jsonMessages;
+//   } catch (error) {
+//     console.error('Error fetching messages with Sequelize:', error);
+//     throw error;
+//   }
+// };
+
+// exports.markMessageAsRead = async ({ r_id }) => {
+//   try {
+//     const updatedCount = await RMessage.update(
+//       { is_read: 0 },
+//       { where: { r_id, is_read: 1 } }
+//     );
+//     console.log(`Updated ${updatedCount} messages as read.`);
+//     return updatedCount > 0;
+//   } catch (error) {
+//     console.error("Error updating is_read:", error);
+//     return false;
+//   }
+// };

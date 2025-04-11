@@ -27,7 +27,7 @@
         // URL에서 roomId 가져오기
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('r_id'); // URL 파라미터에서 roomId 추출
-        const socket = io("http://54.180.54.31:3001",{
+        const socket = io("http://27.113.11.48:3001",{
             path: '/socket.io'
         });
          // 페이지 로드 시 기존 메시지 불러오기
@@ -77,9 +77,11 @@
 
         socket.on("connect", () => {
             console.log("서버에 연결되었습니다.");
+            // socketServer.js에 있는 joinRoom
             socket.emit('joinRoom', { r_id: roomId, u1_id: sessionStorage.getItem('user_id') });
         });
         
+        // socketServer.js에 있는 receiveMessage
         socket.on("receiveMessage", (data) => {
             console.log("Received message from server:", data); // 수신 확인 로그
 
@@ -156,6 +158,7 @@
                     });
                     */
         
+                    //socketServer.js
                     // 소켓으로 메시지와 이미지 전송
                     socket.emit('sendMessage', {
                         message_contents: message || null, // 메시지가 없으면 null

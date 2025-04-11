@@ -7,7 +7,8 @@ import uvicorn
 app = FastAPI()
 
 # ✅ 한국어 분류 모델 로딩 (처음엔 조금 느림)
-classifier = pipeline("text-classification", model="monologg/koelectra-small-v3-discriminator")
+# classifier = pipeline("text-classification", model="monologg/koelectra-small-v3-discriminator")
+classifier = pipeline("text-classification", model="./intent_model")
 
 class Query(BaseModel):
     text: str

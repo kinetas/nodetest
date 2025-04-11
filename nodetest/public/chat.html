@@ -409,7 +409,7 @@
         socket.on("receiveMessage", (data) => {
             const chatMessages = document.getElementById("chatMessages");
             const messageElement = document.createElement("div");
-            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message}`;
+            messageElement.textContent = `[${data.send_date}] ${data.u1_id}: ${data.message_contents}`;
 
             if (data.image) {
                 const img = document.createElement("img");

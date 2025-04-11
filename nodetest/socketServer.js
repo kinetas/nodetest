@@ -290,7 +290,7 @@ if (!u1_id || !u2_id) {
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
     const u1_id = getUserIdFromSocket(socket); // ✅ 핵심
-    const { message, r_id, u2_id, image, image_type, is_read } = data;
+    const { message_contents, r_id, u2_id, image, image_type, is_read } = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
 
     // 필수 값 검증
@@ -307,7 +307,7 @@ if (!u1_id || !u2_id) {
       return;
     }
   }
-  if (!message && !image) {
+  if (!message_contents && !image) {
     console.error('메시지와 파일이 모두 없습니다.');
     socket.emit('errorMessage', '메시지나 파일 중 하나는 반드시 포함되어야 합니다.');
     return;

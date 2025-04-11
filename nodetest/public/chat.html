@@ -440,7 +440,7 @@
                     const base64Image = event.target.result.split(',')[1]; // base64만 추출
 
                     socket.emit('sendMessage', {
-                        message: message || null,
+                        message_contents: message || null,
                         r_id: roomId,
                         // u1_id,
                         u2_id,
@@ -452,7 +452,7 @@
             } else {
                 // 파일 없으면 텍스트 메시지만 전송
                 socket.emit('sendMessage', {
-                    message: message,
+                    message_contents: message,
                     r_id: roomId,
                     u1_id,
                     u2_id

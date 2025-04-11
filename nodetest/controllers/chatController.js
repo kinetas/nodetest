@@ -232,7 +232,7 @@ exports.sendMessage = async (io, socket, { message, r_id, u2_id, image, image_ty
 
     socket.emit('receiveMessage', {
       u1_id,
-      message: message || '[파일 전송]',
+      message_contents: message || '[파일 전송]',
       image,
       is_read,
       send_date: send_date.toISOString().slice(0, 19).replace('T', ' ')

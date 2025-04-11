@@ -23,13 +23,6 @@
     
 
     <script>
-
-        // // JWT 기반 인증 수정: 토큰 가져오기
-        // const token = localStorage.getItem('jwt');
-        // if (!token) {
-        //     alert("로그인이 필요합니다.");
-        //     window.location.href = '/';
-        // }
         
         // URL에서 roomId 가져오기
         const urlParams = new URLSearchParams(window.location.search);
@@ -87,12 +80,6 @@
             socket.emit('joinRoom', { r_id: roomId, u1_id: sessionStorage.getItem('user_id') });
         });
         
-        // // =========== 수정 JWT =============
-        // socket.on("connect", () => {
-        //     console.log("서버에 연결되었습니다.");
-        //     socket.emit("joinRoom", { r_id: roomId }); // JWT 인증 후 방 입장
-        // });
-
         socket.on("receiveMessage", (data) => {
             console.log("Received message from server:", data); // 수신 확인 로그
 

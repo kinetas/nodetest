@@ -5,7 +5,7 @@ langchain-community==0.0.34
 langchain-core==0.1.46
 langchain-chroma
 chromadb
-ollama
+# ollama
 python-dotenv
 beautifulsoup4
 requests
@@ -15,3 +15,6 @@ sentence-transformers==2.6.1
 transformers==4.38.2
 torch==2.1.2
 pydantic==1.10.13
+datasets
+evaluate
+scikit-learn

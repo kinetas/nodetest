@@ -17,10 +17,16 @@ const RMessage = sequelize.define('RMessage', {
     primaryKey: false,
     allowNull: false,
   },
+  // message_num: {
+  //   type: DataTypes.STRING(20),
+  //   primaryKey: true,
+  //   allowNull: false,
+  // },
   message_num: {
-    type: DataTypes.STRING(20),
+    type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false,
+    autoIncrement: true,  // ✅ 자동 증가
   },
   send_date: {
     type: DataTypes.DATE,

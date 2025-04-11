@@ -149,7 +149,10 @@ function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
     console.log("🔑 수신된 토큰:", token); // 로그 추가
-    if (!token) return null;
+    if (!token) {
+      console.error("❌ 토큰 누락");
+      return null;
+    }
     const secretKey = process.env.JWT_SECRET_KEY || "secret-key";
     const decoded = jwt.verify(token, secretKey);
     console.log("✅ 디코딩된 유저 ID:", decoded.userId); // 로그 추가
@@ -174,6 +177,7 @@ exports.createRoom = (socket, roomName) => {
 exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
     const u1_id = getUserIdFromSocket(socket);
+    console.log("🧾 joinRoom - r_id:", r_id, " / u1_id:", u1_id, " / u2_id:", u2_id);
     if (!r_id || !u1_id) {
       console.error(`Missing r_id or u1_id:`, { r_id, u1_id });
       return;

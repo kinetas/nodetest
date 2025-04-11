@@ -1,0 +1,180 @@
+text,label
+미션 추천해줘,GENERAL
+운동 미션 추천해줘,SPECIFIC
+요리 미션 추천해줘,SPECIFIC
+뭐 하면 좋을까?,GENERAL
+놀고 싶어,SPECIFIC
+책상 정리 추천해줘,SPECIFIC
+오늘 뭐하지?,GENERAL
+감정 관리 미션 추천해줘,SPECIFIC
+미션 하나 줘,GENERAL
+미라클 모닝 루틴을 주제로 미션 줘봐,SPECIFIC
+미라클 모닝 루틴이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+미라클 모닝 루틴 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+미라클 모닝 루틴 관련된 미션 하나 추천해줘,SPECIFIC
+미라클 모닝 루틴을 위한 간단한 도전 뭐 있어?,SPECIFIC
+미라클 모닝 루틴 실천하는 습관 추천해줘,SPECIFIC
+자기개발 종류 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+자기개발 종류을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+자기개발 종류을 위한 간단한 도전 뭐 있어?,SPECIFIC
+자기개발 종류 실천하는 습관 추천해줘,SPECIFIC
+자기개발 종류에 대한 활동 뭐가 있을까?,SPECIFIC
+자기개발 종류 관련된 미션 하나 추천해줘,SPECIFIC
+운동 종류 관련된 미션 하나 추천해줘,SPECIFIC
+운동 종류 실천하는 습관 추천해줘,SPECIFIC
+운동 종류을 주제로 미션 줘봐,SPECIFIC
+운동 종류에 대한 활동 뭐가 있을까?,SPECIFIC
+운동 종류을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+운동 종류을 위한 간단한 도전 뭐 있어?,SPECIFIC
+요리 종류을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+요리 종류을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+요리 종류 관련된 미션 하나 추천해줘,SPECIFIC
+요리 종류을 위한 간단한 도전 뭐 있어?,SPECIFIC
+요리 종류 실천할 수 있는 미션 뭐가 있을까?,SPECIFIC
+요리 종류에 대한 활동 뭐가 있을까?,SPECIFIC
+피부관리을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+피부관리에 대한 활동 뭐가 있을까?,SPECIFIC
+피부관리을 주제로 미션 줘봐,SPECIFIC
+피부관리을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+피부관리 실천하는 습관 추천해줘,SPECIFIC
+피부관리을 위한 간단한 도전 뭐 있어?,SPECIFIC
+독서 습관 관련된 미션 하나 추천해줘,SPECIFIC
+독서 습관에 대한 활동 뭐가 있을까?,SPECIFIC
+독서 습관을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+독서 습관이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+독서 습관 실천하는 습관 추천해줘,SPECIFIC
+독서 습관을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+다이어트 식단 실천하는 습관 추천해줘,SPECIFIC
+다이어트 식단이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+다이어트 식단을 위한 간단한 도전 뭐 있어?,SPECIFIC
+다이어트 식단을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+다이어트 식단을 주제로 미션 줘봐,SPECIFIC
+다이어트 식단에 대한 활동 뭐가 있을까?,SPECIFIC
+집 정리 정돈을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+집 정리 정돈을 주제로 미션 줘봐,SPECIFIC
+집 정리 정돈 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+집 정리 정돈에 대한 활동 뭐가 있을까?,SPECIFIC
+집 정리 정돈을 위한 간단한 도전 뭐 있어?,SPECIFIC
+집 정리 정돈 실천할 수 있는 미션 뭐가 있을까?,SPECIFIC
+집중력 향상 방법을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+집중력 향상 방법에 대한 활동 뭐가 있을까?,SPECIFIC
+집중력 향상 방법을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+집중력 향상 방법을 주제로 미션 줘봐,SPECIFIC
+집중력 향상 방법 관련된 미션 하나 추천해줘,SPECIFIC
+집중력 향상 방법 실천할 수 있는 미션 뭐가 있을까?,SPECIFIC
+힐링을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+힐링 관련된 미션 하나 추천해줘,SPECIFIC
+힐링을 위한 간단한 도전 뭐 있어?,SPECIFIC
+힐링 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+힐링을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+힐링 실천할 수 있는 미션 뭐가 있을까?,SPECIFIC
+보드 게임이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+보드 게임을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+보드 게임 관련된 미션 하나 추천해줘,SPECIFIC
+보드 게임을 위한 간단한 도전 뭐 있어?,SPECIFIC
+보드 게임을 주제로 미션 줘봐,SPECIFIC
+보드 게임 실천하는 습관 추천해줘,SPECIFIC
+졸음 해소에 대한 활동 뭐가 있을까?,SPECIFIC
+졸음 해소 실천하는 습관 추천해줘,SPECIFIC
+졸음 해소을 주제로 미션 줘봐,SPECIFIC
+졸음 해소을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+졸음 해소 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+졸음 해소을 위한 간단한 도전 뭐 있어?,SPECIFIC
+돈 절약에 대한 활동 뭐가 있을까?,SPECIFIC
+돈 절약 실천하는 습관 추천해줘,SPECIFIC
+돈 절약을 위한 간단한 도전 뭐 있어?,SPECIFIC
+돈 절약 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+돈 절약 관련된 미션 하나 추천해줘,SPECIFIC
+돈 절약을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+협업 실천하는 습관 추천해줘,SPECIFIC
+협업을 위한 간단한 도전 뭐 있어?,SPECIFIC
+협업을 주제로 미션 줘봐,SPECIFIC
+협업 실천할 수 있는 미션 뭐가 있을까?,SPECIFIC
+협업에 대한 활동 뭐가 있을까?,SPECIFIC
+협업 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+30분 활동 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+30분 활동 관련된 미션 하나 추천해줘,SPECIFIC
+30분 활동에 대한 활동 뭐가 있을까?,SPECIFIC
+30분 활동을 위한 간단한 도전 뭐 있어?,SPECIFIC
+30분 활동이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+30분 활동을 주제로 미션 줘봐,SPECIFIC
+10분 활동을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+10분 활동을 목표로 하루 실천할 수 있는 활동은?,SPECIFIC
+10분 활동을 위한 간단한 도전 뭐 있어?,SPECIFIC
+10분 활동 실천할 수 있는 미션 뭐가 있을까?,SPECIFIC
+10분 활동이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+10분 활동에 대한 활동 뭐가 있을까?,SPECIFIC
+5분활동을 어떻게 실천할 수 있을까? 미션으로 추천해줘,SPECIFIC
+5분활동 관련된 미션 하나 추천해줘,SPECIFIC
+5분활동 관련해서 오늘 해볼만한 미션 알려줘,SPECIFIC
+5분활동이랑 관련된 좋은 루틴 없을까?,SPECIFIC
+집중이 안 돼,SPECIFIC
+짧게 할 수 있는 거 뭐야?,SPECIFIC
+집이 너무 더러운데,SPECIFIC
+협력하는 미션 없어?,SPECIFIC
+즐겁게 할 수 있는 거 없을까?,SPECIFIC
+30분 정도 남는데 할만한 거 있어?,SPECIFIC
+졸음이 쏟아져,SPECIFIC
+정신이 몽롱해,SPECIFIC
+돈 절약할 수 있는 미션 하나 부탁해,SPECIFIC
+졸려 죽겠어,SPECIFIC
+방이 엉망이야,SPECIFIC
+헬스 대신 할 거 없어?,SPECIFIC
+지출 줄이고 싶어,SPECIFIC
+운동 관련된 미션을 줘 봐,SPECIFIC
+30분만에 끝나는 거 뭐 있어?,SPECIFIC
+너무 졸려,SPECIFIC
+짧은 시간 할 수 있는 활동 있어?,SPECIFIC
+하루 미션 추천해줘,GENERAL
+스트레칭 미션 줘,SPECIFIC
+지저분한 공간 어떻게 하지?,SPECIFIC
+힐링용 미션 뭐 있어?,SPECIFIC
+스트레스 해소할 수 있는 활동 추천해줘,SPECIFIC
+기분 풀 수 있는 미션 있어?,SPECIFIC
+눈이 감겨,SPECIFIC
+추천 좀 해줘,GENERAL
+저녁 뭐 해먹을까?,SPECIFIC
+즐길 거리 없을까?,SPECIFIC
+돈 아낄 수 있는 행동 추천해줘,SPECIFIC
+시간 보내고 싶은데 뭐 할까?,SPECIFIC
+기운이 없어,SPECIFIC
+놀고 싶다,SPECIFIC
+심심한데 뭐 추천해줄래?,GENERAL
+친구랑 할만한 미션 추천해줘,SPECIFIC
+간단한 운동 추천해줘,SPECIFIC
+오늘 할만한 거 없어?,GENERAL
+집안이 난장판이야,SPECIFIC
+친구랑 뭐하고 놀까?,SPECIFIC
+게임 같은 거 추천해줄래?,SPECIFIC
+재료 활용하는 요리 추천해줘,SPECIFIC
+절약 습관 미션 줘봐,SPECIFIC
+청소 좀 해야겠는데?,SPECIFIC
+몸을 움직이고 싶어,SPECIFIC
+하루를 시작할 때 좋은 미션 뭐야?,GENERAL
+둘이서 할만한 거 뭐 있어?,SPECIFIC
+소비 줄이기 미션 있어?,SPECIFIC
+냉장고 재료로 뭐 만들 수 있을까?,SPECIFIC
+친구와 할 수 있는 거 추천해줘,SPECIFIC
+오늘 뭐하지?,GENERAL
+경제적인 미션 뭐 있어?,SPECIFIC
+놀거리 추천해줘,SPECIFIC
+미션 같은 거 줘봐,GENERAL
+기분전환 하기 좋은 미션 추천해줘,SPECIFIC
+집에서 할 운동 뭐 있어?,SPECIFIC
+뭐 할까?,GENERAL
+미션 하나 추천해,GENERAL
+미션 추천해줘,GENERAL
+같이 즐길 활동 없을까?,SPECIFIC
+정리가 안 돼 있어,SPECIFIC
+간단한 미션 없을까?,GENERAL
+간단한 요리 미션 줘,SPECIFIC
+우울한데 뭐 하면 좋을까?,SPECIFIC
+같이 할 미션 뭐가 있을까?,SPECIFIC
+빠르게 끝나는 미션 줘봐,SPECIFIC
+재밌는 거 하고 싶어,SPECIFIC
+요리하고 싶은데 뭐 만들어볼까?,SPECIFIC
+잠깐 할 수 있는 미션 추천해줘,SPECIFIC
+마음 정리할 수 있는 미션 뭐가 있어?,SPECIFIC
+정돈할 수 있는 미션 있어?,SPECIFIC
+요리에 관련된 미션을 줘,SPECIFIC
+심심해 죽겠어,SPECIFIC

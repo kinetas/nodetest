@@ -290,11 +290,11 @@ if (!u1_id || !u2_id) {
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
     const u1_id = getUserIdFromSocket(socket); // ✅ 핵심
-    const { message_contents, r_id, u2_id, image, image_type } = data;
+    const { message_contents, r_id, u2_id, image, image_type, is_read } = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
 
     // 필수 값 검증
-    if (!r_id || !u1_id || !u2_id||is_read) {
+    if (!r_id || !u1_id || !u2_id|| is_read) {
       let missingFields = [];
      // 누락된 필드를 확인
       if (!r_id) missingFields.push('r_id');

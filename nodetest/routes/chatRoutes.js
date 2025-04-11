@@ -42,7 +42,7 @@ router.post('/create-room', loginRequired, chatController.createRoom);
 router.post('/join-room', loginRequired, chatController.joinRoom);
 
 // ✅ 메시지 + 파일 전송 - JWT 보호 적용
-// router.post('/send-message', loginRequired, upload.single('file'), chatController.sendMessageWithFile);
+//router.post('/send-message', loginRequired, upload.single('file'), chatController.sendMessageWithFile);
 
 // ✅ 메시지 목록 조회 - 로그인 필요 없음 (로그인 필요할 경우 loginRequired 추가)
 router.get('/messages/:r_id', async (req, res) => {

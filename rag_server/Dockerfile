@@ -66,4 +66,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt 
 COPY . .
 # FastAPI 실행
-CMD ["pm2-runtime", "start", "uvicorn", "--interpreter", "python3", "--", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# CMD ["pm2-runtime", "start", "uvicorn", "--interpreter", "python3", "--", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# PM2 프로세스 설정 파일 복사
+COPY ecosystem.config.js .
+
+# 포트 둘 다 expose (선택)
+EXPOSE 8000
+EXPOSE 8001
+
+CMD ["pm2-runtime", "ecosystem.config.js"]

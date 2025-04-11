@@ -316,6 +316,8 @@ exports.deleteRoom = async (req, res) => {
 };
 
 exports.enterRoom = async (req, res) => {
+    console.log("💡 [enterRoom] Authorization:", req.headers.authorization);
+    console.log("💡 [enterRoom] currentUserId:", req.currentUserId);  // 이게 undefined로 찍힘
     const { r_id, u2_id } = req.body;
     const u1_id = req.currentUserId;
     console.log("✅ [enterRoom] u1_id from JWT:", u1_id); // ✅ 여기가 핵심 로그

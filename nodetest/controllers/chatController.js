@@ -148,12 +148,14 @@ const jwt = require('jsonwebtoken');
 function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
+    console.log("🔑 수신된 토큰:", token); // 로그 추가
     if (!token) return null;
     const secretKey = process.env.JWT_SECRET_KEY || "secret-key";
     const decoded = jwt.verify(token, secretKey);
+    console.log("✅ 디코딩된 유저 ID:", decoded.userId); // 로그 추가
     return decoded.userId;
   } catch (err) {
-    console.error("JWT 디코딩 실패:", err.message);
+    console.error("❌ JWT 디코딩 실패:", err.message);
     return null;
   }
 }

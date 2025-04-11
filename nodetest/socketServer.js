@@ -24,6 +24,26 @@ const NotificationLog = require('./models/notificationModel')
 const serviceAccountPath = path.join(__dirname, 'firebase-adminsdk.json');
 let serviceAccount;
 
+
+const jwt = require('jsonwebtoken');
+const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
+
+function getUserIdFromSocket(socket) {
+  try {
+    const token = socket.handshake.auth?.token;
+    if (!token) {
+      console.error('❌ 소켓 연결 시 토큰이 없습니다.');
+      return null;
+    }
+    const decoded = jwt.verify(token, secretKey);
+    console.log('✅ 토큰 디코딩 성공:', decoded);
+    return decoded.userId;
+  } catch (err) {
+    console.error('❌ 토큰 디코딩 실패:', err.message);
+    return null;
+  }
+}
+
 try {
   // JSON 파일에서 객체로 변환
   console.log('Attempting to load Service Account from:', serviceAccountPath); // 경로 확인
@@ -192,7 +212,8 @@ const userSockets = new Map(); // 사용자 ID와 소켓 ID 매핑
 io.on('connection', (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
 
-  const userId = socket.handshake.query.u1_id;
+  // const userId = socket.handshake.query.u1_id;
+  const userId = getUserIdFromSocket(socket); // ✅ JWT 기반으로 추출
   if (userId) {
       userSockets.set(userId, socket.id);
   }
@@ -235,7 +256,8 @@ socket.on('markAsRead', async (data) => {
 // 방 입장 처리
 socket.on('joinRoom', async (data) => {
   let { r_id, u2_id } = data;
-  const u1_id = data.u1_id || socket.handshake.query.u1_id;
+  // const u1_id = data.u1_id || socket.handshake.query.u1_id;
+  const u1_id = getUserIdFromSocket(socket); // ✅ 여기 핵심
   if (!u2_id) {
     const room = await Room.findOne({ where: { r_id } });
     u2_id = room ? room.u2_id : null;
@@ -267,8 +289,9 @@ if (!u1_id || !u2_id) {
 
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
-
-    const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
+    const u1_id = getUserIdFromSocket(socket); // ✅ 핵심
+    const { message_contents, r_id, u2_id, image, image_type } = data;
+    // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
 
     // 필수 값 검증
     if (!r_id || !u1_id || !u2_id||is_read) {

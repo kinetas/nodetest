@@ -14,13 +14,13 @@ const RMessage = sequelize.define('RMessage', {
   },
   r_id: {
     type: DataTypes.STRING(40),
-    primaryKey: true,
+    primaryKey: false,
     allowNull: false,
   },
   message_num: {
     type: DataTypes.STRING(20),
-    primaryKey: false,
-    allowNull: true,
+    primaryKey: true,
+    allowNull: false,
   },
   send_date: {
     type: DataTypes.DATE,

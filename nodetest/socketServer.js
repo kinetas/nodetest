@@ -290,17 +290,17 @@ if (!u1_id || !u2_id) {
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
     const u1_id = getUserIdFromSocket(socket); // ✅ 핵심
-    const { message_contents, r_id, u2_id, image, image_type, is_read } = data;
+    const { message_contents, r_id, u2_id, image, image_type} = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
 
     // 필수 값 검증
-    if (!r_id || !u1_id || !u2_id|| is_read) {
+    if (!r_id || !u1_id || !u2_id) {
       let missingFields = [];
      // 누락된 필드를 확인
       if (!r_id) missingFields.push('r_id');
       if (!u1_id) missingFields.push('u1_id');
       if (!u2_id) missingFields.push('u2_id');
-      if (!is_read) missingFields.push('is_read');
+      // if (!is_read) missingFields.push('is_read');
       if (missingFields.length > 0) {
       console.error(`누락된 필드: ${missingFields.join(', ')}`); // 누락된 필드 로그 출력 (수정된 부분)
       socket.emit('errorMessage', `필수 필드 누락: ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)

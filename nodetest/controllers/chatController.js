@@ -233,7 +233,9 @@ exports.sendMessage = async (io, socket, { message, r_id, u2_id, image, image_ty
     socket.emit('receiveMessage', {
       u1_id,
       message_contents: message || '[파일 전송]',
-      image,
+      // image,
+      image: image ? image.toString('base64') : null, // ✅ base64 인코딩
+      image_type: image_type || 'image/png',
       is_read,
       send_date: send_date.toISOString().slice(0, 19).replace('T', ' ')
     });

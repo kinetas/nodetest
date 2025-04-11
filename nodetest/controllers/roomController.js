@@ -315,13 +315,25 @@ exports.deleteRoom = async (req, res) => {
     }
 };
 
+const jwt = require('jsonwebtoken');
+const secretKey = process.env.JWT_SECRET_KEY || 'secret-key';
 exports.enterRoom = async (req, res) => {
-    console.log("💡 [enterRoom] Authorization:", req.headers.authorization);
-    console.log("💡 [enterRoom] currentUserId:", req.currentUserId);  // 이게 undefined로 찍힘
-    const { r_id, u2_id } = req.body;
-    const u1_id = req.currentUserId;
-    console.log("✅ [enterRoom] u1_id from JWT:", u1_id); // ✅ 여기가 핵심 로그
     try {
+        const authHeader = req.headers.authorization;
+        console.log("💡 Authorization Header:", authHeader);
+
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ message: '토큰 없음' });
+        }
+
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, secretKey);
+        const u1_id = decoded.userId;
+
+        console.log("✅ JWT 디코딩된 u1_id:", u1_id);
+
+        const { r_id, u2_id } = req.body;
+
         const room = await Room.findOne({ where: { r_id, u1_id, u2_id } });
 
         if (!room) {
@@ -341,10 +353,40 @@ exports.enterRoom = async (req, res) => {
 
         res.json({ message: '방에 성공적으로 입장했습니다.', room });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: `방 입장 중 오류: ${error}` });
+        console.error('❌ 방 입장 중 오류:', error);
+        res.status(500).json({ message: `방 입장 중 오류: ${error.message}` });
     }
 };
+// exports.enterRoom = async (req, res) => {
+//     console.log("💡 [enterRoom] Authorization:", req.headers.authorization);
+//     console.log("💡 [enterRoom] currentUserId:", req.currentUserId);  // 이게 undefined로 찍힘
+//     const { r_id, u2_id } = req.body;
+//     const u1_id = req.currentUserId;
+//     console.log("✅ [enterRoom] u1_id from JWT:", u1_id); // ✅ 여기가 핵심 로그
+//     try {
+//         const room = await Room.findOne({ where: { r_id, u1_id, u2_id } });
+
+//         if (!room) {
+//             return res.status(404).json({ message: '해당 방을 찾을 수 없습니다.' });
+//         }
+
+//         await RMessage.update(
+//             { is_read: 0 },
+//             {
+//                 where: {
+//                     r_id,
+//                     u2_id: u1_id,
+//                     is_read: 1
+//                 }
+//             }
+//         );
+
+//         res.json({ message: '방에 성공적으로 입장했습니다.', room });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: `방 입장 중 오류: ${error}` });
+//     }
+// };
 
 exports.updateRoomName = async (req, res) => {
     const u1_id = req.currentUserId;

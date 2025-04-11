@@ -318,7 +318,7 @@ exports.deleteRoom = async (req, res) => {
 exports.enterRoom = async (req, res) => {
     const { r_id, u2_id } = req.body;
     const u1_id = req.currentUserId;
-
+    console.log("✅ [enterRoom] u1_id from JWT:", u1_id); // ✅ 여기가 핵심 로그
     try {
         const room = await Room.findOne({ where: { r_id, u1_id, u2_id } });
 

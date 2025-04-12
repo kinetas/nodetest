@@ -250,7 +250,19 @@ exports.getMessages = async (r_id) => {
       where: { r_id },
       order: [['send_date', 'ASC']]
     });
-    return messages.map(msg => msg.toJSON());
+    // return messages.map(msg => msg.toJSON());
+
+    return messages.map(msg => {
+      const json = msg.toJSON();
+
+      // ✅ image가 존재하면 base64로 변환
+      if (json.image) {
+        json.image = Buffer.from(json.image).toString('base64');
+      }
+
+      return json;
+    });
+
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);
     throw error;

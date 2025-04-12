@@ -19,8 +19,8 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # 사전 학습 모델 생성
-RUN python3 fine_tuned_intent_model.py
+# RUN python3 fine_tuned_intent_model.py
 
 # PM2로 FastAPI 실행
-CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
+# CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
 

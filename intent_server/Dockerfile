@@ -24,4 +24,5 @@ RUN pip install --upgrade pip && \
 
 # PM2로 FastAPI 실행
 # CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["tail", "-f", "/dev/null"]
 

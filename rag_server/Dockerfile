@@ -65,6 +65,9 @@ WORKDIR /app
 COPY requirements.txt . 
 RUN pip install --no-cache-dir -r requirements.txt 
 COPY . .
+RUN pip install --no-cache-dir torch==2.1.2 transformers==4.38.2 accelerate==0.25.0
+RUN pip install --no-cache-dir -r requirements.txt
+
 # FastAPI 실행
 # CMD ["pm2-runtime", "start", "uvicorn", "--interpreter", "python3", "--", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 

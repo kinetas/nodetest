@@ -14,7 +14,7 @@ RUN apt-get update && \
     apt-get install -y nodejs && \
     npm install -g pm2
 
-RUN pip install numpy<2
+RUN pip install 'numpy<2'
 # 파이썬 패키지 설치
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt

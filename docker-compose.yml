@@ -58,7 +58,6 @@ services:
   intent_server:
     build: ./intent_server
     container_name: intent_server
-    restart: always
     ports:
       - "8002:8002"
     # volumes:

@@ -19,4 +19,4 @@ async def classify(query: Query):
     return {"intent": result["label"]}  # GENERAL or SPECIFIC
 
 if __name__ == "__main__":
-    uvicorn.run("intent_classifier:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("intent_classifier:app", host="0.0.0.0", port=8002, reload=True)

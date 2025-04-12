@@ -9,6 +9,8 @@ COPY requirements.txt ./
 # pip 최신화 및 필수 패키지 설치
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+RUN pip install numpy<2
+
 
 # 프로젝트 파일 복사
 COPY . .

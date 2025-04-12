@@ -14,6 +14,6 @@ RUN pip install --upgrade pip && \
 COPY . .
 
 # FastAPI 실행 포트
-EXPOSE 8001
+EXPOSE 8002
 
-CMD ["uvicorn", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]

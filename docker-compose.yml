@@ -54,6 +54,16 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+
+  intent_server:
+    build: ./intent_server
+    container_name: intent_server
+    restart: always
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./intent_server:/app
+
     
   webRTC_server:
     image: webrtc-server

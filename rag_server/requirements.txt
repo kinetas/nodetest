@@ -12,10 +12,10 @@ requests
 selenium
 webdriver-manager
 sentence-transformers==2.6.1
-# transformers==4.38.2
-# torch==2.1.2
+transformers==4.38.2
+torch==2.1.2
 pydantic==1.10.13
-datasets
-evaluate
-scikit-learn
+# datasets
+# evaluate
+# scikit-learn
 # accelerate==0.25.0

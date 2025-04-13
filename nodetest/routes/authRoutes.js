@@ -5,7 +5,7 @@ const findInfoController = require('../controllers/findInfoController');
 
 const loginRequired = require('../middleware/loginRequired'); // 로그인 확인 미들웨어 불러오기 (로그인이 필요한 기능이 있을시 해당 라우터에 사용됨)
 
-const Keycloak = require('../keycloak'); // keycloak 인스턴스 경로에 맞게
+const { keycloak } = require('../keycloak');
 
 // router.post('/login', authController.login);
 
@@ -35,7 +35,6 @@ router.delete('/deleteAccountToken', loginRequired, authController.deleteAccount
 router.post('/changePassword', findInfoController.changePassword);
 
 // ===================== KeyCloak ==========================
-router.get('/registerKeyCloak', Keycloak.protect(), getOrCreateUserFromKeycloak);
-
+router.get('/registerKeyCloak', keycloak.protect(), getOrCreateUserFromKeycloak);
 
 module.exports = router;

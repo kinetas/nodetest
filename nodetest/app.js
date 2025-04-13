@@ -21,10 +21,8 @@ require('dotenv').config();
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
 // =========== Keycloak ===========
-const Keycloak = require('keycloak-connect');
-const memoryStore = new session.MemoryStore();
-// 🔐 Keycloak 설정
-const keycloak = new Keycloak({ store: memoryStore });
+const { keycloak, memoryStore } = require('./keycloak');
+
 
 const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??

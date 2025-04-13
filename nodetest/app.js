@@ -23,6 +23,8 @@ const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 // =========== Keycloak ===========
 const Keycloak = require('keycloak-connect');
 const memoryStore = new session.MemoryStore();
+// 🔐 Keycloak 설정
+const keycloak = new Keycloak({ store: memoryStore });
 
 const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
@@ -66,9 +68,12 @@ app.use(session({
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?��좏궎�쓽 ��??�슚 湲곌�??? (�뿬湲곗꽌�?�� �븯?���???)
 }));
 
-// 🔐 Keycloak 설정
-const keycloak = new Keycloak({ store: memoryStore });
 app.use(keycloak.middleware());
+
+// ✅ 루트 경로에서 바로 로그인으로 유도
+app.get('/', keycloak.protect(), (req, res) => {
+    res.redirect('/dashboard');
+});
 
 //===========키클락 테스트 화면=============
 // app.get('/keycloak-test', keycloak.protect(), (req, res) => {
@@ -145,10 +150,7 @@ app.get('/user-info', requireAuth, (req, res) => {
 });
 
 
-// ✅ 루트 경로에서 바로 로그인으로 유도
-app.get('/', keycloak.protect(), (req, res) => {
-    res.redirect('/dashboard');
-});
+
 // app.get('/', (req, res) => {
 //     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 //     res.sendFile(path.join(__dirname, 'public', 'index.html'));

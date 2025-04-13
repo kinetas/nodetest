@@ -6,8 +6,7 @@ COPY requirements.txt ./
 COPY fine_tuned_intent_model.py ./
 COPY intent_data.csv ./
 COPY intent_classifier.py ./
-COPY intent_model ./intent_model
-
+COPY intent_model ./
 # apt 업데이트 및 curl, nodejs, npm 설치
 RUN apt-get update && \
     apt-get install -y curl gnupg && \

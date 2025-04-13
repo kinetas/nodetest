@@ -22,10 +22,10 @@ RUN pip install --upgrade pip && \
 # RUN python3 fine_tuned_intent_model.py
 
 # PM2로 FastAPI 실행
-CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
+# CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
 
 # model이 없을 때 실행
-# CMD ["tail", "-f", "/dev/null"]  
+CMD ["tail", "-f", "/dev/null"]  
 
 # COPY start.sh ./start.sh
 # RUN chmod +x start.sh

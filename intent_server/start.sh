@@ -20,6 +20,6 @@ else
 fi
 
 # ✅ PM2로 FastAPI 실행 (📛 이 라인이 잘못되어 있었음)
-pm2-runtime start uvicorn -- "intent_classifier:app" --host 0.0.0.0 --port 8002
+pm2 start uvicorn -- "intent_classifier:app" --host 0.0.0.0 --port 8002
 
 

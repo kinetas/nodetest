@@ -6,7 +6,6 @@ COPY requirements.txt ./
 COPY fine_tuned_intent_model.py ./
 COPY intent_data.csv ./
 COPY intent_classifier.py ./
-COPY intent_model ./
 # apt 업데이트 및 curl, nodejs, npm 설치
 RUN apt-get update && \
     apt-get install -y curl gnupg && \
@@ -23,6 +22,11 @@ RUN pip install --upgrade pip && \
 # RUN python3 fine_tuned_intent_model.py
 
 # PM2로 FastAPI 실행
-CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
+# CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
 # CMD ["tail", "-f", "/dev/null"] #model이 없을 때 실행
+
+COPY start.sh ./start.sh
+RUN chmod +x start.sh
+CMD ["./start.sh"]
+
 

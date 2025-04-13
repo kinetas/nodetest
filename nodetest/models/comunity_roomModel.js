@@ -40,6 +40,10 @@ const CRoom = sequelize.define('CRoom', {
         type: DataTypes.DATE,
         allowNull: true,
     },
+    category: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+    },
 }, {
     tableName: 'community_room', // 테이블 이름 (DB 테이블 이름과 매칭)
     timestamps: false, // createdAt, updatedAt 컬럼 사용 안 함

@@ -11,6 +11,7 @@
         <input type="text" id="cr_title" placeholder="미션 제목">
         <input type="text" id="content" placeholder="미션 내용">
         <input type="datetime-local" id="deadline" placeholder="마감기한">
+        <input type="text" id="category" placeholder="미션 카테고리">
         <button onclick="createCommunityMission()">생성</button>
     </div>
 
@@ -88,6 +89,7 @@
             const cr_title = document.getElementById('cr_title').value;
             const content = document.getElementById('content').value;
             const deadline = document.getElementById('deadline').value;
+            const category = document.getElementById('category').value;
 
             fetch('/api/comumunity_missions/create', {
                 method: 'POST',
@@ -95,7 +97,7 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}` // ✅ JWT 헤더 추가
                 },
-                body: JSON.stringify({ cr_title, contents: content, deadline })
+                body: JSON.stringify({ cr_title, contents: content, deadline, category })
             })
             .then(response => response.json())
             .then(data => alert(data.message))

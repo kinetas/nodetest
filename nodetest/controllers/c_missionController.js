@@ -199,13 +199,13 @@ const { Op } = require('sequelize'); // [추가됨]
 
 // 커뮤니티 미션 생성 (JWT 적용)
 exports.createCommunityMission = async (req, res) => {
-    const { cr_title, contents, deadline } = req.body;
+    const { cr_title, contents, deadline, category } = req.body;
     const u_id = req.currentUserId; // JWT 인증된 사용자 ID 사용
     const cr_num = uuidv4();
     const cr_status = "match";
 
     try {
-        await CRoom.create({ u_id, cr_num, cr_title, cr_status, contents, deadline });
+        await CRoom.create({ u_id, cr_num, cr_title, cr_status, contents, deadline, category });
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 생성되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 생성 오류:', error);
@@ -358,7 +358,8 @@ exports.acceptCommunityMission = async (req, res) => {
                 m_status: '진행중',
                 r_id: rid_open,
                 m_extended: false,
-                missionAuthenticationAuthority: mission.u_id
+                missionAuthenticationAuthority: mission.u_id,
+                category: mission.category,
             },
             {
                 m_id: uuidv4(),
@@ -369,7 +370,8 @@ exports.acceptCommunityMission = async (req, res) => {
                 m_status: '진행중',
                 r_id: rid_open,
                 m_extended: false,
-                missionAuthenticationAuthority: u2_id
+                missionAuthenticationAuthority: u2_id,
+                category: mission.category,
             }
         ]);
 

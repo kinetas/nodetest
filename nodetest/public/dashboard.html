@@ -62,6 +62,7 @@
         <input type="text" id="m_title" placeholder="미션 이름">
         <input type="datetime-local" id="m_deadline" placeholder="미션 마감일">
         <input type="text" id="m_reword" placeholder="보상">
+        <input type="text" id="category" placeholder="카테고리"> 
         <button onclick="createMission()">미션 생성</button>
     </div>
 
@@ -676,7 +677,8 @@
                 authenticationAuthority: document.getElementById('authenticationAuthority').value,
                 m_title: document.getElementById('m_title').value,
                 m_deadline: document.getElementById('m_deadline').value,
-                m_reword: document.getElementById('m_reword').value
+                m_reword: document.getElementById('m_reword').value,
+                category: document.getElementById('category').value,
             };
 
             fetch('/dashboard/missioncreate', {

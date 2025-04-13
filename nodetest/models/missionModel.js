@@ -115,6 +115,10 @@ const Mission = sequelize.define('Mission', {
   //   type: DataTypes.STRING(30),
   //   allowNull: false,
   // },
+  category: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+  },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����

@@ -20,6 +20,10 @@ const MResult = sequelize.define('MResult', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+  category: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+  },
 }, {
   tableName: 'm_result',
   timestamps: false,

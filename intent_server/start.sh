@@ -13,5 +13,5 @@ done
 
 # PM2로 FastAPI 실행
 echo "🚀 Starting FastAPI with PM2..."
-pm2-runtime start "uvicorn --host 0.0.0.0 --port 8002 intent_classifier:app"
+pm2 start intent_classifier.py --interpreter python3 --name intent_classifier
 

@@ -60,8 +60,8 @@ services:
     container_name: intent_server
     ports:
       - "8002:8002"
-    # volumes:
-    #   - ./intent_server:/app
+    volume:
+      - ./models/intent_model:/app/intent_model
 
     
   webRTC_server:

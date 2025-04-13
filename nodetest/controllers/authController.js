@@ -18,30 +18,23 @@ exports.getOrCreateUserFromKeycloak = async (req, res) => {
     try {
         const tokenContent = req.kauth.grant.access_token.content;
 
-        const u_id = tokenContent.sub;
-        const u_mail = tokenContent.email;
-        const u_name = tokenContent.name || tokenContent.preferred_username;
-        const u_nickname = tokenContent.preferred_username;
+        const u_id = token.sub;
+        const u_nickname = token.preferred_username || token.name;
+        const u_name = token.name || token.given_name || '';
+        const u_mail = token.email || null;
         const u_birth = new Date();
+        const u_password = 'keycloak'; // 또는 임의의 고정된 값
 
         // ✅ DB 조회: 사용자 이미 존재하면 등록 안 함 (→ 로그인)
         const existingUser = await User.findOne({ where: { u_id } });
-
         if (existingUser) {
-            return res.status(200).json({
-                success: true,
-                message: '기존 사용자 로그인',
-                user: {
-                    id: existingUser.u_id,
-                    nickname: existingUser.u_nickname,
-                    email: existingUser.u_mail
-                }
-            });
+            return res.status(200).json({ message: '이미 존재하는 사용자입니다.', user: existingUser });
         }
 
         // ✅ 신규 사용자 등록 (→ 회원가입한 경우만)
         const newUser = await User.create({
             u_id,
+            u_password,
             u_nickname,
             u_name,
             u_birth,

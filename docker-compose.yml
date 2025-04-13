@@ -41,7 +41,7 @@ services:
     image: chromadb/chroma:0.5.0
     container_name: chroma
     ports:
-      - "8001:8000"
+      - "8001:8001"
     volumes:
       - ./chroma-data:/chroma/chroma
     environment:
@@ -54,6 +54,15 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+
+  intent_server:
+    build: ./intent_server
+    container_name: intent_server
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./models/intent_model:/app/intent_model
+
     
   webRTC_server:
     image: webrtc-server

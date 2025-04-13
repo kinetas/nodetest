@@ -21,7 +21,8 @@ require('dotenv').config();
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
 // =========== Keycloak ===========
-const Keycloak = require('keycloak-connect');
+const KeycloakConnect = require('keycloak-connect');
+const Keycloak = require('./keycloak');
 const memoryStore = new session.MemoryStore();
 
 const db = require('./config/db');
@@ -67,7 +68,7 @@ app.use(session({
 }));
 
 // 🔐 Keycloak 설정
-const keycloak = new Keycloak({ store: memoryStore });
+const keycloak = new KeycloakConnect({ store: memoryStore });
 app.use(keycloak.middleware());
 
 //===========키클락 테스트 화면=============
@@ -146,7 +147,7 @@ app.get('/user-info', requireAuth, (req, res) => {
 
 
 // ✅ 루트 경로에서 바로 로그인으로 유도
-app.get('/', keycloak.protect(), (req, res) => {
+app.get('/', Keycloak.protect(), (req, res) => {
     res.redirect('/dashboard');
 });
 // app.get('/', (req, res) => {

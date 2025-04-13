@@ -60,7 +60,7 @@ services:
     container_name: intent_server
     ports:
       - "8002:8002"
-    volume:
+    volumes:
       - ./models/intent_model:/app/intent_model
 
     

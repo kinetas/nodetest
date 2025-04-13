@@ -10,6 +10,62 @@ const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 
 
 const roomController = require('./roomController'); // roomController 가져오기
 
+const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
+
+
+// ✅ Keycloak 로그인 후 사용자 정보 기반 DB 자동 저장
+exports.getOrCreateUserFromKeycloak = async (req, res) => {
+    try {
+        const tokenContent = req.kauth.grant.access_token.content;
+
+        const u_id = tokenContent.sub;
+        const u_mail = tokenContent.email;
+        const u_name = tokenContent.name || tokenContent.preferred_username;
+        const u_nickname = tokenContent.preferred_username;
+        const u_birth = new Date();
+
+        // ✅ DB 조회: 사용자 이미 존재하면 등록 안 함 (→ 로그인)
+        const existingUser = await User.findOne({ where: { u_id } });
+
+        if (existingUser) {
+            return res.status(200).json({
+                success: true,
+                message: '기존 사용자 로그인',
+                user: {
+                    id: existingUser.u_id,
+                    nickname: existingUser.u_nickname,
+                    email: existingUser.u_mail
+                }
+            });
+        }
+
+        // ✅ 신규 사용자 등록 (→ 회원가입한 경우만)
+        const newUser = await User.create({
+            u_id,
+            u_nickname,
+            u_name,
+            u_birth,
+            u_mail
+        });
+
+        await roomController.initAddRoom({ body: { u1_id: u_id } });
+
+        res.status(201).json({
+            success: true,
+            message: '신규 사용자 등록 완료',
+            user: {
+                id: newUser.u_id,
+                nickname: newUser.u_nickname,
+                email: newUser.u_mail
+            }
+        });
+
+    } catch (error) {
+        console.error('Keycloak 사용자 저장 오류:', error);
+        res.status(500).json({ message: '사용자 처리 중 오류 발생' });
+    }
+};
+
 // 로그인 처리 함수 - 쿠키
 exports.login = async (req, res) => {
     const { u_id, u_password, token } = req.body;// 여기에 디바이스 토큰 추가

@@ -23,3 +23,4 @@ fi
 pm2 start uvicorn -- "intent_classifier:app" --host 0.0.0.0 --port 8002
 
 
+tail -f /dev/null

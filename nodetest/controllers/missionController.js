@@ -705,7 +705,8 @@ exports.successMission = async (req, res) => {
             mission.u2_id,
             // mission.m_deadline,
             currentTime, // 현재 시간 전달
-            '성공'
+            '성공',
+            mission.category,
         );
 
         // saveResultResponse가 성공하지 않은 경우
@@ -772,7 +773,8 @@ exports.failureMission = async (req, res) => {
             mission.u2_id,
             // mission.m_deadline,
             currentTime, // 현재 시간 전달
-            '실패'
+            '실패',
+            mission.category,
         );
 
         // //==============================리워드 기능 추가==============================

@@ -20,7 +20,8 @@ else
 fi
 
 # ✅ PM2로 FastAPI 실행
-pm2 start uvicorn -- "intent_classifier:app" --host 0.0.0.0 --port 8002
+pm2-runtime start uvicorn --interpreter python3 -- \
+  intent_classifier:app --host 0.0.0.0 --port 8002
 
 
-tail -f /dev/null
+# tail -f /dev/null

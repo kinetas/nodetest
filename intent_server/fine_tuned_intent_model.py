@@ -75,8 +75,10 @@ import evaluate
 import torch
 from torch import nn
 from sklearn.utils.class_weight import compute_class_weight
+import os
 
 # 🧪 데이터 로드
+
 dataset = load_dataset("csv", data_files="intent_data.csv")["train"]
 
 # 🧠 라벨 인코딩
@@ -148,9 +150,12 @@ trainer = WeightedTrainer(
     eval_dataset=dataset,
     compute_metrics=compute_metrics
 )
+SAVE_PATH = "/app/intent_model"
+os.makedirs(SAVE_PATH, exist_ok=True)
 
 trainer.train()
-
+trainer.save_model(SAVE_PATH)
+tokenizer.save_pretrained(SAVE_PATH)
 # 💾 모델 저장
 trainer.save_model("./intent_model")
 tokenizer.save_pretrained("./intent_model")

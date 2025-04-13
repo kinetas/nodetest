@@ -599,6 +599,22 @@
             window.location.href = '/';
         }
 
+        // ===== KeyCloak 회원가입/로그인 후 DB에 데이터 저장 =====
+        fetch('/api/auth/registerKeyCloak', {
+            method: 'GET',
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('[Keycloak 사용자 등록 결과]', data);
+        })
+        .catch(err => {
+            console.error('Keycloak 사용자 등록 오류:', err);
+        });
+
+
         // ✅ 사용자 정보
         fetch('/user-info', {
             headers: {

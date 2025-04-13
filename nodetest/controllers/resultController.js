@@ -3,13 +3,14 @@ const MResult = require('../models/m_resultModel'); // m_resultModel.js 연결
 const { Op } = require('sequelize');
 
 // m_result에 데이터 저장 함수
-exports.saveResult = async (m_id, u_id, m_deadline, m_status) => {
+exports.saveResult = async (m_id, u_id, m_deadline, m_status, category) => {
     try {
         await MResult.create({
             m_id,
             u_id,
             m_deadline,
-            m_status
+            m_status,
+            category,
         });
         return { success: true, message: 'm_result에 데이터가 성공적으로 저장되었습니다.' };
     } catch (error) {

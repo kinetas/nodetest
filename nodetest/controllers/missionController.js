@@ -28,7 +28,7 @@ const Sequelize = require('sequelize');
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
-    const { u2_id, authenticationAuthority, m_title, m_deadline, m_reword } = req.body;
+    const { u2_id, authenticationAuthority, m_title, m_deadline, m_reword, category } = req.body;
     // const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
@@ -98,6 +98,7 @@ exports.createMission = async (req, res) => {
                     r_id: room.r_id, // Room ID를 저장
                     m_extended: false,
                     missionAuthenticationAuthority,
+                    category,
                 });
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
@@ -144,6 +145,7 @@ exports.createMission = async (req, res) => {
                 r_id: room.r_id, // Room ID를 저장
                 m_extended: false,
                 missionAuthenticationAuthority: u1_id,
+                category,
             });
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
@@ -184,6 +186,7 @@ exports.createMission = async (req, res) => {
                 r_id: room.r_id, // Room ID를 저장
                 m_extended: false,
                 missionAuthenticationAuthority: u1_id,
+                category,
             });
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
@@ -702,7 +705,8 @@ exports.successMission = async (req, res) => {
             mission.u2_id,
             // mission.m_deadline,
             currentTime, // 현재 시간 전달
-            '성공'
+            '성공',
+            mission.category,
         );
 
         // saveResultResponse가 성공하지 않은 경우
@@ -769,7 +773,8 @@ exports.failureMission = async (req, res) => {
             mission.u2_id,
             // mission.m_deadline,
             currentTime, // 현재 시간 전달
-            '실패'
+            '실패',
+            mission.category,
         );
 
         // //==============================리워드 기능 추가==============================

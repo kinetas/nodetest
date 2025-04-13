@@ -107,6 +107,10 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  category: {
+    type: DataTypes.STRING(20),
+    allowNull: true,
+  },
   // u1_nickname: {
   //   type: DataTypes.STRING(30),
   //   allowNull: false,

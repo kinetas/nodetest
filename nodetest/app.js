@@ -70,9 +70,10 @@ app.use(session({
 const keycloak = new Keycloak({ store: memoryStore });
 app.use(keycloak.middleware());
 
-app.get('/keycloak-test', keycloak.protect(), (req, res) => {
-    res.send("Keycloak 인증 성공! 🎉");
-});
+//===========키클락 테스트 화면=============
+// app.get('/keycloak-test', keycloak.protect(), (req, res) => {
+//     res.send("Keycloak 인증 성공! 🎉");
+// });
 
 // // ======== ?��?�� JWT ============
 // // JSON ?��?���??? URL ?��코딩 ?��?��
@@ -143,10 +144,15 @@ app.get('/user-info', requireAuth, (req, res) => {
     res.json({ userId: req.currentUserId });    //토큰기반
 });
 
-app.get('/', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+
+// ✅ 루트 경로에서 바로 로그인으로 유도
+app.get('/', keycloak.protect(), (req, res) => {
+    res.redirect('/dashboard');
 });
+// app.get('/', (req, res) => {
+//     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+//     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// });
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });

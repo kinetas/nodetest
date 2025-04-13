@@ -20,6 +20,9 @@ require('dotenv').config();
 
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
+// =========== Keycloak ===========
+const Keycloak = require('keycloak-connect');
+const memoryStore = new session.MemoryStore();
 
 const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
@@ -59,8 +62,17 @@ app.use(session({
     //     httpOnly: true,
     //     secure: false, // HTTPS ?��?�� ?�� true�?? ?��?��
     // }
+    store: memoryStore,
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?��좏궎�쓽 ��??�슚 湲곌�??? (�뿬湲곗꽌�?�� �븯?���???)
 }));
+
+// 🔐 Keycloak 설정
+const keycloak = new Keycloak({ store: memoryStore });
+app.use(keycloak.middleware());
+
+app.get('/keycloak-test', keycloak.protect(), (req, res) => {
+    res.send("Keycloak 인증 성공! 🎉");
+});
 
 // // ======== ?��?�� JWT ============
 // // JSON ?��?���??? URL ?��코딩 ?��?��

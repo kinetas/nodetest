@@ -65,5 +65,5 @@ trainer.train()
 
 # 💾 저장
 trainer.save_model("./intent_model")
-# model.save_pretrained("./intent_model")
-# tokenizer.save_pretrained("./intent_model")
+tokenizer.save_pretrained("./intent_model")
+model.save_pretrained("./intent_model")

@@ -1,30 +1,66 @@
 const axios = require('axios');
+const Mission = require('../models/missionModel');
 
-// AI 서버 주소 (내부 주소 기반 - 실제 환경에 맞게 수정)
+// 서버 주소
 const AI_SERVER_URL = 'http://27.113.11.48:8000';
-const intent_SERVER_URL = 'http://27.113.11.48:8000\1';
-
-let latestAiMessage = null;
+const INTENT_SERVER_URL = 'http://27.113.11.48:8002';
 
 exports.askQuestion = async (req, res) => {
-  const { question } = req.body;
-  if (!question) {
-    return res.status(400).json({ error: '질문 텍스트가 필요합니다.' });
+  const { question, user_id } = req.body;
+
+  if (!question || !user_id) {
+    return res.status(400).json({ error: '질문과 user_id가 필요합니다.' });
   }
+
   try {
-    // AI 서버에 질문을 전송 (JSON 형식)
-    // const response = await axios.post(AI_SERVER_URL, { question });
-    const response = await axios.post(`${AI_SERVER_URL}/recommend`, {
-      category: question
+    // 1. Intent 분류
+    const intentRes = await axios.post(`${INTENT_SERVER_URL}/intent-classify`, {
+      text: question,
     });
-    // AI 서버의 응답을 클라이언트(플러터)로 전달
-    res.status(200).json({ result: response.data });
+
+    const intent = intentRes.data.intent;
+    let finalQuestion = question;
+
+    if (intent === 'generic') {
+      // 2. DB에서 해당 유저의 미션 카테고리 top3 가져오기
+      const results = await Mission.findAll({
+        where: { user_id },
+        attributes: ['category'],
+        group: ['category'],
+        raw: true,
+      });
+
+      if (results.length > 0) {
+        // 카테고리별 횟수 집계
+        const categoryCount = {};
+        results.forEach((row) => {
+          const category = row.category;
+          categoryCount[category] = (categoryCount[category] || 0) + 1;
+        });
+
+        // 정렬 후 상위 3개 중 랜덤 선택
+        const top3 = Object.entries(categoryCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map((item) => item[0]);
+
+        const chosenCategory = top3[Math.floor(Math.random() * top3.length)];
+        finalQuestion = `${chosenCategory} ${question}`;
+      }
+    }
+
+    // 3. AI 서버에 전달
+    const aiRes = await axios.post(`${AI_SERVER_URL}/recommend`, {
+      category: finalQuestion,
+    });
+
+    res.status(200).json({ result: aiRes.data });
+
   } catch (error) {
-    console.error('AI 서버 요청 실패:', error.message);
-    res.status(500).json({ error: 'AI 서버와 통신 실패' });
+    console.error('❌ 에러:', error.message);
+    res.status(500).json({ error: '서버 오류' });
   }
-};
-  
+}
 exports.receiveAiMessage = (req, res) => {
   const { message, category } = req.body;
 

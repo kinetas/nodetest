@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const aiController = require('../controllers/AIController');
+const { sequelize } = require("../models"); // 또는 DB 설정 경로
+
 
 // // FastAPI 주소
 // const RAG_SERVER_URL = 'http://rag_server:8000/recommend'; // Docker 내부 주소

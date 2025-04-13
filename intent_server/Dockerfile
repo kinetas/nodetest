@@ -25,10 +25,10 @@ RUN pip install --upgrade pip && \
 # CMD ["pm2-runtime", "uvicorn", "--", "intent_classifier:app", "--host", "0.0.0.0", "--port", "8002"]
 
 # model이 없을 때 실행
-CMD ["tail", "-f", "/dev/null"]  
+# CMD ["tail", "-f", "/dev/null"]  
 
-# COPY start.sh ./start.sh
-# RUN chmod +x start.sh
-# CMD ["./start.sh"]
+COPY start.sh ./start.sh
+RUN chmod +x start.sh
+CMD ["./start.sh"]
 
 

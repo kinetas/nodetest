@@ -603,9 +603,9 @@
         }
 
         const token = localStorage.getItem('token');
-
+        console.log("token: ", token);
         if (!token) {
-            alert("로그인이 필요합니다.");
+            alert("로그인이 필요합니다.aaa");
             window.location.href = '/';
         }
 
@@ -636,7 +636,7 @@
             document.getElementById('greeting').textContent = `Hello, ${data.userId}`;
         })
         .catch(() => {
-            alert('인증 실패. 로그인 페이지로 이동합니다.');
+            alert('인증 실패aaa. 로그인 페이지로 이동합니다.');
             window.location.href = '/';
         });
 

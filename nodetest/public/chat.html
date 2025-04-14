@@ -362,7 +362,8 @@
         // ✅ Socket.io 연결: auth로 JWT 토큰 전달
         const socket = io("http://27.113.11.48:3001", {
             path: '/socket.io',
-            auth: { token, u1_id, u2_id }
+            // auth: { token, u1_id, u2_id }
+            auth: { token }
         });
 
         // ✅ 페이지 로드시 메시지 불러오기

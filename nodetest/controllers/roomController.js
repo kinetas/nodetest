@@ -327,8 +327,11 @@ exports.enterRoom = async (req, res) => {
         }
 
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, secretKey);
-        const u1_id = decoded.userId;
+        // const decoded = jwt.verify(token, secretKey);
+        // const u1_id = decoded.userId;
+        const keycloakPublicKey = null;
+        const decoded = jwt.verify(token, keycloakPublicKey, { algorithms: ['RS256'] });
+        const u1_id = decoded.preferred_username;
 
         console.log("✅ JWT 디코딩된 u1_id:", u1_id);
 

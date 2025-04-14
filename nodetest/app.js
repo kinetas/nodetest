@@ -236,7 +236,7 @@ app.use((req, res, next) => {
       req.currentUserId = req.kauth.grant.access_token.content.preferred_username;
     }
     next();
-  });
+});
 
 
 // app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰

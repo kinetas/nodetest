@@ -64,6 +64,7 @@ const {
     KEYCLOAK_ADMIN_PASS,
     KEYCLOAK_BASE_URL,
     KEYCLOAK_REALM,
+    KEYCLOAK_CLIENT_ID,
   } = process.env;
 
 exports.deleteAccountFromKeycloak = async (req, res) => {

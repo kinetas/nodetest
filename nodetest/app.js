@@ -230,13 +230,22 @@ app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
 
+
+app.use((req, res, next) => {
+    if (req.kauth?.grant?.access_token?.content?.preferred_username) {
+      req.currentUserId = req.kauth.grant.access_token.content.preferred_username;
+    }
+    next();
+  });
+
+
 // app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
 app.use('/chat', timeConverterMiddleware, chatRoutes);
 
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
 // app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
-app.use('/dashboard', timeConverterMiddleware, missionRoutes); 
+app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
 // app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT토큰
 app.use('/api/rooms', timeConverterMiddleware, roomRoutes);

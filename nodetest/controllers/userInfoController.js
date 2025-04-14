@@ -17,7 +17,8 @@ const extractUserIdFromToken = (req) => {
   
   // 로그인한 사용자의 u_id 반환
   exports.getLoggedInUserId = (req, res) => {
-    const userId = extractUserIdFromToken(req);
+    // const userId = extractUserIdFromToken(req);  //JWT 기반
+    const userId = req.currentUserId; // ✅ Keycloak 기반
     if (!userId) {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }

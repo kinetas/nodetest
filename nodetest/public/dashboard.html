@@ -610,12 +610,19 @@
             localStorage.setItem('id_token', kcIdToken); // ✅ 저장
         }
 
+        const savedToken = localStorage.getItem('token');
+        const savedIdToken = localStorage.getItem('id_token');
+        if (!savedToken) {
+            alert("로그인이 필요합니다.");
+            window.location.href = "/";
+        }
+
         // ===== KeyCloak 회원가입/로그인 후 DB에 데이터 저장 =====
         // DB 사용자 등록
         fetch('/api/auth/registerKeyCloak', {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${savedToken}`
         }
         })
         .then(res => res.json())
@@ -626,11 +633,11 @@
         console.error('[등록 오류]', err);
         });
 
-        console.log("액세스 token: ", token);
+        console.log("액세스 token: ", savedToken);
         // ✅ 사용자 정보
         fetch('/user-info', {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${savedToken}`
             }
         })
         .then(res => res.json())
@@ -645,7 +652,7 @@
         // ✅ 미션 목록
         fetch('/dashboard/missions', {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${savedToken}`
             }
         })
         .then(res => res.json())
@@ -661,7 +668,7 @@
 
         // ✅ i_friend 목록
         fetch('/dashboard/friends/ifriends', {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${savedToken}` }
         })
         .then(res => res.json())
         .then(data => {
@@ -676,7 +683,7 @@
 
         // ✅ t_friend 목록
         fetch('/dashboard/friends/tfriends', {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${savedToken}` }
         })
         .then(res => res.json())
         .then(data => {
@@ -713,7 +720,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${savedToken}`
                 },
                 body: JSON.stringify(payload)
             })
@@ -736,7 +743,7 @@
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${savedToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -755,7 +762,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${savedToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -774,7 +781,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${savedToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -793,7 +800,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${savedToken}`
                 },
                 body: JSON.stringify({ f_id })
             })

@@ -13,7 +13,8 @@ const AI_SERVER_URL = 'http://rag_server:8000';
 
 exports.askQuestion = async (req, res) => {
   const { question} = req.body;
-  const user_id = extractUserIdFromToken(req);
+  // const user_id = extractUserIdFromToken(req);
+  const user_id = req.currentUserId; // ✅ Keycloak 기반
 
   if (!question || !user_id) {
     return res.status(400).json({ error: '질문과 user_id가 필요합니다.' });

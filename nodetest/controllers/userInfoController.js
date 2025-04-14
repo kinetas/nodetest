@@ -27,7 +27,8 @@ const extractUserIdFromToken = (req) => {
   
   // 로그인한 사용자의 u_nickname 반환
   exports.getLoggedInUserNickname = async (req, res) => {
-    const userId = extractUserIdFromToken(req);
+    // const userId = extractUserIdFromToken(req);
+    const userId = req.currentUserId; // ✅ Keycloak 기반
     if (!userId) {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
@@ -49,7 +50,8 @@ const extractUserIdFromToken = (req) => {
   
   // 로그인한 사용자의 모든 정보 반환
   exports.getLoggedInUserAll = async (req, res) => {
-    const userId = extractUserIdFromToken(req);
+    // const userId = extractUserIdFromToken(req);
+    const userId = req.currentUserId; // ✅ Keycloak 기반
     if (!userId) {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }

@@ -81,6 +81,7 @@
                 "?client_id=nodetest" +
                 "&response_type=id_token token" +     // ✅ Implicit flow → 직접 id_token, access_token 받음
                 "&scope=openid" +
+                "&nonce=nonce123" + 
                 "&redirect_uri=http://27.113.11.48:3000/dashboard";
         });
     </script>

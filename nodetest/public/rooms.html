@@ -254,6 +254,7 @@
         });
 
         function addRoom() {
+            const u1_id = sessionStorage.getItem('user_id')
             const u2_id = document.getElementById('userIdInput').value;
             const roomName = document.getElementById('roomNameInput').value;
             const r_type = document.getElementById('roomTypeInput').value;
@@ -263,7 +264,7 @@
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}` // ✅ JWT 적용
                 },
-                body: JSON.stringify({ u2_id, roomName, r_type })
+                body: JSON.stringify({ u1_id, u2_id, roomName, r_type })
             })
             .then(res => res.json())
             .then(data => {

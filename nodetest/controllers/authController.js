@@ -16,48 +16,47 @@ const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 // ✅ Keycloak 로그인 후 사용자 정보 기반 DB 자동 저장
 exports.getOrCreateUserFromKeycloak = async (req, res) => {
     try {
-        const tokenContent = req.kauth.grant.access_token.content;
+      const keycloakUser = req.kauth.grant.access_token.content;
+  
+      const u_id = keycloakUser.preferred_username; // ex: "user01"
+      const u_name = keycloakUser.name || 'unknown';
+      const u_mail = keycloakUser.email || null;
+      const u_nickname = keycloakUser.given_name || u_name;
+      const u_birth = null; // Keycloak에 생년월일이 없다면 null 처리
+      const u_password = 'keycloak'; // 더미 비번 (사용되지 않음)
+  
+      // 🔎 이미 존재하는 사용자 찾기
+      const [user, created] = await User.findOrCreate({
+        where: { u_id },
+        defaults: {
+          u_password,
+          u_nickname,
+          u_name,
+          u_birth,
+          u_mail
+        }
+      });
+  
+      if (created) {
+        console.log(`[✔] Keycloak 사용자가 DB에 등록됨: ${u_id}`);
 
-        const u_id = token.sub;
-        const u_nickname = token.preferred_username || token.name;
-        const u_name = token.name || token.given_name || '';
-        const u_mail = token.email || null;
-        const u_birth = new Date();
-        const u_password = 'keycloak'; // 또는 임의의 고정된 값
-
-        // ✅ DB 조회: 사용자 이미 존재하면 등록 안 함 (→ 로그인)
-        const existingUser = await User.findOne({ where: { u_id } });
-        if (existingUser) {
-            return res.status(200).json({ message: '이미 존재하는 사용자입니다.', user: existingUser });
+        // 방 생성 (응답 처리 없이 결과만 확인)
+        const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
+        if (!roomResult.success) {
+            console.error('방 생성 실패:', roomResult.error);
+            return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });
         }
 
-        // ✅ 신규 사용자 등록 (→ 회원가입한 경우만)
-        const newUser = await User.create({
-            u_id,
-            u_password,
-            u_nickname,
-            u_name,
-            u_birth,
-            u_mail
-        });
-
-        await roomController.initAddRoom({ body: { u1_id: u_id } });
-
-        res.status(201).json({
-            success: true,
-            message: '신규 사용자 등록 완료',
-            user: {
-                id: newUser.u_id,
-                nickname: newUser.u_nickname,
-                email: newUser.u_mail
-            }
-        });
-
-    } catch (error) {
-        console.error('Keycloak 사용자 저장 오류:', error);
-        res.status(500).json({ message: '사용자 처리 중 오류 발생' });
+      } else {
+        console.log(`[✔] Keycloak 사용자가 이미 DB에 존재함: ${u_id}`);
+      }
+  
+      res.status(200).json({ success: true, user });
+    } catch (err) {
+      console.error('[❌] 사용자 등록 오류:', err);
+      res.status(500).json({ success: false, message: '사용자 등록 중 오류 발생' });
     }
-};
+  };
 
 // 로그인 처리 함수 - 쿠키
 exports.login = async (req, res) => {

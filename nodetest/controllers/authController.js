@@ -99,7 +99,7 @@ exports.deleteAccountFromKeycloak = async (req, res) => {
         if (!userSearchRes.data.length) {
             return res.status(404).json({
                 success: false,
-                message: '🔍 Keycloak 계정을 찾을 수 없습니다.'
+                message: 'Keycloak 계정을 찾을 수 없습니다.'
             });
         }
 
@@ -116,10 +116,10 @@ exports.deleteAccountFromKeycloak = async (req, res) => {
 
         return res.json({
             success: true,
-            message: `✅ ${username} 계정이 Keycloak 및 DB에서 삭제되었습니다.`
+            message: `${username} 계정이 Keycloak 및 DB에서 삭제되었습니다.`
         });
     } catch (err) {
-        console.error('❌ Keycloak 계정 삭제 오류:', err.message);
+        console.error('Keycloak 계정 삭제 오류:', err.message);
         return res.status(500).json({
             success: false,
             message: '계정 삭제 중 오류 발생',

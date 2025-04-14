@@ -68,12 +68,12 @@ app.use(session({
 
 app.use(keycloak.middleware());
 
-// ✅ 루트 경로에서 바로 로그인으로 유도
-app.get('/', keycloak.protect(), (req, res) => {
-    const token = req.kauth.grant.access_token.token;
-    res.redirect(`/dashboard#access_token=${token}`);
-    // res.redirect('/dashboard');
-});
+// // ✅ 루트 경로에서 바로 로그인으로 유도
+// app.get('/', keycloak.protect(), (req, res) => {
+//     const token = req.kauth.grant.access_token.token;
+//     res.redirect(`/dashboard#access_token=${token}`);
+//     // res.redirect('/dashboard');
+// });
 
 //===========키클락 테스트 화면=============
 // app.get('/keycloak-test', keycloak.protect(), (req, res) => {
@@ -151,10 +151,10 @@ app.get('/user-info', requireAuth, (req, res) => {
 
 
 
-// app.get('/', (req, res) => {
-//     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-//     res.sendFile(path.join(__dirname, 'public', 'index.html'));
-// });
+app.get('/', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 // ✅ 대시보드 접근 시 Keycloak 인증 요구
 app.get('/', keycloak.protect(), (req, res) => {
     const token = req.kauth.grant.access_token.token;

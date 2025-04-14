@@ -77,7 +77,7 @@
 
         document.getElementById('keycloakLoginButton').addEventListener('click', () => {
             // ✅ Keycloak 로그인 URL로 리디렉션
-            window.location.href = "http://27.113.11.48:8080/realms/master/protocol/openid-connect/auth?client_id=nodetest&response_type=token&scope=openid&redirect_uri=http://27.113.11.48:3000/dashboard";
+            window.location.href = "http://27.113.11.48:8080/realms/master/protocol/openid-connect/auth?client_id=nodetest&response_type=code&scope=openid&redirect_uri=http://27.113.11.48:3000/callback";
         });
     </script>
 </body>

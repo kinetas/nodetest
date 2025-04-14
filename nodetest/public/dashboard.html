@@ -593,35 +593,32 @@
 
         //=================token=================
 
-        // 👉 Keycloak에서 토큰 자동으로 추출해서 저장
+        // URL에서 토큰 추출
         const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const kcAccessToken = urlParams.get('access_token');
+        const token = urlParams.get('access_token');
 
-        if (kcAccessToken) {
-            localStorage.setItem('token', kcAccessToken); // ✅ 저장
-            history.replaceState(null, null, window.location.pathname); // URL 깔끔하게
-        }
-
-        const token = localStorage.getItem('token');
-        console.log("token: ", token);
-        if (!token) {
-            alert("로그인이 필요합니다.aaa");
-            window.location.href = '/';
+        if (token) {
+        localStorage.setItem('token', token);
+        history.replaceState(null, null, window.location.pathname);
+        } else {
+        alert("로그인이 필요합니다.");
+        window.location.href = "/";
         }
 
         // ===== KeyCloak 회원가입/로그인 후 DB에 데이터 저장 =====
+        // DB 사용자 등록
         fetch('/api/auth/registerKeyCloak', {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
+        method: 'GET',
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
         })
         .then(res => res.json())
         .then(data => {
-            console.log('[Keycloak 사용자 등록 결과]', data);
+        console.log('[Keycloak 사용자 등록]', data);
         })
         .catch(err => {
-            console.error('Keycloak 사용자 등록 오류:', err);
+        console.error('[등록 오류]', err);
         });
 
 

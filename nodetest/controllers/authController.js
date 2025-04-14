@@ -66,7 +66,7 @@ const {
     KEYCLOAK_REALM,
   } = process.env;
 
-  exports.deleteAccountFromKeycloak = async (req, res) => {
+exports.deleteAccountFromKeycloak = async (req, res) => {
     try {
         // 🔐 Keycloak 토큰에서 사용자 정보 추출
         const userInfo = req.kauth.grant.access_token.content;

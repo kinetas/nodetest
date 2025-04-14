@@ -38,6 +38,6 @@ router.post('/changePassword', findInfoController.changePassword);
 
 // ===================== KeyCloak ==========================
 router.get('/registerKeyCloak', keycloak.protect(), authController.getOrCreateUserFromKeycloak);
-router.delete('/delete', keycloak.protect(), deleteAccountFromKeycloak);
+router.delete('/delete', keycloak.protect(), authController.deleteAccountFromKeycloak);
 
 module.exports = router;

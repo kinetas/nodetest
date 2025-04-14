@@ -14,7 +14,7 @@ router.post('/findUid', findInfoController.findUid); // 아이디 찾기 경로 
 // router.post('/changePassword', findInfoController.changePassword); // 비밀번호 변경 경로 추가
 router.post('/logout', authController.logOut); // 로그아웃 경로 추가
 
-router.delete('/deleteAccount', authController.deleteAccount); // 추가: 계정 탈퇴 경로
+// router.delete('/deleteAccount', authController.deleteAccount); // 추가: 계정 탈퇴 경로
 
 // // JWT 기반에서는 로그아웃 불필요, 클라이언트에서 토큰 제거
 // router.post('/logout', authController.logOut);
@@ -31,13 +31,13 @@ router.post('/logoutToken', authController.logoutToken);
 
 // 계정탈퇴 
 // router.delete('/deleteAccountToken', loginRequired, authController.deleteAccount);
-router.delete('/deleteAccountToken', authController.deleteAccount);
+// router.delete('/deleteAccountToken', authController.deleteAccount);
 
 // 비밀번호 변경
 router.post('/changePassword', findInfoController.changePassword);
 
 // ===================== KeyCloak ==========================
 router.get('/registerKeyCloak', keycloak.protect(), authController.getOrCreateUserFromKeycloak);
-router.delete('/delete', keycloak.protect(), authController.deleteAccountFromKeycloak);
+router.delete('/deleteAccountToken', keycloak.protect(), authController.deleteAccountFromKeycloak);
 
 module.exports = router;

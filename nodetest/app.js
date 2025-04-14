@@ -153,9 +153,14 @@ app.get('/user-info', requireAuth, (req, res) => {
 //     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
 //     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 // });
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+// ✅ 대시보드 접근 시 Keycloak 인증 요구
+app.get('/', keycloak.protect(), (req, res) => {
+    const token = req.kauth.grant.access_token.token;
+    res.redirect(`/dashboard#access_token=${token}`);
 });
+// app.get('/dashboard', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+// });
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });

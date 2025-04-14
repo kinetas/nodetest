@@ -26,10 +26,12 @@ router.post('/loginToken', authController.loginToken);
 
 // 로그아웃 라우터
 // 쿠키에서 토큰을 제거하는 작업은 동기적인 작업이므로, async 처리 불필요
-router.post('/logoutToken', loginRequired, authController.logoutToken);
+// router.post('/logoutToken', loginRequired, authController.logoutToken);
+router.post('/logoutToken', authController.logoutToken);
 
 // ✅ 계정탈퇴 
-router.delete('/deleteAccountToken', loginRequired, authController.deleteAccount);
+// router.delete('/deleteAccountToken', loginRequired, authController.deleteAccount);
+router.delete('/deleteAccountToken', authController.deleteAccount);
 
 // 비밀번호 변경
 router.post('/changePassword', findInfoController.changePassword);

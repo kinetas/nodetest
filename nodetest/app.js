@@ -144,11 +144,15 @@ app.get('/community_missions', (req, res) => {
 });
 
 // ��??���??? �젙蹂�??�� 諛섑?���븯�뒗 �씪�슦�듃 ?��붽��???
-app.get('/user-info', requireAuth, (req, res) => {
-    // res.json({ userId: req.session.user.id }); //세션기반
-    res.json({ userId: req.currentUserId });    //토큰기반
-});
-
+// app.get('/user-info', requireAuth, (req, res) => {
+//     // res.json({ userId: req.session.user.id }); //세션기반
+//     res.json({ userId: req.currentUserId });    //토큰기반
+// });
+app.get('/user-info', keycloak.protect(), (req, res) => {
+    const userInfo = req.kauth.grant.access_token.content;
+    const userId = userInfo.preferred_username || userInfo.sub;
+    res.json({ userId });
+  });
 
 
 app.get('/', (req, res) => {
@@ -196,7 +200,6 @@ app.get('/cVote/details/', (req, res) => {
 app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
-
 
 // app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
 app.use('/chat', timeConverterMiddleware, chatRoutes);

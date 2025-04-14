@@ -810,7 +810,7 @@
             localStorage.removeItem('token'); // 클라이언트에서 토큰 제거
 
             const logoutUrl = 'http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout' +
-                '?redirect_uri=http://27.113.11.48:3000';
+                '?post_logout_redirect_uri=http://27.113.11.48:3000';
 
             window.location.href = logoutUrl; // Keycloak 로그아웃 → 리디렉션
         }

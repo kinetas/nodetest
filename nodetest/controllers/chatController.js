@@ -144,82 +144,80 @@ const Room = require('../models/roomModel');
 
 // =========================================token================================================
 const jwt = require('jsonwebtoken');
-// const axios = require('axios');
+const axios = require('axios');
 
-// let keycloakPublicKey = null;
+let keycloakPublicKey = null;
 
-// // PEM 형식으로 변환
-// function convertCertToPEM(cert) {
-//   return `-----BEGIN CERTIFICATE-----\n${cert.match(/.{1,64}/g).join('\n')}\n-----END CERTIFICATE-----\n`;
-// }
+// PEM 형식으로 변환
+function convertCertToPEM(cert) {
+  return `-----BEGIN CERTIFICATE-----\n${cert.match(/.{1,64}/g).join('\n')}\n-----END CERTIFICATE-----\n`;
+}
 
-// // Keycloak 공개키 가져오기
-// async function fetchKeycloakPublicKey() {
-//   try {
-//     const realmUrl = `${process.env.KEYCLOAK_BASE_URL}/realms/${process.env.KEYCLOAK_REALM}`;
-//     const { data } = await axios.get(`${realmUrl}`);
-//     const cert = data.public_key;
-//     keycloakPublicKey = convertCertToPEM(cert);
-//     console.log("🔐 Keycloak 공개키 로딩 완료");
-//   } catch (error) {
-//     console.error("❌ Keycloak 공개키 가져오기 실패:", error.message);
-//   }
-// }
-
-// // 최초 실행 시 1회 가져오기
-// fetchKeycloakPublicKey();
-
-// async function getUserIdFromSocket(socket) {
-//   try {
-//     const token = socket.handshake.auth?.token;
-
-//     console.log("🔑 수신된 토큰:", token);
-//     if (!token) {
-//       console.error("❌ 토큰 누락");
-//       return null;
-//     }
-
-//     // 공개키가 없으면 다시 시도
-//     if (!keycloakPublicKey) {
-//       await fetchKeycloakPublicKey();
-//       if (!keycloakPublicKey) {
-//         console.error("❌ Keycloak 공개키가 존재하지 않음");
-//         return null;
-//       }
-//     }
-
-//     const decoded = jwt.verify(token, keycloakPublicKey, { algorithms: ['RS256'] });
-//     console.log("✅ 디코딩된 유저 정보:", decoded);
-
-//     return decoded.preferred_username || decoded.sub || null; // preferred_username = 사용자 ID
-//   } catch (err) {
-//     console.error("❌ JWT 디코딩 실패:", err.message);
-//     return null;
-//   }
-// }
-
-
-// ✅ JWT 토큰에서 userId 추출하는 유틸 함수
-function getUserIdFromSocket(socket) {
+// Keycloak 공개키 가져오기
+async function fetchKeycloakPublicKey() {
   try {
-    // const token = socket.handshake.auth?.token;
-    
-    // console.log("🔑 수신된 토큰:", token); // 로그 추가
-    // if (!token) {
-    //   console.error("❌ 토큰 누락");
-    //   return null;
-    // }
-    // const secretKey = process.env.JWT_SECRET_KEY || "secret-key";
-    // const decoded = jwt.verify(token, secretKey);
-    // console.log("✅ 디코딩된 유저 ID:", decoded.userId); // 로그 추가
-    // return decoded.userId;
-    console.log("유저아이디: ", req.currentUserId);
-    return req.currentUserId; // ✅ Keycloak 기반
+    const realmUrl = `${process.env.KEYCLOAK_BASE_URL}/realms/${process.env.KEYCLOAK_REALM}`;
+    const { data } = await axios.get(`${realmUrl}`);
+    const cert = data.public_key;
+    keycloakPublicKey = convertCertToPEM(cert);
+    console.log("🔐 Keycloak 공개키 로딩 완료");
+  } catch (error) {
+    console.error("❌ Keycloak 공개키 가져오기 실패:", error.message);
+  }
+}
+
+// 최초 실행 시 1회 가져오기
+fetchKeycloakPublicKey();
+
+async function getUserIdFromSocket(socket) {
+  try {
+    const token = socket.handshake.auth?.token;
+
+    console.log("🔑 수신된 토큰:", token);
+    if (!token) {
+      console.error("❌ 토큰 누락");
+      return null;
+    }
+
+    // 공개키가 없으면 다시 시도
+    if (!keycloakPublicKey) {
+      await fetchKeycloakPublicKey();
+      if (!keycloakPublicKey) {
+        console.error("❌ Keycloak 공개키가 존재하지 않음");
+        return null;
+      }
+    }
+
+    const decoded = jwt.verify(token, keycloakPublicKey, { algorithms: ['RS256'] });
+    console.log("✅ 디코딩된 유저 정보:", decoded);
+
+    return decoded.preferred_username || decoded.sub || null; // preferred_username = 사용자 ID
   } catch (err) {
     console.error("❌ JWT 디코딩 실패:", err.message);
     return null;
   }
 }
+
+
+// // ✅ JWT 토큰에서 userId 추출하는 유틸 함수
+// function getUserIdFromSocket(socket) {
+//   try {
+//     const token = socket.handshake.auth?.token;
+    
+//     console.log("🔑 수신된 토큰:", token); // 로그 추가
+//     if (!token) {
+//       console.error("❌ 토큰 누락");
+//       return null;
+//     }
+//     const secretKey = process.env.JWT_SECRET_KEY || "secret-key";
+//     const decoded = jwt.verify(token, secretKey);
+//     console.log("✅ 디코딩된 유저 ID:", decoded.userId); // 로그 추가
+//     return decoded.userId;
+//   } catch (err) {
+//     console.error("❌ JWT 디코딩 실패:", err.message);
+//     return null;
+//   }
+// }
 
 exports.createRoom = (socket, roomName) => {
   const r_id = Math.random().toString(36).substr(2, 9);

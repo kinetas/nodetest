@@ -799,11 +799,20 @@
             });
         }
 
-        // ✅ 로그아웃
+        // // ✅ 로그아웃
+        // function logout() {
+        //     localStorage.removeItem('token');
+        //     alert("로그아웃되었습니다.");
+        //     window.location.href = '/';
+        // }
         function logout() {
-            localStorage.removeItem('token');
-            alert("로그아웃되었습니다.");
-            window.location.href = '/';
+            const token = localStorage.getItem('token');
+            localStorage.removeItem('token'); // 클라이언트에서 토큰 제거
+
+            const logoutUrl = 'http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout' +
+                '?redirect_uri=http://27.113.11.48:3000';
+
+            window.location.href = logoutUrl; // Keycloak 로그아웃 → 리디렉션
         }
 
         // ✅ 계정탈퇴

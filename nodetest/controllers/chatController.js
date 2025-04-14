@@ -232,7 +232,7 @@ exports.createRoom = (socket, roomName) => {
 
 exports.joinRoom = async (socket, { r_id, u2_id }) => {
   try {
-    const u1_id = getUserIdFromSocket(socket);
+    const u1_id = await getUserIdFromSocket(socket);
     console.log("🧾 joinRoom - r_id:", r_id, " / u1_id:", u1_id, " / u2_id:", u2_id);
     if (!r_id || !u1_id) {
       console.error(`Missing r_id or u1_id:`, { r_id, u1_id });

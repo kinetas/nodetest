@@ -155,11 +155,11 @@ app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-// ✅ 대시보드 접근 시 Keycloak 인증 요구
-app.get('/', keycloak.protect(), (req, res) => {
-    const token = req.kauth.grant.access_token.token;
-    res.redirect(`/dashboard#access_token=${token}`);
-});
+// // ✅ 대시보드 접근 시 Keycloak 인증 요구
+// app.get('/', keycloak.protect(), (req, res) => {
+//     const token = req.kauth.grant.access_token.token;
+//     res.redirect(`/dashboard#access_token=${token}`);
+// });
 // app.get('/dashboard', (req, res) => {
 //     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 // });
@@ -197,36 +197,36 @@ app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
 
-// app.use('/chat', chatRoutes);
-app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes);
+
+// app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
+app.use('/chat', timeConverterMiddleware, chatRoutes);
 
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
-// app.use('/dashboard', missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
-app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
+// app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
+app.use('/dashboard', timeConverterMiddleware, missionRoutes); 
 
-// app.use('/api/rooms', roomRoutes);
-app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes);
+// app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT토큰
+app.use('/api/rooms', timeConverterMiddleware, roomRoutes);
 
-// app.use('/api/missions', missionRoutes); // 미션 �????�� ?��?��?�� ?���???
-app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); // 미션 �????�� ?��?��?�� ?���???
+// app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); //JWT토큰
+app.use('/api/missions', timeConverterMiddleware, missionRoutes);
 
-// app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
-app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
+// app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로 //JWT토큰
+app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로
 
-// userInfoRoutes ?���??
-// app.use('/api/user-info', userInfoRoutes);
+// userInfoRoutes 
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 
-// 친구 리스?�� ?��?��?�� 추�??
-// app.use('/dashboard/friends', friendRoutes);
-app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes);
+// app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes); //JWT토큰
+app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
 
-// app.use('/api/cVote', cVoteRoutes);
-app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
 
-// app.use('/api/comumunity_missions', c_missionRoutes);
-app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
+// app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes); //JWT토큰
+app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
+
+// app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes); //JWT토큰
+app.use('/api/comumunity_missions', timeConverterMiddleware, c_missionRoutes);
 
 // //AI관련
 app.use('/api/ai', aiRoutes);
@@ -253,11 +253,6 @@ cron.schedule('0 0 * * *', async () => {
     console.log('���� ���� ���� �۾� ����');
     await checkAndUpdateMissions();
 });
-// // ======== ?��?�� JWT ============
-// // JWT ?���??? 미들?��?���??? 보호?�� ?��?��?��
-// app.use('/dashboard', require('./middleware/authMiddleware'), missionRoutes);
-// app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
-// app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
 //const { sendNotificationController } = require('./controllers/sendNotificationController');
 const {sendNotificationController} = require('./controllers/notificationController');

@@ -53,7 +53,7 @@
         //=================keycloak======================
         document.getElementById("register-btn").addEventListener("click", () => {
         // 👉 Keycloak의 회원가입 URL
-        const registrationUrl = "http://27.113.11.48:8080/realms/master/protocol/openid-connect/auth?client_id=nodetest&response_type=code&scope=openid&redirect_uri=http://27.113.11.48:3000/dashboard";
+        const registrationUrl = "http://27.113.11.48:8080/realms/master/login-actions/registration?client_id=nodetest&redirect_uri=http://27.113.11.48:3000/index";
         window.location.href = registrationUrl;
         });
     </script>

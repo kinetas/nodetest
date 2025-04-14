@@ -592,6 +592,16 @@
         // }
 
         //=================token=================
+
+        // 👉 Keycloak에서 토큰 자동으로 추출해서 저장
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const kcAccessToken = urlParams.get('access_token');
+
+        if (kcAccessToken) {
+            localStorage.setItem('token', kcAccessToken); // ✅ 저장
+            history.replaceState(null, null, window.location.pathname); // URL 깔끔하게
+        }
+
         const token = localStorage.getItem('token');
 
         if (!token) {

@@ -5,6 +5,7 @@ const Room = require('../models/roomModel');
 const RMessage = require('../models/messageModel'); // r_message 모델 가져오기
 const NotificationLog = require('../models/notificationModel'); // r_message 모델 가져오기
 const { Op } = require('sequelize'); // 추가: Sequelize의 Op 객체 가져오기
+const axios = require('axios');
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
 
@@ -38,7 +39,7 @@ exports.getOrCreateUserFromKeycloak = async (req, res) => {
       });
   
       if (created) {
-        console.log(`[✔] Keycloak 사용자가 DB에 등록됨: ${u_id}`);
+        console.log(`Keycloak 사용자가 DB에 등록됨: ${u_id}`);
 
         // 방 생성 (응답 처리 없이 결과만 확인)
         const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
@@ -48,15 +49,84 @@ exports.getOrCreateUserFromKeycloak = async (req, res) => {
         }
 
       } else {
-        console.log(`[✔] Keycloak 사용자가 이미 DB에 존재함: ${u_id}`);
+        console.log(`Keycloak 사용자가 이미 DB에 존재함: ${u_id}`);
       }
   
       res.status(200).json({ success: true, user });
     } catch (err) {
-      console.error('[❌] 사용자 등록 오류:', err);
+      console.error('사용자 등록 오류:', err);
       res.status(500).json({ success: false, message: '사용자 등록 중 오류 발생' });
     }
-  };
+};
+
+const {
+    KEYCLOAK_ADMIN_USER,
+    KEYCLOAK_ADMIN_PASS,
+    KEYCLOAK_BASE_URL,
+    KEYCLOAK_REALM,
+  } = process.env;
+
+  exports.deleteAccountFromKeycloak = async (req, res) => {
+    try {
+        // 🔐 Keycloak 토큰에서 사용자 정보 추출
+        const userInfo = req.kauth.grant.access_token.content;
+        const username = userInfo.preferred_username;
+
+        // 1. Keycloak 관리자 토큰 발급
+        const tokenRes = await axios.post(
+            `${KEYCLOAK_BASE_URL}/realms/master/protocol/openid-connect/token`,
+            new URLSearchParams({
+                grant_type: 'password',
+                client_id: KEYCLOAK_CLIENT_ID,
+                username: KEYCLOAK_ADMIN_USER,
+                password: KEYCLOAK_ADMIN_PASS
+            }),
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        );
+
+        const adminToken = tokenRes.data.access_token;
+
+        // 2. 사용자 UUID 조회
+        const userSearchRes = await axios.get(
+            `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users`,
+            {
+                headers: { Authorization: `Bearer ${adminToken}` },
+                params: { username }
+            }
+        );
+
+        if (!userSearchRes.data.length) {
+            return res.status(404).json({
+                success: false,
+                message: '🔍 Keycloak 계정을 찾을 수 없습니다.'
+            });
+        }
+
+        const kcUserId = userSearchRes.data[0].id;
+
+        // 3. Keycloak 계정 삭제
+        await axios.delete(
+            `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${kcUserId}`,
+            { headers: { Authorization: `Bearer ${adminToken}` } }
+        );
+
+        // 4. 로컬 DB 사용자 삭제
+        await User.destroy({ where: { u_id: username } });
+
+        return res.json({
+            success: true,
+            message: `✅ ${username} 계정이 Keycloak 및 DB에서 삭제되었습니다.`
+        });
+    } catch (err) {
+        console.error('❌ Keycloak 계정 삭제 오류:', err.message);
+        return res.status(500).json({
+            success: false,
+            message: '계정 삭제 중 오류 발생',
+            error: err.message
+        });
+    }
+};
+
 
 // 로그인 처리 함수 - 쿠키
 exports.login = async (req, res) => {

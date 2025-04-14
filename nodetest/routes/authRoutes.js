@@ -29,7 +29,7 @@ router.post('/loginToken', authController.loginToken);
 // router.post('/logoutToken', loginRequired, authController.logoutToken);
 router.post('/logoutToken', authController.logoutToken);
 
-// ✅ 계정탈퇴 
+// 계정탈퇴 
 // router.delete('/deleteAccountToken', loginRequired, authController.deleteAccount);
 router.delete('/deleteAccountToken', authController.deleteAccount);
 
@@ -38,5 +38,6 @@ router.post('/changePassword', findInfoController.changePassword);
 
 // ===================== KeyCloak ==========================
 router.get('/registerKeyCloak', keycloak.protect(), authController.getOrCreateUserFromKeycloak);
+router.delete('/delete', keycloak.protect(), deleteAccountFromKeycloak);
 
 module.exports = router;

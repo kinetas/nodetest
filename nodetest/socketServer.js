@@ -28,21 +28,66 @@ let serviceAccount;
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
 
-function getUserIdFromSocket(socket) {
+
+const axios = require('axios');
+
+let keycloakPublicKey = null;
+
+function convertCertToPEM(cert) {
+  return `-----BEGIN CERTIFICATE-----\n${cert.match(/.{1,64}/g).join('\n')}\n-----END CERTIFICATE-----\n`;
+}
+
+async function fetchKeycloakPublicKey() {
+  try {
+    const realmUrl = `${process.env.KEYCLOAK_BASE_URL}/realms/${process.env.KEYCLOAK_REALM}`;
+    const { data } = await axios.get(realmUrl);
+    const cert = data.public_key;
+    keycloakPublicKey = convertCertToPEM(cert);
+    console.log("🔐 Keycloak 공개키 로딩 완료");
+  } catch (error) {
+    console.error("❌ Keycloak 공개키 가져오기 실패:", error.message);
+  }
+}
+
+fetchKeycloakPublicKey();
+
+async function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
     if (!token) {
-      console.error('❌ 소켓 연결 시 토큰이 없습니다.');
+      console.error("❌ 소켓 토큰 누락");
       return null;
     }
-    const decoded = jwt.verify(token, secretKey);
-    console.log('✅ 토큰 디코딩 성공:', decoded);
-    return decoded.userId;
+
+    if (!keycloakPublicKey) {
+      await fetchKeycloakPublicKey();
+      if (!keycloakPublicKey) return null;
+    }
+
+    const decoded = jwt.verify(token, keycloakPublicKey, { algorithms: ['RS256'] });
+    console.log("✅ Keycloak JWT 디코딩:", decoded);
+    return decoded.preferred_username || decoded.sub;
   } catch (err) {
-    console.error('❌ 토큰 디코딩 실패:', err.message);
+    console.error("❌ JWT 디코딩 실패:", err.message);
     return null;
   }
 }
+
+// function getUserIdFromSocket(socket) {
+//   try {
+//     const token = socket.handshake.auth?.token;
+//     if (!token) {
+//       console.error('❌ 소켓 연결 시 토큰이 없습니다.');
+//       return null;
+//     }
+//     const decoded = jwt.verify(token, secretKey);
+//     console.log('✅ 토큰 디코딩 성공:', decoded);
+//     return decoded.userId;
+//   } catch (err) {
+//     console.error('❌ 토큰 디코딩 실패:', err.message);
+//     return null;
+//   }
+// }
 
 try {
   // JSON 파일에서 객체로 변환
@@ -254,38 +299,73 @@ socket.on('markAsRead', async (data) => {
 });
 */
 // 방 입장 처리
+// socket.on('joinRoom', async (data) => {
+//   let { r_id, u2_id } = data;
+//   // const u1_id = data.u1_id || socket.handshake.query.u1_id;
+//   const u1_id = getUserIdFromSocket(socket); // ✅ 여기 핵심
+//   if (!u2_id) {
+//     const room = await Room.findOne({ where: { r_id } });
+//     u2_id = room ? room.u2_id : null;
+// }
+
+// if (!u1_id || !u2_id) {
+//     console.error('Invalid joinRoom data:', { r_id, u1_id, u2_id });
+//     return;
+// }
+//   try {
+//       // 소켓 방 참여
+//       socket.join(r_id);
+//       console.log(`User ${u1_id} joined room ${r_id}`);
+//       // 메시지 읽음 상태 갱신
+//       const updatedCount = await RMessage.update(
+//           { is_read: 0 },
+//           { where: { r_id, u2_id: u1_id, is_read: 1 } }
+//       );
+//       console.log(`Updated ${updatedCount} messages as read for room ${r_id}`);
+
+//       // 초기 메시지 로드
+//       //const messages = await chatController.getMessages(r_id);
+//       //socket.emit('initialMessages', messages);
+//   } catch (error) {
+//       console.error('Error in joinRoom:', error);
+//       socket.emit('errorMessage', 'Failed to join room or load messages');
+//   }
+// });
+
 socket.on('joinRoom', async (data) => {
   let { r_id, u2_id } = data;
-  // const u1_id = data.u1_id || socket.handshake.query.u1_id;
-  const u1_id = getUserIdFromSocket(socket); // ✅ 여기 핵심
+  const u1_id = await getUserIdFromSocket(socket); // ✅ Keycloak에서 추출
+
+  if (!u1_id) {
+    console.error("❌ 사용자 인증 실패");
+    return;
+  }
+
   if (!u2_id) {
     const room = await Room.findOne({ where: { r_id } });
     u2_id = room ? room.u2_id : null;
-}
+  }
 
-if (!u1_id || !u2_id) {
-    console.error('Invalid joinRoom data:', { r_id, u1_id, u2_id });
+  if (!u2_id) {
+    console.error("❌ 상대방 ID(u2_id) 누락");
     return;
-}
-  try {
-      // 소켓 방 참여
-      socket.join(r_id);
-      console.log(`User ${u1_id} joined room ${r_id}`);
-      // 메시지 읽음 상태 갱신
-      const updatedCount = await RMessage.update(
-          { is_read: 0 },
-          { where: { r_id, u2_id: u1_id, is_read: 1 } }
-      );
-      console.log(`Updated ${updatedCount} messages as read for room ${r_id}`);
+  }
 
-      // 초기 메시지 로드
-      //const messages = await chatController.getMessages(r_id);
-      //socket.emit('initialMessages', messages);
-  } catch (error) {
-      console.error('Error in joinRoom:', error);
-      socket.emit('errorMessage', 'Failed to join room or load messages');
+  try {
+    socket.join(r_id);
+    console.log(`👤 ${u1_id} 방 입장: ${r_id}`);
+
+    await RMessage.update(
+      { is_read: 0 },
+      { where: { r_id, u2_id: u1_id, is_read: 1 } }
+    );
+
+    // 클라이언트에 알림 보내는 로직 추가 가능
+  } catch (err) {
+    console.error("🚨 방 입장 처리 실패:", err);
   }
 });
+
 
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)

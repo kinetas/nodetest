@@ -294,14 +294,18 @@ const IFriend = require('../models/i_friendModel');
 const TFriend = require('../models/t_friendModel');
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController');
+const getCurrentUserId = (req) => {
+    return req.currentUserId || null; // app.js에서 설정된 currentUserId 사용
+  };
 
 // i_friend 테이블의 f_id 리스트 출력
 exports.printIFriend = async (req, res) => {
     try {
+        const u_id = getCurrentUserId(req); // ✅ Keycloak 기반 변경
         const iFriends = await IFriend.findAll({
             attributes: ['f_id'],
             // where: { u_id: req.currentUserId }, // ✅ JWT로부터 추출된 ID 사용
-            where: { u_id: req.kauth?.grant?.access_token?.content?.preferred_username },
+            where: { u_id },
         });
         const friendList = iFriends.map(friend => friend.f_id);
         res.json({ success: true, iFriends: friendList });

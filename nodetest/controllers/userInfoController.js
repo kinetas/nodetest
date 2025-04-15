@@ -3,22 +3,28 @@ const User = require('../models/userModel'); // User 모델 가져오기
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
-// JWT로부터 사용자 ID 추출하는 유틸 함수
-const extractUserIdFromToken = (req) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return null;
-    try {
-      const decoded = jwt.verify(token, secretKey);
-      return decoded.userId;
-    } catch (err) {
-      return null;
-    }
-  };
-  
+// // JWT로부터 사용자 ID 추출하는 유틸 함수
+// const extractUserIdFromToken = (req) => {
+//     const token = req.headers.authorization?.split(' ')[1];
+//     if (!token) return null;
+//     try {
+//       const decoded = jwt.verify(token, secretKey);
+//       return decoded.userId;
+//     } catch (err) {
+//       return null;
+//     }
+//   };
+
+
+// ✅ Keycloak 미들웨어로부터 사용자 ID 추출
+const getCurrentUserId = (req) => {
+  return req.currentUserId || null; // app.js에서 설정된 currentUserId 사용
+};
+
   // 로그인한 사용자의 u_id 반환
   exports.getLoggedInUserId = (req, res) => {
     // const userId = extractUserIdFromToken(req);  //JWT 기반
-    const userId = req.currentUserId; // ✅ Keycloak 기반
+    const userId = getCurrentUserId(req); // ✅ Keycloak 기반
     if (!userId) {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
@@ -28,7 +34,7 @@ const extractUserIdFromToken = (req) => {
   // 로그인한 사용자의 u_nickname 반환
   exports.getLoggedInUserNickname = async (req, res) => {
     // const userId = extractUserIdFromToken(req);
-    const userId = req.currentUserId; // ✅ Keycloak 기반
+    const userId = getCurrentUserId(req); // ✅ Keycloak 기반
     if (!userId) {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
@@ -51,7 +57,7 @@ const extractUserIdFromToken = (req) => {
   // 로그인한 사용자의 모든 정보 반환
   exports.getLoggedInUserAll = async (req, res) => {
     // const userId = extractUserIdFromToken(req);
-    const userId = req.currentUserId; // ✅ Keycloak 기반
+    const userId = getCurrentUserId(req); // ✅ Keycloak 기반
     if (!userId) {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }

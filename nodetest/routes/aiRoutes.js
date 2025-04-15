@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const aiController = require('../controllers/AIController');
-const { sequelize } = require('../models/missionModel'); // 또는 DB 설정 경로
+const { sequelize } = require("../models"); // 또는 DB 설정 경로
 
 
 // // FastAPI 주소

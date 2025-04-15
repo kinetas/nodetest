@@ -1,0 +1,329 @@
+<!-- public/rooms.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+    <!-- Socket.io 클라이언트 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>방 목록</h1>
+    <ul id="roomList">Loading rooms...</ul> <!-- 방 목록을 표시할 요소 -->
+    <input type="text" id="userIdInput" placeholder="추가/삭제할 유저 ID 입력">
+    <input type="text" id="roomNameInput" placeholder="방 이름 입력"> <!-- 방 이름 입력 추가 -->
+    <input type="text" id="roomTypeInput" placeholder="방 타입 입력"> <!-- 수정 -->
+    <button onclick="addRoom()">방 추가</button>
+    <button onclick="deleteRoom()">방 삭제</button>
+    <button onclick="updateRoomName()">방 이름 변경</button>
+
+    <script>
+
+//         // // JWT 토큰 가져오기
+//         // const token = localStorage.getItem('jwt');
+//         // if (!token) {
+//         //     alert("로그인이 필요합니다.");
+//         //     window.location.href = '/'; // 로그인 페이지로 리디렉션
+//         // }
+
+//        /* const socket = io("http://54.180.54.31:3001",{
+//             path: '/socket.io'
+//             // auth: { token }, // JWT 토큰을 소켓 인증에 추가
+//         });
+//         socket.on("connect", () => {
+//             console.log("서버에 연결되었습니다.");
+//         });
+//         */
+//         // sessionStorage.setItem('u1_id', u1_id);
+//         // const u1_id = sessionStorage.getItem('u1_id');
+//         const u1_id = sessionStorage.getItem('u1_id'); // 먼저 u1_id를 선언하고 값을 가져옴
+//         /*if (!u1_id) {
+//             const sessionUserId = "세션에서 가져온 u1_id 값"; // 여기에 실제 세션 데이터 또는 기본값을 설정
+//             sessionStorage.setItem('u1_id', sessionUserId); // sessionStorage에 값 설정
+//         }*/
+//         // 페이지 로드 시 방 목록 가져오기
+//         fetch('/api/rooms')
+
+//         // // 방 목록 가져오기
+//         // fetch('/api/rooms', {
+//         //     method: 'GET',
+//         //     headers: {
+//         //         Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+//         //     },
+//         // })
+
+//             .then(response => response.json())
+//             .then(data => {
+//                 const roomListElement = document.getElementById('roomList');
+//                 roomListElement.innerHTML = '';
+//                 if (data.rooms && data.rooms.length > 0) {
+//                     data.rooms.forEach(room => {
+//                         const listItem = document.createElement('li');
+//                         // listItem.textContent = `${room.u1_id} - ${room.u2_id}`;
+//                         listItem.textContent = room.r_title; // r_title로 방 이름 출력
+                        
+//                         // 방 입장 버튼 추가
+//                         const enterButton = document.createElement('button');
+//                         enterButton.textContent = '입장';
+//                         enterButton.onclick = () => joinRoom(room.r_id, room.u2_id); // 방 ID를 전달
+//                         listItem.appendChild(enterButton);
+
+//                         roomListElement.appendChild(listItem);
+//                     });
+//                 } else {
+//                     roomListElement.textContent = '방이 없습니다.';
+//                 }
+//             })
+//             .catch(error => {
+//                 console.error('Error:', error);
+//                 document.getElementById('roomList').textContent = '방 목록을 불러오는 데 실패했습니다.';
+//             });
+//           // 방 입장 함수
+//       //  function enterRoom(r_id, u2_id) {
+//       //      window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+//       //  }
+//       /*
+//         function enterRoom(r_id, u2_id) {
+//         fetch('/api/rooms/enter', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({r_id, u2_id})
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             if (data.message) {
+//                 alert(data.message);
+//                 window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error:', error);
+//             alert('방 입장 중 오류가 발생했습니다.');
+//         });
+//     }
+// */
+// /*
+// function joinRoom(r_id, u2_id) {
+//     const u1_id = sessionStorage.getItem('user_id');
+//     if (!u2_id) {
+//         console.error(`u2_id가 누락되었습니다. r_id=${r_id}`);
+//         return;
+//     }
+//     console.log(`Joining room: r_id=${r_id}`);
+
+//     socket.emit('joinRoom', { r_id, u1_id, u2_id });
+    
+//     window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+    
+//     socket.on('initialMessages', (messages) => {
+//         console.log('Initial Messages:', messages);
+//         });
+    
+// }
+//  */ function joinRoom(r_id, u2_id) {
+//     const u1_id = sessionStorage.getItem('user_id'); // 로그인된 사용자 ID
+//     if (!u1_id || !u2_id || !r_id) {
+//         console.error("필수 정보가 누락되었습니다.", { r_id, u1_id, u2_id });
+//         return;
+//     }
+
+//     // URL에 필요한 정보를 추가하여 chat.html로 이동
+//     console.log(`Joining room: r_id=${r_id}, u2_id=${u2_id}`);
+//     window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+// }
+//         // 방 추가 함수
+//         function addRoom() {
+//             const u2_id = document.getElementById('userIdInput').value;
+//             const roomName = document.getElementById('roomNameInput').value; // 입력된 방 이름
+//             const r_type = document.getElementById('roomTypeInput').value; // 방 타입 값 가져오기
+//             fetch('/api/rooms', {
+//                 method: 'POST',
+//                 headers: { 'Content-Type': 'application/json' },
+
+//                 // headers: {
+//                 //     'Content-Type': 'application/json',
+//                 //     Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+//                 // },
+
+//                 // body: JSON.stringify({ u1_id: userId, u2_id })
+//                 // body: JSON.stringify({ u1_id: userId, u2_id, r_type }) 
+//                 body: JSON.stringify({ u2_id, roomName, r_type }) // roomName 추가 <!-- 수정 -->
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//                 alert(data.message);
+//                 location.reload();
+//             });
+//         }
+
+//         // 방 삭제 함수
+//         function deleteRoom() {
+//             const u2_id = document.getElementById('userIdInput').value;
+//             let r_type = document.getElementById('roomTypeInput').vaule;
+//             if (!r_type){
+//                 r_type = "general";
+//             }
+//             fetch(`/api/rooms/${u2_id}/${r_type}`, {
+//                 method: 'DELETE',
+//                 headers: { 'Content-Type': 'application/json' },
+
+//                 // headers: {
+//                 //     'Content-Type': 'application/json',
+//                 //     Authorization: `Bearer ${token}`, // JWT 기반 인증 헤더 추가
+//                 // },
+
+//                 body: JSON.stringify({ u1_id }) // u1_id 포함
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//                 alert(data.message);
+//                 location.reload();
+//             });
+//         }
+
+//         //방 이름 변경
+//         function updateRoomName() {
+//             const u2_id = document.getElementById('userIdInput').value;
+//             const newRoomName = document.getElementById('roomNameInput').value;
+//             const r_type = document.getElementById('roomTypeInput').value;
+
+//             fetch('/api/rooms/update', {
+//                 method: 'PUT',
+//                 headers: { 'Content-Type': 'application/json' },
+//                 body: JSON.stringify({ u2_id, newRoomName, r_type })
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//                 alert(data.message);
+//                 location.reload();
+//             })
+//             .catch(error => {
+//                 console.error('Error:', error);
+//                 alert(`방 이름 변경 중 오류(${error})가 발생했습니다.`);
+//             });
+//         }
+
+
+//         // 실시간으로 방 목록 업데이트 (예: 방이 추가되거나 삭제되었을 때)
+//         socket.on("roomUpdated", () => {
+//             // 방 목록 새로고침
+//             location.reload();
+//         });
+
+        //=====================================token======================================
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            window.location.href = '/';
+        }
+
+        // ✅ 방 목록 불러오기
+        fetch('/api/rooms', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('roomList');
+            list.innerHTML = '';
+            (data.rooms || []).forEach(room => {
+                const li = document.createElement('li');
+                li.textContent = `${room.r_title}`;
+                const btn = document.createElement('button');
+                btn.textContent = "입장";
+                btn.onclick = () => joinRoom(room.r_id, room.u2_id);
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        });
+
+        function addRoom() {
+            const u2_id = document.getElementById('userIdInput').value;
+            const roomName = document.getElementById('roomNameInput').value;
+            const r_type = document.getElementById('roomTypeInput').value;
+            fetch('/api/rooms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}` // ✅ JWT 적용
+                },
+                body: JSON.stringify({ u2_id, roomName, r_type })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function deleteRoom() {
+            const u2_id = document.getElementById('userIdInput').value;
+            const r_type = document.getElementById('roomTypeInput').value || 'general';
+            fetch(`/api/rooms/${u2_id}/${r_type}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function updateRoomName() {
+            const u2_id = document.getElementById('userIdInput').value;
+            const newRoomName = document.getElementById('roomNameInput').value;
+            const r_type = document.getElementById('roomTypeInput').value;
+            fetch('/api/rooms/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ u2_id, newRoomName, r_type })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function joinRoom(r_id, u2_id) {
+            fetch('/api/rooms/enter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ r_id, u2_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+            });
+        }
+
+    </script>
+</body>
+</html>

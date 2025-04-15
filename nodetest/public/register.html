@@ -6,7 +6,7 @@
     <title>회원가입</title>
 </head>
 <body>
-    <h1>회원가입</h1>
+    <!-- <h1>회원가입</h1>
     <form id="registerForm">
         <input type="text" id="u_id" placeholder="아이디" required><br><br>
         <input type="password" id="u_password" placeholder="비밀번호" required><br><br>
@@ -16,51 +16,45 @@
         <input type="text" id="u_mail" placeholder="메일" required><br><br>
         <button type="submit">회원가입</button>
     </form>
-    <div id="result"></div>
+    <div id="result"></div> -->
+
+    <!-- ====================keycloak======================== -->
+    <h1>회원가입</h1>
+    <p>Keycloak을 통해 회원가입을 진행합니다.</p>
+    <button id="register-btn">회원가입</button>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const u_id = document.getElementById('u_id').value;
-            const u_password = document.getElementById('u_password').value;
-            const u_nickname = document.getElementById('u_nickname').value;
-            const u_name = document.getElementById('u_name').value;
-            const u_birth = document.getElementById('u_birth').value;
-            const u_mail = document.getElementById('u_mail').value;
+        // document.getElementById('registerForm').addEventListener('submit', function(e) {
+        //     e.preventDefault();
+        //     const u_id = document.getElementById('u_id').value;
+        //     const u_password = document.getElementById('u_password').value;
+        //     const u_nickname = document.getElementById('u_nickname').value;
+        //     const u_name = document.getElementById('u_name').value;
+        //     const u_birth = document.getElementById('u_birth').value;
+        //     const u_mail = document.getElementById('u_mail').value;
 
-            fetch('/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ u_id, u_password, u_nickname, u_name, u_birth, u_mail }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').textContent = data.message;
+        //     fetch('/api/auth/register', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ u_id, u_password, u_nickname, u_name, u_birth, u_mail }),
+        //     })
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         document.getElementById('result').textContent = data.message;
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error:', error);
+        //         document.getElementById('result').textContent = `회원가입 중 ${error}오류가 발생했습니다.`;
+        //     });
+        // });
 
-                // if (data.success) {
-                //     // 회원가입 성공 시 JWT 저장 및 리디렉션
-                //     // 기존 메시지 출력만 주석 처리
-                //     // document.getElementById('result').textContent = data.message;
-
-                //     // ======== JWT 기반 인증 처리 추가 ============
-                //     if (data.token) {
-                //         localStorage.setItem('jwt', data.token); // JWT 저장
-                //         alert('회원가입이 성공적으로 완료되었습니다.');
-                //         window.location.href = '/dashboard'; // 대시보드로 리디렉션
-                //     } else {
-                //         document.getElementById('result').textContent = '회원가입은 성공했지만, 인증 토큰이 없습니다.';
-                //     }
-                // } else {
-                //     // 회원가입 실패 시 메시지 출력
-                //     document.getElementById('result').textContent = data.message;
-                // }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                document.getElementById('result').textContent = `회원가입 중 ${error}오류가 발생했습니다.`;
-            });
+        //=================keycloak======================
+        document.getElementById("register-btn").addEventListener("click", () => {
+        // 👉 Keycloak의 회원가입 URL
+        const registrationUrl = "http://27.113.11.48:8080/realms/master/login-actions/registration?client_id=nodetest&redirect_uri=http://27.113.11.48:3000/index";
+        window.location.href = registrationUrl;
         });
     </script>
 </body>

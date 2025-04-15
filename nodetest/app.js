@@ -19,6 +19,10 @@ const { checkAndUpdateMissions } = require('./controllers/cVoteController');
 require('dotenv').config();
 
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
+const axios = require('axios');
+
+// =========== Keycloak ===========
+const { keycloak, memoryStore } = require('./keycloak');
 
 
 const db = require('./config/db');
@@ -59,8 +63,51 @@ app.use(session({
     //     httpOnly: true,
     //     secure: false, // HTTPS ?��?�� ?�� true�?? ?��?��
     // }
+    store: memoryStore,
     cookie: { maxAge: 24 * 60 * 60 * 1000 } // ?��좏궎�쓽 ��??�슚 湲곌�??? (�뿬湲곗꽌�?�� �븯?���???)
 }));
+
+app.use(keycloak.middleware());
+
+// 🔁 Authorization Code Flow 처리용 콜백
+app.get('/callback', async (req, res) => {
+    const code = req.query.code;
+  
+    if (!code) return res.status(400).send("코드가 없습니다.");
+  
+    try {
+      // Keycloak 서버에 토큰 요청
+      const tokenRes = await axios.post('http://27.113.11.48:8080/realms/master/protocol/openid-connect/token', new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: 'http://27.113.11.48:3000/callback',
+        client_id: 'nodetest',
+        client_secret: 'ptR4hZ66Q6dvBCWzdiySdk57L7Ow2OzE'  // → Keycloak 콘솔에서 확인 가능
+      }), {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+  
+      const { access_token } = tokenRes.data;
+  
+      // 토큰을 파라미터로 전달 (dashboard 페이지에서 처리)
+      res.redirect(`/dashboard#access_token=${access_token}`);
+    } catch (err) {
+      console.error('[토큰 요청 오류]', err.response?.data || err);
+      res.status(500).send("토큰 요청 실패");
+    }
+  });
+
+// // ✅ 루트 경로에서 바로 로그인으로 유도
+// app.get('/', keycloak.protect(), (req, res) => {
+//     const token = req.kauth.grant.access_token.token;
+//     res.redirect(`/dashboard#access_token=${token}`);
+//     // res.redirect('/dashboard');
+// });
+
+//===========키클락 테스트 화면=============
+// app.get('/keycloak-test', keycloak.protect(), (req, res) => {
+//     res.send("Keycloak 인증 성공! 🎉");
+// });
 
 // // ======== ?��?�� JWT ============
 // // JSON ?��?���??? URL ?��코딩 ?��?��
@@ -116,7 +163,7 @@ app.post('/api/rooms/enter', roomController.enterRoom);
 
 
 // �삁�떆: ����?��蹂�??�??? �씪�슦�듃 蹂댄?��
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', keycloak.protect(), (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
     // const userId = req.session.user.id;
     // res.json({ userId });
@@ -126,18 +173,29 @@ app.get('/community_missions', (req, res) => {
 });
 
 // ��??���??? �젙蹂�??�� 諛섑?���븯�뒗 �씪�슦�듃 ?��붽��???
-app.get('/user-info', requireAuth, (req, res) => {
-    // res.json({ userId: req.session.user.id }); //세션기반
-    res.json({ userId: req.currentUserId });    //토큰기반
+// app.get('/user-info', requireAuth, (req, res) => {
+//     // res.json({ userId: req.session.user.id }); //세션기반
+//     res.json({ userId: req.currentUserId });    //토큰기반
+// });
+app.get('/user-info', keycloak.protect(), (req, res) => {
+    const userInfo = req.kauth.grant.access_token.content;
+    const userId = userInfo.preferred_username || userInfo.sub;
+    res.json({ userId });
 });
+
 
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
+// // ✅ 대시보드 접근 시 Keycloak 인증 요구
+// app.get('/', keycloak.protect(), (req, res) => {
+//     const token = req.kauth.grant.access_token.token;
+//     res.redirect(`/dashboard#access_token=${token}`);
+// });
+// app.get('/dashboard', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+// });
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
@@ -172,36 +230,44 @@ app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
 
-// app.use('/chat', chatRoutes);
-app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes);
+
+app.use((req, res, next) => {
+    if (req.kauth?.grant?.access_token?.content?.preferred_username) {
+      req.currentUserId = req.kauth.grant.access_token.content.preferred_username;
+    }
+    next();
+});
+
+
+// app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
+app.use('/chat', timeConverterMiddleware, chatRoutes);
 
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
-// app.use('/dashboard', missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
-app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes); // 誘몄??? �씪�슦�듃?���??? /dashboard濡� �꽕�젙
+// app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
+app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
-// app.use('/api/rooms', roomRoutes);
-app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes);
+// app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT토큰
+app.use('/api/rooms', timeConverterMiddleware, roomRoutes);
 
-// app.use('/api/missions', missionRoutes); // 미션 �????�� ?��?��?�� ?���???
-app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); // 미션 �????�� ?��?��?�� ?���???
+// app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); //JWT토큰
+app.use('/api/missions', timeConverterMiddleware, missionRoutes);
 
-// app.use('/result', resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
-app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로?�� ?��?��?�� ?���???
+// app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로 //JWT토큰
+app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로
 
-// userInfoRoutes ?���??
-// app.use('/api/user-info', userInfoRoutes);
+// userInfoRoutes 
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 
-// 친구 리스?�� ?��?��?�� 추�??
-// app.use('/dashboard/friends', friendRoutes);
-app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes);
+// app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes); //JWT토큰
+app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
 
-// app.use('/api/cVote', cVoteRoutes);
-app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes);
 
-// app.use('/api/comumunity_missions', c_missionRoutes);
-app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes);
+// app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes); //JWT토큰
+app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
+
+// app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes); //JWT토큰
+app.use('/api/comumunity_missions', timeConverterMiddleware, c_missionRoutes);
 
 // //AI관련
 app.use('/api/ai', aiRoutes);
@@ -228,11 +294,6 @@ cron.schedule('0 0 * * *', async () => {
     console.log('���� ���� ���� �۾� ����');
     await checkAndUpdateMissions();
 });
-// // ======== ?��?�� JWT ============
-// // JWT ?���??? 미들?��?���??? 보호?�� ?��?��?��
-// app.use('/dashboard', require('./middleware/authMiddleware'), missionRoutes);
-// app.use('/api/rooms', require('./middleware/authMiddleware'), roomRoutes);
-// app.use('/api/cVote', require('./middleware/authMiddleware'), cVoteRoutes);
 
 //const { sendNotificationController } = require('./controllers/sendNotificationController');
 const {sendNotificationController} = require('./controllers/notificationController');
@@ -262,4 +323,3 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
-

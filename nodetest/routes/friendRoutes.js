@@ -26,21 +26,27 @@ const fcmController = require('../controllers/fcmController');
 
 //==============================Token======================================
 // i_friend 리스트 출력
-router.get('/ifriends', loginRequired, friendController.printIFriend);
+// router.get('/ifriends', loginRequired, friendController.printIFriend);
+router.get('/ifriends', friendController.printIFriend);
 
 // t_friend 리스트 출력
-router.get('/tfriends', loginRequired, friendController.printTFriend);
+// router.get('/tfriends', loginRequired, friendController.printTFriend);
+router.get('/tfriends', friendController.printTFriend);
 
 // 친구 삭제
-router.delete('/delete', loginRequired, friendController.friendDelete);
+// router.delete('/delete', loginRequired, friendController.friendDelete);
+router.delete('/delete', friendController.friendDelete);
 
 // 친구 요청 보내기
-router.post('/request', loginRequired, friendController.friendRequestSend,fcmController.sendFriendRequestNotification);
+// router.post('/request', loginRequired, friendController.friendRequestSend,fcmController.sendFriendRequestNotification);
+router.post('/request', friendController.friendRequestSend,fcmController.sendFriendRequestNotification);
 
 // 친구 요청 수락
-router.post('/accept', loginRequired, friendController.friendRequestAccept,fcmController.sendFriendRequestNotification);
+// router.post('/accept', loginRequired, friendController.friendRequestAccept,fcmController.sendFriendRequestNotification);
+router.post('/accept', friendController.friendRequestAccept,fcmController.sendFriendRequestNotification);
 
 // 친구 요청 거절
-router.post('/reject', loginRequired, friendController.friendRequestReject,fcmController.sendFriendRequestNotification);
+// router.post('/reject', loginRequired, friendController.friendRequestReject,fcmController.sendFriendRequestNotification);
+router.post('/reject', friendController.friendRequestReject,fcmController.sendFriendRequestNotification);
 
 module.exports = router;

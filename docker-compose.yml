@@ -12,6 +12,20 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: gogi0529!
       MYSQL_DATABASE: mission
+  
+
+  nodetest_copy:
+    build: ./nodetest_copy
+    container_name: nodetest_copy
+    restart: always
+    ports:
+      - "4000:4000"
+      - "4001:4001"
+    depends_on:
+      - mysql
+    env_file:
+      - ./nodetest_copy/.env
+
 
   nodetest:
     build: ./nodetest

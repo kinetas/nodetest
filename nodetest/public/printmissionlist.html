@@ -408,14 +408,39 @@
 
         //========================================token=====================================
 
-        const token = localStorage.getItem('token');
-        if (!token) {
+        // URL에서 토큰 추출
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const token = urlParams.get('access_token');
+        const kcIdToken = urlParams.get('id_token'); // ✅ id_token 따로 추출
+
+        if (token) {
+            localStorage.setItem('token', token);
+            history.replaceState(null, null, window.location.pathname);
+        } else {
             alert("로그인이 필요합니다.");
-            location.href = '/';
+            window.location.href = "/";
         }
 
+        if (kcIdToken) {
+            localStorage.setItem('id_token', kcIdToken); // ✅ 저장
+        }
+
+        const savedToken = localStorage.getItem('token');
+        const savedIdToken = localStorage.getItem('id_token');
+        if (!savedToken) {
+            alert("로그인이 필요합니다.");
+            window.location.href = "/";
+        }
+
+
+        // const token = localStorage.getItem('token');
+        // if (!token) {
+        //     alert("로그인이 필요합니다.");
+        //     location.href = '/';
+        // }
+
         const authHeader = {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${savedToken}`
         };
 
         function requestVote(m_id) {

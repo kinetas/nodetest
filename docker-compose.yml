@@ -25,6 +25,9 @@ services:
       - mysql
     env_file:
       - ./nodetest_copy/.env
+    volumes:
+      - ./nodetest_copy/firebase-adminsdk.json:/app/firebase-adminsdk.json
+  
 
 
   nodetest:

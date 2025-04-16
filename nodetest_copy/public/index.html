@@ -1,0 +1,76 @@
+
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 테스트</title>
+</head>
+<body>
+    <h1>로그인 테스트</h1>
+    <form id="loginForm">
+        <input type="text" id="u_id" placeholder="아이디" required><br><br>
+        <input type="password" id="u_password" placeholder="비밀번호" required><br><br>
+        <!-- ✅ JWT 방식에서는 디바이스 토큰 입력 필드 제거 -->
+        <!-- <input type="text" id="token" placeholder="토큰" required><br><br> -->
+        <button type="submit">로그인</button>
+    </form>
+    <div id="result"></div>
+    
+    <!-- 회원가입 버튼 -->
+    <button id="registerButton">회원가입</button>
+    
+    <!-- 아이디/비밀번호 찾기 버튼 -->
+    <button id="findInfoButton">아이디/비밀번호 변경</button>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // ✅ 변수명 변경: JWT 기반 loginToken API는 userId, password 사용
+            const userId = document.getElementById('u_id').value;
+            const password = document.getElementById('u_password').value;
+
+            // ✅ JWT 기반 loginToken 라우트로 요청
+            fetch('/api/auth/loginToken', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("🔁 로그인 응답 데이터:", data); // ✅ 이게 핵심
+                console.log("🔐 응답 토큰:", data.token);   // ✅ undefined면 서버 응답 문제
+                if (data.token) {
+                    // localStorage에 토큰 저장
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userId', data.user.u_id); // 사용자 ID도 저장 가능
+
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000); // 100ms 지연 후 이동
+                } else {
+                    document.getElementById('result').textContent = data.message || '로그인 실패';
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('result').textContent = `로그인 중 오류 (${error})가 발생했습니다.`;
+            });
+        });
+
+        // 회원가입 페이지로 이동
+        document.getElementById('registerButton').addEventListener('click', function() {
+            window.location.href = '/register';
+        });
+
+        // 아이디/비밀번호 찾기 페이지로 이동
+        document.getElementById('findInfoButton').addEventListener('click', function() {
+            window.location.href = '/findinfo';
+        });
+    </script>
+</body>
+</html>

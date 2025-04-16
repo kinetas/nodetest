@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투표 상세 보기</title>
+</head>
+<body>
+    <h1 id="voteTitle">투표 제목</h1>
+    <p id="voteContents">내용</p>
+    <p>작성자: <span id="voteUser"></span></p>
+    <p>좋아요: <span id="voteGood"></span> / 싫어요: <span id="voteBad"></span></p>
+    <div id="voteImage"></div>
+    <button onclick="voteAction('good')">좋아요</button>
+    <button onclick="voteAction('bad')">싫어요</button>
+    <button onclick="window.close()">닫기</button>
+
+    <script>
+        const c_number = new URLSearchParams(window.location.search).get('c_number');
+
+        if (!c_number) {
+            console.error("c_number 값이 유효하지 않습니다.");
+            alert("URL에 유효한 c_number 값이 포함되어 있지 않습니다.");
+            window.location.href = "/cVote"; // 투표 목록 페이지로 리다이렉트
+        } else {
+            console.log(`c_number 값: ${c_number}`);
+            loadVoteDetails(c_number);
+        }
+        function loadVoteDetails() {
+            fetch(`/api/cVote/details?c_number=${c_number}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('voteTitle').innerText = data.vote.c_title;
+                        document.getElementById('voteContents').innerText = data.vote.c_contents;
+                        document.getElementById('voteUser').innerText = data.vote.u_id;
+                        document.getElementById('voteGood').innerText = data.vote.c_good;
+                        document.getElementById('voteBad').innerText = data.vote.c_bad;
+                        if (data.vote.c_image) {
+                            document.getElementById('voteImage').innerHTML = `<img src="data:image/jpeg;base64,${data.vote.c_image}" alt="투표 이미지" style="max-width: 100%;">`;
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Error loading vote details:", error));
+        }
+
+        function voteAction(action) {
+            fetch('/api/cVote/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ c_number, action }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadVoteDetails(); // 데이터 새로고침
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Error updating vote:", error));
+        }
+
+        loadVoteDetails();
+    </script>
+</body>
+</html>

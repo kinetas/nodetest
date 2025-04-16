@@ -11,6 +11,8 @@ const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMi
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
+const { keycloak } = require('../keycloak'); // ✅ Keycloak protect 추가
+
 // // 미션 리스트 반환 라우트
 // router.get('/missions', requireAuth, getUserMissions);
 
@@ -64,24 +66,46 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 //=======================token=========================
 
-// ✅ 모든 API에 JWT 인증 적용
-router.get('/missions', loginRequired, getUserMissions);
-router.get('/missions/assigned', loginRequired, getAssignedMissions);
-router.get('/missions/created', loginRequired, getCreatedMissions);
-router.get('/missions/created_req', loginRequired, getCreatedMissionsReq);
-router.get('/missions/completed', loginRequired, getCompletedMissions);
-router.get('/missions/givenCompleted', loginRequired, getGivenCompletedMissions);
-router.get('/missions/friendAssigned', loginRequired, getFriendAssignedMissions);
-router.get('/missions/friendCompleted', loginRequired, getFriendCompletedMissions);
-router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAuthority);
-router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions);
+// // ✅ 모든 API에 JWT 인증 적용
+// router.get('/missions', loginRequired, getUserMissions);
+// router.get('/missions/assigned', loginRequired, getAssignedMissions);
+// router.get('/missions/created', loginRequired, getCreatedMissions);
+// router.get('/missions/created_req', loginRequired, getCreatedMissionsReq);
+// router.get('/missions/completed', loginRequired, getCompletedMissions);
+// router.get('/missions/givenCompleted', loginRequired, getGivenCompletedMissions);
+// router.get('/missions/friendAssigned', loginRequired, getFriendAssignedMissions);
+// router.get('/missions/friendCompleted', loginRequired, getFriendCompletedMissions);
+// router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAuthority);
+// router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions);
 
-router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission);
-router.post('/missioncreate', loginRequired, createMission);
-router.delete('/missiondelete', loginRequired, deleteMission);
-router.post('/successMission', loginRequired, successMission);
-router.post('/failureMission', loginRequired, failureMission);
-router.post('/printRoomMission', loginRequired, printRoomMission);
-router.post('/missionRequest', loginRequired, requestMissionApproval);
+// router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission);
+// router.post('/missioncreate', loginRequired, createMission);
+// router.delete('/missiondelete', loginRequired, deleteMission);
+// router.post('/successMission', loginRequired, successMission);
+// router.post('/failureMission', loginRequired, failureMission);
+// router.post('/printRoomMission', loginRequired, printRoomMission);
+// router.post('/missionRequest', loginRequired, requestMissionApproval);
+
+//===============================KeyCloak==============================
+
+// ✅ 모든 라우트에 keycloak.protect() 적용
+router.get('/missions', keycloak.protect(), getUserMissions);
+router.get('/missions/assigned', keycloak.protect(), getAssignedMissions);
+router.get('/missions/created', keycloak.protect(), getCreatedMissions);
+router.get('/missions/created_req', keycloak.protect(), getCreatedMissionsReq);
+router.get('/missions/completed', keycloak.protect(), getCompletedMissions);
+router.get('/missions/givenCompleted', keycloak.protect(), getGivenCompletedMissions);
+router.get('/missions/friendAssigned', keycloak.protect(), getFriendAssignedMissions);
+router.get('/missions/friendCompleted', keycloak.protect(), getFriendCompletedMissions);
+router.get('/missions/grantedAuthority', keycloak.protect(), getMissionsWithGrantedAuthority);
+router.get('/missions/selfRequested', keycloak.protect(), getRequestedSelfMissions);
+
+router.post('/missionVote', keycloak.protect(), upload.single('c_image'), requestVoteForMission);
+router.post('/missioncreate', keycloak.protect(), createMission);
+router.delete('/missiondelete', keycloak.protect(), deleteMission);
+router.post('/successMission', keycloak.protect(), successMission);
+router.post('/failureMission', keycloak.protect(), failureMission);
+router.post('/printRoomMission', keycloak.protect(), printRoomMission);
+router.post('/missionRequest', keycloak.protect(), requestMissionApproval);
 
 module.exports = router;

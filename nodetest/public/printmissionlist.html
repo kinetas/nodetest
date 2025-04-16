@@ -417,7 +417,7 @@
             localStorage.setItem('token', token);
             history.replaceState(null, null, window.location.pathname);
         } else {
-            alert("로그인이 필요합니다.");
+            alert("로그인이 필요합니다. <printmissionlist.html1>");
             window.location.href = "/";
         }
 
@@ -428,7 +428,7 @@
         const savedToken = localStorage.getItem('token');
         const savedIdToken = localStorage.getItem('id_token');
         if (!savedToken) {
-            alert("로그인이 필요합니다.");
+            alert("로그인이 필요합니다. <printmissionlist.html2>");
             window.location.href = "/";
         }
 

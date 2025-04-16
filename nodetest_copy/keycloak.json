@@ -1,0 +1,10 @@
+{
+    "realm": "master",
+    "auth-server-url": "http://27.113.11.48:8080/",
+    "ssl-required": "none",
+    "resource": "nodetest",
+    "credentials": {
+      "secret": "ptR4hZ66Q6dvBCWzdiySdk57L7Ow2OzE"
+    },
+    "confidential-port": 0
+  }

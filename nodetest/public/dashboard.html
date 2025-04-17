@@ -854,7 +854,7 @@
 
         // ✅ 계정탈퇴
         function deleteAccountToken() {
-            const token = localStorage.getItem('token'); // ✅ JWT 토큰 가져오기
+            const token = localStorage.getItem('savedKeyCloakToken'); // ✅ JWT 토큰 가져오기
 
             if (!token) {
                 alert("로그인이 필요합니다.");

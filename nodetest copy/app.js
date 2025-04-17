@@ -38,7 +38,7 @@ const requireAuth = require('./middleware/loginRequired'); // JWT 미들웨어 �
 const cors = require('cors');
 app.use(cors());  // 모든 출처?�� ?���????�� ?��?��
 app.use(cors({
-    origin: 'http://27.113.11.48:3000',
+    origin: 'http://27.113.11.48:5555',
     allowedHeaders: ['Authorization', 'Content-Type'],
     // credentials: true // 쿠키 방식 사용 시 필요, 지금은 무관
   }));

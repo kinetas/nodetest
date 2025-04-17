@@ -7,6 +7,12 @@ const NotificationLog = require('../models/notificationModel'); // r_message 모
 const { Op } = require('sequelize'); // 추가: Sequelize의 Op 객체 가져오기
 const axios = require('axios');
 
+//================JWT===================
+const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불러오기
+const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
+const { addLaplaceNoise } = require('../utils/dpUtils');
+//================JWT===================
+
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
 
 const roomController = require('./roomController'); // roomController 가져오기
@@ -125,6 +131,32 @@ exports.deleteAccountFromKeycloak = async (req, res) => {
             message: '계정 삭제 중 오류 발생',
             error: err.message
         });
+    }
+};
+
+
+// ✅ Keycloak 토큰 기반 JWT 발급 API
+exports.issueJwtFromKeycloak = async (req, res) => {
+    try {
+        const keycloakUser = req.kauth.grant.access_token.content;
+
+        const userId = keycloakUser.preferred_username;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: 'Keycloak 사용자 정보가 없습니다.' });
+        }
+
+        // JWT 토큰 생성
+        const payload = { userId };
+        const token = generateToken(payload);
+
+        return res.status(200).json({
+            success: true,
+            message: 'JWT 토큰이 발급되었습니다.',
+            token,
+        });
+    } catch (err) {
+        console.error('JWT 발급 오류:', err);
+        return res.status(500).json({ success: false, message: '서버 오류로 JWT 발급에 실패했습니다.' });
     }
 };
 
@@ -414,9 +446,6 @@ exports.deleteAccount = async (req, res) => { // 추가
 
 //=============================Token========================
 
-const jwt = require('jsonwebtoken'); // jwt 토큰 사용을 위해 모듈 불러오기
-const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러오기
-const { addLaplaceNoise } = require('../utils/dpUtils');
 exports.loginToken = async (req, res) => {
     console.time("LoginResponseTime"); // 시작 지점
     try {

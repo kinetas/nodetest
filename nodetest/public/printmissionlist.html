@@ -515,7 +515,7 @@
         }
 
         const fetchMissions = (endpoint, elementId, renderFn) => {
-            fetch(endpoint, { headers: authHeader })
+            fetch(endpoint, { headers: authHeaderKeyCloak })
                 .then(res => res.json())
                 .then(data => {
                     const el = document.getElementById(elementId);

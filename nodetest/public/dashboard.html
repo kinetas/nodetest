@@ -598,12 +598,9 @@
         const accessToken  = urlParams.get('access_token');
         const kcIdToken = urlParams.get('id_token'); // ✅ id_token 따로 추출
 
-        if (accessToken ) {
+        if (accessToken) {
             localStorage.setItem('keycloak_token', accessToken );
             history.replaceState(null, null, window.location.pathname);
-        } else {
-            alert("KeyCloak 로그인이 필요합니다.");
-            window.location.href = "/";
         }
 
         if (kcIdToken) {

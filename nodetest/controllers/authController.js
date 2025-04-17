@@ -25,11 +25,11 @@ exports.getOrCreateUserFromKeycloak = async (req, res) => {
     try {
       const keycloakUser = req.kauth.grant.access_token.content;
   
-      const u_id = keycloakUser.preferred_username; // ex: "user01"
-      const u_name = keycloakUser.name || 'unknown';
-      const u_mail = keycloakUser.email || null;
-      const u_nickname = keycloakUser.given_name || u_name;
-      const u_birth = null; // Keycloak에 생년월일이 없다면 null 처리
+      const u_id = keycloakUser.preferred_username;                   // 사용자명
+      const u_mail = keycloakUser.email || null;                      // 이메일
+      const u_nickname = keycloakUser.nickname || 'no_nickname';      // 닉네임 (커스텀 필드)
+      const u_birth = keycloakUser.birth || null;                     // 생년월일 (커스텀 필드)
+      const u_name = keycloakUser.name || 'unknown';                  // 전체 이름
       const u_password = 'keycloak'; // 더미 비번 (사용되지 않음)
   
       // 🔎 이미 존재하는 사용자 찾기

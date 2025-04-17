@@ -247,8 +247,8 @@ app.use('/api/auth', timeConverterMiddleware, authRoutes);
 // app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
 app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
-// app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT토큰
-app.use('/api/rooms', timeConverterMiddleware, roomRoutes);
+app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT토큰
+// app.use('/api/rooms', timeConverterMiddleware, roomRoutes);
 
 // app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); //JWT토큰
 app.use('/api/missions', timeConverterMiddleware, missionRoutes);

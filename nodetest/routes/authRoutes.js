@@ -40,4 +40,7 @@ router.post('/changePassword', findInfoController.changePassword);
 router.get('/registerKeyCloak', keycloak.protect(), authController.getOrCreateUserFromKeycloak);
 router.delete('/deleteAccountToken', keycloak.protect(), authController.deleteAccountFromKeycloak);
 
+// ✅ Keycloak access_token → 우리 서버 JWT 발급
+router.get('/issueJwtFromKeycloak', keycloak.protect(), authController.issueJwtFromKeycloak);
+
 module.exports = router;

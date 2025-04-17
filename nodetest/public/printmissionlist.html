@@ -408,16 +408,16 @@
 
         //========================================token=====================================
 
-        const token = localStorage.getItem('token');
+        const accessToken = localStorage.getItem('access_token');
         const idToken = localStorage.getItem('id_token');
 
-        if (!token) {
+        if (!accessToken) {
             alert("로그인이 필요합니다.");
             location.href = '/';
         }
 
         const authHeader = {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${accessToken}`
         };
 
         function requestVote(m_id) {

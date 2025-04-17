@@ -31,61 +31,21 @@ const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
 
 let keycloakPublicKey = null;
 
-function convertCertToPEM(cert) {
-  return `-----BEGIN CERTIFICATE-----\n${cert.match(/.{1,64}/g).join('\n')}\n-----END CERTIFICATE-----\n`;
-}
-
-async function fetchKeycloakPublicKey() {
-  try {
-    const realmUrl = `${process.env.KEYCLOAK_BASE_URL}/realms/${process.env.KEYCLOAK_REALM}`;
-    const { data } = await axios.get(realmUrl);
-    const cert = data.public_key;
-    keycloakPublicKey = convertCertToPEM(cert);
-    console.log("🔐 Keycloak 공개키 로딩 완료");
-  } catch (error) {
-    console.error("❌ Keycloak 공개키 가져오기 실패:", error.message);
-  }
-}
-
-fetchKeycloakPublicKey();
-
-async function getUserIdFromSocket(socket) {
+function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
     if (!token) {
-      console.error("❌ 소켓 토큰 누락");
+      console.error('❌ 소켓 연결 시 토큰이 없습니다.');
       return null;
     }
-
-    if (!keycloakPublicKey) {
-      await fetchKeycloakPublicKey();
-      if (!keycloakPublicKey) return null;
-    }
-
-    const decoded = jwt.verify(token, keycloakPublicKey, { algorithms: ['RS256'] });
-    console.log("✅ Keycloak JWT 디코딩:", decoded);
-    return decoded.preferred_username || decoded.sub;
+    const decoded = jwt.verify(token, secretKey);
+    console.log('✅ 토큰 디코딩 성공:', decoded);
+    return decoded.userId;
   } catch (err) {
-    console.error("❌ JWT 디코딩 실패:", err.message);
+    console.error('❌ 토큰 디코딩 실패:', err.message);
     return null;
   }
 }
-
-// function getUserIdFromSocket(socket) {
-//   try {
-//     const token = socket.handshake.auth?.token;
-//     if (!token) {
-//       console.error('❌ 소켓 연결 시 토큰이 없습니다.');
-//       return null;
-//     }
-//     const decoded = jwt.verify(token, secretKey);
-//     console.log('✅ 토큰 디코딩 성공:', decoded);
-//     return decoded.userId;
-//   } catch (err) {
-//     console.error('❌ 토큰 디코딩 실패:', err.message);
-//     return null;
-//   }
-// }
 
 try {
   // JSON 파일에서 객체로 변환
@@ -332,7 +292,7 @@ socket.on('markAsRead', async (data) => {
 
 socket.on('joinRoom', async (data) => {
   let { r_id, u2_id } = data;
-  const u1_id = await getUserIdFromSocket(socket); // ✅ Keycloak에서 추출
+  const u1_id = await getUserIdFromSocket(socket);
 
   if (!u1_id) {
     console.error("❌ 사용자 인증 실패");

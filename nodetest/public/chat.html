@@ -351,7 +351,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('r_id');
         const u2_id = urlParams.get('u2_id');
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('jwt_token');
         const decoded = parseJwt(token);
         const u1_id = decoded?.userId;
 

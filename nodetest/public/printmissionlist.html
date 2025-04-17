@@ -408,16 +408,27 @@
 
         //========================================token=====================================
 
-        const accessToken = localStorage.getItem('access_token');
+        const savedKeyCloakToken = localStorage.getItem('keycloak_token');
         const idToken = localStorage.getItem('id_token');
 
-        if (!accessToken) {
+        const jwt_token = localStorage.getItem('jwt_token'); // ✅ JWT 토큰
+
+        if (!savedKeyCloakToken) {
             alert("로그인이 필요합니다.");
             location.href = '/';
         }
 
-        const authHeader = {
-            Authorization: `Bearer ${accessToken}`
+        if (!jwt_token) {
+            alert("로그인이 필요합니다.");
+            location.href = '/';
+        }
+
+        const authHeaderKeyCloak = {
+            Authorization: `Bearer ${savedKeyCloakToken}`
+        };
+
+        const authHeaderJWT = {
+            Authorization: `Bearer ${jwt_token}`
         };
 
         function requestVote(m_id) {
@@ -430,7 +441,7 @@
 
             fetch('/dashboard/missionVote', {
                 method: 'POST',
-                headers: authHeader,
+                headers: authHeaderJWT,
                 body: formData
             })
             .then(res => res.json())
@@ -449,7 +460,7 @@
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...authHeader
+                    ...authHeaderKeyCloak
                 },
                 body: JSON.stringify({ m_id })
             })
@@ -468,7 +479,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...authHeader
+                    ...authHeaderKeyCloak
                 },
                 body: JSON.stringify({ m_id })
             })
@@ -487,7 +498,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...authHeader
+                    ...authHeaderKeyCloak
                 },
                 body: JSON.stringify({ m_id })
             })
@@ -506,7 +517,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    ...authHeader
+                    ...authHeaderKeyCloak
                 },
                 body: JSON.stringify({ m_id })
             })

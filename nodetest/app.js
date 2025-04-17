@@ -239,8 +239,8 @@ app.use((req, res, next) => {
 });
 
 
-// app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
-app.use('/chat', timeConverterMiddleware, chatRoutes);
+app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
+// app.use('/chat', timeConverterMiddleware, chatRoutes);
 
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
@@ -253,8 +253,8 @@ app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT�
 // app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); //JWT토큰
 app.use('/api/missions', timeConverterMiddleware, missionRoutes);
 
-// app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로 //JWT토큰
-app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로
+app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로 //JWT토큰
+// app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로
 
 // userInfoRoutes 
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
@@ -263,11 +263,11 @@ app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
 
 
-// app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes); //JWT토큰
-app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
+app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes); //JWT토큰
+// app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
 
-// app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes); //JWT토큰
-app.use('/api/comumunity_missions', timeConverterMiddleware, c_missionRoutes);
+app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes); //JWT토큰
+// app.use('/api/comumunity_missions', timeConverterMiddleware, c_missionRoutes);
 
 // //AI관련
 app.use('/api/ai', aiRoutes);

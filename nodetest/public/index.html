@@ -75,14 +75,30 @@
             window.location.href = '/findinfo';
         });
 
+        // document.getElementById('keycloakLoginButton').addEventListener('click', () => {
+        //     // ✅ Keycloak 로그인 URL로 리디렉션
+        //     window.location.href = "http://27.113.11.48:8080/realms/master/protocol/openid-connect/auth" +
+        //         "?client_id=nodetest" +
+        //         "&response_type=id_token token" +     // ✅ Implicit flow → 직접 id_token, access_token 받음
+        //         "&scope=openid" +
+        //         "&nonce=nonce123" + 
+        //         "&redirect_uri=http://27.113.11.48:3000/dashboard";
+        // });
         document.getElementById('keycloakLoginButton').addEventListener('click', () => {
-            // ✅ Keycloak 로그인 URL로 리디렉션
-            window.location.href = "http://27.113.11.48:8080/realms/master/protocol/openid-connect/auth" +
-                "?client_id=nodetest" +
-                "&response_type=id_token token" +     // ✅ Implicit flow → 직접 id_token, access_token 받음
-                "&scope=openid" +
-                "&nonce=nonce123" + 
-                "&redirect_uri=http://27.113.11.48:3000/dashboard";
+        // 백엔드에서 로그인 URL을 받아옴
+            fetch('/api/auth/keycloak-login-url')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.loginUrl) {
+                        window.location.href = data.loginUrl;
+                    } else {
+                        alert('Keycloak 로그인 URL을 가져오지 못했습니다.');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Keycloak 로그인 요청 오류:', error);
+                    alert('Keycloak 로그인 중 오류 발생');
+                });
         });
     </script>
 </body>

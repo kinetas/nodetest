@@ -20,6 +20,30 @@ const roomController = require('./roomController'); // roomController 가져오�
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
 
+// Keycloak 로그인 리디렉션 URL 제공 API
+exports.getKeycloakLoginUrl = async (req, res) => {
+    try {
+        const baseUrl = 'http://27.113.11.48:8080'; // Keycloak 서버 주소
+        const clientId = 'nodetest';
+        const redirectUri = 'http://27.113.11.48:3000/dashboard';
+        const responseType = 'id_token token'; // Implicit flow
+        const scope = 'openid';
+        const nonce = 'nonce123';
+
+        const loginUrl = `${baseUrl}/realms/master/protocol/openid-connect/auth?` +
+            `client_id=${clientId}` +
+            `&response_type=${encodeURIComponent(responseType)}` +
+            `&scope=${scope}` +
+            `&nonce=${nonce}` +
+            `&redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+        res.json({ success: true, loginUrl });
+    } catch (err) {
+        console.error('Keycloak 로그인 URL 생성 오류:', err);
+        res.status(500).json({ success: false, message: '로그인 URL 생성 실패' });
+    }
+};
+
 // ✅ Keycloak 로그인 후 사용자 정보 기반 DB 자동 저장
 exports.getOrCreateUserFromKeycloak = async (req, res) => {
     try {

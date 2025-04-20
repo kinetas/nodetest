@@ -61,8 +61,8 @@ exports.getKeycloakLoginUrl = async (req, res) => {
     try {
         const baseUrl = 'http://27.113.11.48:8080'; // Keycloak 서버 주소
         const clientId = 'nodetest';
-        const redirectUri = 'http://27.113.11.48:3000/dashboard';
-        // const redirectUri = 'myapp://login-callback';
+        // const redirectUri = 'http://27.113.11.48:3000/dashboard';
+        const redirectUri = 'myapp://login-callback';
         const responseType = 'id_token token'; // Implicit flow
         const scope = 'openid';
         const nonce = 'nonce123';

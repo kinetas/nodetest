@@ -85,8 +85,8 @@
                 if (data.success) {
                     const accessToken = data.accessToken;
                     const idToken = data.idToken;
-                    localStorage.setItem('kc_access_token', accessToken);
-                    localStorage.setItem('kc_id_token', idToken);
+                    localStorage.setItem('access_token', accessToken);
+                    localStorage.setItem('id_token', idToken);
                     // ✅ 우리 서버 JWT 발급 요청 추가
                     return fetch('/api/auth/issueJwtFromKeycloak', {
                         headers: {

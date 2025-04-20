@@ -598,6 +598,9 @@
         const accessToken  = urlParams.get('access_token');
         const kcIdToken = urlParams.get('id_token'); // ✅ id_token 따로 추출
 
+        console.log("accessToken: ", accessToken);
+        console.log("kcIdToken: ", kcIdToken);
+
         if (accessToken) {
             localStorage.setItem('keycloak_token', accessToken );
             history.replaceState(null, null, window.location.pathname);
@@ -609,6 +612,8 @@
 
         const savedKeyCloakToken = localStorage.getItem('keycloak_token');
         const savedIdToken = localStorage.getItem('id_token');
+        console.log("savedKeyCloakToken: ", savedKeyCloakToken);
+        console.log("savedIdToken: ", savedIdToken);
         if (!savedKeyCloakToken) {
             alert("로그인이 필요합니다.");
             window.location.href = "/";

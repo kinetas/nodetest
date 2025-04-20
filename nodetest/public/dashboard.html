@@ -619,30 +619,29 @@
             window.location.href = "/";
         }
 
-
         console.log("jwt_token: ", localStorage.getItem('jwt_token'))
 
-        // ✅ Keycloak access_token으로 우리 서버 JWT 발급 요청
-        fetch('/api/auth/issueJwtFromKeycloak', {
-            headers: {
-                Authorization: `Bearer ${savedKeyCloakToken}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success && data.token) {
-                localStorage.setItem('jwt_token', data.token); // ✅ 우리 서버 JWT 저장
-                console.log("✅ JWT 저장 완료");
-            } else {
-                alert("JWT 발급 실패: " + data.message);
-                window.location.href = "/";
-            }
-        })
-        .catch(err => {
-            console.error("JWT 발급 오류:", err);
-            alert("JWT 발급 중 오류 발생");
-            window.location.href = "/";
-        });
+        // // ✅ Keycloak access_token으로 우리 서버 JWT 발급 요청
+        // fetch('/api/auth/issueJwtFromKeycloak', {
+        //     headers: {
+        //         Authorization: `Bearer ${savedKeyCloakToken}`
+        //     }
+        // })
+        // .then(res => res.json())
+        // .then(data => {
+        //     if (data.success && data.token) {
+        //         localStorage.setItem('jwt_token', data.token); // ✅ 우리 서버 JWT 저장
+        //         console.log("✅ JWT 저장 완료");
+        //     } else {
+        //         alert("JWT 발급 실패: " + data.message);
+        //         window.location.href = "/";
+        //     }
+        // })
+        // .catch(err => {
+        //     console.error("JWT 발급 오류:", err);
+        //     alert("JWT 발급 중 오류 발생");
+        //     window.location.href = "/";
+        // });
 
         const jwtToken = localStorage.getItem('jwt_token');
 

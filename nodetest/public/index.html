@@ -85,6 +85,8 @@
                 if (data.success) {
                     const accessToken = data.accessToken;
                     const idToken = data.idToken;
+                    console.log("accesstoken: ", accessToken);
+                    console.log("idToken: ", idToken);
                     localStorage.setItem('access_token', accessToken);
                     localStorage.setItem('id_token', idToken);
                     // ✅ 우리 서버 JWT 발급 요청 추가

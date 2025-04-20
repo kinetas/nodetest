@@ -20,13 +20,49 @@ const roomController = require('./roomController'); // roomController 가져오�
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
 
+// Keycloak 직접 로그인 처리
+exports.keycloakDirectLogin = async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const tokenRes = await axios.post(
+            'http://27.113.11.48:8080/realms/master/protocol/openid-connect/token',
+            new URLSearchParams({
+                grant_type: 'password',
+                client_id: 'nodetest',
+                client_secret: 'ptR4hZ66Q6dvBCWzdiySdk57L7Ow2OzE',
+                username,
+                password,
+            }),
+            {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }
+        );
+
+        const { access_token, id_token } = tokenRes.data;
+
+        return res.status(200).json({
+            success: true,
+            accessToken: access_token,
+            idToken: id_token
+        });
+    } catch (error) {
+        console.error('[Keycloak 로그인 실패]', error.response?.data || error.message);
+        return res.status(401).json({
+            success: false,
+            message: 'Keycloak 로그인 실패',
+            error: error.response?.data || error.message
+        });
+    }
+};
+
 // Keycloak 로그인 리디렉션 URL 제공 API
 exports.getKeycloakLoginUrl = async (req, res) => {
     try {
         const baseUrl = 'http://27.113.11.48:8080'; // Keycloak 서버 주소
         const clientId = 'nodetest';
-        // const redirectUri = 'http://27.113.11.48:3000/dashboard';
-        const redirectUri = 'myapp://login-callback';
+        const redirectUri = 'http://27.113.11.48:3000/dashboard';
+        // const redirectUri = 'myapp://login-callback';
         const responseType = 'id_token token'; // Implicit flow
         const scope = 'openid';
         const nonce = 'nonce123';

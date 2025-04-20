@@ -620,6 +620,8 @@
         }
 
 
+        console.log("jwt_token: ", localStorage.getItem('jwt_token'))
+
         // ✅ Keycloak access_token으로 우리 서버 JWT 발급 요청
         fetch('/api/auth/issueJwtFromKeycloak', {
             headers: {

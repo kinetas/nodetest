@@ -83,12 +83,28 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    localStorage.setItem('kc_access_token', data.accessToken);
-                    localStorage.setItem('kc_id_token', data.idToken);
-                    alert('✅ Keycloak 로그인 성공!');
-                    window.location.href = '/dashboard'; // 또는 필요한 페이지
+                    const accessToken = data.accessToken;
+                    const idToken = data.idToken;
+                    localStorage.setItem('kc_access_token', accessToken);
+                    localStorage.setItem('kc_id_token', idToken);
+                    // ✅ 우리 서버 JWT 발급 요청 추가
+                    return fetch('/api/auth/issueJwtFromKeycloak', {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    });
                 } else {
                     alert('❌ Keycloak 로그인 실패: ' + (data.message || ''));
+                }
+            })
+            .then(res => res.json())
+            .then(jwt => {
+                if (jwt.success && jwt.token) {
+                    localStorage.setItem('jwt_token', jwt.token); // ✅ JWT 저장
+                    alert('✅ Keycloak + JWT 로그인 완료!');
+                    window.location.href = '/dashboard'; // ✅ JWT까지 받은 후 이동
+                } else {
+                    alert('❌ JWT 발급 실패: ' + (jwt.message || ''));
                 }
             })
             .catch((error) => {

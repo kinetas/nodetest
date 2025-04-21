@@ -3,14 +3,17 @@ const session = require('express-session'); //�꽭��?�異붽��???
 const cron = require('node-cron');
 const path = require('path');
 const chatRoutes = require('./routes/chatRoutes');
-const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��졇�삤湲�
 const missionRoutes = require('./routes/missionRoutes'); // 誘몄??? �씪�슦�듃 ?��?��?���삤湲�
 const roomRoutes = require('./routes/roomRoutes');
 const friendRoutes = require('./routes/friendRoutes');
 const cVoteRoutes = require('./routes/cVoteRoutes');
 const c_missionRoutes = require('./routes/c_missionRoutes');
 const resultRoutes = require('./routes/resultRoutes'); // 결과 ?��?��?�� 추�??
+//==============================================================================
+//======================MSA 적용 시 삭제========================================
+const authRoutes = require('./routes/authRoutes'); // �씪�슦�듃 媛��졇�삤湲�
 const userInfoRoutes = require('./routes/userInfoRoutes');
+//==============================================================================
 const recommendationMissionRoutes = require('./routes/recommendationMissionRoutes'); // 라우트 파일 가져오기
 const aiRoutes = require('./routes/aiRoutes');
 const { checkMissionStatus } = require('./controllers/c_missionController');
@@ -21,8 +24,11 @@ require('dotenv').config();
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 const axios = require('axios');
 
+//==============================================================================
+//======================MSA 적용 시 삭제========================================
 // =========== Keycloak ===========
 const { keycloak, memoryStore } = require('./keycloak');
+//==============================================================================
 
 
 const db = require('./config/db');
@@ -80,7 +86,8 @@ app.get('/callback', async (req, res) => {
       const tokenRes = await axios.post('http://27.113.11.48:8080/realms/master/protocol/openid-connect/token', new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
-        redirect_uri: 'http://27.113.11.48:3000/callback',
+        // redirect_uri: 'http://27.113.11.48:3000/callback',
+        redirect_uri: 'myapp://login-callback',
         client_id: 'nodetest',
         client_secret: 'ptR4hZ66Q6dvBCWzdiySdk57L7Ow2OzE'  // → Keycloak 콘솔에서 확인 가능
       }), {
@@ -177,12 +184,14 @@ app.get('/community_missions', (req, res) => {
 //     // res.json({ userId: req.session.user.id }); //세션기반
 //     res.json({ userId: req.currentUserId });    //토큰기반
 // });
+//==============================================================================
+//======================MSA 적용 시 삭제========================================
 app.get('/user-info', keycloak.protect(), (req, res) => {
     const userInfo = req.kauth.grant.access_token.content;
     const userId = userInfo.preferred_username || userInfo.sub;
     res.json({ userId });
 });
-
+//==============================================================================
 
 app.get('/', (req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
@@ -230,19 +239,25 @@ app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
 
-
+//==============================================================================
+//======================MSA 적용 시 삭제========================================
 app.use((req, res, next) => {
     if (req.kauth?.grant?.access_token?.content?.preferred_username) {
       req.currentUserId = req.kauth.grant.access_token.content.preferred_username;
     }
     next();
 });
-
+//==============================================================================
 
 app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
 // app.use('/chat', timeConverterMiddleware, chatRoutes);
 
+//==============================================================================
+//======================MSA 적용 시 삭제========================================
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
+// userInfoRoutes 
+app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
+//==============================================================================
 
 // app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
 app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
@@ -256,12 +271,8 @@ app.use('/api/missions', timeConverterMiddleware, missionRoutes);
 app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로 //JWT토큰
 // app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로
 
-// userInfoRoutes 
-app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
-
 // app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes); //JWT토큰
 app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
-
 
 app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes); //JWT토큰
 // app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);

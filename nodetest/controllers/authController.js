@@ -198,14 +198,25 @@ exports.deleteAccountFromKeycloak = async (req, res) => {
 // ✅ Keycloak 토큰 기반 JWT 발급 API
 exports.issueJwtFromKeycloak = async (req, res) => {
     try {
-        const keycloakUser = req.kauth.grant.access_token.content;
-
-        const userId = keycloakUser.preferred_username;
-        if (!userId) {
-            return res.status(400).json({ success: false, message: 'Keycloak 사용자 정보가 없습니다.' });
+        const accessToken = req.body.accessToken;
+        if (!accessToken) {
+            return res.status(400).json({ success: false, message: 'accessToken이 없습니다.' });
         }
 
-        // JWT 토큰 생성
+        const userInfoRes = await axios.get(
+            'http://27.113.11.48:8080/realms/master/protocol/openid-connect/userinfo',
+            {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            }
+        );
+
+        const userInfo = userInfoRes.data;
+        const userId = userInfo.preferred_username || userInfo.sub;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: '유효한 사용자 정보를 얻지 못했습니다.' });
+        }
+
         const payload = { userId };
         const token = generateToken(payload);
 

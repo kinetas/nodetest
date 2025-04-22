@@ -106,19 +106,32 @@ exports.changePassword = async (req, res) => {
         }
 
         await axios.put(
-        `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${keycloakUserId}/reset-password`,
-        {
-            type: 'password',
-            value: newPassword,
-            temporary: false
-        },
-        {
-            headers: {
-            Authorization: `Bearer ${adminToken}`,
-            'Content-Type': 'application/json'
+            `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${keycloakUserId}/reset-password`,
+            {
+                type: 'password',
+                value: newPassword,
+                temporary: false
+            },
+            {
+                headers: {
+                Authorization: `Bearer ${adminToken}`,
+                'Content-Type': 'application/json'
+                }
             }
-        }
         );
+
+        await axios.put(
+            `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${keycloakUserId}`,
+            {
+              enabled: true
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${adminToken}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
 
         // 업데이트 성공 시 응답
         if (result[0] > 0) {

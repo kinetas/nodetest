@@ -2,6 +2,41 @@ const User = require('../models/userModel'); // User 모델 불러오기
 const { hashPassword } = require('../utils/passwordUtils'); // 비밀번호 해시 함수 불러오기
 
 const jwt = require('jsonwebtoken'); // ✅ JWT 모듈 추가
+const axios = require('axios');
+
+// Keycloak 설정 정보
+const {
+  KEYCLOAK_BASE_URL,
+  KEYCLOAK_REALM,
+  KEYCLOAK_CLIENT_ID,
+  KEYCLOAK_ADMIN_SECRET
+} = process.env;
+
+// 관리자 토큰 발급
+const getAdminToken = async () => {
+    const res = await axios.post(
+      `${KEYCLOAK_BASE_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token`,
+      new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: KEYCLOAK_CLIENT_ID,
+        client_secret: KEYCLOAK_ADMIN_SECRET
+      }),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+    return res.data.access_token;
+  };
+
+  // Keycloak UUID 조회
+const getKeycloakUserId = async (username, adminToken) => {
+    const res = await axios.get(
+      `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users`,
+      {
+        headers: { Authorization: `Bearer ${adminToken}` },
+        params: { username }
+      }
+    );
+    return res.data?.[0]?.id;
+  };
 
 // 아이디 찾기 함수
 exports.findUid = async (req, res) => {
@@ -59,6 +94,29 @@ exports.changePassword = async (req, res) => {
             { where: { u_id: userId } }
         );
 
+        // Keycloak 비밀번호도 변경
+        const adminToken = await getAdminToken();
+        const keycloakUserId = await getKeycloakUserId(u_id, adminToken);
+
+        if (!keycloakUserId) {
+        return res.status(404).json({ success: false, message: 'Keycloak 사용자 없음' });
+        }
+
+        await axios.put(
+        `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${keycloakUserId}/reset-password`,
+        {
+            type: 'password',
+            value: newPassword,
+            temporary: false
+        },
+        {
+            headers: {
+            Authorization: `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+            }
+        }
+        );
+
         // 업데이트 성공 시 응답
         if (result[0] > 0) {
             console.log(JSON.stringify({ message: '비밀번호가 성공적으로 변경되었습니다.' }));
@@ -72,31 +130,3 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 };
-
-// // ✅ JWT 기반 비밀번호 변경
-// exports.changePassword = async (req, res) => {
-//     const token = req.headers.authorization?.split(' ')[1]; // JWT 토큰 가져오기
-//     if (!token) {
-//         return res.status(401).json({ message: '로그인이 필요합니다.' });
-//     }
-
-//     try {
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // JWT 검증
-//         const userId = decoded.userId; // 페이로드에서 userId 추출
-//         const { newPassword } = req.body;
-
-//         const hashedPassword = await hashPassword(newPassword);
-//         const result = await User.update(
-//             { u_password: hashedPassword },
-//             { where: { u_id: userId } }
-//         );
-
-//         if (result[0] > 0) {
-//             return res.status(200).json({ message: '비밀번호가 성공적으로 변경되었습니다.' });
-//         } else {
-//             return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
-//         }
-//     } catch (error) {
-//         return res.status(403).json({ message: '유효하지 않은 토큰입니다.' });
-//     }
-// };

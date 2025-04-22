@@ -33,6 +33,7 @@ exports.keycloakDirectLogin = async (req, res) => {
                 client_secret: 'HxCBsoCzp0rldTc3ZiuA7QLtXm1jjFnH',
                 username,
                 password,
+                scope: 'openid',
             }),
             {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }

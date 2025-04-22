@@ -820,11 +820,7 @@
         //로그아웃 (KeyCloak + JWT)
         function logout() {
             localStorage.removeItem('jwt_token');
-
-            const redirectUri = encodeURIComponent('http://27.113.11.48:3000');
-            const logoutUrl = `http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout?redirect_uri=${redirectUri}`;
-
-            window.location.href = logoutUrl;
+            window.location.href = '/';
         }
 
         function deleteAccountToken() {

@@ -45,6 +45,7 @@ exports.keycloakDirectLogin = async (req, res) => {
         return res.status(200).json({
             success: true,
             accessToken: access_token,
+            id_token,
         });
     } catch (error) {
         console.error('[Keycloak 로그인 실패]', error.response?.data || error.message);

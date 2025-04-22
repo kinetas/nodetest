@@ -107,6 +107,20 @@ services:
       -  /home/gogi/docker/webRTC_server/turnserver/turnserver.conf:/etc/turnserver.conf
       - ./webRTC_server/SECRETE:/app/cert
     command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli", "--verbose"]
+
+  #nginx:
+   # image: nginx:latest
+   # container_name: nginx
+   # restart: always
+   # ports:
+   #   - "80:80"
+   #   - "443:443"
+   # depends_on:
+   #   - webRTC_server
+   # volumes:
+   #   - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+   #   - ./webRTC_server/SECRETE:/etc/letsencrypt
+
 volumes:
   mysql-data:
   chroma-data:

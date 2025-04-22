@@ -17,6 +17,15 @@ const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 
 const roomController = require('./roomController'); // roomController 가져오기
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
+const {
+    KEYCLOAK_ADMIN_USER,
+    KEYCLOAK_ADMIN_PASS,
+    KEYCLOAK_BASE_URL,
+    KEYCLOAK_REALM,
+    KEYCLOAK_CLIENT_ID,
+    KEYCLOAK_ADMIN_SECRET,
+  } = process.env;
+
 // register 화면에서 회원가입
 exports.registerKeycloakDirect = async (req, res) => {
     const { u_id, u_password, u_mail, u_nickname, u_name, u_birth } = req.body;
@@ -27,8 +36,8 @@ exports.registerKeycloakDirect = async (req, res) => {
             'http://27.113.11.48:8080/realms/master/protocol/openid-connect/token',
             new URLSearchParams({
                 grant_type: 'client_credentials',
-                client_id: 'nodetest',
-                client_secret: 'HxCBsoCzp0rldTc3ZiuA7QLtXm1jjFnH'
+                client_id: KEYCLOAK_CLIENT_ID,
+                client_secret: KEYCLOAK_ADMIN_SECRET
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
@@ -183,14 +192,6 @@ exports.getOrCreateUserFromKeycloak = async (req, res) => {
     }
 };
 
-const {
-    KEYCLOAK_ADMIN_USER,
-    KEYCLOAK_ADMIN_PASS,
-    KEYCLOAK_BASE_URL,
-    KEYCLOAK_REALM,
-    KEYCLOAK_CLIENT_ID,
-  } = process.env;
-
 // 계정 탈퇴
 exports.deleteAccountFromKeycloak = async (req, res) => {
     const userId = req.currentUserId;
@@ -205,8 +206,8 @@ exports.deleteAccountFromKeycloak = async (req, res) => {
             `${KEYCLOAK_BASE_URL}/realms/master/protocol/openid-connect/token`,
             new URLSearchParams({
                 grant_type: 'client_credentials',
-                client_id: 'admin-cli',
-                client_secret: process.env.KEYCLOAK_ADMIN_SECRET
+                client_id: 'nodetest',
+                client_secret: KEYCLOAK_ADMIN_SECRET
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );

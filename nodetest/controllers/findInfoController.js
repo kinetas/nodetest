@@ -96,7 +96,7 @@ exports.changePassword = async (req, res) => {
 
         // Keycloak 비밀번호도 변경
         const adminToken = await getAdminToken();
-        const keycloakUserId = await getKeycloakUserId(u_id, adminToken);
+        const keycloakUserId = await getKeycloakUserId(userId, adminToken);
 
         if (!keycloakUserId) {
         return res.status(404).json({ success: false, message: 'Keycloak 사용자 없음' });

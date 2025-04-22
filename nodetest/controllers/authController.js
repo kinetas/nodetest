@@ -78,6 +78,13 @@ exports.registerKeycloakDirect = async (req, res) => {
             u_birth
         });
 
+        // 4. room 생성
+        const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
+        if (!roomResult.success) {
+            console.error('방 생성 실패:', roomResult.error);
+            return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });
+        }
+
         return res.status(201).json({ success: true, message: '회원가입 성공' });
     } catch (err) {
         console.error('회원가입 실패:', err.response?.data || err.message);

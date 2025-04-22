@@ -78,7 +78,8 @@
     const remoteVideo = document.getElementById("remoteVideo");
     const localVideo = document.getElementById("localVideo");
 
-    const ws = new WebSocket("wss://27.113.11.48:8500/ws");
+    const ws = new WebSocket("wss://" + window.location.host + "/ws");
+    //const ws = new WebSocket("wss://27.113.11.48:8500/ws");
     const iceServers = {
       iceServers: [{
         urls: ["turn:27.113.11.48:3478?transport=udp"],

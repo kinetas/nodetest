@@ -26,9 +26,9 @@ exports.registerKeycloakDirect = async (req, res) => {
         const tokenRes = await axios.post(
             'http://27.113.11.48:8080/realms/master/protocol/openid-connect/token',
             new URLSearchParams({
-                grant_type: 'client_credentials',
+                grant_type: 'password',
                 client_id: 'nodetest',
-                client_secret: process.env.KEYCLOAK_ADMIN_SECRET
+                client_secret: 'HxCBsoCzp0rldTc3ZiuA7QLtXm1jjFnH'
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );

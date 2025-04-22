@@ -41,7 +41,7 @@ router.get('/keycloak-login-url', authController.getKeycloakLoginUrl);
 
 router.post('/keycloak-direct-login', authController.keycloakDirectLogin);
 
-router.get('/registerKeyCloak', keycloak.protect(), authController.getOrCreateUserFromKeycloak);
+router.post('/registerKeyCloak', loginRequired, authController.getOrCreateUserFromKeycloak);
 router.delete('/deleteAccountToken', keycloak.protect(), authController.deleteAccountFromKeycloak);
 
 // ✅ Keycloak access_token → 우리 서버 JWT 발급

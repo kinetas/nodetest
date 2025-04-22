@@ -593,76 +593,53 @@
 
         //=================token=================
 
-        // URL에서 토큰 추출
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const accessToken  = urlParams.get('access_token');
-        const kcIdToken = urlParams.get('id_token'); // ✅ id_token 따로 추출
+        //==========키클락==========
+        // // URL에서 토큰 추출
+        // const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        // const accessToken  = urlParams.get('access_token');
+        // const kcIdToken = urlParams.get('id_token'); // ✅ id_token 따로 추출
 
-        console.log("accessToken: ", accessToken);
-        console.log("kcIdToken: ", kcIdToken);
+        // console.log("accessToken: ", accessToken);
+        // console.log("kcIdToken: ", kcIdToken);
 
-        if (accessToken) {
-            localStorage.setItem('keycloak_token', accessToken );
-            history.replaceState(null, null, window.location.pathname);
-        }
+        // if (accessToken) {
+        //     localStorage.setItem('keycloak_token', accessToken );
+        //     history.replaceState(null, null, window.location.pathname);
+        // }
 
-        if (kcIdToken) {
-            localStorage.setItem('id_token', kcIdToken); // ✅ 저장
-        }
+        // if (kcIdToken) {
+        //     localStorage.setItem('id_token', kcIdToken); // ✅ 저장
+        // }
 
-        const savedKeyCloakToken = localStorage.getItem('keycloak_token');
-        const savedIdToken = localStorage.getItem('id_token');
-        console.log("savedKeyCloakToken: ", savedKeyCloakToken);
-        console.log("savedIdToken: ", savedIdToken);
-        if (!savedKeyCloakToken) {
-            alert("로그인이 필요합니다.");
-            window.location.href = "/";
-        }
-
-        console.log("jwt_token: ", localStorage.getItem('jwt_token'))
-
-        // // ✅ Keycloak access_token으로 우리 서버 JWT 발급 요청
-        // fetch('/api/auth/issueJwtFromKeycloak', {
-        //     headers: {
-        //         Authorization: `Bearer ${savedKeyCloakToken}`
-        //     }
-        // })
-        // .then(res => res.json())
-        // .then(data => {
-        //     if (data.success && data.token) {
-        //         localStorage.setItem('jwt_token', data.token); // ✅ 우리 서버 JWT 저장
-        //         console.log("✅ JWT 저장 완료");
-        //     } else {
-        //         alert("JWT 발급 실패: " + data.message);
-        //         window.location.href = "/";
-        //     }
-        // })
-        // .catch(err => {
-        //     console.error("JWT 발급 오류:", err);
-        //     alert("JWT 발급 중 오류 발생");
+        // const savedKeyCloakToken = localStorage.getItem('keycloak_token');
+        // const savedIdToken = localStorage.getItem('id_token');
+        // console.log("savedKeyCloakToken: ", savedKeyCloakToken);
+        // console.log("savedIdToken: ", savedIdToken);
+        // if (!savedKeyCloakToken) {
+        //     alert("로그인이 필요합니다.");
         //     window.location.href = "/";
-        // });
+        // }
 
         const jwtToken = localStorage.getItem('jwt_token');
-
+        console.log("jwt_token: ", jwtToken)
 
         // ===== KeyCloak 회원가입/로그인 후 DB에 데이터 저장 =====
         // DB 사용자 등록
         fetch('/api/auth/registerKeyCloak', {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${savedKeyCloakToken}`
-        }
-        })
-        .then(res => res.json())
-        .then(data => {
-        console.log('[Keycloak 사용자 등록]', data);
-        })
-        .catch(err => {
-        console.error('[등록 오류]', err);
+            method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('[Keycloak 사용자 등록]', data);
+            })
+            .catch(err => {
+                console.error('[등록 오류]', err);
         });
 
-        console.log("액세스 token: ", savedKeyCloakToken);
         // ✅ 사용자 정보
         fetch('/user-info', {
             headers: {

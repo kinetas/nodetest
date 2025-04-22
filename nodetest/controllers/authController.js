@@ -212,13 +212,20 @@ exports.issueJwtFromKeycloak = async (req, res) => {
         );
 
         const userInfo = userInfoRes.data;
-        const userId = userInfo.preferred_username || userInfo.sub;
+        
+        const payload = { 
+            userId: userInfo.preferred_username || userInfo.sub,
+            email: userInfo.email || null,
+            nickname: userInfo.nickname || null,
+            birth: userInfo.birth || null,
+            name: userInfo.name || null
+        };
 
-        if (!userId) {
-            return res.status(400).json({ success: false, message: '유효한 사용자 정보를 얻지 못했습니다.' });
+        // 필수 필드 검사
+        if (!payload.userId) {
+            return res.status(400).json({ success: false, message: '유효한 사용자 ID를 얻지 못했습니다.' });
         }
 
-        const payload = { userId };
         const token = generateToken(payload);
 
         return res.status(200).json({

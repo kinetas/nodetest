@@ -91,12 +91,14 @@
                     localStorage.setItem('id_token', idToken);
                     // ✅ 우리 서버 JWT 발급 요청 추가
                     return fetch('/api/auth/issueJwtFromKeycloak', {
+                        method: 'POST',
                         headers: {
-                            Authorization: `Bearer ${accessToken}`
-                        }
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ accessToken }),
                     });
                 } else {
-                    alert('❌ Keycloak 로그인 실패: ' + (data.message || ''));
+                    throw new Error(data.message || 'Keycloak 로그인 실패');
                 }
             })
             .then(res => res.json())
@@ -106,12 +108,12 @@
                     alert('✅ Keycloak + JWT 로그인 완료!');
                     window.location.href = '/dashboard'; // ✅ JWT까지 받은 후 이동
                 } else {
-                    alert('❌ JWT 발급 실패: ' + (jwt.message || ''));
+                    throw new Error(jwt.message || 'JWT 발급 실패');
                 }
             })
             .catch((error) => {
-                console.error('Keycloak 로그인 오류:', error);
-                alert('Keycloak 로그인 중 오류 발생');
+                console.error('로그인 오류:', error);
+                alert('로그인 오류: ' + error.message);
             });
         });
 

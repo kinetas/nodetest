@@ -595,34 +595,63 @@
 
         // URL에서 토큰 추출
         const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const token = urlParams.get('access_token');
+        const accessToken  = urlParams.get('access_token');
         const kcIdToken = urlParams.get('id_token'); // ✅ id_token 따로 추출
 
-        if (token) {
-            localStorage.setItem('token', token);
+        console.log("accessToken: ", accessToken);
+        console.log("kcIdToken: ", kcIdToken);
+
+        if (accessToken) {
+            localStorage.setItem('keycloak_token', accessToken );
             history.replaceState(null, null, window.location.pathname);
-        } else {
-            alert("로그인이 필요합니다.");
-            window.location.href = "/";
         }
 
         if (kcIdToken) {
             localStorage.setItem('id_token', kcIdToken); // ✅ 저장
         }
 
-        const savedToken = localStorage.getItem('token');
+        const savedKeyCloakToken = localStorage.getItem('keycloak_token');
         const savedIdToken = localStorage.getItem('id_token');
-        if (!savedToken) {
+        console.log("savedKeyCloakToken: ", savedKeyCloakToken);
+        console.log("savedIdToken: ", savedIdToken);
+        if (!savedKeyCloakToken) {
             alert("로그인이 필요합니다.");
             window.location.href = "/";
         }
+
+        console.log("jwt_token: ", localStorage.getItem('jwt_token'))
+
+        // // ✅ Keycloak access_token으로 우리 서버 JWT 발급 요청
+        // fetch('/api/auth/issueJwtFromKeycloak', {
+        //     headers: {
+        //         Authorization: `Bearer ${savedKeyCloakToken}`
+        //     }
+        // })
+        // .then(res => res.json())
+        // .then(data => {
+        //     if (data.success && data.token) {
+        //         localStorage.setItem('jwt_token', data.token); // ✅ 우리 서버 JWT 저장
+        //         console.log("✅ JWT 저장 완료");
+        //     } else {
+        //         alert("JWT 발급 실패: " + data.message);
+        //         window.location.href = "/";
+        //     }
+        // })
+        // .catch(err => {
+        //     console.error("JWT 발급 오류:", err);
+        //     alert("JWT 발급 중 오류 발생");
+        //     window.location.href = "/";
+        // });
+
+        const jwtToken = localStorage.getItem('jwt_token');
+
 
         // ===== KeyCloak 회원가입/로그인 후 DB에 데이터 저장 =====
         // DB 사용자 등록
         fetch('/api/auth/registerKeyCloak', {
         method: 'GET',
         headers: {
-            Authorization: `Bearer ${savedToken}`
+            Authorization: `Bearer ${savedKeyCloakToken}`
         }
         })
         .then(res => res.json())
@@ -633,11 +662,11 @@
         console.error('[등록 오류]', err);
         });
 
-        console.log("액세스 token: ", savedToken);
+        console.log("액세스 token: ", savedKeyCloakToken);
         // ✅ 사용자 정보
         fetch('/user-info', {
             headers: {
-                Authorization: `Bearer ${savedToken}`
+                Authorization: `Bearer ${savedKeyCloakToken}`
             }
         })
         .then(res => res.json())
@@ -652,7 +681,7 @@
         // ✅ 미션 목록
         fetch('/dashboard/missions', {
             headers: {
-                Authorization: `Bearer ${savedToken}`
+                Authorization: `Bearer ${savedKeyCloakToken}`
             }
         })
         .then(res => res.json())
@@ -668,7 +697,7 @@
 
         // ✅ i_friend 목록
         fetch('/dashboard/friends/ifriends', {
-            headers: { Authorization: `Bearer ${savedToken}` }
+            headers: { Authorization: `Bearer ${savedKeyCloakToken}` }
         })
         .then(res => res.json())
         .then(data => {
@@ -683,7 +712,7 @@
 
         // ✅ t_friend 목록
         fetch('/dashboard/friends/tfriends', {
-            headers: { Authorization: `Bearer ${savedToken}` }
+            headers: { Authorization: `Bearer ${savedKeyCloakToken}` }
         })
         .then(res => res.json())
         .then(data => {
@@ -720,7 +749,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${savedToken}`
+                    Authorization: `Bearer ${savedKeyCloakToken}`
                 },
                 body: JSON.stringify(payload)
             })
@@ -743,7 +772,7 @@
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${savedToken}`
+                    Authorization: `Bearer ${savedKeyCloakToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -762,7 +791,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${savedToken}`
+                    Authorization: `Bearer ${savedKeyCloakToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -781,7 +810,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${savedToken}`
+                    Authorization: `Bearer ${savedKeyCloakToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -800,7 +829,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${savedToken}`
+                    Authorization: `Bearer ${savedKeyCloakToken}`
                 },
                 body: JSON.stringify({ f_id })
             })
@@ -831,7 +860,7 @@
 
         // ✅ 계정탈퇴
         function deleteAccountToken() {
-            const token = localStorage.getItem('token'); // ✅ JWT 토큰 가져오기
+            const token = localStorage.getItem('savedKeyCloakToken'); // ✅ JWT 토큰 가져오기
 
             if (!token) {
                 alert("로그인이 필요합니다.");
@@ -850,7 +879,7 @@
                 .then(data => {
                     if (data.success) {
                         alert(data.message);
-                        localStorage.removeItem('token'); // ✅ 토큰 제거
+                        localStorage.removeItem('savedKeyCloakToken'); // ✅ 토큰 제거
                         window.location.href = '/'; // 로그인 페이지로 이동
                     } else {
                         alert(data.message);

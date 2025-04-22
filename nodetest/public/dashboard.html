@@ -817,10 +817,22 @@
             });
         }
 
-        //로그아웃 (KeyCloak + JWT)
+        //로그아웃 (JWT)
         function logout() {
-            localStorage.removeItem('jwt_token');
-            window.location.href = '/';
+            fetch('/api/auth/logoutToken', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`
+                }
+            })
+            .then(() => {
+                localStorage.removeItem('jwt_token');
+                window.location.href = '/';
+            })
+            .catch(err => {
+                console.error('로그아웃 실패:', err);
+                alert('로그아웃 중 문제가 발생했습니다.');
+            });
         }
 
         function deleteAccountToken() {

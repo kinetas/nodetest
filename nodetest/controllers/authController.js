@@ -30,7 +30,7 @@ exports.keycloakDirectLogin = async (req, res) => {
             new URLSearchParams({
                 grant_type: 'password',
                 client_id: 'nodetest',
-                client_secret: 'ptR4hZ66Q6dvBCWzdiySdk57L7Ow2OzE',
+                client_secret: 'HxCBsoCzp0rldTc3ZiuA7QLtXm1jjFnH',
                 username,
                 password,
             }),

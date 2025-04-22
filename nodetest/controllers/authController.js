@@ -135,62 +135,63 @@ const {
   } = process.env;
 
 exports.deleteAccountFromKeycloak = async (req, res) => {
-    try {
-        // 🔐 Keycloak 토큰에서 사용자 정보 추출
-        const userInfo = req.kauth.grant.access_token.content;
-        const username = userInfo.preferred_username;
+    const userId = req.currentUserId;
 
+    if (!userId) {
+        return res.status(401).json({ success: false, message: 'JWT 토큰이 필요합니다.' });
+    }
+
+    try {
         // 1. Keycloak 관리자 토큰 발급
         const tokenRes = await axios.post(
             `${KEYCLOAK_BASE_URL}/realms/master/protocol/openid-connect/token`,
             new URLSearchParams({
-                grant_type: 'password',
-                client_id: KEYCLOAK_CLIENT_ID,
-                username: KEYCLOAK_ADMIN_USER,
-                password: KEYCLOAK_ADMIN_PASS
+                grant_type: 'client_credentials',
+                client_id: 'admin-cli',
+                client_secret: process.env.KEYCLOAK_ADMIN_SECRET
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
 
         const adminToken = tokenRes.data.access_token;
 
-        // 2. 사용자 UUID 조회
+        // 2. Keycloak 사용자 UUID 검색
         const userSearchRes = await axios.get(
             `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users`,
             {
                 headers: { Authorization: `Bearer ${adminToken}` },
-                params: { username }
+                params: { username: userId }
             }
         );
 
         if (!userSearchRes.data.length) {
-            return res.status(404).json({
-                success: false,
-                message: 'Keycloak 계정을 찾을 수 없습니다.'
-            });
+            return res.status(404).json({ success: false, message: 'Keycloak 계정을 찾을 수 없습니다.' });
         }
 
-        const kcUserId = userSearchRes.data[0].id;
+        const keycloakUserId = userSearchRes.data[0].id;
 
         // 3. Keycloak 계정 삭제
         await axios.delete(
-            `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${kcUserId}`,
+            `${KEYCLOAK_BASE_URL}/admin/realms/${KEYCLOAK_REALM}/users/${keycloakUserId}`,
             { headers: { Authorization: `Bearer ${adminToken}` } }
         );
 
-        // 4. 로컬 DB 사용자 삭제
-        await User.destroy({ where: { u_id: username } });
+        // 4. 우리 DB의 메시지, 미션, 방, 유저 삭제
+        await RMessage.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+        await Mission.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+        await Room.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+        await User.destroy({ where: { u_id: userId } });
 
         return res.json({
             success: true,
-            message: `${username} 계정이 Keycloak 및 DB에서 삭제되었습니다.`
+            message: `${userId} 계정이 Keycloak 및 로컬 DB에서 모두 삭제되었습니다.`
         });
     } catch (err) {
-        console.error('Keycloak 계정 삭제 오류:', err.message);
+        console.error('계정 삭제 오류:', err.response?.data || err.message);
         return res.status(500).json({
             success: false,
-            message: '계정 삭제 중 오류 발생',
-            error: err.message
+            message: '계정 삭제 중 오류가 발생했습니다.',
+            error: err.response?.data || err.message
         });
     }
 };

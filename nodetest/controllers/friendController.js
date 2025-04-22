@@ -323,10 +323,10 @@ exports.printTFriend = async (req, res) => {
             where: { f_status: 0 },
         });
 
-        // const sentRequests = tFriends.filter(friend => friend.u_id === req.currentUserId).map(friend => friend.f_id);
-        // const receivedRequests = tFriends.filter(friend => friend.f_id === req.currentUserId).map(friend => friend.u_id);
-        const sentRequests = tFriends.filter(friend => friend.u_id === req.kauth?.grant?.access_token?.content?.preferred_username).map(friend => friend.f_id);
-        const receivedRequests = tFriends.filter(friend => friend.f_id === req.kauth?.grant?.access_token?.content?.preferred_username).map(friend => friend.u_id);
+        const sentRequests = tFriends.filter(friend => friend.u_id === req.currentUserId).map(friend => friend.f_id);
+        const receivedRequests = tFriends.filter(friend => friend.f_id === req.currentUserId).map(friend => friend.u_id);
+        // const sentRequests = tFriends.filter(friend => friend.u_id === req.kauth?.grant?.access_token?.content?.preferred_username).map(friend => friend.f_id);
+        // const receivedRequests = tFriends.filter(friend => friend.f_id === req.kauth?.grant?.access_token?.content?.preferred_username).map(friend => friend.u_id);
 
         res.json({ success: true, sentRequests, receivedRequests });
     } catch (error) {

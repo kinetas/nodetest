@@ -14,13 +14,10 @@ const { addLaplaceNoise } = require('../utils/dpUtils');
 //================JWT===================
 
 const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 암호화 모듈 가져오기
-
 const roomController = require('./roomController'); // roomController 가져오기
-
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
-
-// Keycloak 직접 로그인 처리
+// Keycloak 직접 로그인 처리 (index 화면에서 로그인)
 exports.keycloakDirectLogin = async (req, res) => {
     const { username, password } = req.body;
 
@@ -57,7 +54,7 @@ exports.keycloakDirectLogin = async (req, res) => {
     }
 };
 
-// Keycloak 로그인 리디렉션 URL 제공 API
+// Keycloak 로그인 리디렉션 URL 제공 API (KeyCloak 화면에서 로그인)
 exports.getKeycloakLoginUrl = async (req, res) => {
     try {
         const baseUrl = 'http://27.113.11.48:8080'; // Keycloak 서버 주소
@@ -135,6 +132,7 @@ const {
     KEYCLOAK_CLIENT_ID,
   } = process.env;
 
+// 계정 탈퇴
 exports.deleteAccountFromKeycloak = async (req, res) => {
     const userId = req.currentUserId;
 
@@ -276,161 +274,8 @@ exports.deleteAccount = async (req, res) => { // 추가
     }
 };
 
-
-//=============================Token========================
-
-exports.loginToken = async (req, res) => {
-    console.time("LoginResponseTime"); // 시작 지점
-    try {
-        const { userId, password } = req.body;
-
-        // 사용자 조회
-        const user = await User.findOne({ where: { u_id: userId } });
-
-        if (!user) {
-            return res.status(400).json({ success: false, message: '가입되지 않은 아이디입니다.' });
-        }
-
-        const isMatched = await comparePassword(password, user.u_password);
-
-        if (!isMatched) {
-            return res.status(401).json({ success: false, message: '비밀번호가 일치하지 않습니다.' });
-        }
-
-        // 생년월일 처리: 일반 버전과 DP 버전 선택 가능하게
-        let birthDate;
-        const useDP = false; // ✅ 실험 시 여기만 true/false 바꿔서 비교 가능
-
-        if (useDP) {
-            const birth = new Date(user.u_birth);
-            const birthDays = Math.floor(birth.getTime() / (1000 * 60 * 60 * 24));
-            const epsilon = 0.9;
-            const noisyDays = Math.floor(addLaplaceNoise(birthDays, epsilon));
-            birthDate = new Date(noisyDays * 24 * 60 * 60 * 1000);
-        } else {
-            birthDate = user.u_birth;
-        }
-
-        const payload = {
-            userId: user.u_id,
-            birth: birthDate.toISOString().split('T')[0],
-        };
-
-        const token = generateToken(payload);
-
-        console.timeEnd("LoginResponseTime"); // 응답 시간 측정 끝
-
-        return res.status(200).json({
-            success: true,
-            message: '성공적으로 로그인 되었습니다.',
-            token,
-            user: {
-                u_id: user.u_id,
-                u_name: user.u_name,
-                birth_sent: birthDate.toISOString().split('T')[0],
-            }
-        });
-
-        // // JWT 페이로드 설정
-        // const payload = {
-        //     userId: user.u_id,  // 클레임 이름은 loginRequired.js와 일치시켜야 함
-        // };
-
-        // // 토큰 생성
-        // const token = generateToken(payload); // 1시간 유효 토큰 발급
-
-        // // 클라이언트로 토큰 전달
-        // return res.status(200).json({
-        //     success: true,
-        //     message: '성공적으로 로그인 되었습니다.',
-        //     token, // ✅ 클라이언트는 이걸 localStorage에 저장
-        //     user: {
-        //         u_id: user.u_id,
-        //         u_name: user.u_name,
-        //         // 추가 정보 필요한 경우 여기에 포함
-        //     }
-        // });
-
-    } catch (error) {
-        console.error('loginToken error:', error);
-        return res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
-    }
-};
-
-// 로그아웃 로직 구현
-// exports.logoutToken = async (req, res) => { 
-//     const token = req.headers.authorization?.split(" ")[1];
-
-//     if (!token) {
-//         res.status(400).json({ message: '토큰이 없습니다. 로그인 상태를 확안하세요.' });
-//         return;
-//     }
-
-//     const decoded = jwt.verify(token, secretKey);
-
-//     if (!decoded) {
-//         res.status(401).json({ message: '잘못된 토큰입니다. 로그인 상태를 확인하세요.' });
-//         return;
-//     }
-
-//     res.clearCookie('token'); // 로그아웃시 쿠키 삭제
-//     res.json({ message: '로그아웃 되었습니다.' });
-// };
 // ✅ JWT 기반 로그아웃 로직 (간소화 버전)
 exports.logoutToken = async (req, res) => {
     res.clearCookie('token'); // 만약 쿠키 기반이라면 의미 있음
     res.json({ message: '로그아웃 되었습니다.' });
-};
-
-// ✅ JWT 기반 계정 탈퇴 함수
-exports.deleteAccountToken = async (req, res) => {
-    const userId = req.currentUserId; // ✅ JWT로부터 추출한 사용자 ID
-
-    if (!userId) {
-        return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
-    }
-
-    try {
-        // 1. 메시지 삭제
-        await RMessage.destroy({
-            where: {
-                [Op.or]: [{ u1_id: userId }, { u2_id: userId }]
-            }
-        });
-
-        // 2. 미션 삭제
-        await Mission.destroy({
-            where: {
-                [Op.or]: [{ u1_id: userId }, { u2_id: userId }]
-            }
-        });
-
-        // 3. 방 삭제
-        await Room.destroy({
-            where: {
-                [Op.or]: [{ u1_id: userId }, { u2_id: userId }]
-            }
-        });
-
-        // 4. 유저 삭제
-        const deleted = await User.destroy({ where: { u_id: userId } });
-
-        if (deleted) {
-            return res.status(200).json({
-                success: true,
-                message: '계정이 성공적으로 삭제되었습니다.'
-            });
-        } else {
-            return res.status(404).json({
-                success: false,
-                message: '사용자를 찾을 수 없습니다.'
-            });
-        }
-    } catch (error) {
-        console.error('계정 삭제 오류:', error);
-        return res.status(500).json({
-            success: false,
-            message: `서버 오류(${error.message})가 발생했습니다.`
-        });
-    }
 };

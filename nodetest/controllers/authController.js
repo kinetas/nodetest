@@ -17,7 +17,7 @@ const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 
 const roomController = require('./roomController'); // roomController 가져오기
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
-
+// 회원가입
 exports.registerKeycloakDirect = async (req, res) => {
     const { u_id, u_password, u_mail, u_nickname, u_name, u_birth } = req.body;
 
@@ -32,7 +32,9 @@ exports.registerKeycloakDirect = async (req, res) => {
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
+        console.log("secret: ", process.env.KEYCLOAK_ADMIN_SECRET);
         const adminToken = tokenRes.data.access_token;
+        console.log("admintoken: ", adminToken);
 
         // 2. Keycloak 사용자 생성
         await axios.post(

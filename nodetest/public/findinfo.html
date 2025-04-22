@@ -53,25 +53,25 @@
 
         //비밀번호 변경
         document.getElementById('changePasswordButton').addEventListener('click', function() {
-        const userId = document.getElementById('userId').value;
-        const newPassword = document.getElementById('newPassword').value;
+            const userId = document.getElementById('userId').value;
+            const newPassword = document.getElementById('newPassword').value;
 
-        fetch('/api/auth/changePassword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            fetch('/api/auth/changePassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
 
-            body: JSON.stringify({ userId, newPassword })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-        })
-        .catch(error => {
-            console.error('오류:', error);
-            alert('비밀번호 변경 중 오류가 발생했습니다.');
-        });
+                body: JSON.stringify({ userId, newPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('오류:', error);
+                alert('비밀번호 변경 중 오류가 발생했습니다.(findInfo.html:73)');
+            });
         });
 
         // // 비밀번호 변경 (✅ JWT 사용)

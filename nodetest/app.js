@@ -180,17 +180,17 @@ app.get('/community_missions', (req, res) => {
 });
 
 // ��??���??? �젙蹂�??�� 諛섑?���븯�뒗 �씪�슦�듃 ?��붽��???
-// app.get('/user-info', requireAuth, (req, res) => {
-//     // res.json({ userId: req.session.user.id }); //세션기반
-//     res.json({ userId: req.currentUserId });    //토큰기반
-// });
+app.get('/user-info', loginRequired, (req, res) => {
+    // res.json({ userId: req.session.user.id }); //세션기반
+    res.json({ userId: req.currentUserId });    //토큰기반
+});
 //==============================================================================
 //======================MSA 적용 시 삭제========================================
-app.get('/user-info', keycloak.protect(), (req, res) => {
-    const userInfo = req.kauth.grant.access_token.content;
-    const userId = userInfo.preferred_username || userInfo.sub;
-    res.json({ userId });
-});
+// app.get('/user-info', keycloak.protect(), (req, res) => {
+//     const userInfo = req.kauth.grant.access_token.content;
+//     const userId = userInfo.preferred_username || userInfo.sub;
+//     res.json({ userId });
+// });
 //==============================================================================
 
 app.get('/', (req, res) => {
@@ -259,8 +259,8 @@ app.use('/api/auth', timeConverterMiddleware, authRoutes);
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 //==============================================================================
 
-// app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
-app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
+app.use('/dashboard', timeConverterMiddleware, loginRequired, missionRoutes);  //JWT토큰
+// app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
 app.use('/api/rooms', timeConverterMiddleware, loginRequired, roomRoutes); //JWT토큰
 // app.use('/api/rooms', timeConverterMiddleware, roomRoutes);

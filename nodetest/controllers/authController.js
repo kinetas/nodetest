@@ -27,7 +27,7 @@ exports.registerKeycloakDirect = async (req, res) => {
             'http://27.113.11.48:8080/realms/master/protocol/openid-connect/token',
             new URLSearchParams({
                 grant_type: 'client_credentials',
-                client_id: 'admin-cli',
+                client_id: 'nodetest',
                 client_secret: process.env.KEYCLOAK_ADMIN_SECRET
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }

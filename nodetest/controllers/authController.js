@@ -17,6 +17,64 @@ const { hashPassword, comparePassword } = require('../utils/passwordUtils'); // 
 const roomController = require('./roomController'); // roomController 가져오기
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
+
+exports.registerKeycloakDirect = async (req, res) => {
+    const { u_id, u_password, u_mail, u_nickname, u_name, u_birth } = req.body;
+
+    try {
+        // 1. 관리자 토큰 발급
+        const tokenRes = await axios.post(
+            'http://27.113.11.48:8080/realms/master/protocol/openid-connect/token',
+            new URLSearchParams({
+                grant_type: 'client_credentials',
+                client_id: 'admin-cli',
+                client_secret: process.env.KEYCLOAK_ADMIN_SECRET
+            }),
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        );
+        const adminToken = tokenRes.data.access_token;
+
+        // 2. Keycloak 사용자 생성
+        await axios.post(
+            'http://27.113.11.48:8080/admin/realms/master/users',
+            {
+                username: u_id,
+                enabled: true,
+                email: u_mail,
+                firstName: u_name,
+                attributes: {
+                    nickname: [u_nickname],
+                    birth: [u_birth]
+                },
+                credentials: [
+                    {
+                        type: 'password',
+                        value: u_password,
+                        temporary: false
+                    }
+                ]
+            },
+            { headers: { Authorization: `Bearer ${adminToken}` } }
+        );
+
+        // 3. 우리 DB에 사용자 정보 저장
+        const hashed = await hashPassword(u_password);
+        await User.create({
+            u_id,
+            u_password: hashed,
+            u_mail,
+            u_nickname,
+            u_name,
+            u_birth
+        });
+
+        return res.status(201).json({ success: true, message: '회원가입 성공' });
+    } catch (err) {
+        console.error('회원가입 실패:', err.response?.data || err.message);
+        return res.status(500).json({ success: false, message: '회원가입 실패', error: err.message });
+    }
+};
+
 // Keycloak 직접 로그인 처리 (index 화면에서 로그인)
 exports.keycloakDirectLogin = async (req, res) => {
     const { username, password } = req.body;

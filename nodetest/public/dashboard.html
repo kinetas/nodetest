@@ -623,23 +623,6 @@
         const jwtToken = localStorage.getItem('jwt_token');
         console.log("jwt_token: ", jwtToken)
 
-        // // ===== KeyCloak 회원가입/로그인 후 DB에 데이터 저장 =====
-        // // DB 사용자 등록
-        // fetch('/api/auth/registerKeyCloak', {
-        //     method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Authorization': `Bearer ${jwtToken}`
-        //         }
-        //     })
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         console.log('[사용자 등록]', data);
-        //     })
-        //     .catch(err => {
-        //         console.error('[등록 오류(dashboard:640)]', err);
-        // });
-
         // ✅ 사용자 정보
         fetch('/user-info', {
             headers: {

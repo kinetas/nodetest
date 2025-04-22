@@ -98,6 +98,9 @@ exports.changePassword = async (req, res) => {
         const adminToken = await getAdminToken();
         const keycloakUserId = await getKeycloakUserId(userId, adminToken);
 
+        console.log("adminToken: ", adminToken);
+        console.log("keycloakUserId: ", keycloakUserId);
+
         if (!keycloakUserId) {
         return res.status(404).json({ success: false, message: 'Keycloak 사용자 없음' });
         }

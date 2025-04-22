@@ -147,50 +147,50 @@ exports.getKeycloakLoginUrl = async (req, res) => {
     }
 };
 
-// ✅ Keycloak 로그인 후 사용자 정보 기반 DB 자동 저장
-exports.getOrCreateUserFromKeycloak = async (req, res) => {
-    try {
-      const keycloakUser = req.kauth.grant.access_token.content;
+// // ✅ Keycloak 로그인 후 사용자 정보 기반 DB 자동 저장
+// exports.getOrCreateUserFromKeycloak = async (req, res) => {
+//     try {
+//       const keycloakUser = req.kauth.grant.access_token.content;
   
-      const u_id = keycloakUser.preferred_username;                   // 사용자명
-      const u_mail = keycloakUser.email || null;                      // 이메일
-      const u_nickname = keycloakUser.nickname || 'no_nickname';      // 닉네임 (커스텀 필드)
-      const u_birth = keycloakUser.birth || null;                     // 생년월일 (커스텀 필드)
-      const u_name = keycloakUser.name || 'unknown';                  // 전체 이름
-      const u_password = 'keycloak'; // 더미 비번 (사용되지 않음)
+//       const u_id = keycloakUser.preferred_username;                   // 사용자명
+//       const u_mail = keycloakUser.email || null;                      // 이메일
+//       const u_nickname = keycloakUser.nickname || 'no_nickname';      // 닉네임 (커스텀 필드)
+//       const u_birth = keycloakUser.birth || null;                     // 생년월일 (커스텀 필드)
+//       const u_name = keycloakUser.name || 'unknown';                  // 전체 이름
+//       const u_password = 'keycloak'; // 더미 비번 (사용되지 않음)
   
-      // 🔎 이미 존재하는 사용자 찾기
-      const [user, created] = await User.findOrCreate({
-        where: { u_id },
-        defaults: {
-          u_password,
-          u_nickname,
-          u_name,
-          u_birth,
-          u_mail
-        }
-      });
+//       // 🔎 이미 존재하는 사용자 찾기
+//       const [user, created] = await User.findOrCreate({
+//         where: { u_id },
+//         defaults: {
+//           u_password,
+//           u_nickname,
+//           u_name,
+//           u_birth,
+//           u_mail
+//         }
+//       });
   
-      if (created) {
-        console.log(`Keycloak 사용자가 DB에 등록됨: ${u_id}`);
+//       if (created) {
+//         console.log(`Keycloak 사용자가 DB에 등록됨: ${u_id}`);
 
-        // 방 생성 (응답 처리 없이 결과만 확인)
-        const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
-        if (!roomResult.success) {
-            console.error('방 생성 실패:', roomResult.error);
-            return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });
-        }
+//         // 방 생성 (응답 처리 없이 결과만 확인)
+//         const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
+//         if (!roomResult.success) {
+//             console.error('방 생성 실패:', roomResult.error);
+//             return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });
+//         }
 
-      } else {
-        console.log(`Keycloak 사용자가 이미 DB에 존재함: ${u_id}`);
-      }
+//       } else {
+//         console.log(`Keycloak 사용자가 이미 DB에 존재함: ${u_id}`);
+//       }
   
-      res.status(200).json({ success: true, user });
-    } catch (err) {
-      console.error('사용자 등록 오류:', err);
-      res.status(500).json({ success: false, message: '사용자 등록 중 오류 발생' });
-    }
-};
+//       res.status(200).json({ success: true, user });
+//     } catch (err) {
+//       console.error('사용자 등록 오류:', err);
+//       res.status(500).json({ success: false, message: '사용자 등록 중 오류 발생' });
+//     }
+// };
 
 // 계정 탈퇴
 exports.deleteAccountFromKeycloak = async (req, res) => {

@@ -12,9 +12,8 @@
     <form id="loginForm">
         <input type="text" id="u_id" placeholder="아이디" required><br><br>
         <input type="password" id="u_password" placeholder="비밀번호" required><br><br>
-        <!-- ✅ JWT 방식에서는 디바이스 토큰 입력 필드 제거 -->
-        <!-- <input type="text" id="token" placeholder="토큰" required><br><br> -->
-        <button type="submit">로그인</button>
+        <!-- ✅ Keycloak 직접 로그인 버튼 -->
+        <button id="keycloakDirectLoginButton">Keycloak 직접 로그인</button>
     </form>
     <div id="result"></div>
     
@@ -25,54 +24,16 @@
     <button id="findInfoButton">아이디/비밀번호 변경</button>
 
     <!-- ✅ Keycloak 로그인 버튼 -->
-    <button id="keycloakLoginButton">Keycloak 로그인</button>
-
-    <!-- ✅ Keycloak 직접 로그인 버튼 -->
-    <button id="keycloakDirectLoginButton">Keycloak 직접 로그인</button>
+    <!-- <button id="keycloakLoginButton">Keycloak 로그인</button> -->
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // ✅ 변수명 변경: JWT 기반 loginToken API는 userId, password 사용
-            const userId = document.getElementById('u_id').value;
-            const password = document.getElementById('u_password').value;
-
-            // ✅ JWT 기반 loginToken 라우트로 요청
-            fetch('/api/auth/loginToken', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId, password }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log("🔁 로그인 응답 데이터:", data); // ✅ 이게 핵심
-                console.log("🔐 응답 토큰:", data.token);   // ✅ undefined면 서버 응답 문제
-                if (data.token) {
-                    // localStorage에 토큰 저장
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('userId', data.user.u_id); // 사용자 ID도 저장 가능
-
-                    setTimeout(() => {
-                        window.location.href = '/dashboard';
-                    }, 1000); // 100ms 지연 후 이동
-                } else {
-                    document.getElementById('result').textContent = data.message || '로그인 실패';
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                document.getElementById('result').textContent = `로그인 중 오류 (${error})가 발생했습니다.`;
-            });
-        });
 
         // ✅ Keycloak 직접 로그인 버튼 핸들러
         document.getElementById('keycloakDirectLoginButton').addEventListener('click', () => {
             const username = document.getElementById('u_id').value;
             const password = document.getElementById('u_password').value;
 
+            // index 화면에서 로그인
             fetch('/api/auth/keycloak-direct-login', {
                 method: 'POST',
                 headers: {
@@ -112,8 +73,8 @@
                 }
             })
             .catch((error) => {
-                console.error('로그인 오류:', error);
-                alert('로그인 오류: ' + error.message);
+                console.error('로그인 오류(index.html:76):', error);
+                alert('로그인 오류(index.html:76): ' + error.message);
             });
         });
 
@@ -136,22 +97,24 @@
         //         "&nonce=nonce123" + 
         //         "&redirect_uri=http://27.113.11.48:3000/dashboard";
         // });
-        document.getElementById('keycloakLoginButton').addEventListener('click', () => {
-        // 백엔드에서 로그인 URL을 받아옴
-            fetch('/api/auth/keycloak-login-url')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.loginUrl) {
-                        window.location.href = data.loginUrl;
-                    } else {
-                        alert('Keycloak 로그인 URL을 가져오지 못했습니다.');
-                    }
-                })
-                .catch((error) => {
-                    console.error('Keycloak 로그인 요청 오류:', error);
-                    alert('Keycloak 로그인 중 오류 발생');
-                });
-        });
+
+        // KeyCloak 화면에서 로그인
+        // document.getElementById('keycloakLoginButton').addEventListener('click', () => {
+        // // 백엔드에서 로그인 URL을 받아옴
+        //     fetch('/api/auth/keycloak-login-url')
+        //         .then(response => response.json())
+        //         .then(data => {
+        //             if (data.success && data.loginUrl) {
+        //                 window.location.href = data.loginUrl;
+        //             } else {
+        //                 alert('Keycloak 로그인 URL을 가져오지 못했습니다.');
+        //             }
+        //         })
+        //         .catch((error) => {
+        //             console.error('Keycloak 로그인 요청 오류:', error);
+        //             alert('Keycloak 로그인 중 오류 발생');
+        //         });
+        // });
     </script>
 </body>
 </html>

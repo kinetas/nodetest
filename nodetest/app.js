@@ -35,14 +35,14 @@ const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
 
 const app = express();
-const PORT = 3000;
+const PORT = 3002;
 const roomController = require('./controllers/roomController');
 //=====================추�??========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 // // ======== ?��?�� JWT ============
 const jwt = require('jsonwebtoken'); // JWT 추�??
-const requireAuth = require('./middleware/loginRequired'); // JWT 미들웨어 추가
+const loginRequired = require('./middleware/loginRequired'); // JWT 미들웨어 추가
 // const requireAuth = require('./middleware/authMiddleware');
 
 const cors = require('cors');
@@ -170,7 +170,7 @@ app.post('/api/rooms/enter', roomController.enterRoom);
 
 
 // �삁�떆: ����?��蹂�??�??? �씪�슦�듃 蹂댄?��
-app.get('/dashboard', keycloak.protect(), (req, res) => {
+app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
     // const userId = req.session.user.id;
     // res.json({ userId });
@@ -180,17 +180,17 @@ app.get('/community_missions', (req, res) => {
 });
 
 // ��??���??? �젙蹂�??�� 諛섑?���븯�뒗 �씪�슦�듃 ?��붽��???
-// app.get('/user-info', requireAuth, (req, res) => {
-//     // res.json({ userId: req.session.user.id }); //세션기반
-//     res.json({ userId: req.currentUserId });    //토큰기반
-// });
+app.get('/user-info', loginRequired, (req, res) => {
+    // res.json({ userId: req.session.user.id }); //세션기반
+    res.json({ userId: req.currentUserId });    //토큰기반
+});
 //==============================================================================
 //======================MSA 적용 시 삭제========================================
-app.get('/user-info', keycloak.protect(), (req, res) => {
-    const userInfo = req.kauth.grant.access_token.content;
-    const userId = userInfo.preferred_username || userInfo.sub;
-    res.json({ userId });
-});
+// app.get('/user-info', keycloak.protect(), (req, res) => {
+//     const userInfo = req.kauth.grant.access_token.content;
+//     const userId = userInfo.preferred_username || userInfo.sub;
+//     res.json({ userId });
+// });
 //==============================================================================
 
 app.get('/', (req, res) => {
@@ -241,15 +241,15 @@ app.get('/recommendationMission', (req, res) => {
 
 //==============================================================================
 //======================MSA 적용 시 삭제========================================
-app.use((req, res, next) => {
-    if (req.kauth?.grant?.access_token?.content?.preferred_username) {
-      req.currentUserId = req.kauth.grant.access_token.content.preferred_username;
-    }
-    next();
-});
+// app.use((req, res, next) => {
+//     if (req.kauth?.grant?.access_token?.content?.preferred_username) {
+//       req.currentUserId = req.kauth.grant.access_token.content.preferred_username;
+//     }
+//     next();
+// });
 //==============================================================================
 
-app.use('/chat', timeConverterMiddleware, requireAuth, chatRoutes); //JWT토큰
+app.use('/chat', timeConverterMiddleware, loginRequired, chatRoutes); //JWT토큰
 // app.use('/chat', timeConverterMiddleware, chatRoutes);
 
 //==============================================================================
@@ -259,25 +259,25 @@ app.use('/api/auth', timeConverterMiddleware, authRoutes);
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 //==============================================================================
 
-// app.use('/dashboard', timeConverterMiddleware, requireAuth, missionRoutes);  //JWT토큰
-app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
+app.use('/dashboard', timeConverterMiddleware, loginRequired, missionRoutes);  //JWT토큰
+// app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
-app.use('/api/rooms', timeConverterMiddleware, requireAuth, roomRoutes); //JWT토큰
+app.use('/api/rooms', timeConverterMiddleware, loginRequired, roomRoutes); //JWT토큰
 // app.use('/api/rooms', timeConverterMiddleware, roomRoutes);
 
-// app.use('/api/missions', timeConverterMiddleware, requireAuth, missionRoutes); //JWT토큰
-app.use('/api/missions', timeConverterMiddleware, missionRoutes);
+app.use('/api/missions', timeConverterMiddleware, loginRequired, missionRoutes); //JWT토큰
+// app.use('/api/missions', timeConverterMiddleware, missionRoutes);
 
-app.use('/result', timeConverterMiddleware, requireAuth, resultRoutes); // '/result' 경로 //JWT토큰
+app.use('/result', timeConverterMiddleware, loginRequired, resultRoutes); // '/result' 경로 //JWT토큰
 // app.use('/result', timeConverterMiddleware, resultRoutes); // '/result' 경로
 
-// app.use('/dashboard/friends', timeConverterMiddleware, requireAuth, friendRoutes); //JWT토큰
-app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
+app.use('/dashboard/friends', timeConverterMiddleware, loginRequired, friendRoutes); //JWT토큰
+// app.use('/dashboard/friends', timeConverterMiddleware, friendRoutes);
 
-app.use('/api/cVote', timeConverterMiddleware, requireAuth, cVoteRoutes); //JWT토큰
+app.use('/api/cVote', timeConverterMiddleware, loginRequired, cVoteRoutes); //JWT토큰
 // app.use('/api/cVote', timeConverterMiddleware, cVoteRoutes);
 
-app.use('/api/comumunity_missions', timeConverterMiddleware, requireAuth, c_missionRoutes); //JWT토큰
+app.use('/api/comumunity_missions', timeConverterMiddleware, loginRequired, c_missionRoutes); //JWT토큰
 // app.use('/api/comumunity_missions', timeConverterMiddleware, c_missionRoutes);
 
 // //AI관련

@@ -17,9 +17,11 @@ services:
     build: ./nodetest
     container_name: nodetest
     restart: always
-    ports:
-      - "3000:3000"
-      - "3001:3001"
+    # ports:
+    #   - "3000:3000"
+    #   - "3001:3001"
+    expose:
+      - "3000"
     depends_on:
       - mysql
     env_file:
@@ -30,8 +32,10 @@ services:
     build: ./rag_server
     container_name: rag_server
     restart: always
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       - chroma
       - ollama
@@ -59,8 +63,10 @@ services:
   intent_server:
     build: ./intent_server
     container_name: intent_server
-    ports:
-      - "8002:8002"
+    # ports:
+    #   - "8002:8002"
+    expose:
+      - "8002"
     volumes:
       - ./models/intent_model:/app/intent_model
 
@@ -106,15 +112,15 @@ services:
       - rag_server
       - intent_server
 
-  # auth_server_1:
-  #   build: ./auth_server
-  #   container_name: auth_server_1
-  #   expose:
-  #     - "3000"
-  #   env_file:
-  #     - ./auth_server/.env
-  #   depends_on:
-  #     - mysql
+  auth_server_1:
+    build: ./auth_server
+    container_name: auth_server_1
+    expose:
+      - "3000"
+    env_file:
+      - ./auth_server/.env
+    depends_on:
+      - mysql
 
   # auth_server_2:
   #   build: ./auth_server

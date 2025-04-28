@@ -122,15 +122,15 @@ services:
     depends_on:
       - mysql
 
-  # auth_server_2:
-  #   build: ./auth_server
-  #   container_name: auth_server_2
-  #   expose:
-  #     - "3000"
-  #   env_file:
-  #     - ./auth_server/.env
-  #   depends_on:
-  #     - mysql
+  auth_server_2:
+    build: ./auth_server
+    container_name: auth_server_2
+    expose:
+      - "3000"
+    env_file:
+      - ./auth_server/.env
+    depends_on:
+      - mysql
 
   # nodetest:
   #   build: ./nodetest

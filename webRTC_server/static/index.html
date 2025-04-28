@@ -62,6 +62,9 @@
     <button id="toggleCam">📷 캠 끄기</button>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+  
   <script>
     const userId = crypto.randomUUID();
     let targetId = null;
@@ -74,9 +77,66 @@
     let lastBytesSent = 0;
     let lastTimestamp = 0;
 
+    let detector;
+    const video = document.getElementById("remoteVideo");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
     const statusBox = document.getElementById("status");
     const remoteVideo = document.getElementById("remoteVideo");
     const localVideo = document.getElementById("localVideo");
+
+    async function initPoseDetector() {
+      const model = poseDetection.SupportedModels.MoveNet;
+      detector = await poseDetection.createDetector(model);
+      console.log("✅ Pose Detector 초기화 완료");
+    }
+    
+    async function detectFall() {
+      if (!video.videoWidth || !video.videoHeight) return;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+      const poses = await detector.estimatePoses(canvas);
+    
+      if (poses.length > 0) {
+        const keypoints = poses[0].keypoints;
+    
+        const nose = keypoints.find(k => k.name === "nose");
+        const leftHip = keypoints.find(k => k.name === "left_hip");
+        const rightHip = keypoints.find(k => k.name === "right_hip");
+    
+        if (nose && leftHip && rightHip && nose.score > 0.5 && leftHip.score > 0.5 && rightHip.score > 0.5) {
+          const hipY = (leftHip.y + rightHip.y) / 2;
+          const noseY = nose.y;
+          const diffY = hipY - noseY;
+    
+          if (diffY < 100) { // 허리-머리 y축 차이 작으면 낙상 판단
+            console.warn("🛑 낙상 감지! (hipY-noseY=", diffY, ")");
+            statusBox.innerText = "🛑 낙상 감지!";
+            statusBox.style.backgroundColor = "red";
+          } else {
+            statusBox.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+          }
+        }
+      }
+    }
+    
+    async function startFallDetectionLoop() {
+      await initPoseDetector();
+      setInterval(async () => {
+        if (detector && video.readyState >= 2) {
+          await detectFall();
+        }
+      }, 2000); // 2초 간격
+    }
+    
+    // 연결 완료되면 낙상 감지 루프 시작
+    remoteVideo.addEventListener("loadeddata", () => {
+      console.log("🎥 remoteVideo 재생 시작됨");
+      startFallDetectionLoop();
+    });
 
     const ws = new WebSocket("wss://" + window.location.host + "/ws");
     //const ws = new WebSocket("wss://27.113.11.48:8500/ws");

@@ -99,7 +99,7 @@ services:
     command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli", "--verbose"]
 
   gateway:
-    build: ./gateway
+    build: ./api_gateway
     container_name: api_gateway
     ports:
       - "3000:3000"  # 외부 노출은 오직 Gateway

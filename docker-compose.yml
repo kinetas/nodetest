@@ -86,7 +86,7 @@ services:
     container_name: turnserver
     restart: always
     env_file:
-    - ./webRTC_server/.env
+      - ./webRTC_server/.env
     ports:
       - "3478:3478/udp"
       - "3478:3478/tcp"

@@ -17,31 +17,25 @@ services:
     build: ./nodetest
     container_name: nodetest
     restart: always
-    ports:
-      - "3000:3000"
-      - "3001:3001"
+    # ports:
+    #   - "3000:3000"
+    #   - "3001:3001"
+    expose:
+      - "3000"
     depends_on:
       - mysql
     env_file:
       - ./nodetest/.env
 
-  # auth_server1:
-  #   build: ./auth_server1
-  #   container_name: auth_server1
-  #   restart: always
-  #   ports:
-  #     - "3004:3000"
-  #   depends_on:
-  #     - mysql
-  #   env_file:
-  #     - ./auth_server1/.env
 
   rag_server:
     build: ./rag_server
     container_name: rag_server
     restart: always
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       - chroma
       - ollama
@@ -69,8 +63,10 @@ services:
   intent_server:
     build: ./intent_server
     container_name: intent_server
-    ports:
-      - "8002:8002"
+    # ports:
+    #   - "8002:8002"
+    expose:
+      - "8002"
     volumes:
       - ./models/intent_model:/app/intent_model
 
@@ -102,18 +98,82 @@ services:
       - ./webRTC_server/SECRETE:/app/cert
     command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli", "--verbose"]
 
-  #nginx:
-   # image: nginx:latest
-   # container_name: nginx
-   # restart: always
-   # ports:
-   #   - "80:80"
-   #   - "443:443"
-   # depends_on:
-   #   - webRTC_server
-   # volumes:
-   #   - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-   #   - ./webRTC_server/SECRETE:/etc/letsencrypt
+  gateway:
+    build: ./gateway
+    container_name: api_gateway
+    ports:
+      - "3000:3000"  # 외부 노출은 오직 Gateway
+    env_file:
+      - ./gateway/.env
+    depends_on:
+      - auth_server_1
+      - auth_server_2
+      - nodetest
+      - rag_server
+      - intent_server
+
+  auth_server_1:
+    build: ./auth_server
+    container_name: auth_server_1
+    expose:
+      - "3000"
+    env_file:
+      - ./auth_server/.env
+    depends_on:
+      - mysql
+
+  # auth_server_2:
+  #   build: ./auth_server
+  #   container_name: auth_server_2
+  #   expose:
+  #     - "3000"
+  #   env_file:
+  #     - ./auth_server/.env
+  #   depends_on:
+  #     - mysql
+
+  # nodetest:
+  #   build: ./nodetest
+  #   container_name: nodetest
+  #   expose:
+  #     - "3000"
+  #   env_file:
+  #     - ./nodetest/.env
+  #   depends_on:
+  #     - mysql
+
+  # rag_server:
+  #   build: ./rag_server
+  #   container_name: rag_server
+  #   expose:
+  #     - "8000"
+  #   env_file:
+  #     - ./rag_server/.env
+
+  # intent_server:
+  #   build: ./intent_server
+  #   container_name: intent_server
+  #   expose:
+  #     - "8002"
+  #   env_file:
+  #     - ./intent_server/.env
+
+
+  # 이건 nginx시에 만약 express기반 gateway를 쓴다면 사용안하는 코드
+  # nginx: 
+  #   image: nginx:latest
+  #   container_name: nginx
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - auth_server_1
+  #     - auth_server_2
+  #     - nodetest
+  #     - rag_server
+  #     - intent_server
 
 volumes:
   mysql-data:

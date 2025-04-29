@@ -45,6 +45,9 @@ app.use('/ai', createProxyMiddleware({
 app.use('/intent', createProxyMiddleware({
   target: 'http://intent_server:8002',
   changeOrigin: true,
+  pathRewrite: {
+    '^/intent': '',  // ✅ '/intent' 잘라내서 FastAPI에 보냄
+  },
 }));
 
 // ✅ /mission → nodetest

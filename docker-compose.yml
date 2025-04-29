@@ -98,39 +98,39 @@ services:
       - ./webRTC_server/SECRETE:/app/cert
     command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli", "--verbose"]
 
-  # auth_server_1:
-  #   build: ./auth_server
-  #   container_name: auth_server_1
-  #   expose:
-  #     - "3000"
-  #   env_file:
-  #     - ./auth_server/.env
-  #   depends_on:
-  #     - mysql
+  auth_server_1:
+    build: ./auth_server1
+    container_name: auth_server_1
+    expose:
+      - "3000"
+    env_file:
+      - ./auth_server1/.env
+    depends_on:
+      - mysql
 
-  # auth_server_2:
-  #   build: ./auth_server
-  #   container_name: auth_server_2
-  #   expose:
-  #     - "3000"
-  #   env_file:
-  #     - ./auth_server/.env
-  #   depends_on:
-  #     - mysql
+  auth_server_2:
+    build: ./auth_server2
+    container_name: auth_server_2
+    expose:
+      - "3000"
+    env_file:
+      - ./auth_server2/.env
+    depends_on:
+      - mysql
 
-  # gateway:
-  #   build: ./api_gateway
-  #   container_name: api_gateway
-  #   ports:
-  #     - "3000:3000"  # 외부 노출은 오직 Gateway
-  #   env_file:
-  #     - ./api_gateway/.env
-  #   depends_on:
-  #     - auth_server_1
-  #     - auth_server_2
-  #     - nodetest
-  #     - rag_server
-  #     - intent_server
+  gateway:
+    build: ./api_gateway
+    container_name: api_gateway
+    ports:
+      - "3000:3000"  # 외부 노출은 오직 Gateway
+    env_file:
+      - ./api_gateway/.env
+    depends_on:
+      - auth_server_1
+      - auth_server_2
+      - nodetest
+      - rag_server
+      - intent_server
 
 
 

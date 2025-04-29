@@ -35,7 +35,7 @@ const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
 
 const app = express();
-const PORT = 3002;
+const PORT = 3000;
 const roomController = require('./controllers/roomController');
 //=====================추�??========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);
@@ -259,7 +259,7 @@ app.use('/api/auth', timeConverterMiddleware, authRoutes);
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 //==============================================================================
 
-app.use('/dashboard', timeConverterMiddleware, loginRequired, missionRoutes);  //JWT토큰
+app.use('/dashboard', timeConverterMiddleware, missionRoutes);  //JWT토큰
 // app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
 app.use('/api/rooms', timeConverterMiddleware, loginRequired, roomRoutes); //JWT토큰

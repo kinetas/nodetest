@@ -8,8 +8,8 @@ const { extractUserIdFromToken } = require('./userInfoController');
 // const INTENT_SERVER_URL = 'http://27.113.11.48:8002';
 
 
-const INTENT_SERVER_URL = 'http://intent_server:8002';
-const AI_SERVER_URL = 'http://rag_server:8000';
+const INTENT_SERVER_URL = 'http://gateway:3000/intent';
+const AI_SERVER_URL = 'http://gateway:3000/ai';
 
 exports.askQuestion = async (req, res) => {
   const { question} = req.body;

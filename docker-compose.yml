@@ -64,7 +64,7 @@ services:
     build: ./intent_server
     container_name: intent_server
     # ports:
-      - "8002:8002"
+    #   - "8002:8002"
     expose:
       - "8002"
     volumes:

@@ -117,12 +117,30 @@
             statusBox.innerText = "🛑 낙상 감지!";
             statusBox.style.backgroundColor = "red";
             alert("🛑 낙상 감지!");
-          } else {
+            // ✅ 서버로 낙상 보고 전송
+          fetch("/report-fall", {
+          method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: userId,
+      timestamp: new Date().toISOString()
+    })
+  }).then(res => {
+    if (res.ok) {
+      console.log("✅ 서버에 낙상 보고 완료");
+    } else {
+      console.error("❌ 서버 보고 실패");
+    }
+  }).catch(err => {
+    console.error("❌ 서버 연결 에러", err);
+  });
+}
+ } else {
             statusBox.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
           }
         }
       }
-    }
+    
     
     async function startFallDetectionLoop() {
       await initPoseDetector();

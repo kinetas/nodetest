@@ -36,6 +36,9 @@ app.use('/auth', async (req, res, next) => {
 app.use('/ai', createProxyMiddleware({
   target: 'http://rag_server:8000',
   changeOrigin: true,
+  pathRewrite: {
+    '^/ai': '', // ✅ 이거 꼭 있어야 함
+  }
 }));
 
 // ✅ /intent → intent_server

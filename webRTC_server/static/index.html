@@ -112,7 +112,7 @@
           const noseY = nose.y;
           const diffY = hipY - noseY;
     
-          if (diffY < 100) { // 허리-머리 y축 차이 작으면 낙상 판단
+          if (diffY < 150) { // 허리-머리 y축 차이 작으면 낙상 판단
             console.warn("🛑 낙상 감지! (hipY-noseY=", diffY, ")");
             statusBox.innerText = "🛑 낙상 감지!";
             statusBox.style.backgroundColor = "red";

@@ -32,7 +32,7 @@ app.use('/auth', async (req, res, next) => {
 });
 
 // ✅ /mission → nodetest
-app.use('/mission', createProxyMiddleware({
+app.use('/', createProxyMiddleware({
   target: 'http://nodetest:3000',
   changeOrigin: true,
 }));

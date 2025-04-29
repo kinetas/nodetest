@@ -72,7 +72,7 @@
   <script>
     async function getRecommendation() {
       const category = document.getElementById('category').value;
-      const res = await fetch('/recommend', {
+      const res = await fetch('/ai/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category })
@@ -93,7 +93,7 @@
     }
 
     async function loadDocuments() {
-      const res = await fetch('/documents');
+      const res = await fetch('/ai/documents');
       const data = await res.json();
       document.getElementById('docList').textContent = JSON.stringify(data, null, 2);
     }

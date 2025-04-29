@@ -51,10 +51,10 @@ exports.registerKeycloakDirect = async (req, res) => {
                 username: u_id,
                 enabled: true,
                 email: u_mail,
-                name: u_name,
                 attributes: {
+                    name: [u_name],
                     nickname: [u_nickname],
-                    birth: [u_birth]
+                    birth: [u_birth],
                 },
                 credentials: [
                     {

@@ -63,7 +63,7 @@ def crawl_naver_blog(url):
 class ChatRequest(BaseModel):
     category: str
 
-@app.post("/ai/recommend")
+@app.post("/recommend")
 async def recommend(req: ChatRequest):
     start_time = time.time()
     query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
@@ -152,7 +152,7 @@ async def recommend(req: ChatRequest):
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ✅ 디버깅용 문서 확인용 API
-@app.get("/ai/documents")
+@app.get("/documents")
 async def get_documents():
     try:
         data = db.get()

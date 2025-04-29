@@ -78,6 +78,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.signaling import signaling_router
 from app.config import get_config
+from fastapi import Request
 
 app = FastAPI()
 
@@ -94,3 +95,11 @@ async def root():
 @app.get("/config")
 async def config():
     return get_config()
+
+@app.post("/report-fall")
+async def report_fall(request: Request):
+    data = await request.json()
+    user_id = data.get("userId")
+    timestamp = data.get("timestamp")
+    print(f"🛑 [낙상 감지] 사용자: {user_id}, 시간: {timestamp}")
+    return {"message": "Fall report received"}

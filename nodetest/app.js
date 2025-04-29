@@ -259,7 +259,7 @@ app.use('/api/auth', timeConverterMiddleware, authRoutes);
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 //==============================================================================
 
-app.use('/dashboard', timeConverterMiddleware, loginRequired, missionRoutes);  //JWT토큰
+app.use('/dashboard', timeConverterMiddleware, missionRoutes);  //JWT토큰
 // app.use('/dashboard', keycloak.protect(), timeConverterMiddleware, missionRoutes);
 
 app.use('/api/rooms', timeConverterMiddleware, loginRequired, roomRoutes); //JWT토큰

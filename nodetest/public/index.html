@@ -29,7 +29,9 @@
     <script>
 
         // ✅ Keycloak 직접 로그인 버튼 핸들러
-        document.getElementById('keycloakDirectLoginButton').addEventListener('click', () => {
+        document.getElementById('keycloakDirectLoginButton').addEventListener('click', (e) => {
+            e.preventDefault();
+
             const username = document.getElementById('u_id').value;
             const password = document.getElementById('u_password').value;
 
@@ -41,7 +43,10 @@
                 },
                 body: JSON.stringify({ username, password }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Keycloak 로그인 요청 실패');
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const accessToken = data.accessToken;
@@ -62,7 +67,10 @@
                     throw new Error(data.message || 'Keycloak 로그인 실패');
                 }
             })
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) throw new Error('JWT 발급 요청 실패');
+                return response.json();
+            })
             .then(jwt => {
                 if (jwt.success && jwt.token) {
                     localStorage.setItem('jwt_token', jwt.token); // ✅ JWT 저장

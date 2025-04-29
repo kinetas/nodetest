@@ -35,7 +35,7 @@ const db = require('./config/db');
 const { Room, Mission } = require('./models/relations'); // �??�?? ?��?�� 불러?���??
 
 const app = express();
-const PORT = 3002;
+const PORT = 3000;
 const roomController = require('./controllers/roomController');
 //=====================추�??========================
 // const SequelizeStore = require('connect-session-sequelize')(session.Store);

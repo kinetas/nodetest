@@ -31,11 +31,6 @@ app.use('/auth', async (req, res, next) => {
   createProxyMiddleware({ target, changeOrigin: true })(req, res, next);
 });
 
-// ✅ /mission → nodetest
-app.use('/', createProxyMiddleware({
-  target: 'http://nodetest:3000',
-  changeOrigin: true,
-}));
 
 // ✅ /ai → rag_server
 app.use('/ai', createProxyMiddleware({
@@ -46,6 +41,12 @@ app.use('/ai', createProxyMiddleware({
 // ✅ /intent → intent_server
 app.use('/intent', createProxyMiddleware({
   target: 'http://intent_server:8002',
+  changeOrigin: true,
+}));
+
+// ✅ /mission → nodetest
+app.use('/', createProxyMiddleware({
+  target: 'http://nodetest:3000',
   changeOrigin: true,
 }));
 

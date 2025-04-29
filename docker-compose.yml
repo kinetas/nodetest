@@ -32,10 +32,10 @@ services:
     build: ./rag_server
     container_name: rag_server
     restart: always
-    # ports:
-    #   - "8000:8000"
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"
+    # expose:
+    #   - "8000"
     depends_on:
       - chroma
       # - ollama
@@ -63,10 +63,10 @@ services:
   intent_server:
     build: ./intent_server
     container_name: intent_server
-    # ports:
-    #   - "8002:8002"
-    expose:
-      - "8002"
+    ports:
+      - "8002:8002"
+    # expose:
+    #   - "8002"
     volumes:
       - ./models/intent_model:/app/intent_model
 
@@ -97,23 +97,24 @@ services:
       -  /home/gogi/docker/webRTC_server/turnserver/turnserver.conf:/etc/turnserver.conf
       - ./webRTC_server/SECRETE:/app/cert
     command: ["turnserver", "-c", "/etc/turnserver.conf", "--no-cli", "--verbose"]
+
   auth_server_1:
-    build: ./auth_server
+    build: ./auth_server1
     container_name: auth_server_1
     expose:
       - "3000"
     env_file:
-      - ./auth_server/.env
+      - ./auth_server1/.env
     depends_on:
       - mysql
 
   auth_server_2:
-    build: ./auth_server
+    build: ./auth_server2
     container_name: auth_server_2
     expose:
       - "3000"
     env_file:
-      - ./auth_server/.env
+      - ./auth_server2/.env
     depends_on:
       - mysql
 

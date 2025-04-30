@@ -15,6 +15,8 @@ import random
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+USER_DB_API = "http://nodetest:3000/user-top-categories"
+INTENT_API = "http://intent_server:8002/intent-classify"
 
 # ✅ FastAPI 초기화
 app = FastAPI()
@@ -34,6 +36,10 @@ embedding = HuggingFaceEmbeddings(
     encode_kwargs={"normalize_embeddings": True}
 )
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
+
+class ChatRequest(BaseModel):
+    user_id: str
+    question: str
 
 # ✅ 블로그 본문 크롤링 함수
 def crawl_naver_blog(url):
@@ -66,8 +72,28 @@ class ChatRequest(BaseModel):
 @app.post("/recommend")
 async def recommend(req: ChatRequest):
     start_time = time.time()
-    query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    # query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    query = f"{req.question} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    user_id = req.user_id
 
+    # 1️⃣ Intent 분류
+    try:
+        intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
+        intent = intent_res.json().get("intent", "SPECIFIC")
+    except:
+        intent = "SPECIFIC"
+
+    # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
+    if intent == "GENERAL":
+        try:
+            user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
+            top3 = user_res.json().get("top3", [])
+            if top3:
+                chosen = random.choice(top3)
+                query = f"{chosen} {query}"
+        except:
+            pass  # 실패하면 그대로 진행
+    
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)
     print("🔍 유사도 검색 결과:")

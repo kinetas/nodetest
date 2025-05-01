@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const PORT = 3004;
 
@@ -8,15 +9,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
-const loginRequired = require('./middleware/loginRequired'); // JWT 미들웨어 추가
-
-app.get('/user-info', loginRequired, (req, res) => {
-  res.json({ userId: req.currentUserId });    //토큰기반
-});
+const authRoutes = require('./routes/authRoutes');
 
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
-app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
+// 헬스체크 라우트 추가 (Gateway에서 사용함)
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
 
 app.listen(PORT, () => {
     console.log('Auth server listening on port 3004');

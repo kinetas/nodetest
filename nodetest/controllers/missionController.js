@@ -58,12 +58,14 @@ exports.createMission = async (req, res) => {
             console.log("missionAuthenticationAuthority(missionController.js:58): ", missionAuthenticationAuthority)
             // 1-1. 인증권한자가 미션생성자가 아닌 경우 (= 인증권한을 친구에게 맡기는 경우)
             if (missionAuthenticationAuthority !== u1_id) {
+                console.log("1-1 경우");
                 const isFriend = await IFriend.findOne({
                     where: { u_id: u1_id, f_id: missionAuthenticationAuthority },
                 });
 
                 //1-1-1. 입력한 인증권한자가 친구가 아니면 에러메시지 반환
                 if (!isFriend) {
+                    console.log("1-1-1 경우");
                     return res.status(400).json({
                         success: false,
                         message: '인증 권한자로 선택된 사용자가 친구 목록에 없습니다.',
@@ -71,6 +73,7 @@ exports.createMission = async (req, res) => {
                 }
 
                 //1-1-2. 입력한 인증권한자가 친구일때 
+                console.log("1-1-2 경우");
                 //인증권한자인 친구와의 방 여부 확인
                 const room = await Room.findOne({
                     where: {
@@ -82,6 +85,7 @@ exports.createMission = async (req, res) => {
 
                 //1-1-2-1. 인증권한자인 친구와의 방이 없다면 방 생성
                 if (!room){
+                    console.log("1-1-2-1 경우");
                     const newRoom = await roomController.initAddRoom({
                         body: { u1_id: assignedU2Id, roomName: `${assignedU2Id}-${missionAuthenticationAuthority}` },
                     });
@@ -91,6 +95,7 @@ exports.createMission = async (req, res) => {
                 }
 
                 //1-1-2. 미션 생성
+                console.log("1-1-2 미션생성");
                 await Mission.create({
                     m_id: uuidv4(),
                     u1_id,
@@ -120,6 +125,7 @@ exports.createMission = async (req, res) => {
                 return res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
             //1-2. 인증권한자가 미션생성자인 경우
+            console.log("1-2 경우");
             //u1_id와 u2_id로 Room 확인 및 r_id 가져오기 (자신의 방 존재 여부 확인)
             const room = await Room.findOne({
                 where: {
@@ -130,6 +136,7 @@ exports.createMission = async (req, res) => {
 
             //1-2-1. 자신의 방이 없다면 방 생성 (initAddRoom)
             if (!room) {
+                console.log("1-2-1 경우");
                 const initRoomRes = await roomController.initAddRoom({
                     body: { u1_id, roomName: `${u1_id}-${u1_id}` }
                 });
@@ -150,6 +157,7 @@ exports.createMission = async (req, res) => {
             let stat = "진행중";
 
             //1-2. 미션 생성
+            console.log("1-2 미션생성");
             await Mission.create({
                 m_id: missionId,
                 u1_id,
@@ -168,6 +176,7 @@ exports.createMission = async (req, res) => {
         } else {
             //2. 타인에게 미션 생성 시
             //2-1. 인증권한자는 자신(u1_id = 미션 생성자 = 미션 부여자)이어야 함
+            console.log("2-1 경우");
             if (authenticationAuthority && authenticationAuthority !== u1_id) {
                 return res.status(400).json({
                     success: false,
@@ -176,11 +185,13 @@ exports.createMission = async (req, res) => {
             }
 
             //2-2. u2_id가 친구인지 확인
+            console.log("2-2 경우");
             const isFriend = await IFriend.findOne({
                 where: { u_id: u1_id, f_id: u2_id },
             });
             //2-2-1. u2_id가 친구가 아니라면
             if (!isFriend) {
+                console.log("2-2-1 경우");
                 return res.status(400).json({
                     success: false,
                     message: '친구가 아닙니다.',
@@ -188,6 +199,7 @@ exports.createMission = async (req, res) => {
             }
 
             //2-2-2. u2_id가 친구일 때
+            console.log("2-2-2 경우");
             //u1_id와 u2_id로 Room 확인 및 r_id 가져오기
             const room = await Room.findOne({
                 where: {
@@ -199,6 +211,7 @@ exports.createMission = async (req, res) => {
 
             //2-2-2-1. 친구와의 방이 없다면 방 생성 (addRoom)
             if (!room) {
+                console.log("2-2-2-1 경우");
                 const fakeReq = { body: { u1_id, u2_id } };
                 const fakeRes = {
                     status: () => ({ json: (data) => data }),
@@ -216,6 +229,7 @@ exports.createMission = async (req, res) => {
             let stat = "진행중";
 
             //2-2-2. 미션 생성
+            console.log("2-2-2 미션생성");
             await Mission.create({
                 m_id: missionId,
                 u1_id,
@@ -247,7 +261,7 @@ exports.createMission = async (req, res) => {
         }
         
     } catch (error) {
-        console.error('미션 생성 오류:', error);
+        console.error('미션 생성 오류(missionController.js:264):', error);
         res.status(500).json({ success: false, message: `미션 생성 중 오류(${error})가 발생했습니다.` });
     }
 };

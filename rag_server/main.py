@@ -37,9 +37,9 @@ embedding = HuggingFaceEmbeddings(
 )
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
-class ChatRequest(BaseModel):
-    user_id: str
-    question: str
+# class ChatRequest(BaseModel):
+#     user_id: str
+#     question: str
 
 # ✅ 블로그 본문 크롤링 함수
 def crawl_naver_blog(url):
@@ -72,27 +72,27 @@ class ChatRequest(BaseModel):
 @app.post("/recommend")
 async def recommend(req: ChatRequest):
     start_time = time.time()
-    # query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
-    query = f"{req.question} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
-    user_id = req.user_id
+    query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    # query = f"{req.question} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    # user_id = req.user_id
 
     # 1️⃣ Intent 분류
-    try:
-        intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
-        intent = intent_res.json().get("intent", "SPECIFIC")
-    except:
-        intent = "SPECIFIC"
+    # try:
+    #     intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
+    #     intent = intent_res.json().get("intent", "SPECIFIC")
+    # except:
+    #     intent = "SPECIFIC"
 
-    # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
-    if intent == "GENERAL":
-        try:
-            user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
-            top3 = user_res.json().get("top3", [])
-            if top3:
-                chosen = random.choice(top3)
-                query = f"{chosen} {query}"
-        except:
-            pass  # 실패하면 그대로 진행
+    # # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
+    # if intent == "GENERAL":
+    #     try:
+    #         user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
+    #         top3 = user_res.json().get("top3", [])
+    #         if top3:
+    #             chosen = random.choice(top3)
+    #             query = f"{chosen} {query}"
+    #     except:
+    #         pass  # 실패하면 그대로 진행
     
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)
@@ -193,3 +193,144 @@ async def get_documents():
         return JSONResponse(content={"documents": documents_info})
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+    
+
+# from fastapi import FastAPI, Request
+# from fastapi.responses import JSONResponse, FileResponse
+# from fastapi.staticfiles import StaticFiles
+# from pydantic import BaseModel
+# from dotenv import load_dotenv
+# import os, requests, json, re, time
+# from bs4 import BeautifulSoup
+# from langchain_community.vectorstores import Chroma
+# from langchain.embeddings import HuggingFaceEmbeddings
+# from jose import jwt
+# import random
+
+# load_dotenv()
+
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+# USER_DB_API = "http://nodetest:3000/user-top-categories"
+# INTENT_API = "http://intent_server:8002/intent-classify"
+
+# app = FastAPI()
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# @app.get("/")
+# def serve_index():
+#     return FileResponse("static/index.html")
+
+# embedding = HuggingFaceEmbeddings(
+#     model_name="jhgan/ko-sroberta-multitask",
+#     model_kwargs={"device": "cpu"},
+#     encode_kwargs={"normalize_embeddings": True}
+# )
+# db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
+
+# class ChatRequest(BaseModel):
+#     question: str
+
+# def extract_user_id_from_keycloak_token(request: Request) -> str:
+#     auth_header = request.headers.get("Authorization")
+#     if not auth_header or not auth_header.startswith("Bearer "):
+#         return None
+#     token = auth_header[7:]
+#     try:
+#         decoded = jwt.get_unverified_claims(token)
+#         return decoded.get("preferred_username") or decoded.get("sub")
+#     except Exception as e:
+#         print("❌ Keycloak 토큰 파싱 실패:", e)
+#         return None
+
+# @app.post("/recommend")
+# async def recommend(req: ChatRequest, request: Request):
+#     start_time = time.time()
+#     query = req.question
+
+#     user_id = extract_user_id_from_keycloak_token(request)
+#     if not user_id:
+#         return JSONResponse(status_code=401, content={"error": "로그인이 필요합니다."})
+
+#     # 1️⃣ Intent 분류
+#     try:
+#         intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
+#         intent = intent_res.json().get("intent", "SPECIFIC")
+#     except:
+#         intent = "SPECIFIC"
+
+#     # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
+#     if intent == "GENERAL":
+#         try:
+#             user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
+#             top3 = user_res.json().get("top3", [])
+#             if top3:
+#                 chosen = random.choice(top3)
+#                 query = f"{chosen} {query}"
+#         except:
+#             pass  # 실패하면 그대로 진행
+
+#     # 3️⃣ RAG 검색
+#     docs_with_scores = db.similarity_search_with_score(query, k=10)
+#     filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.2]
+
+#     if not filtered_docs_with_scores:
+#         prompt = (
+#             "너는 미션 추천 AI야. 아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n"
+#             'message 항목은 사용자의 요청에 맞는 미션을 자연스럽고 부드럽게 추천해줘.\n'
+#             '{\n  "message": "...",\n  "category": "..."\n}\n'
+#             f"사용자 요청: {query}"
+#         )
+#     else:
+#         selected_doc = filtered_docs_with_scores[0][0]
+#         url = selected_doc.metadata.get("source")
+#         blog_text = crawl_naver_blog(url) or ""
+#         prompt = (
+#             "너는 참고 문서를 바탕으로 미션을 추천하는 AI야.\n"
+#             '아래 JSON 형식으로만 응답하고, JSON 외에는 아무 것도 출력하지 마.\n'
+#             '{\n  "message": "...",\n  "category": "..."\n}\n'
+#             f"본문: {blog_text[:3000]}\n\n요청: {query}"
+#         )
+
+#     headers = {
+#         "Authorization": f"Bearer {GROQ_API_KEY}",
+#         "Content-Type": "application/json"
+#     }
+#     body = {
+#         "model": "llama3-8b-8192",
+#         "messages": [{"role": "user", "content": prompt}],
+#         "temperature": 0.7
+#     }
+
+#     try:
+#         response = requests.post(GROQ_API_URL, headers=headers, json=body)
+#         result = response.json()
+#         content = result["choices"][0]["message"]["content"]
+#         json_match = re.search(r"\{.*\}", content, re.DOTALL)
+#         parsed = json.loads(json_match.group(0).replace("'", '"'))
+#         parsed["response_time_sec"] = round(time.time() - start_time, 2)
+#         return parsed
+#     except Exception as e:
+#         return JSONResponse(status_code=500, content={"error": str(e)})
+
+# def crawl_naver_blog(url):
+#     headers = {"User-Agent": "Mozilla/5.0"}
+#     try:
+#         time.sleep(3)
+#         res = requests.get(url, headers=headers, timeout=10)
+#         soup = BeautifulSoup(res.text, "html.parser")
+#         iframe = soup.select_one("iframe#mainFrame")
+#         if iframe:
+#             iframe_url = "https://blog.naver.com" + iframe["src"]
+#             res2 = requests.get(iframe_url, headers=headers, timeout=10)
+#             soup2 = BeautifulSoup(res2.text, "html.parser")
+#             content_div = soup2.select_one("div.se-main-container")
+#             if content_div:
+#                 return content_div.get_text("\n", strip=True)
+#         else:
+#             content_div = soup.select_one("div.se-main-container")
+#             if content_div:
+#                 return content_div.get_text("\n", strip=True)
+#     except Exception as e:
+#         print("❌ 크롤링 실패:", e)
+#     return None

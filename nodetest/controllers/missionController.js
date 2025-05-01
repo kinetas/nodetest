@@ -145,7 +145,7 @@ exports.createMission = async (req, res) => {
                     body: { u1_id, roomName: `${u1_id}-${u1_id}` }
                 });
                 console.log("initRoomRes(missionController.js:147): ", initRoomRes);
-                if (!initRoomRes || !initRoomRes.success || !initRoomRes.r_id) {
+                if (!initRoomRes || !initRoomRes.success) {
                     return res.status(500).json({ success: false, message: '자신의 방 생성 실패' });
                 }
                 room = await Room.findOne({
@@ -154,7 +154,10 @@ exports.createMission = async (req, res) => {
                         u2_id: assignedU2Id // = u1_id
                     }
                 });
-                console.log("room(missionController.js:157): ", room);
+                if (!room || !room.r_id) {
+                    return res.status(500).json({ message: '방 조회 실패 (room 없거나 r_id 없음) (missionController.js:158)' });
+                }
+                console.log("room(missionController.js:160): ", room);
                 // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 

@@ -841,6 +841,7 @@
             console.log("id_token(dashboard.html:841): ", localStorage.getItem('id_token'))
             // 웹 또는 Flutter 등에서 요청
             fetch('/api/auth/logoutToken', {
+            // fetch('/api/auth/logoutToken', {    //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

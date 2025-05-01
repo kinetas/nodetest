@@ -338,7 +338,7 @@ exports.printTFriend = async (req, res) => {
 // 친구 삭제
 exports.friendDelete = async (req, res) => {
     const { f_id } = req.body;
-    const u_id = req.currentUserId; // ✅ JWT에서 추출
+    const u_id = req.currentUserId;
 
     try {
         const result1 = await IFriend.destroy({ where: { u_id, f_id } });
@@ -358,7 +358,7 @@ exports.friendDelete = async (req, res) => {
 // 친구 요청 보내기
 exports.friendRequestSend = async (req, res) => {
     const { f_id } = req.body;
-    const u_id = req.currentUserId; // ✅ JWT에서 추출
+    const u_id = req.currentUserId;
 
     try {
         if (u_id === f_id) {
@@ -411,7 +411,7 @@ exports.friendRequestSend = async (req, res) => {
 // 친구 요청 수락
 exports.friendRequestAccept = async (req, res) => {
     const { f_id } = req.body;
-    const u_id = req.currentUserId; // ✅ JWT 기반
+    const u_id = req.currentUserId;
 
     try {
         const existingRequest = await TFriend.findOne({ where: { u_id: f_id, f_id: u_id, f_status: 0 } });
@@ -443,7 +443,7 @@ exports.friendRequestAccept = async (req, res) => {
 // 친구 요청 거절
 exports.friendRequestReject = async (req, res) => {
     const { f_id } = req.body;
-    const u_id = req.currentUserId; // ✅ JWT 기반
+    const u_id = req.currentUserId;
 
     try {
         const result = await TFriend.update({ f_status: 2 }, { where: { u_id: f_id, f_id: u_id } });

@@ -14,7 +14,11 @@ const AI_SERVER_URL = 'http://gateway:3000/ai';
 exports.askQuestion = async (req, res) => {
   const { question} = req.body;
   // const user_id = extractUserIdFromToken(req);
-  const user_id = req.currentUserId; // ✅ Keycloak 기반
+  // const user_id = req.currentUserId;  // 라우트에 loginRequired 미들웨어 적용 시 사용 가능
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: '토큰이 없습니다.' });
+
+  let user_id;
 
   if (!question || !user_id) {
     return res.status(400).json({ error: '질문과 user_id가 필요합니다.' });

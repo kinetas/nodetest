@@ -365,6 +365,7 @@ exports.deleteAccount = async (req, res) => { // 추가
 exports.logoutToken = async (req, res) => {
     try {
         const { idToken } = req.body;
+        console.log("id_token(authController.js:368): ", localStorage.getItem('id_token'))
         const redirectUri = 'http://27.113.11.48:3000/'; // 로그아웃 후 돌아갈 경로
 
         if (!idToken) {

@@ -289,7 +289,7 @@ socket.on('markAsRead', async (data) => {
 
 socket.on('joinRoom', async (data) => {
   let { r_id, u2_id } = data;
-  const u1_id = await getUserIdFromSocket(socket);
+  const u1_id = getUserIdFromSocket(socket);
 
   if (!u1_id) {
     console.error("❌ 사용자 인증 실패");
@@ -327,6 +327,7 @@ socket.on('joinRoom', async (data) => {
     const u1_id = getUserIdFromSocket(socket); // ✅ 핵심
     const { message_contents, r_id, u2_id, image, image_type} = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
+    console.log("u1_id(sockerServer:330): ", u1_id);
 
     // 필수 값 검증
     if (!r_id || !u1_id || !u2_id) {

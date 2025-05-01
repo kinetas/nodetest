@@ -803,6 +803,7 @@
         //로그아웃 (JWT)
         function logout() {
             fetch('/api/auth/logoutToken', {
+            // fetch('/auth/logoutToken', {    //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${jwtToken}`
@@ -828,6 +829,7 @@
 
             if (confirm("정말 계정을 탈퇴하시겠습니까?")) {
                 fetch('/api/auth/deleteAccountToken', {
+                // fetch('/auth/deleteAccountToken', { //MSA적용 시 사용
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

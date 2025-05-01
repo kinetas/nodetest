@@ -12,7 +12,6 @@
     <form id="loginForm">
         <input type="text" id="u_id" placeholder="아이디" required><br><br>
         <input type="password" id="u_password" placeholder="비밀번호" required><br><br>
-        <!-- ✅ Keycloak 직접 로그인 버튼 -->
         <button id="keycloakDirectLoginButton">Keycloak 직접 로그인</button>
     </form>
     <div id="result"></div>
@@ -22,9 +21,6 @@
     
     <!-- 아이디/비밀번호 찾기 버튼 -->
     <button id="findInfoButton">아이디/비밀번호 변경</button>
-
-    <!-- ✅ Keycloak 로그인 버튼 -->
-    <!-- <button id="keycloakLoginButton">Keycloak 로그인</button> -->
 
     <script>
 
@@ -37,6 +33,7 @@
 
             // index 화면에서 로그인
             fetch('/api/auth/keycloak-direct-login', {
+            // fetch('/auth/keycloak-direct-login', {   //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,6 +54,7 @@
                     localStorage.setItem('id_token', idToken);
                     // ✅ 우리 서버 JWT 발급 요청 추가
                     return fetch('/api/auth/issueJwtFromKeycloak', {
+                    // return fetch('/auth/issueJwtFromKeycloak', {    //MSA적용 시 사용
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

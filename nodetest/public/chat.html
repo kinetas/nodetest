@@ -430,6 +430,7 @@
 
         // ✅ 메시지 전송 (소켓 기반)
         function sendMessage() {
+            console.log("✅ sendMessage() 호출됨(chat.html:433)");
             const messageInput = document.getElementById("messageInput");
             const fileInput = document.getElementById("fileInput");
             const message = messageInput.value.trim();
@@ -454,6 +455,12 @@
                         image: base64Image,
                         image_type: file.type
                     });
+                    console.log("📤 이미지 포함 메시지 전송(chat.html:458):", {
+                        message_contents: message || null,
+                        r_id: roomId,
+                        u2_id,
+                        image_type: file.type
+                    });
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -462,6 +469,11 @@
                     message_contents: message,
                     r_id: roomId,
                     // u1_id,
+                    u2_id
+                });
+                console.log("📤 텍스트 메시지 전송(chat.html:474):", {
+                    message_contents: message,
+                    r_id: roomId,
                     u2_id
                 });
             }

@@ -32,14 +32,14 @@ async function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
     if (!token) {
-      console.error('❌ 소켓 연결 시 토큰이 없습니다.');
+      console.error('❌ 소켓 연결 시 토큰이 없습니다.(sockerServer:35)');
       return null;
     }
     const decoded = jwt.verify(token, secretKey);
-    console.log('✅ 토큰 디코딩 성공:', decoded);
+    console.log('✅ 토큰 디코딩 성공(sockerServer:39):', decoded);
     return decoded.userId;
   } catch (err) {
-    console.error('❌ 토큰 디코딩 실패:', err.message);
+    console.error('❌ 토큰 디코딩 실패(sockerServer:42):', err.message);
     return null;
   }
 }
@@ -292,7 +292,7 @@ socket.on('joinRoom', async (data) => {
   const u1_id = await getUserIdFromSocket(socket);
 
   if (!u1_id) {
-    console.error("❌ 사용자 인증 실패");
+    console.error("❌ 사용자 인증 실패(sockerServer:295)");
     return;
   }
 
@@ -302,13 +302,13 @@ socket.on('joinRoom', async (data) => {
   }
 
   if (!u2_id) {
-    console.error("❌ 상대방 ID(u2_id) 누락");
+    console.error("❌ 상대방 ID(u2_id) 누락(sockerServer:305)");
     return;
   }
 
   try {
     socket.join(r_id);
-    console.log(`👤 ${u1_id} 방 입장: ${r_id}`);
+    console.log(`👤 ${u1_id} 방 입장(sockerServer:311): ${r_id}`);
 
     await RMessage.update(
       { is_read: 0 },
@@ -317,7 +317,7 @@ socket.on('joinRoom', async (data) => {
 
     // 클라이언트에 알림 보내는 로직 추가 가능
   } catch (err) {
-    console.error("🚨 방 입장 처리 실패:", err);
+    console.error("🚨 방 입장 처리 실패(sockerServer:320):", err);
   }
 });
 
@@ -328,6 +328,7 @@ socket.on('joinRoom', async (data) => {
     const { message_contents, r_id, u2_id, image, image_type} = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
     console.log("u1_id(sockerServer:330): ", u1_id);
+    console.log(`Sending message to room ${r_id}:(sockerServer:331)`);
 
     // 필수 값 검증
     if (!r_id || !u1_id || !u2_id) {
@@ -338,8 +339,8 @@ socket.on('joinRoom', async (data) => {
       if (!u2_id) missingFields.push('u2_id');
       // if (!is_read) missingFields.push('is_read');
       if (missingFields.length > 0) {
-      console.error(`누락된 필드: ${missingFields.join(', ')}`); // 누락된 필드 로그 출력 (수정된 부분)
-      socket.emit('errorMessage', `필수 필드 누락: ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)
+      console.error(`누락된 필드(sockerServer:341): ${missingFields.join(', ')}`); // 누락된 필드 로그 출력 (수정된 부분)
+      socket.emit('errorMessage', `필수 필드 누락(sockerServer:342): ${missingFields.join(', ')}`); // 클라이언트로 누락된 필드 전송 (수정된 부분)
       return;
     }
   }

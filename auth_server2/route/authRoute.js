@@ -1,33 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controller/authController');
-const findInfoController = require('../controller/findInfoController');
-const userInfoController = require('../controller/userInfoController');
+const authController = require('../controllers/authController');
+const findInfoController = require('../controllers/findInfoController');
+const loginRequired = require('../middleware/loginRequired'); // 로그인 확인 미들웨어 불러오기 (로그인이 필요한 기능이 있을시 해당 라우터에 사용됨)
 
-const { keycloak } = require('../keycloak');
-
-router.post('/findUid', findInfoController.findUid); // 아이디 찾기 경로 추가
-
-router.post('/logoutToken', authController.logoutToken);
-
-// 비밀번호 변경
-router.post('/changePassword', findInfoController.changePassword);
-
+//======================authController=====================
 // ===================== KeyCloak ==========================
-router.get('/keycloak-login-url', authController.getKeycloakLoginUrl);
+router.post('/register-keycloak-direct', authController.registerKeycloakDirect); // 회원가입 (register 화면에서 회원가입)
+router.get('/keycloak-login-url', authController.getKeycloakLoginUrl); // KeyCloak 로그인 (KeyCloak 화면에서 로그인)
+router.post('/keycloak-direct-login', authController.keycloakDirectLogin); // KeyCloak 직접 로그인 (index 화면에서 로그인)
+router.post('/issueJwtFromKeycloak', authController.issueJwtFromKeycloak); // ✅ Keycloak access_token → 우리 서버 JWT 발급
+router.post('/logoutToken', loginRequired, authController.logoutToken); // 로그아웃 라우터
+router.delete('/deleteAccountToken', loginRequired, authController.deleteAccountFromKeycloak); // 계졍탈퇴
 
-router.post('/keycloak-direct-login', authController.keycloakDirectLogin);
-
-router.get('/registerKeyCloak', keycloak.protect(), authController.getOrCreateUserFromKeycloak);
-router.delete('/deleteAccountToken', keycloak.protect(), authController.deleteAccountFromKeycloak);
-
-// ✅ Keycloak access_token → 우리 서버 JWT 발급
-router.get('/issueJwtFromKeycloak', keycloak.protect(), authController.issueJwtFromKeycloak);
-
-// =========== userInfo ===============
-// ✅ Keycloak 인증 필요 라우트 설정
-router.get('/user-id', keycloak.protect(), userInfoController.getLoggedInUserId);
-router.get('/user-nickname', keycloak.protect(), userInfoController.getLoggedInUserNickname);
-router.get('/user-all', keycloak.protect(), userInfoController.getLoggedInUserAll);
+//======================findInfoController=====================
+router.post('/changePassword', findInfoController.changePassword); // 비밀번호 변경
+router.post('/findUid', findInfoController.findUid); // 아이디 찾기 경로 추가
 
 module.exports = router;

@@ -93,14 +93,15 @@ exports.createMission = async (req, res) => {
                             u2_id: missionAuthenticationAuthority,
                             roomName: `${assignedU2Id}-${missionAuthenticationAuthority}`,
                             r_type: 'general'
-                          },
-                          currentUserId: assignedU2Id
+                        },
+                        currentUserId: assignedU2Id
                      };
                     const fakeRes = {
                         status: () => ({ json: (data) => data }),
                         json: (data) => data
                     };
                     const result = await roomController.addRoom(fakeReq, fakeRes);
+                    console.log("result: ", result);
                     if (!result || !result.success) {
                         return res.status(500).json({ success: false, message: '친구와의 방 생성 실패' });
                     }

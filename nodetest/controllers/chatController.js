@@ -147,7 +147,7 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 
 // ✅ JWT 토큰에서 userId 추출하는 유틸 함수
-function getUserIdFromSocket(socket) {
+async function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
     
@@ -208,7 +208,7 @@ exports.joinRoom = async (socket, { r_id, u2_id }) => {
 };
 
 exports.sendMessage = async (io, socket, { message, r_id, u2_id, image, image_type }) => {
-  const u1_id = getUserIdFromSocket(socket);
+  const u1_id = await getUserIdFromSocket(socket);
   const send_date = new Date();
   const is_read = 1;
   const message_num = Math.random().toString(36).substr(2, 9);

@@ -273,7 +273,7 @@ exports.addRoom = async (req, res) => {
         await Room.create({ u1_id, u2_id, r_id: roomId, r_title, r_type: type });
         await Room.create({ u1_id: u2_id, u2_id: u1_id, r_id: roomId, r_title, r_type: type });
 
-        res.status(201).json({ success: true, message: '방이 성공적으로 추가되었습니다.' });
+        res.json({ message: '방이 성공적으로 추가되었습니다.' });
 
     } catch (error) {
         console.error("❌ 방 생성 중 오류:", error);

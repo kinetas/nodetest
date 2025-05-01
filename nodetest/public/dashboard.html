@@ -842,7 +842,10 @@
             // 웹 또는 Flutter 등에서 요청
             fetch('/api/auth/logoutToken', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                },
                 body: JSON.stringify({ idToken: localStorage.getItem('id_token') })
             })
             .then(res => res.json())

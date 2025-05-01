@@ -713,14 +713,20 @@
                 },
                 body: JSON.stringify(payload)
             })
-            .then(res => res.json())
+            .then(async res => {
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                return data;
+            })
             .then(data => {
                 if (data.success) {
                     alert('생성 완료');
                     location.reload();
                 } else {
-                    document.getElementById('errorMessage(dashboard:722)').textContent = data.message;
+                    document.getElementById('errorMessage(dashboard:726)').textContent = data.message;
                 }
+            }).catch(err => {
+                alert("생성 중 오류(dashboard.html:729): " + err.message);
             });
         }
 

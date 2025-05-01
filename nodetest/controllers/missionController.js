@@ -102,9 +102,6 @@ exports.createMission = async (req, res) => {
                     };
                     const result = await roomController.addRoom(fakeReq, fakeRes);
                     console.log("result: ", result);
-                    if (!result || !result.success) {
-                        return res.status(500).json({ success: false, message: '친구와의 방 생성 실패' });
-                    }
                     room = await Room.findOne({
                         where: {
                             u1_id: assignedU2Id,

@@ -298,6 +298,6 @@ exports.deleteAccount = async (req, res) => { // 추가
 
 // ✅ JWT 기반 로그아웃 로직 (간소화 버전)
 exports.logoutToken = async (req, res) => {
-    res.clearCookie('token'); // 만약 쿠키 기반이라면 의미 있음
+    res.clearCookie('jwt_token'); // 만약 쿠키 기반이라면 의미 있음
     res.json({ message: '로그아웃 되었습니다.' });
 };

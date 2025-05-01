@@ -37,9 +37,9 @@ embedding = HuggingFaceEmbeddings(
 )
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
-class ChatRequest(BaseModel):
-    user_id: str
-    question: str
+# class ChatRequest(BaseModel):
+#     user_id: str
+#     question: str
 
 # ✅ 블로그 본문 크롤링 함수
 def crawl_naver_blog(url):
@@ -72,9 +72,9 @@ class ChatRequest(BaseModel):
 @app.post("/recommend")
 async def recommend(req: ChatRequest):
     start_time = time.time()
-    # query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
-    query = f"{req.question} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
-    user_id = req.user_id
+    query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    # query = f"{req.question} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+    # user_id = req.user_id
 
     # 1️⃣ Intent 분류
     try:

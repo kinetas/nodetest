@@ -26,7 +26,7 @@ router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAu
 router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions); //printmissionlist
 
 router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission);
-router.post('/missioncreate', loginRequired, createMission);
+router.post('/missioncreate', loginRequired, createMission); // dashboard
 router.delete('/missiondelete', loginRequired, deleteMission);
 router.post('/successMission', loginRequired, successMission);
 router.post('/failureMission', loginRequired, failureMission);

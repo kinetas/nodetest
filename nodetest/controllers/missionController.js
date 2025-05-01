@@ -29,7 +29,6 @@ const Sequelize = require('sequelize');
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
     const { u2_id, authenticationAuthority, m_title, m_deadline, m_reword, category } = req.body;
-    // const u1_id = req.session.user.id; // 현재 로그인된 사용자 ID
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
@@ -53,15 +52,16 @@ exports.createMission = async (req, res) => {
 
         const assignedU2Id = u2_id || u1_id;
 
+        // 1. 자신에게 미션 생성 시
         if (assignedU2Id === u1_id) {
-            // 자신에게 미션 생성 시
             const missionAuthenticationAuthority = authenticationAuthority || u1_id;
-            // 3-1. 인증권한자가 미션생성자가 아닌 경우
+            // 1-1. 인증권한자가 미션생성자가 아닌 경우 (= 인증권한을 친구에게 맡기는 경우)
             if (missionAuthenticationAuthority !== u1_id) {
                 const isFriend = await IFriend.findOne({
                     where: { u_id: u1_id, f_id: missionAuthenticationAuthority },
                 });
 
+                //1-1-1. 입력한 인증권한자가 친구가 아니면 에러메시지 반환
                 if (!isFriend) {
                     return res.status(400).json({
                         success: false,
@@ -69,6 +69,8 @@ exports.createMission = async (req, res) => {
                     });
                 }
 
+                //1-1-2. 입력한 인증권한자가 친구일때 
+                //인증권한자인 친구와의 방 여부 확인
                 const room = await Room.findOne({
                     where: {
                         u1_id: assignedU2Id,
@@ -77,6 +79,7 @@ exports.createMission = async (req, res) => {
                     }
                 });
 
+                //1-1-2-1. 인증권한자인 친구와의 방이 없다면 방 생성
                 if (!room){
                     const newRoom = await roomController.initAddRoom({
                         body: { u1_id: assignedU2Id, roomName: `${assignedU2Id}-${missionAuthenticationAuthority}` },
@@ -86,7 +89,7 @@ exports.createMission = async (req, res) => {
                     }
                 }
 
-                // 미션 생성
+                //1-1-2. 미션 생성
                 await Mission.create({
                     m_id: uuidv4(),
                     u1_id,
@@ -115,25 +118,31 @@ exports.createMission = async (req, res) => {
 
                 return res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
             }
-            // 3-2. 인증권한자가 미션생성자인 경우
-            // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
+            //1-2. 인증권한자가 미션생성자인 경우
+            //u1_id와 u2_id로 Room 확인 및 r_id 가져오기 (자신의 방 존재 여부 확인)
             const room = await Room.findOne({
                 where: {
                     u1_id,
-                    u2_id: assignedU2Id
+                    u2_id: assignedU2Id // = u1_id
                 }
             });
 
+            //1-2-1. 자신의 방이 없다면 방 생성 (initAddRoom)
             if (!room) {
-                return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
+                const initRoomRes = await roomController.initAddRoom({
+                    body: { u1_id, roomName: `${u1_id}-${u1_id}` }
+                });
+                if (!initRoomRes || !initRoomRes.success || !initRoomRes.r_id) {
+                    return res.status(500).json({ success: false, message: '자신의 방 생성 실패' });
+                }
+                room = initRoomRes;
+                // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 
             const missionId = uuidv4();
             let stat = "진행중";
 
-            
-
-            // 미션 생성
+            //1-2. 미션 생성
             await Mission.create({
                 m_id: missionId,
                 u1_id,
@@ -150,15 +159,29 @@ exports.createMission = async (req, res) => {
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
-            // 다른 사용자에게 미션 생성 시
-            // 4. 타인에게 미션 생성
+            //2. 타인에게 미션 생성 시
+            //2-1. 인증권한자는 자신(u1_id = 미션 생성자 = 미션 부여자)이어야 함
             if (authenticationAuthority && authenticationAuthority !== u1_id) {
                 return res.status(400).json({
                     success: false,
                     message: '다른 사용자에게 미션 생성 시 인증 권한자를 입력할 수 없습니다.',
                 });
             }
-            // u1_id와 u2_id로 Room 확인 및 r_id 가져오기
+
+            //2-2. u2_id가 친구인지 확인
+            const isFriend = await IFriend.findOne({
+                where: { u_id: u1_id, f_id: u2_id },
+            });
+            //2-2-1. u2_id가 친구가 아니라면
+            if (!isFriend) {
+                return res.status(400).json({
+                    success: false,
+                    message: '친구가 아닙니다.',
+                });
+            }
+
+            //2-2-2. u2_id가 친구일 때
+            //u1_id와 u2_id로 Room 확인 및 r_id 가져오기
             const room = await Room.findOne({
                 where: {
                     u1_id,
@@ -167,14 +190,25 @@ exports.createMission = async (req, res) => {
                 }
             });
 
+            //2-2-2-1. 친구와의 방이 없다면 방 생성 (addRoom)
             if (!room) {
-                return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
+                const fakeReq = { body: { u1_id, u2_id } };
+                const fakeRes = {
+                    status: () => ({ json: (data) => data }),
+                    json: (data) => data
+                };
+                const result = await roomController.addRoom(fakeReq, fakeRes);
+                if (!result || !result.success) {
+                    return res.status(500).json({ success: false, message: '친구와의 방 생성 실패' });
+                }
+                room = result;
+                // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 
             const missionId = uuidv4();
             let stat = "진행중";
 
-            // 미션 생성
+            //2-2-2. 미션 생성
             await Mission.create({
                 m_id: missionId,
                 u1_id,
@@ -183,7 +217,8 @@ exports.createMission = async (req, res) => {
                 m_deadline,
                 m_reword,
                 m_status: stat,
-                r_id: room.r_id, // Room ID를 저장
+                // r_id: room.r_id, // Room ID를 저장
+                r_id: room?.r_id || null, // Room ID를 저장
                 m_extended: false,
                 missionAuthenticationAuthority: u1_id,
                 category,

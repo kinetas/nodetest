@@ -82,6 +82,31 @@
                 console.error('로그인 오류(index.html:76):', error);
                 alert('로그인 오류(index.html:76): ' + error.message);
             });
+
+            // // KeyCloak + JWT 한번에
+            // fetch('/api/auth/keycloak-direct-login', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ username, password }),
+            // })
+            // .then(response => {
+            //     if (!response.ok) throw new Error('로그인 실패(index.html:93)');
+            //     return response.json();
+            // })
+            // .then(data => {
+            //     if (data.success) {
+            //         console.log("accesstoken(index.html:98): ", data.accessToken);
+            //         console.log("idToken(index.html:99): ", data.idToken);
+            //         console.log("jwtToken(index.html:100): ", data.jwtToken);
+            //         localStorage.setItem('access_token', data.accessToken);
+            //         localStorage.setItem('id_token', data.idToken);
+            //         localStorage.setItem('jwt_token', data.jwtToken);
+            //         alert('✅ Keycloak + JWT 로그인 완료!(index.html:104)');
+            //         window.location.href = '/dashboard';
+            //     } else {
+            //         throw new Error(data.message || '로그인 실패(index.html:107)');
+            //     }
+            // })
         });
 
         // 회원가입 페이지로 이동

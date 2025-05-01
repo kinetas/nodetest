@@ -105,7 +105,16 @@ exports.createMission = async (req, res) => {
                     if (!result || !result.success) {
                         return res.status(500).json({ success: false, message: '친구와의 방 생성 실패' });
                     }
-                    room = result;
+                    room = await Room.findOne({
+                        where: {
+                            u1_id: assignedU2Id,
+                            u2_id: missionAuthenticationAuthority
+                        }
+                    });
+                    console.log("room: ", room);
+                    if (!room || !room.r_id) {
+                        return res.status(500).json({ message: '방 조회 실패 (room 없거나 r_id 없음) (missionController.js:158)' });
+                    }
                 }
 
                 //1-1-2. 미션 생성

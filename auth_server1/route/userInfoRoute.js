@@ -2,11 +2,17 @@
 const express = require('express');
 const router = express.Router();
 const userInfoController = require('../controllers/userInfoController');
-const { keycloak } = require('../keycloak'); // ✅ Keycloak 미들웨어 가져오기
+const loginRequired = require('../middleware/loginRequired'); // ✅ JWT 미들웨어
 
-// ✅ Keycloak 인증 필요 라우트 설정
-router.get('/user-id', keycloak.protect(), userInfoController.getLoggedInUserId);
-router.get('/user-nickname', keycloak.protect(), userInfoController.getLoggedInUserNickname);
-router.get('/user-all', keycloak.protect(), userInfoController.getLoggedInUserAll);
+// // 로그인한 사용자의 u_id 반환
+// router.get('/user-id', userInfoController.getLoggedInUserId);
+// // 로그인한 사용자의 u_nickname 반환
+// router.get('/user-nickname', userInfoController.getLoggedInUserNickname);
+// // 로그인한 사용자의 모든 정보 반환
+// router.get('/user-all', userInfoController.getLoggedInUserAll);
+
+router.get('/user-id', loginRequired, userInfoController.getLoggedInUserId);
+router.get('/user-nickname', loginRequired, userInfoController.getLoggedInUserNickname);
+router.get('/user-all', loginRequired, userInfoController.getLoggedInUserAll);
 
 module.exports = router;

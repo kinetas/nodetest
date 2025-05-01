@@ -138,12 +138,11 @@ exports.createMission = async (req, res) => {
                 }
                 room = await Room.findOne({
                     where: {
-                        [Room.sequelize.Op.or]: [
-                            { u1_id, u2_id: assignedU2Id },
-                            { u1_id: assignedU2Id, u2_id: u1_id }
-                        ]
+                        u1_id,
+                        u2_id: assignedU2Id // = u1_id
                     }
                 });
+                console.log("room(missionController.js:145): ", room);
                 // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 

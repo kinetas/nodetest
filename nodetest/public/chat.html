@@ -356,8 +356,8 @@
         const u1_id = decoded?.userId;
 
         // 이 토큰과 u1_id가 실제로 있는지 콘솔에 출력
-        console.log("📦 JWT:", token);
-        console.log("👤 유저 ID:", u1_id);
+        console.log("JWT:", token);
+        console.log("유저 ID:", u1_id);
 
         // ✅ Socket.io 연결: auth로 JWT 토큰 전달
         const socket = io("http://27.113.11.48:3001", {

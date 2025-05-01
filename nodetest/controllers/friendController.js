@@ -301,10 +301,9 @@ const getCurrentUserId = (req) => {
 // i_friend 테이블의 f_id 리스트 출력
 exports.printIFriend = async (req, res) => {
     try {
-        const u_id = getCurrentUserId(req); // ✅ Keycloak 기반 변경
+        const u_id = getCurrentUserId(req);
         const iFriends = await IFriend.findAll({
             attributes: ['f_id'],
-            // where: { u_id: req.currentUserId }, // ✅ JWT로부터 추출된 ID 사용
             where: { u_id },
         });
         const friendList = iFriends.map(friend => friend.f_id);
@@ -318,13 +317,14 @@ exports.printIFriend = async (req, res) => {
 // t_friend 테이블의 요청 리스트 출력
 exports.printTFriend = async (req, res) => {
     try {
+        const u_id = getCurrentUserId(req);
         const tFriends = await TFriend.findAll({
             attributes: ['u_id', 'f_id'],
             where: { f_status: 0 },
         });
 
-        const sentRequests = tFriends.filter(friend => friend.u_id === req.currentUserId).map(friend => friend.f_id);
-        const receivedRequests = tFriends.filter(friend => friend.f_id === req.currentUserId).map(friend => friend.u_id);
+        const sentRequests = tFriends.filter(friend => friend.u_id === u_id).map(friend => friend.f_id);
+        const receivedRequests = tFriends.filter(friend => friend.f_id === u_id).map(friend => friend.u_id);
         // const sentRequests = tFriends.filter(friend => friend.u_id === req.kauth?.grant?.access_token?.content?.preferred_username).map(friend => friend.f_id);
         // const receivedRequests = tFriends.filter(friend => friend.f_id === req.kauth?.grant?.access_token?.content?.preferred_username).map(friend => friend.u_id);
 

@@ -75,7 +75,7 @@ exports.createMission = async (req, res) => {
                 //1-1-2. 입력한 인증권한자가 친구일때 
                 console.log("1-1-2 경우");
                 //인증권한자인 친구와의 방 여부 확인
-                const room = await Room.findOne({
+                let room = await Room.findOne({
                     where: {
                         u1_id: assignedU2Id,
                         u2_id: missionAuthenticationAuthority,
@@ -131,7 +131,7 @@ exports.createMission = async (req, res) => {
             //1-2. 인증권한자가 미션생성자인 경우
             console.log("1-2 경우");
             //u1_id와 u2_id로 Room 확인 및 r_id 가져오기 (자신의 방 존재 여부 확인)
-            const room = await Room.findOne({
+            let room = await Room.findOne({
                 where: {
                     u1_id,
                     u2_id: assignedU2Id // = u1_id
@@ -209,7 +209,7 @@ exports.createMission = async (req, res) => {
             //2-2-2. u2_id가 친구일 때
             console.log("2-2-2 경우");
             //u1_id와 u2_id로 Room 확인 및 r_id 가져오기
-            const room = await Room.findOne({
+            let room = await Room.findOne({
                 where: {
                     u1_id,
                     u2_id: assignedU2Id,

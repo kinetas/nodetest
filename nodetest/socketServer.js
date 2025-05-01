@@ -28,7 +28,7 @@ let serviceAccount;
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
 
-function getUserIdFromSocket(socket) {
+async function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;
     if (!token) {
@@ -209,11 +209,11 @@ const upload = multer({ storage });
 const userSockets = new Map(); // 사용자 ID와 소켓 ID 매핑
 
 // 소켓 연결 처리
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log('user connected'); // 클라이언트가 연결되었을 때 로그 출력
 
   // const userId = socket.handshake.query.u1_id;
-  const userId = getUserIdFromSocket(socket); // ✅ JWT 기반으로 추출
+  const userId = await getUserIdFromSocket(socket); // ✅ JWT 기반으로 추출
   if (userId) {
       userSockets.set(userId, socket.id);
   }
@@ -289,7 +289,7 @@ socket.on('markAsRead', async (data) => {
 
 socket.on('joinRoom', async (data) => {
   let { r_id, u2_id } = data;
-  const u1_id = getUserIdFromSocket(socket);
+  const u1_id = await getUserIdFromSocket(socket);
 
   if (!u1_id) {
     console.error("❌ 사용자 인증 실패");
@@ -324,7 +324,7 @@ socket.on('joinRoom', async (data) => {
 
   socket.on('sendMessage', async (data) => {
     //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
-    const u1_id = getUserIdFromSocket(socket); // ✅ 핵심
+    const u1_id = await getUserIdFromSocket(socket); // ✅ 핵심
     const { message_contents, r_id, u2_id, image, image_type} = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
     console.log("u1_id(sockerServer:330): ", u1_id);

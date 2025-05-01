@@ -86,12 +86,16 @@ exports.createMission = async (req, res) => {
                 //1-1-2-1. 인증권한자인 친구와의 방이 없다면 방 생성
                 if (!room){
                     console.log("1-1-2-1 경우");
-                    const newRoom = await roomController.initAddRoom({
-                        body: { u1_id: assignedU2Id, roomName: `${assignedU2Id}-${missionAuthenticationAuthority}` },
-                    });
-                    if (!newRoom.success) {
-                        return res.status(500).json({ success: false, message: '방 생성 실패.' });
+                    const fakeReq = { body: { assignedU2Id, missionAuthenticationAuthority } };
+                    const fakeRes = {
+                        status: () => ({ json: (data) => data }),
+                        json: (data) => data
+                    };
+                    const result = await roomController.addRoom(fakeReq, fakeRes);
+                    if (!result || !result.success) {
+                        return res.status(500).json({ success: false, message: '친구와의 방 생성 실패' });
                     }
+                    room = result;
                 }
 
                 //1-1-2. 미션 생성
@@ -140,6 +144,7 @@ exports.createMission = async (req, res) => {
                 const initRoomRes = await roomController.initAddRoom({
                     body: { u1_id, roomName: `${u1_id}-${u1_id}` }
                 });
+                console.log("initRoomRes(missionController.js:147): ", initRoomRes);
                 if (!initRoomRes || !initRoomRes.success || !initRoomRes.r_id) {
                     return res.status(500).json({ success: false, message: '자신의 방 생성 실패' });
                 }
@@ -149,7 +154,7 @@ exports.createMission = async (req, res) => {
                         u2_id: assignedU2Id // = u1_id
                     }
                 });
-                console.log("room(missionController.js:145): ", room);
+                console.log("room(missionController.js:157): ", room);
                 // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 

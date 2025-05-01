@@ -78,12 +78,12 @@ exports.registerKeycloakDirect = async (req, res) => {
             u_birth
         });
 
-        // 4. room 생성
-        const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
-        if (!roomResult.success) {
-            console.error('방 생성 실패:', roomResult.error);
-            return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });
-        }
+        // // 4. room 생성
+        // const roomResult = await roomController.initAddRoom({ body: { u1_id: u_id } });
+        // if (!roomResult.success) {
+        //     console.error('방 생성 실패:', roomResult.error);
+        //     return res.status(500).json({ message: '회원가입은 완료되었으나 방 생성에 실패했습니다.' });
+        // }
 
         return res.status(201).json({ success: true, message: '회원가입 성공' });
     } catch (err) {
@@ -298,6 +298,6 @@ exports.deleteAccount = async (req, res) => { // 추가
 
 // ✅ JWT 기반 로그아웃 로직 (간소화 버전)
 exports.logoutToken = async (req, res) => {
-    res.clearCookie('token'); // 만약 쿠키 기반이라면 의미 있음
+    res.clearCookie('jwt_token'); // 만약 쿠키 기반이라면 의미 있음
     res.json({ message: '로그아웃 되었습니다.' });
 };

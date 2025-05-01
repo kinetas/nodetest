@@ -86,6 +86,8 @@ exports.createMission = async (req, res) => {
                 //1-1-2-1. 인증권한자인 친구와의 방이 없다면 방 생성
                 if (!room){
                     console.log("1-1-2-1 경우");
+                    console.log("assignedU2Id: ", assignedU2Id);
+                    console.log("missionAuthenticationAuthority: ", missionAuthenticationAuthority);
                     const fakeReq = { body: { assignedU2Id, missionAuthenticationAuthority } };
                     const fakeRes = {
                         status: () => ({ json: (data) => data }),

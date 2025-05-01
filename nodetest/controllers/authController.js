@@ -365,7 +365,7 @@ exports.deleteAccount = async (req, res) => { // 추가
 exports.logoutToken = async (req, res) => {
     try {
         const { idToken } = req.body;
-        console.log("id_token(authController.js:368): ", localStorage.getItem('id_token'))
+        console.log("id_token(authController.js:368): ", idToken)
         const redirectUri = 'http://27.113.11.48:3000/'; // 로그아웃 후 돌아갈 경로
 
         if (!idToken) {
@@ -389,7 +389,7 @@ exports.logoutToken = async (req, res) => {
             logoutUrl
         });
     } catch (error) {
-        console.error('🚫 로그아웃 처리 중 오류:', error.message);
+        console.error('🚫 로그아웃 처리 중 오류(authController.js:392):', error.message);
         return res.status(500).json({
             success: false,
             message: '서버 오류로 로그아웃 URL 생성에 실패했습니다.',

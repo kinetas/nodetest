@@ -236,16 +236,30 @@ exports.createMission = async (req, res) => {
             //2-2-2-1. 친구와의 방이 없다면 방 생성 (addRoom)
             if (!room) {
                 console.log("2-2-2-1 경우");
-                const fakeReq = { body: { u1_id, u2_id } };
+                const fakeReq = { 
+                    body: {
+                        u2_id,
+                        roomName: `${u1_id}-${u2_id}`,
+                        r_type: 'general'
+                    },
+                    currentUserId: u1_id
+                 };
                 const fakeRes = {
                     status: () => ({ json: (data) => data }),
                     json: (data) => data
                 };
                 const result = await roomController.addRoom(fakeReq, fakeRes);
-                if (!result || !result.success) {
-                    return res.status(500).json({ success: false, message: '친구와의 방 생성 실패' });
+                console.log("result: ", result);
+                room = await Room.findOne({
+                    where: {
+                        u1_id: u1_id,
+                        u2_id: u2_id
+                    }
+                });
+                console.log("room: ", room);
+                if (!room || !room.r_id) {
+                    return res.status(500).json({ message: '방 조회 실패 (room 없거나 r_id 없음) (missionController.js:158)' });
                 }
-                room = result;
                 // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 

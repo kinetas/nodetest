@@ -28,9 +28,6 @@ let serviceAccount;
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
 
-
-let keycloakPublicKey = null;
-
 function getUserIdFromSocket(socket) {
   try {
     const token = socket.handshake.auth?.token;

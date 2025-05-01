@@ -800,22 +800,56 @@
             });
         }
 
-        //로그아웃 (JWT)
+        // //로그아웃 (JWT)
+        // function logout() {
+        //     fetch('/api/auth/logoutToken', {
+        //     // fetch('/auth/logoutToken', {    //MSA적용 시 사용
+        //         method: 'POST',
+        //         headers: {
+        //             'Authorization': `Bearer ${jwtToken}`
+        //         }
+        //     })
+        //     .then(() => {
+        //         localStorage.removeItem('jwt_token');
+        //         window.location.href = '/';
+        //     })
+        //     .catch(err => {
+        //         console.error('로그아웃 실패:', err);
+        //         alert('로그아웃 중 문제가 발생했습니다.');
+        //     });
+        // }
+        // function logout() {
+        //     const idToken = localStorage.getItem('id_token'); // ✅ Keycloak에서 받은 id_token
+        //     const redirectUri = 'http://27.113.11.48:3000/';  // 로그아웃 후 돌아갈 페이지
+
+        //     // 1. 로컬 토큰 제거
+        //     localStorage.removeItem('jwt_token');
+        //     localStorage.removeItem('access_token');
+        //     localStorage.removeItem('id_token');
+
+        //     // 2. Keycloak 로그아웃 URL로 리디렉션
+        //     if (idToken) {
+        //         const logoutUrl = `http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout?` +
+        //                         `id_token_hint=${idToken}&post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
+        //         window.location.href = logoutUrl;
+        //     } else {
+        //         // fallback
+        //         window.location.href = redirectUri;
+        //     }
+        // }
         function logout() {
+            // 웹 또는 Flutter 등에서 요청
             fetch('/api/auth/logoutToken', {
-            // fetch('/auth/logoutToken', {    //MSA적용 시 사용
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${jwtToken}`
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken: localStorage.getItem('id_token') })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.logoutUrl) {
+                    localStorage.clear(); // 모든 토큰 제거
+                    window.location.href = data.logoutUrl; // ✅ Keycloak 로그아웃 URL로 이동
                 }
-            })
-            .then(() => {
-                localStorage.removeItem('jwt_token');
-                window.location.href = '/';
-            })
-            .catch(err => {
-                console.error('로그아웃 실패:', err);
-                alert('로그아웃 중 문제가 발생했습니다.');
             });
         }
 

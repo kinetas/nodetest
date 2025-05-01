@@ -361,8 +361,38 @@ exports.deleteAccount = async (req, res) => { // 추가
     }
 };
 
-// ✅ JWT 기반 로그아웃 로직 (간소화 버전)
+// ✅ Keycloak 로그아웃 URL 반환 + JWT 제거
 exports.logoutToken = async (req, res) => {
-    res.clearCookie('jwt_token'); // 만약 쿠키 기반이라면 의미 있음
-    res.json({ message: '로그아웃 되었습니다.' });
+    try {
+        const { idToken } = req.body;
+        const redirectUri = 'http://27.113.11.48:3000/'; // 로그아웃 후 돌아갈 경로
+
+        if (!idToken) {
+            return res.status(400).json({
+                success: false,
+                message: 'id_token이 없습니다.'
+            });
+        }
+
+        // JWT 쿠키 방식일 경우 삭제 가능
+        res.clearCookie('jwt_token');
+
+        // Keycloak 로그아웃 URL 생성
+        const logoutUrl = `http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout?` +
+                          `id_token_hint=${encodeURIComponent(idToken)}&` +
+                          `post_logout_redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+        return res.status(200).json({
+            success: true,
+            message: 'Keycloak 로그아웃 URL 생성 완료',
+            logoutUrl
+        });
+    } catch (error) {
+        console.error('🚫 로그아웃 처리 중 오류:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: '서버 오류로 로그아웃 URL 생성에 실패했습니다.',
+            error: error.message
+        });
+    }
 };

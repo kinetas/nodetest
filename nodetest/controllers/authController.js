@@ -157,7 +157,7 @@ exports.keycloakDirectLogin = async (req, res) => {
         const userInfoRes = await axios.get(
             'http://27.113.11.48:8080/realms/master/protocol/openid-connect/userinfo',
             {
-                headers: { Authorization: `Bearer ${accessToken}` }
+                headers: { Authorization: `Bearer ${access_token}` }
             }
         );
 

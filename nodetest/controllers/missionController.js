@@ -136,7 +136,14 @@ exports.createMission = async (req, res) => {
                 if (!initRoomRes || !initRoomRes.success || !initRoomRes.r_id) {
                     return res.status(500).json({ success: false, message: '자신의 방 생성 실패' });
                 }
-                room = initRoomRes;
+                room = await Room.findOne({
+                    where: {
+                        [Room.sequelize.Op.or]: [
+                            { u1_id, u2_id: assignedU2Id },
+                            { u1_id: assignedU2Id, u2_id: u1_id }
+                        ]
+                    }
+                });
                 // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 

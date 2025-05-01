@@ -55,6 +55,7 @@ exports.createMission = async (req, res) => {
         // 1. 자신에게 미션 생성 시
         if (assignedU2Id === u1_id) {
             const missionAuthenticationAuthority = authenticationAuthority || u1_id;
+            console.log("missionAuthenticationAuthority(missionController.js:58): ", missionAuthenticationAuthority)
             // 1-1. 인증권한자가 미션생성자가 아닌 경우 (= 인증권한을 친구에게 맡기는 경우)
             if (missionAuthenticationAuthority !== u1_id) {
                 const isFriend = await IFriend.findOne({

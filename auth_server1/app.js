@@ -7,16 +7,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 const loginRequired = require('./middleware/loginRequired'); // JWT 미들웨어 추가
 
 app.get('/user-info', loginRequired, (req, res) => {
-    const userInfo = req.kauth.grant.access_token.content;
-    const userId = userInfo.preferred_username || userInfo.sub;
-    res.json({ userId });
+  res.json({ userId: req.currentUserId });    //토큰기반
 });
 
-app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
-app.listen(3004, () => {
+app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
+
+app.listen(PORT, () => {
     console.log('Auth server listening on port 3004');
 });

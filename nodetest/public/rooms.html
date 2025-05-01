@@ -227,6 +227,7 @@
         //=====================================token======================================
 
         const token = localStorage.getItem('jwt_token');
+        console.log("jwt_token(rooms.html:230): ", token);
         if (!token) {
             alert("로그인이 필요합니다.");
             window.location.href = '/';

@@ -88,7 +88,7 @@ exports.createMission = async (req, res) => {
                     console.log("1-1-2-1 경우");
                     console.log("assignedU2Id: ", assignedU2Id);
                     console.log("missionAuthenticationAuthority: ", missionAuthenticationAuthority);
-                    const fakeReq = { body: { assignedU2Id, missionAuthenticationAuthority } };
+                    const fakeReq = { body: { u1_id: assignedU2Id, u2_id: missionAuthenticationAuthority } };
                     const fakeRes = {
                         status: () => ({ json: (data) => data }),
                         json: (data) => data

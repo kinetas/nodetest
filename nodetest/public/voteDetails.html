@@ -16,6 +16,13 @@
     <button onclick="window.close()">닫기</button>
 
     <script>
+        // ✅ JWT 토큰 가져오기
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            location.href = "/";
+        }
+
         const c_number = new URLSearchParams(window.location.search).get('c_number');
 
         if (!c_number) {
@@ -27,7 +34,11 @@
             loadVoteDetails(c_number);
         }
         function loadVoteDetails() {
-            fetch(`/api/cVote/details?c_number=${c_number}`)
+            fetch(`/api/cVote/details?c_number=${c_number}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -49,7 +60,10 @@
         function voteAction(action) {
             fetch('/api/cVote/action', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({ c_number, action }),
             })
                 .then(response => response.json())

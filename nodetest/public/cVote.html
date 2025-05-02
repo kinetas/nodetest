@@ -158,6 +158,7 @@
                         <p>좋아요: ${vote.c_good} / 싫어요: ${vote.c_bad}</p>
                         <button onclick="vote('${vote.c_number}', 'good')">좋아요</button>
                         <button onclick="vote('${vote.c_number}', 'bad')">싫어요</button>
+                        <button onclick="viewVoteDetails('${vote.c_number}')">상세 보기</button>
                         <hr />
                     `;
                     voteList.appendChild(div);

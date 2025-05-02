@@ -406,6 +406,19 @@ exports.deleteCommunityMission = async (req, res) => {
     }
 };
 
+// 커뮤니티 미션 불러오기 (JWT 적용)
+exports.getCommunityMission = async (req, res) => {
+    try {
+        const missions = await CRoom.findAll({
+            order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
+        }); // 모든 커뮤니티 미션 가져오기
+        res.json({ missions });
+    } catch (error) {
+        console.error('커뮤니티 미션 리스트 오류:', error);
+        res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
 //======================Token===============================
 
 exports.checkMissionStatus = async () => {

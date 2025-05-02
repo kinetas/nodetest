@@ -138,6 +138,10 @@
             location.href = "/";
         }
 
+        function viewVoteDetails(c_number) {
+            window.open(`/cVote/details?c_number=${c_number}`, '_blank');
+        }
+
         // ✅ 투표 목록 불러오기 함수화
         function loadVotes() {
             fetch("/api/cVote", {

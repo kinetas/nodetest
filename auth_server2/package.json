@@ -15,7 +15,7 @@
       "moment-timezone": "^0.5.45",
       "sequelize": "^6.x.x",
       "mysql2": "^3.x.x",
-      "jsonwebtoken": "^9.0.0"
+      "jsonwebtoken": "^9.0.2"
     }
   }
   

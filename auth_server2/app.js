@@ -11,7 +11,7 @@ const authRoutes = require('./route/authRoute');
 
 // ==================== 앱 초기화 ====================
 const app = express();
-const PORT = 3005;
+const PORT = 3000;
 
 // ==================== 공통 미들웨어 ====================
 app.use(cors());

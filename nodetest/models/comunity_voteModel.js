@@ -13,7 +13,7 @@ const CVote = sequelize.define('CVote', {
     allowNull: false,
   },
   c_title: {
-    type: DataTypes.STRING(10),
+    type: DataTypes.STRING(40),
     allowNull: false,
   },
   c_contents: {

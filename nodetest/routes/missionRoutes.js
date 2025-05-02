@@ -25,12 +25,12 @@ router.get('/missions/friendCompleted', loginRequired, getFriendCompletedMission
 router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAuthority); //printmissionlist
 router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions); //printmissionlist
 
-router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission);
 router.post('/missioncreate', loginRequired, createMission); // dashboard
 router.delete('/missiondelete', loginRequired, deleteMission); //printmissionlist
 router.post('/successMission', loginRequired, successMission); //printmissionlist
-router.post('/failureMission', loginRequired, failureMission);
-router.post('/printRoomMission', loginRequired, printRoomMission);
+router.post('/failureMission', loginRequired, failureMission); //printmissionlist
 router.post('/missionRequest', loginRequired, requestMissionApproval); //printmissionlist
+router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission); //printmissionlist
+router.post('/printRoomMission', loginRequired, printRoomMission); //chat
 
 module.exports = router;

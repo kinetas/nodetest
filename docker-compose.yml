@@ -180,4 +180,4 @@ services:
 volumes:
   mysql-data:
   chroma-data:
-  ollama_data:
+  # ollama_data:

@@ -1,5 +1,5 @@
-const User = require('../models/userModel'); // User 모델 불러오기
-const { hashPassword } = require('../utils/passwordUtils'); // 비밀번호 해시 함수 불러오기
+const User = require('../model/userModel'); // User 모델 불러오기
+const { hashPassword } = require('../util/passwordUtils'); // 비밀번호 해시 함수 불러오기
 
 const jwt = require('jsonwebtoken'); // ✅ JWT 모듈 추가
 const axios = require('axios');

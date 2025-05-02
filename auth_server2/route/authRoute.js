@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
-const findInfoController = require('../controllers/findInfoController');
+const authController = require('../controller/authController');
+const findInfoController = require('../controller/findInfoController');
 const loginRequired = require('../middleware/loginRequired'); // 로그인 확인 미들웨어 불러오기 (로그인이 필요한 기능이 있을시 해당 라우터에 사용됨)
 
 //======================authController=====================

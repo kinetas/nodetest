@@ -13,7 +13,7 @@ const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러�
 //================JWT===================
 
 const { hashPassword, comparePassword } = require('../util/passwordUtils'); // 암호화 모듈 가져오기
-const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
+// const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
 const {
     KEYCLOAK_ADMIN_USER,

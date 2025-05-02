@@ -24,11 +24,17 @@ async function getHealthyTarget() {
   return null; // 전부 죽었을 경우
 }
 
-// ✅ /auth 프록시 with 헬스체크
+// ✅ /auth 프록시 with 헬스체크 + pathRewrite
 app.use('/auth', async (req, res, next) => {
   const target = await getHealthyTarget();
   if (!target) return res.status(503).send('모든 auth 서버가 다운됨');
-  createProxyMiddleware({ target, changeOrigin: true })(req, res, next);
+  createProxyMiddleware({
+    target,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/auth': '/api/auth', // ✅ 핵심! auth 서버가 기대하는 경로로 바꿔줌
+    }
+  })(req, res, next);
 });
 
 

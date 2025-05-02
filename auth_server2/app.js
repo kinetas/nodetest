@@ -1,61 +1,38 @@
+// ==================== 기본 내장/외부 모듈 ====================
 const express = require('express');
-const session = require('express-session');
+const cors = require('cors');
+require('dotenv').config();
+
+// ==================== 미들웨어 & 유틸 ====================
+const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
+
+// ==================== 라우터 ====================
+const authRoutes = require('./route/authRoute');
+
+// ==================== 앱 초기화 ====================
 const app = express();
 const PORT = 3005;
-const { keycloak, memoryStore } = require('./keycloak');
 
-require('dotenv').config();
+// ==================== 공통 미들웨어 ====================
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    store: memoryStore,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 }
-}));
+// ==================== 라우팅 설정 ====================
+app.use('/api/auth', timeConverterMiddleware, authRoutes);
 
-app.use(keycloak.middleware());
-
-// 🔁 Authorization Code Flow 처리용 콜백
-app.get('/callback', async (req, res) => {
-    const code = req.query.code;
-  
-    if (!code) return res.status(400).send("코드가 없습니다.");
-  
-    try {
-      // Keycloak 서버에 토큰 요청
-      const tokenRes = await axios.post('http://27.113.11.48:8080/realms/master/protocol/openid-connect/token', new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code,
-        // redirect_uri: 'http://27.113.11.48:3000/callback',
-        redirect_uri: 'myapp://login-callback',
-        client_id: 'nodetest',
-        client_secret: 'ptR4hZ66Q6dvBCWzdiySdk57L7Ow2OzE'  // → Keycloak 콘솔에서 확인 가능
-      }), {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      });
-  
-      const { access_token } = tokenRes.data;
-  
-      // 토큰을 파라미터로 전달 (dashboard 페이지에서 처리)
-      res.redirect(`/dashboard#access_token=${access_token}`);
-    } catch (err) {
-      console.error('[토큰 요청 오류]', err.response?.data || err);
-      res.status(500).send("토큰 요청 실패");
-    }
-  });
-
-app.get('/user-info', keycloak.protect(), (req, res) => {
-    const userInfo = req.kauth.grant.access_token.content;
-    const userId = userInfo.preferred_username || userInfo.sub;
-    res.json({ userId });
+// ==================== 라우팅: HTML 정적 페이지 ====================
+// 헬스체크 라우트 추가 (Gateway에서 사용함)
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
 });
 
-app.use('/api/auth', require('./routes/authRoutes'));
+// ==================== 404 처리 ====================
+app.use((req, res) => {
+  res.status(404).json({ message: '경로가 존재하지 않습니다.' });
+});
 
-app.listen(3005, () => {
-    console.log('Auth server listening on port 3005');
+// ==================== 서버 시작 ====================
+app.listen(PORT, () => {
+    console.log('Auth server listening on port 3004');
 });

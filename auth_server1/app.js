@@ -7,7 +7,7 @@ require('dotenv').config();
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
 // ==================== 라우터 ====================
-const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./route/authRoute');
 
 // ==================== 앱 초기화 ====================
 const app = express();

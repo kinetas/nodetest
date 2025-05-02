@@ -27,10 +27,10 @@ router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions); 
 
 router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission);
 router.post('/missioncreate', loginRequired, createMission); // dashboard
-router.delete('/missiondelete', loginRequired, deleteMission);
-router.post('/successMission', loginRequired, successMission);
+router.delete('/missiondelete', loginRequired, deleteMission); //printmissionlist
+router.post('/successMission', loginRequired, successMission); //printmissionlist
 router.post('/failureMission', loginRequired, failureMission);
 router.post('/printRoomMission', loginRequired, printRoomMission);
-router.post('/missionRequest', loginRequired, requestMissionApproval);
+router.post('/missionRequest', loginRequired, requestMissionApproval); //printmissionlist
 
 module.exports = router;

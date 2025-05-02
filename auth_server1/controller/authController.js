@@ -1,8 +1,8 @@
 // User 모델 불러오기
 const User = require('../model/userModel'); // 경로를 확인하세요
-const Mission = require('../model/missionModel');
-const Room = require('../model/roomModel');
-const RMessage = require('../model/messageModel'); // r_message 모델 가져오기
+// const Mission = require('../model/missionModel');
+// const Room = require('../model/roomModel');
+// const RMessage = require('../model/messageModel'); // r_message 모델 가져오기
 const NotificationLog = require('../model/notificationModel'); // r_message 모델 가져오기
 const { Op } = require('sequelize'); // 추가: Sequelize의 Op 객체 가져오기
 const axios = require('axios');
@@ -14,7 +14,7 @@ const { generateToken } = require('./jwt'); // jwt 토큰 생성 파일 불러�
 //================JWT===================
 
 const { hashPassword, comparePassword } = require('../util/passwordUtils'); // 암호화 모듈 가져오기
-const roomController = require('./roomController'); // roomController 가져오기
+// const roomController = require('./roomController'); // roomController 가져오기
 const { v4: uuidv4 } = require('uuid'); // 필요시 ID 생성 유틸
 
 const {
@@ -263,9 +263,9 @@ exports.deleteAccountFromKeycloak = async (req, res) => {
         );
 
         // 4. 우리 DB의 메시지, 미션, 방, 유저 삭제
-        await RMessage.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
-        await Mission.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
-        await Room.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+        // await RMessage.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+        // await Mission.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
+        // await Room.destroy({ where: { [Op.or]: [{ u1_id: userId }, { u2_id: userId }] } });
         await User.destroy({ where: { u_id: userId } });
 
         return res.json({

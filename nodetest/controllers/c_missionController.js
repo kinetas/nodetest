@@ -375,6 +375,19 @@ exports.acceptCommunityMission = async (req, res) => {
             }
         ]);
 
+        //         // ================ 알림 추가 - 디바이스 토큰 =======================
+                
+        //         const sendAcceptCommunityMissionNotification = await notificationController.sendAcceptCommunityMissionNotification(
+        //             mission.u_id,
+        //             missionTitle
+        //         );
+
+        //         if(!sendAcceptCommunityMissionNotification){
+        //             return res.status(400).json({ success: false, message: '커뮤니티 미션 수락 알림 전송을 실패했습니다.' });
+        //         }
+                
+        //         // ================ 알림 추가 - 디바이스 토큰 =======================
+
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 수락 오류:', error);
@@ -418,8 +431,6 @@ exports.getCommunityMission = async (req, res) => {
         res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류가 발생했습니다.' });
     }
 };
-
-//======================Token===============================
 
 exports.checkMissionStatus = async () => {
     try {

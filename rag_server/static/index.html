@@ -131,12 +131,13 @@
     async function getRecommendation() {
       const category = document.getElementById('category').value;
       const jwtToken = localStorage.getItem('jwt_token');
+      
 
       if (!jwtToken) {
         alert("❌ JWT 토큰이 없습니다. 먼저 로그인 해주세요.");
         return;
       }
-
+      console.log(JSON.parse(atob(token.split(".")[1])));
       try {
         const res = await fetch('/ai/recommend', {
           method: 'POST',

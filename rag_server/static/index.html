@@ -43,7 +43,7 @@
 </body>
 </html> -->
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
@@ -90,6 +90,84 @@
       fullJson.id = "jsonDebug";
       
       document.body.appendChild(fullJson);
+    }
+
+    async function loadDocuments() {
+      const res = await fetch('/ai/documents');
+      const data = await res.json();
+      document.getElementById('docList').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Chroma RAG 테스트</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    pre { background: #f4f4f4; padding: 1rem; border-radius: 5px; }
+    input, button { font-size: 1rem; margin: 0.5rem 0; padding: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>🧠 RAG 추천 요청</h1>
+  <input type="text" id="category" placeholder="예: 여행, 공부, 운동" />
+  <button onclick="getRecommendation()">추천 요청</button>
+
+  <p><strong>추천 결과:</strong></p>
+  <pre id="result">아직 결과가 없습니다.</pre>
+  <p><strong>⏱️ 응답 시간:</strong> <span id="responseTime">-</span> 초</p>
+
+  <hr />
+
+  <h2>📄 Chroma DB 문서 목록</h2>
+  <button onclick="loadDocuments()">문서 불러오기</button>
+  <pre id="docList">문서 목록을 불러오세요.</pre>
+
+  <script>
+    async function getRecommendation() {
+      const category = document.getElementById('category').value;
+      const jwtToken = localStorage.getItem('jwt_token');
+
+      if (!jwtToken) {
+        alert("❌ JWT 토큰이 없습니다. 먼저 로그인 해주세요.");
+        return;
+      }
+
+      try {
+        const res = await fetch('/ai/recommend', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+          },
+          body: JSON.stringify({ category })
+        });
+
+        const data = await res.json();
+        if (res.status !== 200) {
+          throw new Error(data.detail || "오류 발생");
+        }
+
+        document.getElementById('result').textContent = data.message;
+        document.getElementById('responseTime').textContent = data.response_time_sec + "초";
+
+        console.log("전체 JSON 응답:", data);
+        const fullJson = document.createElement('pre');
+        fullJson.textContent = JSON.stringify(data, null, 2);
+
+        const oldDebug = document.getElementById("jsonDebug");
+        if (oldDebug) oldDebug.replaceWith(fullJson);
+        fullJson.id = "jsonDebug";
+
+        document.body.appendChild(fullJson);
+      } catch (err) {
+        console.error("❌ 요청 실패:", err);
+        alert("요청 실패: " + err.message);
+      }
     }
 
     async function loadDocuments() {

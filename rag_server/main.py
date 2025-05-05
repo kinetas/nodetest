@@ -33,7 +33,7 @@ def extract_user_id_from_token(request: Request):
     token = auth_header.split(" ")[1]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub") or payload.get("preferred_username")
+        user_id = payload.get("userId")
         if not user_id:
             raise HTTPException(status_code=400, detail="user_id 없음")
         return user_id

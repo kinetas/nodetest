@@ -3,7 +3,8 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import os, requests, json, re, time
+import os, requests, json, re, time, jwt
+from fastapi import Request, HTTPException
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
 # from langchain_ollama import OllamaEmbeddings
@@ -17,6 +18,29 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 USER_DB_API = "http://nodetest:3000/user-top-categories"
 INTENT_API = "http://intent_server:8002/intent-classify"
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("❌ JWT_SECRET_KEY 환경변수가 설정되어 있지 않습니다.")
+
+ALGORITHM = "HS256"  # RS256이 아니라면 이 값 유지
+
+def extract_user_id_from_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="토큰이 없습니다")
+
+    token = auth_header.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub") or payload.get("preferred_username")
+        if not user_id:
+            raise HTTPException(status_code=400, detail="user_id 없음")
+        return user_id
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="토큰 만료됨")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="유효하지 않은 토큰")
 
 # ✅ FastAPI 초기화
 app = FastAPI()
@@ -70,29 +94,30 @@ class ChatRequest(BaseModel):
     category: str
 
 @app.post("/recommend")
-async def recommend(req: ChatRequest):
+async def recommend(req: ChatRequest, request: Request):
     start_time = time.time()
+    user_id = extract_user_id_from_token(request)
     query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
     # query = f"{req.question} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
-    # user_id = req.user_id
+
 
     # 1️⃣ Intent 분류
-    # try:
-    #     intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
-    #     intent = intent_res.json().get("intent", "SPECIFIC")
-    # except:
-    #     intent = "SPECIFIC"
+    try:
+        intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
+        intent = intent_res.json().get("intent", "SPECIFIC")
+    except:
+        intent = "SPECIFIC"
 
-    # # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
-    # if intent == "GENERAL":
-    #     try:
-    #         user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
-    #         top3 = user_res.json().get("top3", [])
-    #         if top3:
-    #             chosen = random.choice(top3)
-    #             query = f"{chosen} {query}"
-    #     except:
-    #         pass  # 실패하면 그대로 진행
+    # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
+    if intent == "GENERAL":
+        try:
+            user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
+            top3 = user_res.json().get("top3", [])
+            if top3:
+                chosen = random.choice(top3)
+                query = f"{chosen} {query}"
+        except:
+            pass  # 실패하면 그대로 진행
     
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)

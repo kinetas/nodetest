@@ -99,9 +99,9 @@ app.get('/cVote/details/', (req, res) => {
 app.get('/recommendationMission', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
 });
-// app.get('/findinfo', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
-// }); //==============MSA적용 시 삭제=============
+app.get('/findinfo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
+});
 
 // ==================== 기타 API ====================
 app.post('/api/rooms/enter', roomController.enterRoom);

@@ -30,7 +30,8 @@
             const birthdate = document.getElementById('birthdate').value;
             const email = document.getElementById('email').value;
     
-            fetch('/api/auth/findUid', {
+            // fetch('/api/auth/findUid', {
+            fetch('/auth/findUid', { //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -56,7 +57,8 @@
             const userId = document.getElementById('userId').value;
             const newPassword = document.getElementById('newPassword').value;
 
-            fetch('/api/auth/changePassword', {
+            // fetch('/api/auth/changePassword', {
+            fetch('/auth/changePassword', { //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -73,34 +75,6 @@
                 alert('비밀번호 변경 중 오류가 발생했습니다.(findInfo.html:73)');
             });
         });
-
-        // // 비밀번호 변경 (✅ JWT 사용)
-        // document.getElementById('changePasswordButton').addEventListener('click', function () {
-        //     const userId = document.getElementById('userId').value; // 현재는 필요 없음
-        //     const newPassword = document.getElementById('newPassword').value;
-
-        //     if (!token) {
-        //         alert("로그인이 필요합니다.");
-        //         window.location.href = '/';
-        //         return;
-        //     }
-
-        //     fetch('/api/auth/changePassword', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             Authorization: `Bearer ${token}` // ✅ JWT 인증 헤더 추가
-        //         },
-        //         body: JSON.stringify({ newPassword })
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         alert(data.message);
-        //     })
-        //     .catch(error => {
-        //         alert('비밀번호 변경 중 오류가 발생했습니다.');
-        //     });
-        // });
     </script>
 </body>
 </html>

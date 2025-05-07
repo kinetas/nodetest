@@ -30,7 +30,8 @@
                 u_birth: document.getElementById("u_birth").value,
             };
 
-            fetch('/api/auth/register-keycloak-direct', {
+            // fetch('/api/auth/register-keycloak-direct', {
+            fetch('/auth/register-keycloak-direct', {   //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

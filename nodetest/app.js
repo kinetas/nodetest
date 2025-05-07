@@ -8,6 +8,7 @@ require('dotenv').config();
 // ==================== 미들웨어 & 유틸 ====================
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 const loginRequired = require('./middleware/loginRequired'); // JWT 미들웨어 추가
+const { runWeeklyLeagueEvaluation } = require('./leagueScheduler');
 
 // ==================== 라우터 ====================
 const chatRoutes = require('./routes/chatRoutes');
@@ -41,7 +42,8 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-  
+
+
 // ==================== 정적 파일 제공 ====================
 // Static folder to serve the HTML file
 app.use(express.static('public'));
@@ -121,6 +123,11 @@ cron.schedule('0 0 * * *', async () => { // 매일 자정에 실행
     console.log('미션 업데이트 체크');
     await checkAndUpdateMissions();
 });
+//매주 리그 정산
+cron.schedule('0 0 * * 0', () => { // 매주 일요일 00:00
+    console.log('🕒 주간 리그 정산 시작');
+    runWeeklyLeagueEvaluation();
+  });
 
 // ==================== FCM 알림 ====================
 //const { sendNotificationController } = require('./controllers/sendNotificationController');

@@ -59,6 +59,10 @@ const CRoom = sequelize.define('CRoom', {
         allowNull: false,
         defaultValue: 0,
     },
+    maded_time: {
+        type: DataTypes.DATE,
+        allowNull: true,
+    },
 }, {
     tableName: 'community_room', // 테이블 이름 (DB 테이블 이름과 매칭)
     timestamps: false, // createdAt, updatedAt 컬럼 사용 안 함

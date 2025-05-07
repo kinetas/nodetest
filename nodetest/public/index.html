@@ -31,58 +31,6 @@
             const username = document.getElementById('u_id').value;
             const password = document.getElementById('u_password').value;
 
-            // // index 화면에서 로그인
-            // fetch('/api/auth/keycloak-direct-login', {
-            // // fetch('/auth/keycloak-direct-login', {   //MSA적용 시 사용
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ username, password }),
-            // })
-            // .then(response => {
-            //     if (!response.ok) throw new Error('Keycloak 로그인 요청 실패');
-            //     return response.json();
-            // })
-            // .then(data => {
-            //     if (data.success) {
-            //         const accessToken = data.accessToken;
-            //         const idToken = data.idToken;
-            //         console.log("accesstoken: ", accessToken);
-            //         console.log("idToken: ", idToken);
-            //         localStorage.setItem('access_token', accessToken);
-            //         localStorage.setItem('id_token', idToken);
-            //         // ✅ 우리 서버 JWT 발급 요청 추가
-            //         return fetch('/api/auth/issueJwtFromKeycloak', {
-            //         // return fetch('/auth/issueJwtFromKeycloak', {    //MSA적용 시 사용
-            //             method: 'POST',
-            //             headers: {
-            //                 'Content-Type': 'application/json'
-            //             },
-            //             body: JSON.stringify({ accessToken }),
-            //         });
-            //     } else {
-            //         throw new Error(data.message || 'Keycloak 로그인 실패');
-            //     }
-            // })
-            // .then(response => {
-            //     if (!response.ok) throw new Error('JWT 발급 요청 실패');
-            //     return response.json();
-            // })
-            // .then(jwt => {
-            //     if (jwt.success && jwt.token) {
-            //         localStorage.setItem('jwt_token', jwt.token); // ✅ JWT 저장
-            //         alert('✅ Keycloak + JWT 로그인 완료!');
-            //         window.location.href = '/dashboard'; // ✅ JWT까지 받은 후 이동
-            //     } else {
-            //         throw new Error(jwt.message || 'JWT 발급 실패');
-            //     }
-            // })
-            // .catch((error) => {
-            //     console.error('로그인 오류(index.html:76):', error);
-            //     alert('로그인 오류(index.html:76): ' + error.message);
-            // });
-
             // KeyCloak + JWT 한번에 (index 화면에서 로그인)
             // fetch('/api/auth/keycloak-direct-login', {
             fetch('/auth/keycloak-direct-login', {   //MSA적용 시 사용
@@ -119,34 +67,6 @@
         document.getElementById('findInfoButton').addEventListener('click', function() {
             window.location.href = '/findinfo';
         });
-
-        // document.getElementById('keycloakLoginButton').addEventListener('click', () => {
-        //     // ✅ Keycloak 로그인 URL로 리디렉션
-        //     window.location.href = "http://27.113.11.48:8080/realms/master/protocol/openid-connect/auth" +
-        //         "?client_id=nodetest" +
-        //         "&response_type=id_token token" +     // ✅ Implicit flow → 직접 id_token, access_token 받음
-        //         "&scope=openid" +
-        //         "&nonce=nonce123" + 
-        //         "&redirect_uri=http://27.113.11.48:3000/dashboard";
-        // });
-
-        // KeyCloak 화면에서 로그인
-        // document.getElementById('keycloakLoginButton').addEventListener('click', () => {
-        // // 백엔드에서 로그인 URL을 받아옴
-        //     fetch('/api/auth/keycloak-login-url')
-        //         .then(response => response.json())
-        //         .then(data => {
-        //             if (data.success && data.loginUrl) {
-        //                 window.location.href = data.loginUrl;
-        //             } else {
-        //                 alert('Keycloak 로그인 URL을 가져오지 못했습니다.');
-        //             }
-        //         })
-        //         .catch((error) => {
-        //             console.error('Keycloak 로그인 요청 오류:', error);
-        //             alert('Keycloak 로그인 중 오류 발생');
-        //         });
-        // });
     </script>
 </body>
 </html>

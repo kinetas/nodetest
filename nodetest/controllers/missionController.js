@@ -1,30 +1,20 @@
 // controllers/missionController.js
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
-// const { sequelize } = require('../models/missionModel'); // sequelize 객체 불러오기
 const Room = require('../models/roomModel'); // Room 모델 가져오기
 const MResult = require('../models/m_resultModel.js'); //MResult 모델 가져오기
-const CRoom = require('../models/comunity_roomModel'); // Community Room 테이블
 const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추가
 const CVote = require('../models/comunity_voteModel');
-const User = require('../models/userModel');
 const resultController = require('../controllers/resultController'); // resultController 가져오기
 const roomController = require('../controllers/roomController');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
-const Sequelize = require('sequelize');
-// const moment = require('moment-timezone');
 
 // //============================================================================
 // const { io } = require('../socketServer');
 // const RMessage = require('../models/messageModel'); // 메시지 모델 가져오기
 // const { sendMessage } = require('../socketServer'); // sendMessage 가져오기
 // //============================================================================
-
-
-// const sequelize = require('../config/db'); // 데이터베이스 연결
-
-// const jwt = require('jsonwebtoken'); // JWT 추가
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
@@ -174,7 +164,6 @@ exports.createMission = async (req, res) => {
                     return res.status(500).json({ message: '방 조회 실패 (room 없거나 r_id 없음) (missionController.js:158)' });
                 }
                 console.log("room(missionController.js:160): ", room);
-                // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 
             const missionId = uuidv4();
@@ -260,7 +249,6 @@ exports.createMission = async (req, res) => {
                 if (!room || !room.r_id) {
                     return res.status(500).json({ message: '방 조회 실패 (room 없거나 r_id 없음) (missionController.js:158)' });
                 }
-                // return res.status(400).json({ success: false, message: '방이 존재하지 않습니다.' });
             }
 
             const missionId = uuidv4();
@@ -276,7 +264,6 @@ exports.createMission = async (req, res) => {
                 m_deadline,
                 m_reword,
                 m_status: stat,
-                // r_id: room.r_id, // Room ID를 저장
                 r_id: room?.r_id || null, // Room ID를 저장
                 m_extended: false,
                 missionAuthenticationAuthority: u1_id,
@@ -304,31 +291,6 @@ exports.createMission = async (req, res) => {
     }
 };
 
-// // 미션 삭제 함수
-// exports.deleteMission = async (req, res) => {
-//     const { m_id } = req.body;
-//     // const u1_id = req.session.user.id; // 세션에서 로그인한 사용자 ID 가져오기
-//     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
-
-//     if (!m_id) {
-//         return res.json({ success: false, message: '미션 ID는 필수 항목입니다.' });
-//     }
-
-//     try {
-//         // 특정 m_id와 u1_id로 삭제할 미션을 직접 지정하여 삭제
-//         const deletedCount = await Mission.destroy({ where: { m_id, u1_id } });
-
-//         if (deletedCount === 0) {
-//             // 미션이 존재하지 않거나, 해당 사용자의 미션이 아닌 경우
-//             return res.json({ success: false, message: '해당 미션이 존재하지 않거나 삭제 권한이 없습니다.' });
-//         }
-        
-//         res.json({ success: true, message: '미션이 성공적으로 삭제되었습니다.' });
-//     } catch (error) {
-//         console.error('미션 삭제 오류:', error);
-//         res.status(500).json({ success: false, message: '미션 삭제 중 오류가 발생했습니다.' });
-//     }
-// };
 // 미션 삭제
 exports.deleteMission = async (req, res) => {
     const { m_id } = req.body;
@@ -360,7 +322,6 @@ exports.deleteMission = async (req, res) => {
 // 미션 리스트 조회 함수
 exports.getUserMissions = async (req, res) => {
     try {
-        // const userId = req.session.user.id;
         const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
         
         // 사용자 ID에 해당하는 미션 리스트 조회
@@ -379,7 +340,6 @@ exports.getUserMissions = async (req, res) => {
 // 자신이 수행해야 할 미션 목록 (u2_id = userId)(방 이름 포함)
 exports.getAssignedMissions = async (req, res) => {
     try {
-        // const userId = req.session.user.id;
         const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 자신이 수행해야 할 미션 가져오기
@@ -422,7 +382,6 @@ exports.getAssignedMissions = async (req, res) => {
 // 자신이 부여한 미션 목록 (u1_id = userId)(방 이름 포함)
 exports.getCreatedMissions = async (req, res) => {
     try {
-        // const userId = req.session.user.id;
         const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 자신이 부여한 미션 가져오기
@@ -465,7 +424,6 @@ exports.getCreatedMissions = async (req, res) => {
 // 자신이 부여한 미션 목록 / 요청 (u1_id = userId)(방 이름 포함)
 exports.getCreatedMissionsReq = async (req, res) => {
     try {
-        // const userId = req.session.user.id;
         const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 자신이 부여한 미션 가져오기
@@ -508,7 +466,6 @@ exports.getCreatedMissionsReq = async (req, res) => {
 // 자신이 완료한 미션 목록 
 exports.getCompletedMissions = async (req, res) => {
     try {
-        // const userId = req.session.user.id;
         const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 완료한 미션 가져오기
@@ -546,7 +503,6 @@ exports.getCompletedMissions = async (req, res) => {
 // 자신이 부여한 미션 중 상대가 완료한 미션 목록 
 exports.getGivenCompletedMissions = async (req, res) => {
     try {
-        // const userId = req.session.user.id;
         const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
         // 1. 부여한 완료된 미션 가져오기
@@ -586,7 +542,6 @@ exports.getGivenCompletedMissions = async (req, res) => {
 
 // ====== 1. 친구가 수행해야 하는 미션 ======
 exports.getFriendAssignedMissions = async (req, res) => {
-    // const userId = req.session.user.id;
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
@@ -616,7 +571,6 @@ exports.getFriendAssignedMissions = async (req, res) => {
 
 // ====== 2. 친구가 완료한 미션 ======
 exports.getFriendCompletedMissions = async (req, res) => {
-    // const userId = req.session.user.id;
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
@@ -645,7 +599,6 @@ exports.getFriendCompletedMissions = async (req, res) => {
 
 // ======= 3. 인증 권한을 부여한 미션 조회 =======
 exports.getMissionsWithGrantedAuthority = async (req, res) => {
-    // const userId = req.session.user.id;
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
@@ -664,7 +617,6 @@ exports.getMissionsWithGrantedAuthority = async (req, res) => {
 // 미션 인증 요청 함수
 exports.requestMissionApproval = async (req, res) => {
     const { m_id } = req.body; // 클라이언트에서 미션 ID 전달
-    // const userId = req.session?.user?.id; // 세션에서 로그인된 사용자 ID 가져오기
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {
@@ -742,11 +694,9 @@ exports.requestMissionApproval = async (req, res) => {
 // 미션 성공 처리 함수
 exports.successMission = async (req, res) => {
     const { m_id } = req.body;
-    // const u1_id = req.session.user.id;
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
     
     try {
-        // const mission = await Mission.findOne({ where: { m_id, u1_id } });
         const mission = await Mission.findOne({ where: { m_id } }); // ✅ m_id로 조회
 
         if (!mission) {
@@ -835,7 +785,6 @@ exports.successMission = async (req, res) => {
 // 미션 실패 처리 함수
 exports.failureMission = async (req, res) => {
     const { m_id } = req.body;
-    // const u1_id = req.session.user.id;
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
     try {
         const mission = await Mission.findOne({ where: { m_id, u1_id } });
@@ -925,7 +874,6 @@ exports.failureMission = async (req, res) => {
 //방미션출력
 exports.printRoomMission = async (req, res) => {
     const { u2_id } = req.body; // 클라이언트에서 상대방 ID 전달
-    // const u1_id = req.session?.user?.id; // 현재 로그인된 사용자 ID (세션)
     const u1_id = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     if (!u2_id) {
@@ -1123,7 +1071,6 @@ exports.checkMissionDeadline = async () => {
 
 // 자신이 만든 미션 목록, 상태 : 진행중
 exports.getRequestedSelfMissions = async (req, res) => {
-    // const userId = req.session.user.id; // 현재 로그인한 사용자 ID
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
 
     try {

@@ -1,5 +1,5 @@
 // const db = require('../config/db');
-// const RMessage = require('../models/messageModel');
+const RMessage = require('../models/messageModel');
 // const { sequelize } = require('../models/messageModel');
 // const Room = require('../models/roomModel');
 
@@ -108,30 +108,30 @@
 //   }
 // };
 
-// exports.getMessages = async (r_id) => {
-//   try {
-//     const messages = await RMessage.findAll({
-//       where: { r_id },
-//       order: [['send_date', 'ASC']]
-//     });
-//     // return messages.map(msg => msg.toJSON());
+exports.getMessages = async (r_id) => {
+  try {
+    const messages = await RMessage.findAll({
+      where: { r_id },
+      order: [['send_date', 'ASC']]
+    });
+    // return messages.map(msg => msg.toJSON());
 
-//     return messages.map(msg => {
-//       const json = msg.toJSON();
+    return messages.map(msg => {
+      const json = msg.toJSON();
 
-//       // ✅ image가 존재하면 base64로 변환
-//       if (json.image) {
-//         json.image = Buffer.from(json.image).toString('base64');
-//       }
+      // ✅ image가 존재하면 base64로 변환
+      if (json.image) {
+        json.image = Buffer.from(json.image).toString('base64');
+      }
 
-//       return json;
-//     });
+      return json;
+    });
 
-//   } catch (error) {
-//     console.error('Error fetching messages with Sequelize:', error);
-//     throw error;
-//   }
-// // };
+  } catch (error) {
+    console.error('Error fetching messages with Sequelize:', error);
+    throw error;
+  }
+};
 
 // exports.markMessageAsRead = async ({ r_id }) => {
 //   try {

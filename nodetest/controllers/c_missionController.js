@@ -554,6 +554,7 @@ exports.getPopularyityCommunity = async (req, res) => {
             where: { popularity: true },
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
         }); // 모든 커뮤니티 미션 가져오기
+        console.log("인기글: ", missions);
         res.json({ missions });
     } catch (error) {
         console.error('커뮤니티 미션 리스트 오류:', error);

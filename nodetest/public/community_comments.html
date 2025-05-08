@@ -120,7 +120,7 @@
       })
       .then(res => res.json())
       .then(data => {
-        alert(data.message);
+        console.log(data.message);
         document.getElementById('commentInput').value = '';
         loadComments();
       })
@@ -141,7 +141,7 @@
       })
       .then(res => res.json())
       .then(data => {
-        alert(data.message);
+        console.log(data.message);
         loadComments();
       })
       .catch(err => console.error('댓글 삭제 오류:', err));

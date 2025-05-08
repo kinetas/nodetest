@@ -24,8 +24,12 @@
         alert('cr_num이 제공되지 않았습니다.');
         location.href = '/community_missions.html';
       }
-
       console.log("cr_num(community_commonets_html): ", cr_num);
+
+      function getUserId() {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.u_id;
+      }
 
       // 커뮤니티 글 상세 불러오기
       function loadCommunities() {
@@ -107,6 +111,26 @@
         loadComments();
       })
       .catch(err => console.error('댓글 작성 오류:', err));
+    }
+
+    //댓글 삭제
+    function deleteComment(cc_num) {
+      if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) return;
+
+      fetch('/api/comumunity_missions/deleteComment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ cc_num })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        loadComments();
+      })
+      .catch(err => console.error('댓글 삭제 오류:', err));
     }
   </script>
 </body>

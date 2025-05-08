@@ -283,7 +283,7 @@ async def recommend(req: ChatRequest, request: Request):
     #     "temperature": 0.7
     # }
     response = client.chat.completions.create(
-        model="gpt-4",  # 또는 "gpt-3.5-turbo"
+        model="gpt-4-turbo",  # 또는 "gpt-3.5-turbo"
         messages=[{"role": "user", "content": step1_prompt}],
         temperature=0.7
     )
@@ -312,7 +312,7 @@ async def recommend(req: ChatRequest, request: Request):
         #     "temperature": 0.3
         # }
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4-turbo",
             messages=[{"role": "user", "content": step2_prompt}],
             temperature=0.3
         )

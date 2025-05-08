@@ -146,6 +146,24 @@
             .catch(error => console.error('일반 커뮤니티 생성 오류:', error));
         }
 
+        // 일반 커뮤니티 글 삭제
+        function deleteGeneralCommunity(cr_num) {
+            fetch('/api/comumunity_missions/deleteGeneralCommunity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ cr_num })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadGeneralCommunities();
+            })
+            .catch(error => console.error('일반 커뮤니티 삭제 오류:', error));
+        }
+
         // 일반 커뮤니티 리스트 로딩
         function loadGeneralCommunities() {
             fetch('/api/comumunity_missions/printGeneralCommunityList', {
@@ -161,6 +179,7 @@
                     listItem.innerHTML = `
                         제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
                         ${imgTag}
+                        <button onclick="deleteGeneralCommunity('${c.cr_num}')">삭제</button>
                     `;
                     list.appendChild(listItem);
                 });

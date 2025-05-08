@@ -453,6 +453,26 @@ exports.createCommunity = async (req, res) => {
     }
 };
 
+//일반 커뮤니티 글 삭제 함수
+exports.deleteGeneralCommunity = async (req, res) => {
+    const { cr_num } = req.body;
+    const u_id = req.currentUserId;
+
+    try {
+        const post = await CRoom.findOne({ where: { cr_num, u_id, community_type: 'general' } });
+
+        if (!post) {
+            return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다.' });
+        }
+
+        await post.destroy();
+        res.json({ success: true, message: '일반 커뮤니티 글이 삭제되었습니다.' });
+    } catch (error) {
+        console.error('삭제 오류:', error);
+        res.status(500).json({ success: false, message: '삭제 중 오류가 발생했습니다.' });
+    }
+};
+
 // 일반 커뮤니티 리스트 출력 함수
 exports.printGeneralCommunity = async (req, res) => {
     try {

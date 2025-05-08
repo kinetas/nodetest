@@ -287,8 +287,8 @@ async def recommend(req: ChatRequest, request: Request):
         messages=[{"role": "user", "content": step1_prompt}],
         temperature=0.7
     )
-    message = response["choices"][0]["message"]["content"]
-
+    # message = response["choices"][0]["message"]["content"]
+    message = response.choices[0].message.content
     try:
         # res1 = requests.post(GROQ_API_URL, headers=headers, json=step1_body)
         # message = res1.json()["choices"][0]["message"]["content"].strip()
@@ -316,8 +316,8 @@ async def recommend(req: ChatRequest, request: Request):
             messages=[{"role": "user", "content": step2_prompt}],
             temperature=0.3
         )
-        content = response["choices"][0]["message"]["content"]
-
+        # content = response["choices"][0]["message"]["content"]
+        content = response.choices[0].message.content
         # res2 = requests.post(GROQ_API_URL, headers=headers, json=step2_body)
         # content = res2.json()["choices"][0]["message"]["content"]
         print("📦 Step2 응답:\n", content)

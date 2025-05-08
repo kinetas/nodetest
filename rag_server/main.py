@@ -277,7 +277,7 @@ async def recommend(req: ChatRequest, request: Request):
         # ✅ Step 2: JSON 변환 요청
         step2_prompt = (
             f"다음 문장을 JSON 형식으로 바꿔줘.\n"
-            "message에는 그대로 이 문장을 넣고, category에는 적절한 하나의 카테고리만 넣어줘. "
+            "message에는 이 문장을 넣는데 따옴표(`\"`)를 포함하지 말고, category에는 적절한 하나의 카테고리만 넣어줘. "
             "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. 그리고 message,category,title은 전부 반드시 한국어로 해야하고,"
             "무조건 출력결과물은 밑의 형식으로 json만 있어야 돼."
             '{\n'

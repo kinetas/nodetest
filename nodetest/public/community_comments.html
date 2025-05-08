@@ -89,7 +89,7 @@
       const comment = document.getElementById('commentInput').value;
       if (!comment.trim()) return alert('댓글을 입력하세요.');
 
-      fetch('/api/community_comments/create', {
+      fetch('/api/community_comments/writeComment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

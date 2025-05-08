@@ -631,6 +631,35 @@ exports.getCommunityComments = async (req, res) => {
     }
 };
 
+// 댓글 작성 (JWT 적용)
+exports.writeComment = async (req, res) => {
+    const { cr_num, comment } = req.body;
+    const u_id = req.currentUserId;
+
+    try {
+        // 사용자 닉네임 조회
+        const user = await User.findOne({ where: { u_id } });
+        if (!user) {
+            return res.status(404).json({ success: false, message: '사용자를 찾을 수 없습니다.' });
+        }
+
+        // 댓글 생성
+        await CommunityComment.create({
+            cc_num: uuidv4(),
+            cr_num,
+            u_id,
+            user_nickname: user.u_nickname,
+            comment,
+            created_time: new Date()
+        });
+
+        res.json({ success: true, message: '댓글이 성공적으로 작성되었습니다.' });
+    } catch (error) {
+        console.error('댓글 작성 오류:', error);
+        res.status(500).json({ success: false, message: '댓글 작성 중 오류가 발생했습니다.' });
+    }
+};
+
 // 커뮤니티 전체 불러오기 (JWT 적용)
 exports.getAllCommunity = async (req, res) => {
     try {

@@ -25,6 +25,8 @@
         location.href = '/community_missions.html';
       }
 
+      console.log("cr_num(community_commonets_html): ", cr_num);
+
       // 커뮤니티 글 상세 불러오기
       function loadCommunities() {
           fetch('/api/comumunity_missions/getOneCommunity', {
@@ -37,18 +39,23 @@
           })  
           .then(response => response.json())
           .then(data => {
+              console.log('getOneCommunity 응답:', data);
               const list = document.getElementById('postDetail');
               list.innerHTML = '';
+
               const c = data.communities; // getOneCommunity는 단일 객체 반환
-              if (!c) return;
-              
+              if (!c) {
+                list.innerHTML = '<p>게시글을 불러올 수 없습니다.</p>';
+                return;
+              }
+
               const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
               list.innerHTML = `
                 제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
                 <br>${imgTag}<br>
               `;
-            })
-            .catch(error => console.error('커뮤니티 글 불러오기 오류:', error));
+          })
+          .catch(error => console.error('커뮤니티 글 불러오기 오류:', error));
       }
 
     // // 댓글 목록 불러오기

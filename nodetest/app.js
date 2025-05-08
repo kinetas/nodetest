@@ -8,7 +8,7 @@ require('dotenv').config();
 // ==================== 미들웨어 & 유틸 ====================
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 const loginRequired = require('./middleware/loginRequired'); // JWT 미들웨어 추가
-const { runWeeklyLeagueEvaluation } = require('./leagueScheduler');
+const { runWeeklyLeagueEvaluation } = require('./middleware/leagueScheduler');
 
 // ==================== 라우터 ====================
 const chatRoutes = require('./routes/chatRoutes');

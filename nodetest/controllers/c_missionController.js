@@ -681,7 +681,7 @@ exports.deleteComment = async (req, res) => {
     }
 };
 
-// 댓글 추천 토글
+// 댓글 추천
 exports.recommendComment = async (req, res) => {
     const { cc_num } = req.body;
     const u_id = req.currentUserId;

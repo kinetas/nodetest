@@ -95,6 +95,8 @@
 
           li.innerHTML = `
             ${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}
+            추천수: ${c.recommended_num || 0}
+            <button onclick="recommendComment('${c.cc_num}')">추천</button>
             ${c.u_id === u_id ? `<button onclick="deleteComment('${c.cc_num}')">삭제</button>` : ''}
           `;
           list.appendChild(li);
@@ -145,6 +147,24 @@
         loadComments();
       })
       .catch(err => console.error('댓글 삭제 오류:', err));
+    }
+
+    // 댓글 추천
+    function recommendComment(cc_num) {
+      fetch('/api/comumunity_missions/recommendComment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ cc_num })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        loadComments(); // ✅ 새로고침
+      })
+      .catch(err => console.error('댓글 추천 오류:', err));
     }
   </script>
 </body>

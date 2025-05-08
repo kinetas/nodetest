@@ -263,8 +263,8 @@ async def recommend(req: ChatRequest, request: Request):
             "본문 내용을 반드시 참고해서 그 안의 핵심 문장이나 활동, 키워드 등을 분석하고, \n"
             "해당 내용을 반영하여 너가 1개의 미션을 창작하여 추천해줘. \n"
             "미션은 자연스럽고 부드러운 문장으로 설명하고, 추천 이유도 각각 적어줘. \n"
-            "절대로 본문 내용을 무시하거나 일반적인 추천만 하지 마. 반드시 본문 내용을 반영해야 해.\n"
-            "결과는 자연어 한국어 문장만 제공해. JSON은 필요 없어."
+            "절대로 본문 내용을 무시하거나 반대로 본문 내용을 그대로 사용하여 추천만 하지 마. 반드시 본문 내용을 반영해야 해.\n"
+            "결과는 반드시 **자연어 한국어** 문장만 제공해. JSON은 필요 없어."
         )
 
     # ✅ Groq Step 1 - 자연어 문장 생성
@@ -286,7 +286,7 @@ async def recommend(req: ChatRequest, request: Request):
 
         # ✅ Step 2: category + title만 생성
         step2_prompt = (
-            f"아래 미션 문장을 기반으로 category와 title만 뽑아서 JSON으로 응답해줘.\n"
+            f"아래 미션 문장을 기반으로 category와 title만 **한국어**로 뽑아서 JSON으로 응답해줘.\n"
             '{\n'
             '  "category": "카테고리",\n'
             '  "title": "미션을 요약한 제목"\n'

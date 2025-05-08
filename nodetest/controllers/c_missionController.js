@@ -583,6 +583,7 @@ exports.getPopularyityCommunity = async (req, res) => {
     }
 };
 
+//====== 상사보기, 댓글 =======
 // cr_num으로 커뮤니티 하나 불러오기 (JWT 적용)
 exports.getOneCommunity = async (req, res) => {
     const { cr_num } = req.body;

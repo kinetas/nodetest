@@ -200,13 +200,27 @@ const { Op } = require('sequelize'); // [추가됨]
 
 // ✅ 인기글 여부 갱신 함수
 function updatePopularity(community) {
+    if (community.popularity) return Promise.resolve(); // ✅ 이미 인기글이면 유지
+
     const now = new Date();
     const createdTime = new Date(community.maded_time);
-    const minutesSinceCreation = (now - createdTime) / (1000 * 60);
+    const minutes = (now - createdTime) / (1000 * 60);
 
-    const isPopular = (minutesSinceCreation <= 10 && community.recommended_num >= 5) || community.recommended_num >= 30;
+    let isPopular = false;
+    if (minutes <= 10 && community.recommended_num >= 5) {  //10분안에 추천 5개 이상
+        isPopular = true;
+    } else if (minutes <= 60 && community.recommended_num >= 30) {  //1시간 안에 추천 30개 이상
+        isPopular = true;
+    } else if (minutes <= 1440 && community.recommended_num >= 100) {  //24시간 안에 추천 100개 이상
+        isPopular = true;
+    } else if (minutes <= 1440*7 && community.recommended_num >= 300) {  //일주일 안에 추천 300개 이상
+        isPopular = true;
+    }
 
-    return community.update({ popularity: isPopular });
+    if (isPopular) {
+        return community.update({ popularity: true }); // ✅ 처음 인기글로 진입 시에만 true로 설정
+    }
+    return Promise.resolve(); // ✅ false로 다시 바꾸지 않음
 }
 
 // 커뮤니티 미션 생성 (JWT 적용)

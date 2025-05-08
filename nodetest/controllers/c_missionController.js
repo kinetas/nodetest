@@ -3,6 +3,7 @@ const CRoom = require('../models/comunity_roomModel'); // comunity_room 모델 �
 const Room = require('../models/roomModel'); // room 모델
 const Mission = require('../models/missionModel'); // mission 모델
 const MResult = require('../models/m_resultModel');
+const CRecom = require('../models/community_recommendationModel')
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const Sequelize = require('sequelize');
@@ -481,7 +482,7 @@ exports.recommendCommunity = async (req, res) => {
     const u_id = req.currentUserId;
 
     try {
-        const existingRecommendation = await Recommendation.findOne({ where: { cr_num, u_id } });
+        const existingRecommendation = await CRecom.findOne({ where: { cr_num, u_id } });
 
         if (existingRecommendation) {
             // 이미 추천한 상태이면 추천 취소 (토글)

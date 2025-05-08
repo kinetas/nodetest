@@ -236,7 +236,7 @@ async def recommend(req: ChatRequest, request: Request):
             f"사용자 요청: {query}\n\n"
             "너는 사용자의 요청을 분석해 미션을 추천하는 AI야. "
             "먼저 카테고리를 분석하고, 그 카테고리의 효과나 특징을 한 줄로 요약한 후, "
-            "그에 맞는 미션을 2가지 추천해주고 그게 왜 카테고리의 효과나 특징과 맞는지 근거를 말해줘. "
+            "그에 맞는 미션을 1가지 추천해주고 그게 왜 카테고리의 효과나 특징과 맞는지 근거를 말해줘. "
             "반드시 한국어로 부드럽고 자연스럽게 말해줘."
         )
         url = "(문서 없음)"
@@ -261,7 +261,7 @@ async def recommend(req: ChatRequest, request: Request):
             f"참고 블로그 본문:\n{blog_text[:3000]}\n\n"
             "너는 블로그 본문을 바탕으로 미션을 추천하는 AI야. \n"
             "본문 내용을 반드시 참고해서 그 안의 핵심 문장이나 활동, 키워드 등을 분석하고, \n"
-            "해당 내용을 반영하여 너가 2개의 미션을 창작하여 추천해줘. \n"
+            "해당 내용을 반영하여 너가 1개의 미션을 창작하여 추천해줘. \n"
             "미션은 자연스럽고 부드러운 문장으로 설명하고, 추천 이유도 각각 적어줘. \n"
             "절대로 본문 내용을 무시하거나 일반적인 추천만 하지 마. 반드시 본문 내용을 반영해야 해.\n"
             "결과는 자연어 한국어 문장만 제공해. JSON은 필요 없어."
@@ -281,32 +281,17 @@ async def recommend(req: ChatRequest, request: Request):
 
     try:
         res1 = requests.post(GROQ_API_URL, headers=headers, json=step1_body)
-        generated_text = res1.json()["choices"][0]["message"]["content"].strip()
-        print("✅ 생성된 자연어 추천 문장:\n", generated_text)
+        message = res1.json()["choices"][0]["message"]["content"].strip()
+        print("✅ 생성된 미션 문장:\n", message)
 
-        # ✅ Step 2: JSON 변환 요청
-        # step2_prompt = (
-        #     f"다음 문장을 JSON 형식으로 바꿔줘.\n"
-        #     "message에는 이 문장을 넣는데 따옴표(`\"`)를 포함하지 말고, category에는 적절한 하나의 카테고리만 넣어줘. "
-        #     "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. 그리고 message,category,title은 전부 반드시 한국어로 해야하고,"
-        #     "무조건 출력결과물은 밑의 형식으로 json만 있어야 돼."
-        #     '{\n'
-        #     '  "message": "...",\n'
-        #     '  "category": "...",\n'
-        #     '  "title": "..." \n'
-        #     '}\n\n'
-        #     f"문장: {generated_text}"
-        # )
+        # ✅ Step 2: category + title만 생성
         step2_prompt = (
-            f"다음 문장을 JSON으로 바꿔줘. 절대로 큰따옴표(`\"`) 안에 또 다른 큰따옴표가 들어가면 안 돼. \n"
-            "message 항목은 반드시 한국어로 표현하고, 큰따옴표는 필요할 경우 작은따옴표나 설명식으로 바꿔. \n"
-            "출력은 반드시 아래 형식처럼 JSON만:\n"
+            f"아래 미션 문장을 기반으로 category와 title만 뽑아서 JSON으로 응답해줘.\n"
             '{\n'
-            '  "message": "한국어로 된 미션 추천 문장",\n'
-            '  "category": "카테고리명",\n'
-            '  "title": "짧은 요약 제목"\n'
+            '  "category": "카테고리",\n'
+            '  "title": "미션을 요약한 제목"\n'
             '}\n\n'
-            f"문장: {generated_text}"
+            f"문장:\n{message}"
         )
 
         step2_body = {
@@ -316,30 +301,30 @@ async def recommend(req: ChatRequest, request: Request):
         }
 
         res2 = requests.post(GROQ_API_URL, headers=headers, json=step2_body)
-        result = res2.json()
-        content = result["choices"][0]["message"]["content"]
-        print("📦 Groq 응답 원문:\n", content)
+        content = res2.json()["choices"][0]["message"]["content"]
+        print("📦 Step2 응답:\n", content)
 
         json_match = re.search(r"\{.*\}", content, re.DOTALL)
         if not json_match:
-            raise ValueError("응답에서 JSON을 찾을 수 없습니다.")
+            raise ValueError("Step2 응답에서 JSON을 찾을 수 없습니다.")
 
-        raw_json = json_match.group(0).replace("'", '"')
-        print("📦 추출된 JSON 문자열:\n", raw_json)
+        parsed = json.loads(json_match.group(0).replace("'", '"'))
 
-        parsed = json.loads(raw_json)
-        parsed["source"] = url
-        parsed["response_time_sec"] = round(time.time() - start_time, 2)
-        return parsed
+        # ✅ 최종 조합
+        result = {
+            "message": message,
+            "category": parsed["category"],
+            "title": parsed["title"],
+            "source": url,
+            "response_time_sec": round(time.time() - start_time, 2)
+        }
+        return result
 
     except Exception as e:
-        print("❌ 예외 발생:", e)
         return JSONResponse(status_code=500, content={
             "error": str(e),
             "raw_groq_response": content if 'content' in locals() else "응답 없음"
         })
-
-
 
 # ✅ 디버깅용 문서 확인용 API
 @app.get("/documents")

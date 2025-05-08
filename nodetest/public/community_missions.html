@@ -202,7 +202,7 @@
 
         // 인기글 리스트 로딩
         function loadpopularityCommunities() {
-            fetch('/api/comumunity_missions/printGeneralCommunityList', {
+            fetch('/api/comumunity_missions/getpopularyityCommunityList', {
                 headers: { 'Authorization': `Bearer ${token}` },
             })
             .then(response => response.json())

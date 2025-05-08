@@ -52,7 +52,7 @@ exports.assignInitialLeague = async (req, res) => {
       data: {
         user_id,
         league_id: selectedLeague,
-        lp: 0
+        lp:0
       }
     });
 

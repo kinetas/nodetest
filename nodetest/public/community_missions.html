@@ -148,7 +148,9 @@
 
         // 일반 커뮤니티 리스트 로딩
         function loadGeneralCommunities() {
-            fetch('/api/comumunity_missions/printGeneralCommunityList')
+            fetch('/api/comumunity_missions/printGeneralCommunityList', {
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
             .then(response => response.json())
             .then(data => {
                 const list = document.getElementById('generalCommunityList');

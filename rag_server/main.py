@@ -279,7 +279,12 @@ async def recommend(req: ChatRequest, request: Request):
             f"다음 문장을 JSON 형식으로 바꿔줘.\n"
             "message에는 그대로 이 문장을 넣고, category에는 적절한 하나의 카테고리만 넣어줘. "
             "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. "
-            "JSON 외에는 아무 것도 출력하지 마.\n\n"
+            "무조건 출력결과물은 json만 있어야하고 한국어로 해야돼."
+            '{\n'
+            '  "message": "...",\n'
+            '  "category": "...",\n'
+            '  "title": "..." \n'
+            '}\n\n'
             f"문장: {generated_text}"
         )
 

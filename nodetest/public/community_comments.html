@@ -72,7 +72,10 @@
       .then(res => res.json())
       .then(data => {
         const list = document.getElementById('commentList');
-        list.innerHTML = '';
+        list.innerHTML = `
+          ${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}
+          ${c.u_id === getUserId() ? `<button onclick="deleteComment('${c.cc_num}')">삭제</button>` : ''}
+        `;
         data.comments.forEach(c => {
           const li = document.createElement('li');
           li.innerText = `${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}`;

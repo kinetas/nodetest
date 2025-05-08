@@ -660,6 +660,26 @@ exports.writeComment = async (req, res) => {
     }
 };
 
+// 댓글 삭제 (JWT 인증 필요)
+exports.deleteComment = async (req, res) => {
+    const { cc_num } = req.body;
+    const u_id = req.currentUserId;
+
+    try {
+        const comment = await CommunityComment.findOne({ where: { cc_num, u_id } });
+
+        if (!comment) {
+            return res.status(404).json({ success: false, message: '댓글이 존재하지 않거나 권한이 없습니다.' });
+        }
+
+        await comment.destroy();
+        res.json({ success: true, message: '댓글이 삭제되었습니다.' });
+    } catch (error) {
+        console.error('댓글 삭제 오류:', error);
+        res.status(500).json({ success: false, message: '댓글 삭제 중 오류가 발생했습니다.' });
+    }
+};
+
 // 커뮤니티 전체 불러오기 (JWT 적용)
 exports.getAllCommunity = async (req, res) => {
     try {

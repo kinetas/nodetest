@@ -16,52 +16,62 @@
   <ul id="commentList">로딩 중...</ul>
 
   <script>
-      const token = localStorage.getItem('jwt_token');
-      const urlParams = new URLSearchParams(window.location.search);
-      const cr_num = urlParams.get('cr_num');
+    // JWT 디코딩 함수 추가
+    function parseJwt(token) {
+        try {
+            const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(atob(base64).split('').map(c => {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(json);
+        } catch (e) {
+            return null;
+        }
+    }
+    const token = localStorage.getItem('jwt_token');
+    const decoded = parseJwt(token);
+    const u_id = decoded?.userId;
 
-      if (!cr_num) {
-        alert('cr_num이 제공되지 않았습니다.');
-        location.href = '/community_missions.html';
-      }
-      console.log("cr_num(community_commonets_html): ", cr_num);
+    const urlParams = new URLSearchParams(window.location.search);
+    const cr_num = urlParams.get('cr_num');
+    
+    if (!cr_num) {
+      alert('cr_num이 제공되지 않았습니다.');
+      location.href = '/community_missions.html';
+    }
+    console.log("cr_num(community_commonets_html): ", cr_num);
 
-      function getUserId() {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.u_id;
-      }
+    // 커뮤니티 글 상세 불러오기
+    function loadCommunities() {
+        fetch('/api/comumunity_missions/getOneCommunity', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ cr_num })  // ✅ cr_num을 POST로 보냄
+        })  
+        .then(response => response.json())
+        .then(data => {
+            console.log('getOneCommunity 응답:', data);
+            const list = document.getElementById('postDetail');
+            list.innerHTML = '';
 
-      // 커뮤니티 글 상세 불러오기
-      function loadCommunities() {
-          fetch('/api/comumunity_missions/getOneCommunity', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ cr_num })  // ✅ cr_num을 POST로 보냄
-          })  
-          .then(response => response.json())
-          .then(data => {
-              console.log('getOneCommunity 응답:', data);
-              const list = document.getElementById('postDetail');
-              list.innerHTML = '';
+            const c = data.communities; // getOneCommunity는 단일 객체 반환
+            if (!c) {
+              list.innerHTML = '<p>게시글을 불러올 수 없습니다.</p>';
+              return;
+            }
 
-              const c = data.communities; // getOneCommunity는 단일 객체 반환
-              if (!c) {
-                list.innerHTML = '<p>게시글을 불러올 수 없습니다.</p>';
-                return;
-              }
-
-              const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
-              list.innerHTML = `
-                제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
-                <br>${imgTag}<br>
-              `;
-          })
-          .catch(error => console.error('커뮤니티 글 불러오기 오류:', error));
-      }
-      loadCommunities();
+            const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
+            list.innerHTML = `
+              제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
+              <br>${imgTag}<br>
+            `;
+        })
+        .catch(error => console.error('커뮤니티 글 불러오기 오류:', error));
+    }
+    loadCommunities();
 
     // 댓글 목록 불러오기
     function loadComments() {
@@ -80,12 +90,12 @@
 
         data.comments.forEach(c => {
           const li = document.createElement('li');
-          console.log("JWT_userID: ", getUserId());
+          console.log("JWT_userID: ", u_id);
           console.log("c.u_id: ", c.u_id);
 
           li.innerHTML = `
             ${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}
-            ${c.u_id === getUserId() ? `<button onclick="deleteComment('${c.cc_num}')">삭제</button>` : ''}
+            ${c.u_id === u_id ? `<button onclick="deleteComment('${c.cc_num}')">삭제</button>` : ''}
           `;
           list.appendChild(li);
         });

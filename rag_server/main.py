@@ -254,7 +254,7 @@ async def recommend(req: ChatRequest, request: Request):
             "너는 사용자의 요청을 분석해 미션을 추천하는 AI야. "
             "먼저 카테고리를 분석하고, 그 카테고리의 효과나 특징을 한 줄로 요약한 후, "
             "위 블로그 본문을 참고해서 자연스럽고 부드러운 문장으로 미션을 2개 추천해줘. "
-            "각 미션이 왜 해당 카테고리에 적절한지 근거를 설명해줘. JSON 필요 없고 자연어 문장으로 반드시 한국어로 줘."
+            "각 미션이 왜 해당 카테고리에 적절한지 근거를 설명해줘. JSON 필요 없고 자연어 문장으로 무조건 한국어로 줘."
         )
 
     # ✅ Groq Step 1 - 자연어 문장 생성
@@ -278,8 +278,8 @@ async def recommend(req: ChatRequest, request: Request):
         step2_prompt = (
             f"다음 문장을 JSON 형식으로 바꿔줘.\n"
             "message에는 그대로 이 문장을 넣고, category에는 적절한 하나의 카테고리만 넣어줘. "
-            "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. "
-            "무조건 출력결과물은 json만 있어야하고 반드시 한국어로 해야돼."
+            "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. 그리고 message,category,title은 전부 반드시 한국어로 해야하고,"
+            "무조건 출력결과물은 밑의 형식으로 json만 있어야 돼."
             '{\n'
             '  "message": "...",\n'
             '  "category": "...",\n'

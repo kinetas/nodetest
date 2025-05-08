@@ -287,7 +287,6 @@ async def recommend(req: ChatRequest, request: Request):
         # ✅ Step 2: category + title만 생성
         step2_prompt = (
             f"아래 미션 문장을 기반으로 category와 title만 뽑아서 JSON으로 응답해줘.\n"
-            "message는 내가 따로 쓸 거니까 건드리지 마. 다른 문장 말고 JSON만 출력해.\n"
             '{\n'
             '  "category": "카테고리",\n'
             '  "title": "미션을 요약한 제목"\n'

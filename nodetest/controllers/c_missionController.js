@@ -460,7 +460,7 @@ exports.deleteGeneralCommunity = async (req, res) => {
 
     try {
         const post = await CRoom.findOne({ where: { cr_num, u_id, community_type: 'general' } });
-        console.log("cr_num: ", cr_num);
+        console.log("cr_num(controller): ", cr_num);
         if (!post) {
             return res.status(404).json({ success: false, message: '게시글을 찾을 수 없습니다.' });
         }

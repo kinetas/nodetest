@@ -148,6 +148,7 @@
 
         // 일반 커뮤니티 글 삭제
         function deleteGeneralCommunity(cr_num) {
+            console.log("cr_num(html_delete): ", cr_num);
             fetch('/api/comumunity_missions/deleteGeneralCommunity', {
                 method: 'POST',
                 headers: {
@@ -172,6 +173,7 @@
             .then(response => response.json())
             .then(data => {
                 const list = document.getElementById('generalCommunityList');
+                console.log("cr_num(html): ", c.cr_num);
                 list.innerHTML = '';
                 data.communities.forEach(c => {
                     const listItem = document.createElement('li');

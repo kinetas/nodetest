@@ -3,18 +3,19 @@ const { QueryTypes } = require('sequelize');
 
 async function runWeeklyLeagueEvaluation() {
   try {
-    // 모든 리그 불러오기
     const leagues = await db.query(
       `SELECT * FROM leagues ORDER BY level ASC`,
       { type: QueryTypes.SELECT }
     );
+
+    // 정산 중 중복 처리 방지용
+    const processedUsers = new Set();
 
     for (const league of leagues) {
       const leagueId = league.league_id;
       const tier = league.tier;
       const level = league.level;
 
-      // 해당 리그에 속한 유저 정렬
       const users = await db.query(
         `SELECT user_id, lp FROM user_league_status WHERE league_id = :league_id ORDER BY lp DESC`,
         {
@@ -37,14 +38,29 @@ async function runWeeklyLeagueEvaluation() {
 
       for (let i = 0; i < users.length; i++) {
         const user = users[i];
+        const userId = user.user_id;
 
-        // 기록 백업
+        // 이미 리그 이동된 유저는 건너뜀
+        if (processedUsers.has(userId)) continue;
+
+        // 유저의 현재 리그 확인 (정산 도중 이동했을 수 있음)
+        const [current] = await db.query(
+          `SELECT league_id FROM user_league_status WHERE user_id = :user_id`,
+          {
+            replacements: { user_id: userId },
+            type: QueryTypes.SELECT
+          }
+        );
+
+        if (current.league_id !== leagueId) continue;
+
+        // 1. 정산 기록 백업
         await db.query(
           `INSERT INTO weekly_lp_history (user_id, week_start, week_end, league_id, lp)
            VALUES (:user_id, :week_start, :week_end, :league_id, :lp)`,
           {
             replacements: {
-              user_id: user.user_id,
+              user_id: userId,
               week_start: weekStartStr,
               week_end: weekEndStr,
               league_id: leagueId,
@@ -54,7 +70,7 @@ async function runWeeklyLeagueEvaluation() {
           }
         );
 
-        // 승급
+        // 2. 승급
         if (i < topCount) {
           const upperLeagues = leagues.filter(l => l.level === level + 1);
           if (upperLeagues.length > 0) {
@@ -65,7 +81,7 @@ async function runWeeklyLeagueEvaluation() {
               {
                 replacements: {
                   next_league: nextLeague.league_id,
-                  user_id: user.user_id
+                  user_id: userId
                 },
                 type: QueryTypes.UPDATE
               }
@@ -77,14 +93,14 @@ async function runWeeklyLeagueEvaluation() {
                VALUES (:user_id, 100)
                ON DUPLICATE KEY UPDATE points = points + 100`,
               {
-                replacements: { user_id: user.user_id },
+                replacements: { user_id: userId },
                 type: QueryTypes.INSERT
               }
             );
           }
         }
 
-        // 강등
+        // 3. 강등
         else if (i >= total - bottomCount && tier !== 'bronze') {
           const lowerLeagues = leagues.filter(l => l.level === level - 1);
           if (lowerLeagues.length > 0) {
@@ -95,7 +111,7 @@ async function runWeeklyLeagueEvaluation() {
               {
                 replacements: {
                   prev_league: prevLeague.league_id,
-                  user_id: user.user_id
+                  user_id: userId
                 },
                 type: QueryTypes.UPDATE
               }
@@ -103,16 +119,19 @@ async function runWeeklyLeagueEvaluation() {
           }
         }
 
-        // 잔류
+        // 4. 잔류
         else {
           await db.query(
             `UPDATE user_league_status SET lp = 0 WHERE user_id = :user_id`,
             {
-              replacements: { user_id: user.user_id },
+              replacements: { user_id: userId },
               type: QueryTypes.UPDATE
             }
           );
         }
+
+        // 처리 완료 표시
+        processedUsers.add(userId);
       }
     }
 

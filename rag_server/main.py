@@ -306,11 +306,19 @@ async def recommend(req: ChatRequest, request: Request):
         content = res2.json()["choices"][0]["message"]["content"]
         print("📦 Step2 응답:\n", content)
 
-        json_match = re.search(r"\{.*\}", content, re.DOTALL)
+        json_match = re.search(r"\{.*", content, re.DOTALL)
         if not json_match:
             raise ValueError("Step2 응답에서 JSON을 찾을 수 없습니다.")
 
-        parsed = json.loads(json_match.group(0).replace("'", '"'))
+        raw_json = json_match.group(0).replace("'", '"').replace('""', '"')
+
+        # 중괄호 수 맞추기
+        open_count = raw_json.count('{')
+        close_count = raw_json.count('}')
+        if open_count > close_count:
+            raw_json += '}' * (open_count - close_count)
+
+        parsed = json.loads(raw_json)
 
         # ✅ 최종 조합
         result = {

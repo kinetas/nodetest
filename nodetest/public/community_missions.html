@@ -112,7 +112,7 @@
 
         // 커뮤니티 미션 추천
         function recommendCommunityMission(cr_num) {
-            fetch('/api/comumunity_missions/recommend', {
+            fetch('/api/comumunity_missions/recommendCommunity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -136,7 +136,7 @@
             formData.append('community_type', 'general');
             if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
 
-            fetch('/api/comumunity_missions/createGeneral', {
+            fetch('/api/comumunity_missions/createGeneralCommunity', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -148,7 +148,7 @@
 
         // 일반 커뮤니티 리스트 로딩
         function loadGeneralCommunities() {
-            fetch('/api/comumunity_missions/generalList')
+            fetch('/api/comumunity_missions/printGeneralCommunityList')
             .then(response => response.json())
             .then(data => {
                 const list = document.getElementById('generalCommunityList');

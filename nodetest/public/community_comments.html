@@ -50,45 +50,45 @@
           .catch(error => console.error('인기글 로딩 오류:', error));
       }
 
-    // 댓글 목록 불러오기
-    function loadComments() {
-      fetch(`/api/community_comments/${cr_num}`)
-        .then(res => res.json())
-        .then(data => {
-          const list = document.getElementById('commentList');
-          list.innerHTML = '';
-          data.comments.forEach(c => {
-            const li = document.createElement('li');
-            li.innerText = `${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}`;
-            list.appendChild(li);
-          });
-        })
-        .catch(err => console.error('댓글 로딩 오류:', err));
-    }
+    // // 댓글 목록 불러오기
+    // function loadComments() {
+    //   fetch(`/api/community_comments/${cr_num}`)
+    //     .then(res => res.json())
+    //     .then(data => {
+    //       const list = document.getElementById('commentList');
+    //       list.innerHTML = '';
+    //       data.comments.forEach(c => {
+    //         const li = document.createElement('li');
+    //         li.innerText = `${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}`;
+    //         list.appendChild(li);
+    //       });
+    //     })
+    //     .catch(err => console.error('댓글 로딩 오류:', err));
+    // }
 
-    loadComments();
+    // loadComments();
 
-    // 댓글 작성
-    function submitComment() {
-      const comment = document.getElementById('commentInput').value;
-      if (!comment.trim()) return alert('댓글을 입력하세요.');
+    // // 댓글 작성
+    // function submitComment() {
+    //   const comment = document.getElementById('commentInput').value;
+    //   if (!comment.trim()) return alert('댓글을 입력하세요.');
 
-      fetch('/api/community_comments/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ cr_num, comment })
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.message);
-        document.getElementById('commentInput').value = '';
-        loadComments();
-      })
-      .catch(err => console.error('댓글 작성 오류:', err));
-    }
+    //   fetch('/api/community_comments/create', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${token}`
+    //     },
+    //     body: JSON.stringify({ cr_num, comment })
+    //   })
+    //   .then(res => res.json())
+    //   .then(data => {
+    //     alert(data.message);
+    //     document.getElementById('commentInput').value = '';
+    //     loadComments();
+    //   })
+    //   .catch(err => console.error('댓글 작성 오류:', err));
+    // }
   </script>
 </body>
 </html>

@@ -281,9 +281,9 @@ async def recommend(req: ChatRequest, request: Request):
             "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. "
             "무조건 출력결과물은 json만 있어야하고 한국어로 해야돼."
             '{\n'
-            "message": "...",
-            "category": "...",
-            "title": "..."
+            '  "message": "...",\n'
+            '  "category": "...",\n'
+            '  "title": "..." \n'
             '}\n\n'
             f"문장: {generated_text}"
         )

@@ -18,4 +18,6 @@ router.post('/deleteGeneralCommunity', loginRequired, c_missionController.delete
 router.get('/printGeneralCommunityList', loginRequired, c_missionController.printGeneralCommunity);
 router.post('/recommendCommunity', loginRequired, c_missionController.recommendCommunity);
 
+router.get('/getAllCommunityList', loginRequired, c_missionController.getAllCommunity);
+
 module.exports = router;

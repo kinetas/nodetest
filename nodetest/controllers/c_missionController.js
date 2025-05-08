@@ -531,7 +531,7 @@ exports.recommendCommunity = async (req, res) => {
 };
 
 // 커뮤니티 전체 불러오기 (JWT 적용)
-exports.getCommunityMission = async (req, res) => {
+exports.getAllCommunity = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬

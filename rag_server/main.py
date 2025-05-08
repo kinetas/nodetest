@@ -11,7 +11,8 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import random
-import openai
+from openai import OpenAI
+
 
 # ✅ 환경 변수 로딩
 load_dotenv()
@@ -19,7 +20,8 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 USER_DB_API = "http://nodetest:3000/user-top-categories"
 INTENT_API = "http://intent_server:8002/intent-classify"
-openai.api_key = os.getenv("OPENAI_API_KEY")  # 환경변수에서 불러오기
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
@@ -280,7 +282,7 @@ async def recommend(req: ChatRequest, request: Request):
     #     "messages": [{"role": "system", "content": "모든 응답은 반드시 한국어로 작성되어야 합니다."},{"role": "user", "content": step1_prompt}],
     #     "temperature": 0.7
     # }
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",  # 또는 "gpt-3.5-turbo"
         messages=[{"role": "user", "content": step1_prompt}],
         temperature=0.7
@@ -309,7 +311,7 @@ async def recommend(req: ChatRequest, request: Request):
         #     "messages": [{"role": "user", "content": step2_prompt}],
         #     "temperature": 0.3
         # }
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": step2_prompt}],
             temperature=0.3

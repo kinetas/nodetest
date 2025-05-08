@@ -68,6 +68,11 @@ const CommunityComment = sequelize.define('CommunityComment', {
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
+  },
+  recommended_num: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
   }
 }, {
   tableName: 'community_comments',

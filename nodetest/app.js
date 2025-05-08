@@ -71,6 +71,9 @@ app.get('/dashboard', (req, res) => {
 app.get('/community_missions', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'community_missions.html'));
 });
+app.get('/community_comments/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'community_comments.html'));
+});
 app.get('/user-info', loginRequired, (req, res) => {
     res.json({ userId: req.currentUserId });    //JWT 토큰기반
 });

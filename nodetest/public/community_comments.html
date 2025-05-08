@@ -80,6 +80,9 @@
 
         data.comments.forEach(c => {
           const li = document.createElement('li');
+          console.log("JWT_userID: ", getUserId());
+          console.log("c.u_id: ", c.u_id);
+
           li.innerHTML = `
             ${c.user_nickname} (${new Date(c.created_time).toLocaleString()}): ${c.comment}
             ${c.u_id === getUserId() ? `<button onclick="deleteComment('${c.cc_num}')">삭제</button>` : ''}

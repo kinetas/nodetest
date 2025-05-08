@@ -121,7 +121,10 @@
                 body: JSON.stringify({ cr_num })
             })
             .then(response => response.json())
-            .then(data => alert(data.message))
+            .then(data => {
+                alert(data.message);
+                loadGeneralCommunities(); // ✅ 새로고침해서 추천 수 반영
+            })
             .catch(error => console.error('추천 오류:', error));
         }
 

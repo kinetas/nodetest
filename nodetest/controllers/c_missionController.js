@@ -424,6 +424,7 @@ exports.deleteCommunityMission = async (req, res) => {
 exports.getCommunityMission = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
+            where: { community_type: 'mission' },
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
         }); // 모든 커뮤니티 미션 가져오기
         res.json({ missions });

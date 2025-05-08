@@ -481,6 +481,7 @@ exports.printGeneralCommunity = async (req, res) => {
             order: [['maded_time', 'DESC']]
         });
         const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
             cr_title: c.cr_title,
             contents: c.contents,
             hits: c.hits,

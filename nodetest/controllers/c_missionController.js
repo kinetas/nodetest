@@ -498,7 +498,7 @@ exports.recommendCommunity = async (req, res) => {
             }
         } else {
             // 처음 추천하는 경우
-            await Recommendation.create({ cr_num, u_id, recommended: true });
+            await CRecom.create({ cr_num, u_id, recommended: true });
             await CRoom.increment('recommended_num', { where: { cr_num } });
             res.json({ success: true, message: '추천했습니다.' });
         }

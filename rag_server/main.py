@@ -275,7 +275,7 @@ async def recommend(req: ChatRequest, request: Request):
 
     step1_body = {
         "model": "llama3-8b-8192",
-        "messages": [{"role": "user", "content": step1_prompt}],
+        "messages": [{"role": "system", "content": "모든 응답은 반드시 한국어로 작성되어야 합니다."},{"role": "user", "content": step1_prompt}],
         "temperature": 0.7
     }
 

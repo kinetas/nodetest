@@ -182,6 +182,7 @@
                         제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
                         <br>${imgTag}<br>
                         <button onclick="deleteGeneralCommunity('${c.cr_num}')">삭제</button>
+                        <button onclick="recommendCommunityMission('${c.cr_num}')">추천</button>
                     `;
                     list.appendChild(listItem);
                 });

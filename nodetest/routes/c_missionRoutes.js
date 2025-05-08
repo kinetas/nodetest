@@ -7,18 +7,25 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// 커뮤니티 미션
 router.post('/create', loginRequired, c_missionController.createCommunityMission);
 router.post('/accept', loginRequired, c_missionController.acceptCommunityMission);
 router.delete('/delete', loginRequired, c_missionController.deleteCommunityMission);
-
 router.get('/list', loginRequired, c_missionController.getCommunityMission);
 
+// 일반 커뮤니티
 router.post('/createGeneralCommunity', loginRequired, upload.single('image'), c_missionController.createCommunity);
 router.post('/deleteGeneralCommunity', loginRequired, c_missionController.deleteGeneralCommunity);
-router.post('/recommendCommunity', loginRequired, c_missionController.recommendCommunity);
-
 router.get('/printGeneralCommunityList', loginRequired, c_missionController.printGeneralCommunity);
+
+// 추천, 인기글
+router.post('/recommendCommunity', loginRequired, c_missionController.recommendCommunity);
 router.get('/getpopularyityCommunityList', loginRequired, c_missionController.getPopularyityCommunity);
+
+// 댓글
+router.post('/getOneCommunity', loginRequired, c_missionController.getOneCommunity);
+
+// 모든 커뮤니티
 router.get('/getAllCommunityList', loginRequired, c_missionController.getAllCommunity);
 
 module.exports = router;

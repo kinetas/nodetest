@@ -198,30 +198,7 @@ const { Op } = require('sequelize'); // [추가됨]
 
 //======================Token===============================
 
-// ✅ 인기글 여부 갱신 함수
-function updatePopularity(community) {
-    if (community.popularity) return Promise.resolve(); // ✅ 이미 인기글이면 유지
-
-    const now = new Date();
-    const createdTime = new Date(community.maded_time);
-    const minutes = (now - createdTime) / (1000 * 60);
-
-    let isPopular = false;
-    if (minutes <= 10 && community.recommended_num >= 5) {  //10분안에 추천 5개 이상
-        isPopular = true;
-    } else if (minutes <= 60 && community.recommended_num >= 30) {  //1시간 안에 추천 30개 이상
-        isPopular = true;
-    } else if (minutes <= 1440 && community.recommended_num >= 100) {  //24시간 안에 추천 100개 이상
-        isPopular = true;
-    } else if (minutes <= 1440*7 && community.recommended_num >= 300) {  //일주일 안에 추천 300개 이상
-        isPopular = true;
-    }
-
-    if (isPopular) {
-        return community.update({ popularity: true }); // ✅ 처음 인기글로 진입 시에만 true로 설정
-    }
-    return Promise.resolve(); // ✅ false로 다시 바꾸지 않음
-}
+//============미션===============
 
 // 커뮤니티 미션 생성 (JWT 적용)
 exports.createCommunityMission = async (req, res) => {
@@ -460,6 +437,8 @@ exports.getCommunityMission = async (req, res) => {
 };
 
 
+//============일반===============
+
 // 일반 커뮤니티 생성 함수
 exports.createCommunity = async (req, res) => {
     const { cr_title, contents, community_type } = req.body;
@@ -523,6 +502,34 @@ exports.printGeneralCommunity = async (req, res) => {
     }
 };
 
+
+//============추천, 인기===============
+
+// ✅ 인기글 여부 갱신 함수
+function updatePopularity(community) {
+    if (community.popularity) return Promise.resolve(); // ✅ 이미 인기글이면 유지
+
+    const now = new Date();
+    const createdTime = new Date(community.maded_time);
+    const minutes = (now - createdTime) / (1000 * 60);
+
+    let isPopular = false;
+    if (minutes <= 10 && community.recommended_num >= 5) {  //10분안에 추천 5개 이상
+        isPopular = true;
+    } else if (minutes <= 60 && community.recommended_num >= 30) {  //1시간 안에 추천 30개 이상
+        isPopular = true;
+    } else if (minutes <= 1440 && community.recommended_num >= 100) {  //24시간 안에 추천 100개 이상
+        isPopular = true;
+    } else if (minutes <= 1440*7 && community.recommended_num >= 300) {  //일주일 안에 추천 300개 이상
+        isPopular = true;
+    }
+
+    if (isPopular) {
+        return community.update({ popularity: true }); // ✅ 처음 인기글로 진입 시에만 true로 설정
+    }
+    return Promise.resolve(); // ✅ false로 다시 바꾸지 않음
+}
+
 //추천
 exports.recommendCommunity = async (req, res) => {
     const { cr_num } = req.body;
@@ -567,12 +574,27 @@ exports.getPopularyityCommunity = async (req, res) => {
         const communities = await CRoom.findAll({
             where: { popularity: true },
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
-        }); // 모든 커뮤니티 미션 가져오기
+        });
         console.log("인기글: ", communities);
         res.json({ communities });
     } catch (error) {
-        console.error('커뮤니티 미션 리스트 오류:', error);
-        res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류가 발생했습니다.' });
+        console.error('인기글 리스트 오류:', error);
+        res.status(500).json({ message: '인기글 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// cr_num으로 커뮤니티 하나 불러오기 (JWT 적용)
+exports.getOneCommunity = async (req, res) => {
+    const { cr_num } = req.body;
+    
+    try {
+        const communities = await CRoom.findOne({
+            where: { cr_num: cr_num },
+        });
+        res.json({ communities });
+    } catch (error) {
+        console.error('단일 커뮤니티 가져오기 오류:', error);
+        res.status(500).json({ message: '단일 커뮤니티를 불러오는 중 오류가 발생했습니다.' });
     }
 };
 
@@ -581,11 +603,11 @@ exports.getAllCommunity = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
-        }); // 모든 커뮤니티 미션 가져오기
+        }); // 모든 커뮤니티 가져오기
         res.json({ missions });
     } catch (error) {
-        console.error('커뮤니티 미션 리스트 오류:', error);
-        res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류가 발생했습니다.' });
+        console.error('모든 커뮤니티 리스트 오류:', error);
+        res.status(500).json({ message: '모든 커뮤니티 리스트를 불러오는 중 오류가 발생했습니다.' });
     }
 };
 

@@ -198,6 +198,17 @@ const { Op } = require('sequelize'); // [추가됨]
 
 //======================Token===============================
 
+// ✅ 인기글 여부 갱신 함수
+function updatePopularity(community) {
+    const now = new Date();
+    const createdTime = new Date(community.maded_time);
+    const minutesSinceCreation = (now - createdTime) / (1000 * 60);
+
+    const isPopular = (minutesSinceCreation <= 10 && community.recommended_num >= 5) || community.recommended_num >= 30;
+
+    return community.update({ popularity: isPopular });
+}
+
 // 커뮤니티 미션 생성 (JWT 적용)
 exports.createCommunityMission = async (req, res) => {
     const { cr_title, contents, deadline, category } = req.body;
@@ -504,6 +515,9 @@ exports.recommendCommunity = async (req, res) => {
     const u_id = req.currentUserId;
 
     try {
+        const community = await CRoom.findOne({ where: { cr_num } });
+        if (!community) return res.status(404).json({ success: false, message: '커뮤니티 글을 찾을 수 없습니다.' });
+        
         const existingRecommendation = await CRecom.findOne({ where: { cr_num, u_id } });
 
         if (existingRecommendation) {
@@ -511,17 +525,20 @@ exports.recommendCommunity = async (req, res) => {
             if (existingRecommendation.recommended) {
                 await existingRecommendation.update({ recommended: false });
                 await CRoom.decrement('recommended_num', { where: { cr_num } });
+                await updatePopularity(community);// ✅ 인기글 여부 업데이트
                 res.json({ success: true, message: '추천을 취소했습니다.' });
             } else {
                 // 추천이 취소된 상태라면 다시 추천 활성화
                 await existingRecommendation.update({ recommended: true });
                 await CRoom.increment('recommended_num', { where: { cr_num } });
+                await updatePopularity(community);// ✅ 인기글 여부 업데이트
                 res.json({ success: true, message: '다시 추천했습니다.' });
             }
         } else {
             // 처음 추천하는 경우
             await CRecom.create({ cr_num, u_id, recommended: true });
             await CRoom.increment('recommended_num', { where: { cr_num } });
+            await updatePopularity(community);// ✅ 인기글 여부 업데이트
             res.json({ success: true, message: '추천했습니다.' });
         }
     } catch (error) {

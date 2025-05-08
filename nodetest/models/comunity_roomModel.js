@@ -67,6 +67,12 @@ const CRoom = sequelize.define('CRoom', {
         type: DataTypes.BLOB('long'),
         allowNull: true,
     },
+    // ✅ 인기글 여부 (10분 내 추천수 5 이상 또는 추천수 30 이상)
+    popularity: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
 }, {
     tableName: 'community_room', // 테이블 이름 (DB 테이블 이름과 매칭)
     timestamps: false, // createdAt, updatedAt 컬럼 사용 안 함

@@ -516,7 +516,7 @@ function updatePopularity(community) {
     const minutes = (now - createdTime) / (1000 * 60);
 
     let isPopular = false;
-    if (minutes <= 10 && community.recommended_num >= 5) {  //10분안에 추천 5개 이상
+    if (minutes <= 30 && community.recommended_num >= 5) {  //30분안에 추천 5개 이상
         isPopular = true;
     } else if (minutes <= 60 && community.recommended_num >= 30) {  //1시간 안에 추천 30개 이상
         isPopular = true;
@@ -681,7 +681,7 @@ exports.deleteComment = async (req, res) => {
     }
 };
 
-// 댓글 추천 토글
+// 댓글 추천
 exports.recommendComment = async (req, res) => {
     const { cc_num } = req.body;
     const u_id = req.currentUserId;

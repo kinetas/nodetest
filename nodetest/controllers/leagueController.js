@@ -3,12 +3,20 @@ const db = require('../config/db'); // DB 연결 모듈
 exports.assignInitialLeague = async (req, res) => {
 const user_id = req.body.user_id;
 
-  try {
-    // 1. 이미 배정된 유저인지 확인
-    const [existing] = await db.query(
-      `SELECT * FROM user_league_status WHERE user_id = ?`,
-      [user_id]
-    );
+if (!user_id) {
+  return res.status(400).json({ message: 'user_id가 요청 본문에 없습니다.' });
+}
+
+    try {
+  // 1. 이미 배정된 유저인지 확인
+  const [existing] = await db.query(
+    `SELECT * FROM user_league_status WHERE user_id = :user_id`,
+    {
+      replacements: { user_id },
+      type: db.QueryTypes.SELECT
+    }
+  );
+
 
     if (existing.length > 0) {
       return res.status(200).json({
@@ -18,7 +26,11 @@ const user_id = req.body.user_id;
     }
 
     // 2. 전체 리그 목록 조회
-    const [leagues] = await db.query(`SELECT league_id FROM leagues`);
+    const leagues = await db.query(
+      `SELECT league_id FROM leagues`,
+      { type: db.QueryTypes.SELECT }
+    );
+
     if (leagues.length === 0) {
       return res.status(500).json({ message: '리그 정보가 없습니다.' });
     }
@@ -29,8 +41,11 @@ const user_id = req.body.user_id;
 
     // 4. 사용자 리그 상태 등록
     await db.query(
-      `INSERT INTO user_league_status (user_id, league_id, lp) VALUES (?, ?, 0)`,
-      [user_id, selectedLeague]
+      `INSERT INTO user_league_status (user_id, league_id, lp) VALUES (:user_id, :league_id, 0)`,
+      {
+        replacements: { user_id, league_id: selectedLeague },
+        type: db.QueryTypes.INSERT
+      }
     );
 
     return res.status(201).json({

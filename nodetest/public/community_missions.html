@@ -193,6 +193,7 @@
                         <br>${imgTag}<br>
                         <button onclick="deleteGeneralCommunity('${c.cr_num}')">삭제</button>
                         <button onclick="recommendCommunityMission('${c.cr_num}')">추천</button>
+                        <button onclick="location.href='/community_comments.html?cr_num=${c.cr_num}'">상세보기</button>
                     `;
                     list.appendChild(listItem);
                 });

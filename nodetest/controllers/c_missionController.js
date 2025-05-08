@@ -5,6 +5,7 @@ const Mission = require('../models/missionModel'); // mission 모델
 const MResult = require('../models/m_resultModel');
 const CRecom = require('../models/community_recommendationModel')
 const CommunityComment = require('../models/comunity_commentModel')
+const CommunityCommentCmtRecom = require('../models/comment_recommendationModel');
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const Sequelize = require('sequelize');
@@ -677,6 +678,38 @@ exports.deleteComment = async (req, res) => {
     } catch (error) {
         console.error('댓글 삭제 오류:', error);
         res.status(500).json({ success: false, message: '댓글 삭제 중 오류가 발생했습니다.' });
+    }
+};
+
+// 댓글 추천 토글
+exports.recommendComment = async (req, res) => {
+    const { cc_num } = req.body;
+    const u_id = req.currentUserId;
+
+    try {
+        const comment = await CommunityComment.findOne({ where: { cc_num } });
+        if (!comment) return res.status(404).json({ success: false, message: '댓글을 찾을 수 없습니다.' });
+
+        let existing = await CommunityCommentCmtRecom.findOne({ where: { cc_num, u_id } });
+
+        if (existing) {
+            if (existing.recommended) {
+                await existing.update({ recommended: false });
+                await comment.decrement('recommended_num');
+                res.json({ success: true, message: '댓글 추천 취소됨' });
+            } else {
+                await existing.update({ recommended: true });
+                await comment.increment('recommended_num');
+                res.json({ success: true, message: '댓글 다시 추천됨' });
+            }
+        } else {
+            await CommunityCommentCmtRecom.create({ cc_num, u_id, recommended: true });
+            await comment.increment('recommended_num');
+            res.json({ success: true, message: '댓글 추천됨' });
+        }
+    } catch (error) {
+        console.error('댓글 추천 오류:', error);
+        res.status(500).json({ success: false, message: '댓글 추천 중 오류 발생' });
     }
 };
 

@@ -27,6 +27,7 @@ router.post('/getOneCommunity', loginRequired, c_missionController.getOneCommuni
 router.post('/getCommunityComments', loginRequired, c_missionController.getCommunityComments);
 router.post('/writeComment', loginRequired, c_missionController.writeComment);
 router.post('/deleteComment', loginRequired, c_missionController.deleteComment);
+router.post('/recommendComment', loginRequired, c_missionController.recommendComment);
 
 // 모든 커뮤니티
 router.get('/getAllCommunityList', loginRequired, c_missionController.getAllCommunity);

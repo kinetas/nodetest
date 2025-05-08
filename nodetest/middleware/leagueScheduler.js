@@ -8,8 +8,7 @@ async function runWeeklyLeagueEvaluation() {
       { type: QueryTypes.SELECT }
     );
 
-    // 정산 중 중복 처리 방지용
-    const processedUsers = new Set();
+    const processedUsers = new Set(); // 중복 방지
 
     for (const league of leagues) {
       const leagueId = league.league_id;
@@ -40,10 +39,9 @@ async function runWeeklyLeagueEvaluation() {
         const user = users[i];
         const userId = user.user_id;
 
-        // 이미 리그 이동된 유저는 건너뜀
         if (processedUsers.has(userId)) continue;
 
-        // 유저의 현재 리그 확인 (정산 도중 이동했을 수 있음)
+        // 현재 리그 확인 (중간에 이동한 유저는 건너뜀)
         const [current] = await db.query(
           `SELECT league_id FROM user_league_status WHERE user_id = :user_id`,
           {
@@ -54,7 +52,7 @@ async function runWeeklyLeagueEvaluation() {
 
         if (current.league_id !== leagueId) continue;
 
-        // 1. 정산 기록 백업
+        // 정산 기록 저장
         await db.query(
           `INSERT INTO weekly_lp_history (user_id, week_start, week_end, league_id, lp)
            VALUES (:user_id, :week_start, :week_end, :league_id, :lp)`,
@@ -70,7 +68,7 @@ async function runWeeklyLeagueEvaluation() {
           }
         );
 
-        // 2. 승급
+        // 승급
         if (i < topCount) {
           const upperLeagues = leagues.filter(l => l.level === level + 1);
           if (upperLeagues.length > 0) {
@@ -100,7 +98,7 @@ async function runWeeklyLeagueEvaluation() {
           }
         }
 
-        // 3. 강등
+        // 강등
         else if (i >= total - bottomCount && tier !== 'bronze') {
           const lowerLeagues = leagues.filter(l => l.level === level - 1);
           if (lowerLeagues.length > 0) {
@@ -119,7 +117,7 @@ async function runWeeklyLeagueEvaluation() {
           }
         }
 
-        // 4. 잔류
+        // 잔류
         else {
           await db.query(
             `UPDATE user_league_status SET lp = 0 WHERE user_id = :user_id`,
@@ -130,7 +128,7 @@ async function runWeeklyLeagueEvaluation() {
           );
         }
 
-        // 처리 완료 표시
+        // ✅ 무조건 처리 완료로 표시
         processedUsers.add(userId);
       }
     }

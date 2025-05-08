@@ -11,6 +11,8 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import random
+from openai import OpenAI
+
 
 # ✅ 환경 변수 로딩
 load_dotenv()
@@ -18,6 +20,8 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 USER_DB_API = "http://nodetest:3000/user-top-categories"
 INTENT_API = "http://intent_server:8002/intent-classify"
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 if not SECRET_KEY:
@@ -268,20 +272,26 @@ async def recommend(req: ChatRequest, request: Request):
         )
 
     # ✅ Groq Step 1 - 자연어 문장 생성
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    # headers = {
+    #     "Authorization": f"Bearer {GROQ_API_KEY}",
+    #     "Content-Type": "application/json"
+    # }
 
-    step1_body = {
-        "model": "llama3-8b-8192",
-        "messages": [{"role": "system", "content": "모든 응답은 반드시 한국어로 작성되어야 합니다."},{"role": "user", "content": step1_prompt}],
-        "temperature": 0.7
-    }
+    # step1_body = {
+    #     "model": "llama3-8b-8192",
+    #     "messages": [{"role": "system", "content": "모든 응답은 반드시 한국어로 작성되어야 합니다."},{"role": "user", "content": step1_prompt}],
+    #     "temperature": 0.7
+    # }
+    response = client.chat.completions.create(
+        model="gpt-4",  # 또는 "gpt-3.5-turbo"
+        messages=[{"role": "user", "content": step1_prompt}],
+        temperature=0.7
+    )
+    message = response["choices"][0]["message"]["content"]
 
     try:
-        res1 = requests.post(GROQ_API_URL, headers=headers, json=step1_body)
-        message = res1.json()["choices"][0]["message"]["content"].strip()
+        # res1 = requests.post(GROQ_API_URL, headers=headers, json=step1_body)
+        # message = res1.json()["choices"][0]["message"]["content"].strip()
         print("✅ 생성된 미션 문장:\n", message)
 
         # ✅ Step 2: category + title만 생성
@@ -296,14 +306,20 @@ async def recommend(req: ChatRequest, request: Request):
             f"미션 문장:\n{message}"
         )
 
-        step2_body = {
-            "model": "llama3-8b-8192",
-            "messages": [{"role": "user", "content": step2_prompt}],
-            "temperature": 0.3
-        }
+        # step2_body = {
+        #     "model": "llama3-8b-8192",
+        #     "messages": [{"role": "user", "content": step2_prompt}],
+        #     "temperature": 0.3
+        # }
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": step2_prompt}],
+            temperature=0.3
+        )
+        content = response["choices"][0]["message"]["content"]
 
-        res2 = requests.post(GROQ_API_URL, headers=headers, json=step2_body)
-        content = res2.json()["choices"][0]["message"]["content"]
+        # res2 = requests.post(GROQ_API_URL, headers=headers, json=step2_body)
+        # content = res2.json()["choices"][0]["message"]["content"]
         print("📦 Step2 응답:\n", content)
 
         json_match = re.search(r"\{.*", content, re.DOTALL)

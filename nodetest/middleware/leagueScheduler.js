@@ -3,7 +3,7 @@ const { QueryTypes } = require('sequelize');
 
 async function runWeeklyLeagueEvaluation() {
   try {
-    // 전체 리그 목록
+    // 모든 리그 불러오기
     const leagues = await db.query(
       `SELECT * FROM leagues ORDER BY level ASC`,
       { type: QueryTypes.SELECT }
@@ -14,7 +14,7 @@ async function runWeeklyLeagueEvaluation() {
       const tier = league.tier;
       const level = league.level;
 
-      // 현재 리그의 유저들 LP 순 정렬
+      // 해당 리그에 속한 유저 정렬
       const users = await db.query(
         `SELECT user_id, lp FROM user_league_status WHERE league_id = :league_id ORDER BY lp DESC`,
         {
@@ -27,7 +27,7 @@ async function runWeeklyLeagueEvaluation() {
       if (total === 0) continue;
 
       const topCount = Math.floor(total * 0.4);
-      const bottomCount = tier === 'bronze' ? 0 : Math.floor(total * 0.1); // 브론즈는 강등 없음
+      const bottomCount = tier === 'bronze' ? 0 : Math.floor(total * 0.1);
 
       const now = new Date();
       const weekStart = new Date(now);
@@ -56,28 +56,22 @@ async function runWeeklyLeagueEvaluation() {
 
         // 승급
         if (i < topCount) {
-          const upper = leagues.find(l => l.level === level + 1);
-          if (upper) {
-            // 같은 tier 중 무작위 선택 가능하게 하려면 여기서 upper.tier에 대해 SELECT
-            const upperLeagues = await db.query(
-              `SELECT league_id FROM leagues WHERE level = :level`,
-              {
-                replacements: { level: upper.level },
-                type: QueryTypes.SELECT
-              }
-            );
-            const rand = Math.floor(Math.random() * upperLeagues.length);
-            const nextLeagueId = upperLeagues[rand].league_id;
+          const upperLeagues = leagues.filter(l => l.level === level + 1);
+          if (upperLeagues.length > 0) {
+            const nextLeague = upperLeagues[Math.floor(Math.random() * upperLeagues.length)];
 
             await db.query(
               `UPDATE user_league_status SET league_id = :next_league, lp = 0 WHERE user_id = :user_id`,
               {
-                replacements: { next_league: nextLeagueId, user_id: user.user_id },
+                replacements: {
+                  next_league: nextLeague.league_id,
+                  user_id: user.user_id
+                },
                 type: QueryTypes.UPDATE
               }
             );
 
-            // 포인트 지급 (예: 100pt)
+            // 포인트 보상
             await db.query(
               `INSERT INTO user_points (user_id, points)
                VALUES (:user_id, 100)
@@ -92,22 +86,17 @@ async function runWeeklyLeagueEvaluation() {
 
         // 강등
         else if (i >= total - bottomCount && tier !== 'bronze') {
-          const lower = leagues.find(l => l.level === level - 1);
-          if (lower) {
-            const lowerLeagues = await db.query(
-              `SELECT league_id FROM leagues WHERE level = :level`,
-              {
-                replacements: { level: lower.level },
-                type: QueryTypes.SELECT
-              }
-            );
-            const rand = Math.floor(Math.random() * lowerLeagues.length);
-            const prevLeagueId = lowerLeagues[rand].league_id;
+          const lowerLeagues = leagues.filter(l => l.level === level - 1);
+          if (lowerLeagues.length > 0) {
+            const prevLeague = lowerLeagues[Math.floor(Math.random() * lowerLeagues.length)];
 
             await db.query(
               `UPDATE user_league_status SET league_id = :prev_league, lp = 0 WHERE user_id = :user_id`,
               {
-                replacements: { prev_league: prevLeagueId, user_id: user.user_id },
+                replacements: {
+                  prev_league: prevLeague.league_id,
+                  user_id: user.user_id
+                },
                 type: QueryTypes.UPDATE
               }
             );

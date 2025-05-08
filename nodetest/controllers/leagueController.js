@@ -1,7 +1,7 @@
 const db = require('../config/db'); // DB 연결 모듈
 
 exports.assignInitialLeague = async (req, res) => {
-const { user_id } = req.body;
+const user_id = req.body.user_id;
 
   try {
     // 1. 이미 배정된 유저인지 확인

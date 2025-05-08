@@ -230,16 +230,17 @@ async def recommend(req: ChatRequest, request: Request):
     docs_with_scores = db.similarity_search_with_score(query, k=10)
     filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.2]
 
+    # 📌 Step 1 프롬프트 구성
     if not filtered_docs_with_scores:
-        # ✅ Step 1 - CoT 기반 자연어 생성
         step1_prompt = (
+            f"사용자 요청: {query}\n\n"
             "너는 사용자의 요청을 분석해 미션을 추천하는 AI야. "
             "먼저 카테고리를 분석하고, 그 카테고리의 효과나 특징을 한 줄로 요약한 후, "
-            "그에 맞는 미션을 2가지 추천해주고 그게 왜 카테고리의 효과나 특징과 맞는지 근거를 말해줘. 반드시 단계별로 생각하고 마지막에 최종 결과를 정리해서 한국어로 말해줘. \n\n"
+            "그에 맞는 미션을 2가지 추천해주고 그게 왜 카테고리의 효과나 특징과 맞는지 근거를 말해줘. "
+            "반드시 한국어로 부드럽고 자연스럽게 말해줘."
         )
         url = "(문서 없음)"
     else:
-        # ✅ 유사도 높은 문서에서 블로그 본문 크롤링
         if len(filtered_docs_with_scores) >= 2 and abs(filtered_docs_with_scores[0][1] - filtered_docs_with_scores[1][1]) < 0.03:
             selected_doc = random.choice(filtered_docs_with_scores)[0]
         else:
@@ -247,16 +248,16 @@ async def recommend(req: ChatRequest, request: Request):
         url = selected_doc.metadata.get("source")
         blog_text = crawl_naver_blog(url) or ""
 
-        # ✅ Step 1 - 블로그 기반 자연어 생성
         step1_prompt = (
             f"사용자 요청: {query}\n\n"
             f"참고 블로그 본문:\n{blog_text[:3000]}\n\n"
             "너는 사용자의 요청을 분석해 미션을 추천하는 AI야. "
             "먼저 카테고리를 분석하고, 그 카테고리의 효과나 특징을 한 줄로 요약한 후, "
-            "위 참고 블로그를 바탕으로 자연스럽고 부드러운 문장으로 미션을 추천해줘. "
-            "이때 카테고리의 효과와 특징을 설명 후 뒤에 추천해주는 미션에 대하여 설명해줘. JSON 필요 없고 자연어 문장만 줘."
+            "위 블로그 본문을 참고해서 자연스럽고 부드러운 문장으로 미션을 2개 추천해줘. "
+            "각 미션이 왜 해당 카테고리에 적절한지 근거를 설명해줘. JSON 필요 없고 자연어 문장만 줘."
         )
 
+    # ✅ Groq Step 1 - 자연어 문장 생성
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
@@ -273,10 +274,11 @@ async def recommend(req: ChatRequest, request: Request):
         generated_text = res1.json()["choices"][0]["message"]["content"].strip()
         print("✅ 생성된 자연어 추천 문장:\n", generated_text)
 
-        # ✅ Step 2: JSON 형식으로 변환 요청
+        # ✅ Step 2: JSON 변환 요청
         step2_prompt = (
             f"다음 문장을 JSON 형식으로 바꿔줘.\n"
-            "message에는 그대로 이 문장을 넣고, category에는 적절한 하나의 카테고리만 넣어줘. 그리고 title에는 이 message를 한마디로 요약해서 넣어줘."
+            "message에는 그대로 이 문장을 넣고, category에는 적절한 하나의 카테고리만 넣어줘. "
+            "그리고 title에는 이 message를 한마디로 요약해서 넣어줘. "
             "JSON 외에는 아무 것도 출력하지 마.\n\n"
             f"문장: {generated_text}"
         )
@@ -290,18 +292,27 @@ async def recommend(req: ChatRequest, request: Request):
         res2 = requests.post(GROQ_API_URL, headers=headers, json=step2_body)
         result = res2.json()
         content = result["choices"][0]["message"]["content"]
+        print("📦 Groq 응답 원문:\n", content)
 
         json_match = re.search(r"\{.*\}", content, re.DOTALL)
         if not json_match:
             raise ValueError("응답에서 JSON을 찾을 수 없습니다.")
 
-        parsed = json.loads(json_match.group(0).replace("'", '"'))
+        raw_json = json_match.group(0).replace("'", '"')
+        print("📦 추출된 JSON 문자열:\n", raw_json)
+
+        parsed = json.loads(raw_json)
         parsed["source"] = url
         parsed["response_time_sec"] = round(time.time() - start_time, 2)
         return parsed
 
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": str(e)})
+        print("❌ 예외 발생:", e)
+        return JSONResponse(status_code=500, content={
+            "error": str(e),
+            "raw_groq_response": content if 'content' in locals() else "응답 없음"
+        })
+
 
 
 # ✅ 디버깅용 문서 확인용 API

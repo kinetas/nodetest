@@ -145,7 +145,10 @@
                 body: formData
             })
             .then(response => response.json())
-            .then(data => alert(data.message))
+            .then(data => {
+                alert(data.message);
+                loadGeneralCommunities();
+            })
             .catch(error => console.error('일반 커뮤니티 생성 오류:', error));
         }
 

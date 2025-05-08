@@ -16,38 +16,39 @@
   <ul id="commentList">로딩 중...</ul>
 
   <script>
-    const token = localStorage.getItem('jwt_token');
-    const urlParams = new URLSearchParams(window.location.search);
-    const cr_num = urlParams.get('cr_num');
+      const token = localStorage.getItem('jwt_token');
+      const urlParams = new URLSearchParams(window.location.search);
+      const cr_num = urlParams.get('cr_num');
 
-    if (!cr_num) {
-      alert('cr_num이 제공되지 않았습니다.');
-      location.href = '/community_missions.html';
-    }
+      if (!cr_num) {
+        alert('cr_num이 제공되지 않았습니다.');
+        location.href = '/community_missions.html';
+      }
 
-    // 커뮤니티 글 상세 불러오기
-    function loadCommunities() {
+      // 커뮤니티 글 상세 불러오기
+      function loadCommunities() {
           fetch('/api/comumunity_missions/getOneCommunity', {
-              headers: { 'Authorization': `Bearer ${token}` },
-          })
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ cr_num })  // ✅ cr_num을 POST로 보냄
+          })  
           .then(response => response.json())
           .then(data => {
               const list = document.getElementById('postDetail');
               list.innerHTML = '';
-              data.communities.forEach(c => {
-                  console.log("cr_num(html): ", c.cr_num);
-                  const listItem = document.createElement('li');
-                  const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
-                  listItem.innerHTML = `
-                      제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
-                      <br>${imgTag}<br>
-                      <button onclick="deleteGeneralCommunity('${c.cr_num}')">삭제</button>
-                      <button onclick="recommendCommunityMission('${c.cr_num}')">추천</button>
-                  `;
-                  list.appendChild(listItem);
-              });
-          })
-          .catch(error => console.error('인기글 로딩 오류:', error));
+              const c = data.communities; // getOneCommunity는 단일 객체 반환
+              if (!c) return;
+              
+              const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
+              list.innerHTML = `
+                제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
+                <br>${imgTag}<br>
+              `;
+            })
+            .catch(error => console.error('커뮤니티 글 불러오기 오류:', error));
       }
 
     // // 댓글 목록 불러오기

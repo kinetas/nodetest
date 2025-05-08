@@ -22,6 +22,7 @@ const userInfoRoutes = require('./routes/userInfoRoutes');
 const recommendationMissionRoutes = require('./routes/recommendationMissionRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const authRoutes = require('./routes/authRoutes');//MSA 적용 시 삭제
+const leagueRoutes = require('./routes/leagueRoutes');
 
 // ==================== 컨트롤러 (Cron용 함수 등) ====================
 const { checkMissionStatus } = require('./controllers/c_missionController');
@@ -60,6 +61,7 @@ app.use('/api/comumunity_missions', timeConverterMiddleware, loginRequired, c_mi
 app.use('/chat', timeConverterMiddleware, loginRequired, chatRoutes);
 app.use('/api/recommendationMission', recommendationMissionRoutes); //미션 추천 라우트
 app.use('/api/ai', aiRoutes);
+app.use('/api', leagueRoutes);
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제
 
 // ==================== 라우팅: HTML 정적 페이지 ====================

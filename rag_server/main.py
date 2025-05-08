@@ -286,13 +286,14 @@ async def recommend(req: ChatRequest, request: Request):
 
         # ✅ Step 2: category + title만 생성
         step2_prompt = (
-            f"아래 미션 문장을 기반으로 category와 title만 **한국어**로 뽑아서 JSON으로 응답해줘.\n"
-            "이때 큰따옴표는 절대 포함하지 말아줘."
+            "아래 미션 문장을 보고 category와 title을 반드시 **한국어**로 추출해서 단일 JSON 오브젝트 형식으로만 출력해.\n"
+            "JSON 외에 다른 설명은 출력하지 마. 배열([]), 코드블럭(```), 마크다운도 절대 사용하지 마.\n"
+            "형식 예시:\n"
             '{\n'
             '  "category": "카테고리",\n'
-            '  "title": "미션을 요약한 제목"\n'
+            '  "title": "미션 제목"\n'
             '}\n\n'
-            f"문장:\n{message}"
+            f"미션 문장:\n{message}"
         )
 
         step2_body = {

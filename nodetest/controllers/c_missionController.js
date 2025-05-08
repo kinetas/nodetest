@@ -432,6 +432,82 @@ exports.getCommunityMission = async (req, res) => {
     }
 };
 
+
+// 일반 커뮤니티 생성 함수
+exports.createCommunity = async (req, res) => {
+    const { cr_title, contents, community_type } = req.body;
+    const image = req.file ? req.file.buffer : null;
+    const u_id = req.currentUserId;
+    const cr_num = uuidv4();
+
+    try {
+        await CRoom.create({
+            u_id, cr_num, cr_title, contents, community_type,
+            hits: 0, recommended_num: 0, maded_time: new Date(), image
+        });
+        res.json({ success: true, message: '일반 커뮤니티가 성공적으로 생성되었습니다.' });
+    } catch (error) {
+        console.error('일반 커뮤니티 생성 오류:', error);
+        res.status(500).json({ success: false, message: '일반 커뮤니티 생성 중 오류가 발생했습니다.' });
+    }
+};
+
+// 일반 커뮤니티 리스트 출력 함수
+exports.printGeneralCommunity = async (req, res) => {
+    try {
+        const communities = await CRoom.findAll({
+            where: { community_type: 'general' },
+            order: [['maded_time', 'DESC']]
+        });
+        const communityList = communities.map(c => ({
+            cr_title: c.cr_title,
+            contents: c.contents,
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
+    } catch (error) {
+        console.error('일반 커뮤니티 리스트 출력 오류:', error);
+        res.status(500).json({ message: '일반 커뮤니티 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+//추천
+exports.recommendCommunity = async (req, res) => {
+    const { cr_num } = req.body;
+    const u_id = req.currentUserId;
+
+    try {
+        const existingRecommendation = await Recommendation.findOne({ where: { cr_num, u_id } });
+
+        if (existingRecommendation) {
+            // 이미 추천한 상태이면 추천 취소 (토글)
+            if (existingRecommendation.recommended) {
+                await existingRecommendation.update({ recommended: false });
+                await CRoom.decrement('recommended_num', { where: { cr_num } });
+                res.json({ success: true, message: '추천을 취소했습니다.' });
+            } else {
+                // 추천이 취소된 상태라면 다시 추천 활성화
+                await existingRecommendation.update({ recommended: true });
+                await CRoom.increment('recommended_num', { where: { cr_num } });
+                res.json({ success: true, message: '다시 추천했습니다.' });
+            }
+        } else {
+            // 처음 추천하는 경우
+            await Recommendation.create({ cr_num, u_id, recommended: true });
+            await CRoom.increment('recommended_num', { where: { cr_num } });
+            res.json({ success: true, message: '추천했습니다.' });
+        }
+    } catch (error) {
+        console.error('추천 오류:', error);
+        res.status(500).json({ success: false, message: '추천 처리 중 오류가 발생했습니다.' });
+    }
+};
+
+
 exports.checkMissionStatus = async () => {
     try {
         // 진행 중인 커뮤니티 미션 조회

@@ -17,65 +17,18 @@
 
     <ul id="communityMissionList">로딩 중...</ul>
 
+    <!-- 일반 커뮤니티 생성 UI -->
+    <h3>새로운 커뮤니티 글 생성</h3>
+    <div>
+        <input type="text" id="general_cr_title" placeholder="커뮤니티 제목">
+        <input type="text" id="general_contents" placeholder="커뮤니티 내용">
+        <input type="file" id="general_image" accept="image/*">
+        <button onclick="createGeneralCommunity()">일반 커뮤니티 생성</button>
+    </div>
+
+    <ul id="generalCommunityList">로딩 중...</ul>
+
     <script>
-        // // 미션 생성
-        // function createCommunityMission() {
-        //     const cr_title = document.getElementById('cr_title').value;
-        //     const content = document.getElementById('content').value;
-        //     const deadline = document.getElementById('deadline').value;
-        //     fetch('/api/comumunity_missions/create', {
-        //         method: 'POST',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         // body: JSON.stringify({ cr_title })
-        //         body: JSON.stringify({ cr_title, content, deadline })
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => alert(data.message))
-        //     .catch(error => console.error(error));
-        // }
-
-        // // 미션 수락
-        // function acceptCommunityMission(cr_num) {
-        //     fetch('/api/comumunity_missions/accept', {
-        //         method: 'POST',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         body: JSON.stringify({ cr_num })
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => alert(data.message))
-        //     .catch(error => console.error(error));
-        // }
-
-        // // 미션 삭제
-        // function deleteCommunityMission(cr_num) {
-        //     fetch('/api/comumunity_missions/delete', {
-        //         method: 'DELETE',
-        //         headers: { 'Content-Type': 'application/json' },
-        //         body: JSON.stringify({ cr_num })
-        //     })
-        //     .then(response => response.json())
-        //     .then(data => alert(data.message))
-        //     .catch(error => console.error(error));
-        // }
-
-        // // 미션 리스트 출력
-        // fetch('/api/comumunity_missions/list')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         const list = document.getElementById('communityMissionList');
-        //         list.innerHTML = '';
-        //         data.missions.forEach(mission => {
-        //             const listItem = document.createElement('li');
-        //             listItem.innerHTML = `
-        //                 미션이름: ${mission.cr_title}, 미션내용: ${mission.contents}, 기한: ${mission.deadline} (상태: ${mission.cr_status})
-        //                 <button onclick="acceptCommunityMission('${mission.cr_num}')">수락</button>
-        //                 <button onclick="deleteCommunityMission('${mission.cr_num}')">삭제</button>
-        //             `;
-        //             list.appendChild(listItem);
-        //         });
-        //     })
-        //     .catch(error => console.error(error));
-
         //=========================================token=========================================
         // ✅ JWT 토큰 가져오기
         const token = localStorage.getItem('jwt_token');
@@ -150,11 +103,70 @@
                     미션이름: ${mission.cr_title}, 미션내용: ${mission.contents}, 기한: ${mission.deadline} (상태: ${mission.cr_status})
                     <button onclick="acceptCommunityMission('${mission.cr_num}')">수락</button>
                     <button onclick="deleteCommunityMission('${mission.cr_num}')">삭제</button>
+                    <button onclick="recommendCommunity('${mission.cr_num}')">추천</button>
                 `;
                 list.appendChild(listItem);
             });
         })
         .catch(error => console.error('미션 리스트 로딩 오류:', error));
+
+        // 커뮤니티 미션 추천
+        function recommendCommunityMission(cr_num) {
+            fetch('/api/comumunity_missions/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ cr_num })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('추천 오류:', error));
+        }
+
+        // 일반 커뮤니티 생성
+        function createGeneralCommunity() {
+            const cr_title = document.getElementById('general_cr_title').value;
+            const contents = document.getElementById('general_contents').value;
+            const imageInput = document.getElementById('general_image');
+            const formData = new FormData();
+            formData.append('cr_title', cr_title);
+            formData.append('contents', contents);
+            formData.append('community_type', 'general');
+            if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
+
+            fetch('/api/comumunity_missions/createGeneral', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('일반 커뮤니티 생성 오류:', error));
+        }
+
+        // 일반 커뮤니티 리스트 로딩
+        function loadGeneralCommunities() {
+            fetch('/api/comumunity_missions/generalList')
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('generalCommunityList');
+                list.innerHTML = '';
+                data.communities.forEach(c => {
+                    const listItem = document.createElement('li');
+                    const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
+                    listItem.innerHTML = `
+                        제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
+                        ${imgTag}
+                    `;
+                    list.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('일반 커뮤니티 로딩 오류:', error));
+        }
+
+        loadGeneralCommunities();
     </script>
 </body>
 </html>

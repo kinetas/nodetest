@@ -9,4 +9,8 @@ router.delete('/delete', loginRequired, deleteCommunityMission);
 
 router.get('/list', loginRequired, getCommunityMission);
 
+router.post('/createGeneralCommunity', loginRequired, createCommunity);
+router.get('/printGeneralCommunityList', loginRequired, printGeneralCommunity);
+router.post('/recommendCommunity', loginRequired, recommendCommunity);
+
 module.exports = router;

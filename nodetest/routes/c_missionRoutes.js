@@ -15,9 +15,10 @@ router.get('/list', loginRequired, c_missionController.getCommunityMission);
 
 router.post('/createGeneralCommunity', loginRequired, upload.single('image'), c_missionController.createCommunity);
 router.post('/deleteGeneralCommunity', loginRequired, c_missionController.deleteGeneralCommunity);
-router.get('/printGeneralCommunityList', loginRequired, c_missionController.printGeneralCommunity);
 router.post('/recommendCommunity', loginRequired, c_missionController.recommendCommunity);
 
+router.get('/printGeneralCommunityList', loginRequired, c_missionController.printGeneralCommunity);
+router.get('/getpopularyityCommunityList', loginRequired, c_missionController.getPopularyityCommunity);
 router.get('/getAllCommunityList', loginRequired, c_missionController.getAllCommunity);
 
 module.exports = router;

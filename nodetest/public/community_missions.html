@@ -28,6 +28,10 @@
 
     <ul id="generalCommunityList">로딩 중...</ul>
 
+    <!-- 인기글 리스트 UI -->
+    <h3>인기글 리스트</h3>
+    <ul id="popularityCommunityList">로딩 중...</ul>
+
     <script>
         //=========================================token=========================================
         // ✅ JWT 토큰 가져오기
@@ -196,7 +200,33 @@
             .catch(error => console.error('일반 커뮤니티 로딩 오류:', error));
         }
 
+        // 인기글 리스트 로딩
+        function loadpopularityCommunities() {
+            fetch('/api/comumunity_missions/printGeneralCommunityList', {
+                headers: { 'Authorization': `Bearer ${token}` },
+            })
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('popularityCommunityList');
+                list.innerHTML = '';
+                data.communities.forEach(c => {
+                    console.log("cr_num(html): ", c.cr_num);
+                    const listItem = document.createElement('li');
+                    const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
+                    listItem.innerHTML = `
+                        제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
+                        <br>${imgTag}<br>
+                        <button onclick="deleteGeneralCommunity('${c.cr_num}')">삭제</button>
+                        <button onclick="recommendCommunityMission('${c.cr_num}')">추천</button>
+                    `;
+                    list.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('일반 커뮤니티 로딩 오류:', error));
+        }
+
         loadGeneralCommunities();
+        loadpopularityCommunities()
     </script>
 </body>
 </html>

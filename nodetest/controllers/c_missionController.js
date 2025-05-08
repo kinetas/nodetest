@@ -547,6 +547,20 @@ exports.recommendCommunity = async (req, res) => {
     }
 };
 
+// 인기글 리스트 (JWT 적용)
+exports.getPopularyityCommunity = async (req, res) => {
+    try {
+        const missions = await CRoom.findAll({
+            where: { popularity: true },
+            order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
+        }); // 모든 커뮤니티 미션 가져오기
+        res.json({ missions });
+    } catch (error) {
+        console.error('커뮤니티 미션 리스트 오류:', error);
+        res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
 // 커뮤니티 전체 불러오기 (JWT 적용)
 exports.getAllCommunity = async (req, res) => {
     try {

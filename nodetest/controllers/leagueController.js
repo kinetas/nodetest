@@ -18,12 +18,12 @@ if (!user_id) {
   );
 
 
-    if (existing.length > 0) {
-      return res.status(200).json({
-        message: '이미 리그에 배정된 사용자입니다.',
-        data: existing[0]
-      });
-    }
+  if (existing) {
+    return res.status(200).json({
+      message: '이미 리그에 배정된 사용자입니다.',
+      data: existing
+    });
+  }
 
     // 2. 전체 리그 목록 조회
     const leagues = await db.query(

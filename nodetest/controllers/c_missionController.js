@@ -4,6 +4,7 @@ const Room = require('../models/roomModel'); // room 모델
 const Mission = require('../models/missionModel'); // mission 모델
 const MResult = require('../models/m_resultModel');
 const CRecom = require('../models/community_recommendationModel')
+const CommunityComment = require('../models/community_commentModel')
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const Sequelize = require('sequelize');
@@ -601,8 +602,29 @@ exports.getOneCommunity = async (req, res) => {
         if (communities.image) {
             communities.image = communities.image.toString('base64');
         }
-        
+
         res.json({ communities });
+    } catch (error) {
+        console.error('단일 커뮤니티 가져오기 오류:', error);
+        res.status(500).json({ message: '단일 커뮤니티를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// cr_num으로 댓글 리스트 불러오기 (JWT 적용)
+exports.getCommunityComments = async (req, res) => {
+    const { cr_num } = req.body;
+    
+    try {
+        const comments = await CommunityComment.findAll({
+            where: { cr_num: cr_num },
+            order: [['created_time', 'ASC']],
+        });
+
+        if (!comments) {
+            return res.status(404).json({ message: '해당 댓글을 찾을 수 없습니다.' });
+        }
+
+        res.json({ comments });
     } catch (error) {
         console.error('단일 커뮤니티 가져오기 오류:', error);
         res.status(500).json({ message: '단일 커뮤니티를 불러오는 중 오류가 발생했습니다.' });

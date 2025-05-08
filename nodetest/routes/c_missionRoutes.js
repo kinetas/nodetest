@@ -24,6 +24,7 @@ router.get('/getpopularyityCommunityList', loginRequired, c_missionController.ge
 
 // 댓글
 router.post('/getOneCommunity', loginRequired, c_missionController.getOneCommunity);
+router.post('/getCommunityComments', loginRequired, c_missionController.getCommunityComments);
 
 // 모든 커뮤니티
 router.get('/getAllCommunityList', loginRequired, c_missionController.getAllCommunity);

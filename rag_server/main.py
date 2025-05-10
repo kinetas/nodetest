@@ -232,7 +232,7 @@ async def recommend(req: ChatRequest, request: Request):
 
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)
-    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.2]
+    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1]
 
     # 📌 Step 1 프롬프트 구성
     if not filtered_docs_with_scores:

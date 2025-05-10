@@ -245,10 +245,8 @@ async def recommend(req: ChatRequest, request: Request):
         )
         url = "(문서 없음)"
     else:
-        if len(filtered_docs_with_scores) >= 2 and abs(filtered_docs_with_scores[0][1] - filtered_docs_with_scores[1][1]) < 0.03:
-            selected_doc = random.choice(filtered_docs_with_scores)[0]
-        else:
-            selected_doc = filtered_docs_with_scores[0][0]
+        top_n = min(3, len(filtered_docs_with_scores))  # 적절히 자르기
+        selected_doc = random.choice(filtered_docs_with_scores[:top_n])[0]
         url = selected_doc.metadata.get("source")
         blog_text = crawl_naver_blog(url) or ""
 

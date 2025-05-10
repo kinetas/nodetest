@@ -232,7 +232,7 @@ async def recommend(req: ChatRequest, request: Request):
 
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)
-    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1]
+    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score > 1]
 
     # 📌 Step 1 프롬프트 구성
     if not filtered_docs_with_scores:
@@ -245,7 +245,7 @@ async def recommend(req: ChatRequest, request: Request):
         )
         url = "(문서 없음)"
     else:
-        top_n = min(3, len(filtered_docs_with_scores))  # 적절히 자르기
+        top_n = max(3, len(filtered_docs_with_scores))  # 적절히 자르기
         selected_doc = random.choice(filtered_docs_with_scores[:top_n])[0]
         url = selected_doc.metadata.get("source")
         blog_text = crawl_naver_blog(url) or ""

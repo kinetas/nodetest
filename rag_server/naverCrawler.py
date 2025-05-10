@@ -56,7 +56,7 @@ documents = []
 
 for keyword, category in keywords:
     print(f"🔍 '{keyword}' 블로그 검색 중...")
-    items = search_naver_blog(keyword, display=10)
+    items = search_naver_blog(keyword, display=30)
     for item in items:
         documents.append({
             "id": str(uuid.uuid4()),

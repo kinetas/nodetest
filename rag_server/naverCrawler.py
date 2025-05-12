@@ -12,7 +12,7 @@ NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
 NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
 
 # ✅ 블로그 검색 함수
-def search_naver_blog(query, display=10):
+def search_naver_blog(query, display=30):
     url = "https://openapi.naver.com/v1/search/blog.json"
     headers = {
         "X-Naver-Client-Id": NAVER_CLIENT_ID,
@@ -56,7 +56,7 @@ documents = []
 
 for keyword, category in keywords:
     print(f"🔍 '{keyword}' 블로그 검색 중...")
-    items = search_naver_blog(keyword, display=10)
+    items = search_naver_blog(keyword, display=30)
     for item in items:
         documents.append({
             "id": str(uuid.uuid4()),

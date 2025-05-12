@@ -232,7 +232,7 @@ async def recommend(req: ChatRequest, request: Request):
 
     # 🔍 RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)
-    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score < 1.2]
+    filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score > 1]
 
     # 📌 Step 1 프롬프트 구성
     if not filtered_docs_with_scores:
@@ -245,10 +245,8 @@ async def recommend(req: ChatRequest, request: Request):
         )
         url = "(문서 없음)"
     else:
-        if len(filtered_docs_with_scores) >= 2 and abs(filtered_docs_with_scores[0][1] - filtered_docs_with_scores[1][1]) < 0.03:
-            selected_doc = random.choice(filtered_docs_with_scores)[0]
-        else:
-            selected_doc = filtered_docs_with_scores[0][0]
+        top_n = max(3, len(filtered_docs_with_scores))  # 적절히 자르기
+        selected_doc = random.choice(filtered_docs_with_scores[:top_n])[0]
         url = selected_doc.metadata.get("source")
         blog_text = crawl_naver_blog(url) or ""
 
@@ -264,6 +262,7 @@ async def recommend(req: ChatRequest, request: Request):
             f"사용자 요청: {query}\n\n"
             f"참고 블로그 본문:\n{blog_text[:3000]}\n\n"
             "너는 블로그 본문을 바탕으로 미션을 추천하는 AI야. \n"
+            "**단, 블로그 작성자의 개인 상황(예: 엄마, 육아, 직장, 성별, 가족 상황 등)에 너무 의존하지 말고, 모든 사람이 실천할 수 있는 일반적인 미션을 추천해야 해.**\n"
             "본문 내용을 반드시 참고해서 그 안의 핵심 문장이나 활동, 키워드 등을 분석하고, \n"
             "해당 내용을 반영하여 너가 1개의 미션을 반드시 한국어만 사용하여 창작하고 추천해줘. \n"
             "미션은 자연스럽고 부드러운 문장으로 한국어로만 설명하고, 추천 이유도 한국어로만 적어줘. \n"
@@ -287,8 +286,8 @@ async def recommend(req: ChatRequest, request: Request):
         messages=[{"role": "user", "content": step1_prompt}],
         temperature=0.7
     )
-    message = response["choices"][0]["message"]["content"]
-
+    # message = response["choices"][0]["message"]["content"]
+    message = response.choices[0].message.content
     try:
         # res1 = requests.post(GROQ_API_URL, headers=headers, json=step1_body)
         # message = res1.json()["choices"][0]["message"]["content"].strip()
@@ -316,8 +315,8 @@ async def recommend(req: ChatRequest, request: Request):
             messages=[{"role": "user", "content": step2_prompt}],
             temperature=0.3
         )
-        content = response["choices"][0]["message"]["content"]
-
+        # content = response["choices"][0]["message"]["content"]
+        content = response.choices[0].message.content
         # res2 = requests.post(GROQ_API_URL, headers=headers, json=step2_body)
         # content = res2.json()["choices"][0]["message"]["content"]
         print("📦 Step2 응답:\n", content)

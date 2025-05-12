@@ -23,7 +23,7 @@ router.post('/recommendCommunity', loginRequired, c_missionController.recommendC
 router.get('/getpopularyityCommunityList', loginRequired, c_missionController.getPopularyityCommunity);
 
 // 댓글
-router.post('/getOneCommunity', loginRequired, c_missionController.getOneCommunity);
+router.post('/getOneCommunity', loginRequired, c_missionController.getOneCommunity);    // community_comments.html
 router.post('/getCommunityComments', loginRequired, c_missionController.getCommunityComments);
 router.post('/writeComment', loginRequired, c_missionController.writeComment);
 router.post('/deleteComment', loginRequired, c_missionController.deleteComment);

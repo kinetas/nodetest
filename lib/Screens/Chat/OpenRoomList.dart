@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:convert'; // JSON 파싱을 위해 필요
-import '../../SessionCookieManager.dart'; // SessionCookieManager 경로에 맞게 수정
+import 'dart:convert';
+import '../../SessionTokenManager.dart'; // ✅ Token 기반으로 변경
 import 'EnterChatRoom.dart';
 
 class OpenRoomList extends StatefulWidget {
@@ -9,43 +9,39 @@ class OpenRoomList extends StatefulWidget {
 }
 
 class _OpenRoomListState extends State<OpenRoomList> {
-  List<dynamic> openRooms = []; // 오픈 채팅방 리스트 저장
-  bool isLoading = true; // 로딩 상태 표시
+  List<dynamic> openRooms = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchOpenRooms(); // 채팅방 리스트 가져오기
+    fetchOpenRooms();
   }
 
   Future<void> fetchOpenRooms() async {
     try {
-      final url = 'http://27.113.11.48:3000/api/rooms';
-      final response = await SessionCookieManager.get(url);
+      final response = await SessionTokenManager.get('http://27.113.11.48:3000/api/rooms');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        if (data is List) {
-          setState(() {
+        setState(() {
+          if (data is List) {
             openRooms = data.where((room) => room['r_type'] == 'open').toList();
-            isLoading = false;
-          });
-        } else if (data is Map<String, dynamic> && data.containsKey('rooms')) {
-          setState(() {
-            openRooms = (data['rooms'] as List)
-                .where((room) => room['r_type'] == 'open')
-                .toList();
-            isLoading = false;
-          });
-        } else {
-          print('Unexpected data format: $data');
-        }
+          } else if (data is Map<String, dynamic> && data.containsKey('rooms')) {
+            openRooms = (data['rooms'] as List).where((room) => room['r_type'] == 'open').toList();
+          } else {
+            print('⚠️ 예상치 못한 데이터 형식: $data');
+          }
+          isLoading = false;
+        });
       } else {
-        print('Error: ${response.statusCode}');
+        print('❌ 서버 오류: ${response.statusCode}');
+        setState(() => isLoading = false);
       }
     } catch (e) {
-      print('Error fetching open rooms: $e');
+      print('❌ 네트워크 오류: $e');
+      setState(() => isLoading = false);
     }
   }
 
@@ -61,58 +57,23 @@ class _OpenRoomListState extends State<OpenRoomList> {
           ),
         ),
         child: isLoading
-            ? Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
-          ),
-        )
+            ? Center(child: CircularProgressIndicator(color: Colors.lightBlue))
             : openRooms.isEmpty
-            ? Center(
-          child: Text(
-            '오픈 채팅방이 없습니다.',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey,
-            ),
-          ),
-        )
+            ? Center(child: Text('오픈 채팅방이 없습니다.', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)))
             : ListView.builder(
           itemCount: openRooms.length,
           itemBuilder: (context, index) {
             final room = openRooms[index];
             return Card(
-              margin:
-              const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               child: ListTile(
-                title: Text(
-                  room['r_title'] ?? '제목 없음',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey.shade800,
-                  ),
-                ),
-                subtitle: Text(
-                  '방 ID: ${room['r_id']}',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                trailing: Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.lightBlue,
-                  size: 16,
-                ),
+                title: Text(room['r_title'] ?? '제목 없음', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blueGrey.shade800)),
+                subtitle: Text('방 ID: ${room['r_id']}', style: TextStyle(color: Colors.grey)),
+                trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 16),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EnterChatRoom(roomData: room),
-                    ),
-                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => EnterChatRoom(roomData: room)));
                 },
               ),
             );

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'ChatContent.dart'; // ChatContent import
-import 'ChatPlusButton.dart'; // ChatPlusButton import
+import '../../SessionTokenManager.dart'; // ✅ 토큰 매니저 import
+import 'ChatContent.dart';
+import 'ChatPlusButton.dart';
 
 class ChatRoomScreen extends StatefulWidget {
-  final Map<String, dynamic> roomData; // roomData를 받도록 수정
+  final Map<String, dynamic> roomData;
 
   const ChatRoomScreen({
     required this.roomData,
@@ -16,38 +17,40 @@ class ChatRoomScreen extends StatefulWidget {
 }
 
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
-  late IO.Socket socket; // Socket.IO 클라이언트
+  late IO.Socket socket;
   final TextEditingController _messageController = TextEditingController();
-  bool _showPlusOptions = false; // "+" 버튼 옵션 표시 여부
-  final GlobalKey<ChatContentState> _chatContentKey = GlobalKey<ChatContentState>(); // ChatContent 상태 접근용 Key
+  bool _showPlusOptions = false;
+  final GlobalKey<ChatContentState> _chatContentKey = GlobalKey<ChatContentState>();
 
   @override
   void initState() {
     super.initState();
-    _initializeSocket(); // 소켓 초기화
+    _initializeSocket();
   }
 
   @override
   void dispose() {
-    socket.disconnect(); // 소켓 연결 해제
+    socket.disconnect();
     socket.dispose();
-    _messageController.dispose(); // 컨트롤러 해제
+    _messageController.dispose();
     super.dispose();
   }
 
-  void _initializeSocket() {
-    print('Initializing socket for room: ${widget.roomData['r_id']}');
+  Future<void> _initializeSocket() async {
+    final token = await SessionTokenManager.getToken();
+    print('🔐 JWT Token for Socket: $token');
 
     socket = IO.io(
       'http://27.113.11.48:3001',
       IO.OptionBuilder()
-          .setTransports(['websocket']) // WebSocket 사용
+          .setTransports(['websocket'])
           .disableAutoConnect()
+          .setExtraHeaders({'Authorization': 'Bearer $token'}) // ✅ 헤더로 토큰 전달
           .build(),
     );
 
     socket.onConnect((_) {
-      print('Socket connected');
+      print('✅ Socket connected');
       socket.emit('joinRoom', {
         'r_id': widget.roomData['r_id'],
         'u1_id': widget.roomData['u1_id'],
@@ -56,18 +59,16 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     });
 
     socket.onDisconnect((_) {
-      print('Socket disconnected');
-      socket.connect(); // 연결 끊어질 경우 재연결
+      print('⚠️ Socket disconnected');
+      socket.connect();
     });
 
     socket.on('receiveMessage', (data) {
-      print('Message received: $data');
-      if (_chatContentKey.currentState != null) {
-        _chatContentKey.currentState?.addMessage(data);
-      }
+      print('📥 Message received: $data');
+      _chatContentKey.currentState?.addMessage(data);
     });
 
-    socket.connect(); // 소켓 연결 시작
+    socket.connect();
   }
 
   void _sendMessage() {
@@ -82,8 +83,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       'send_date': DateTime.now().toIso8601String(),
     };
 
-    print('Sending message: $messageData');
-
+    print('📤 Sending message: $messageData');
     socket.emit('sendMessage', messageData);
     _messageController.clear();
   }
@@ -98,12 +98,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.roomData['r_title'] ?? '채팅방',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Text(widget.roomData['r_title'] ?? '채팅방', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.lightBlue,
-        elevation: 2,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -124,9 +120,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               ),
             ),
             if (_showPlusOptions)
-              ChatPlusButton(
-                roomData: widget.roomData,
-              ),
+              ChatPlusButton(roomData: widget.roomData),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(

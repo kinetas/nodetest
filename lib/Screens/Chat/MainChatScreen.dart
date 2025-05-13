@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'GeneralRoomList.dart'; // 일반 채팅 리스트
-import 'OpenRoomList.dart'; // 미션 채팅 리스트
-import 'AddChat_screen.dart'; // AddChat 화면
+import 'GeneralRoomList.dart'; // ✅ 일반 채팅 리스트 (Token 인증 방식)
+import 'OpenRoomList.dart'; // ✅ 미션 채팅 리스트 (Token 인증 방식)
+import 'AddChat_screen.dart'; // 채팅방 추가 화면
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -14,21 +14,21 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this); // 두 개의 탭
+    _tabController = TabController(length: 2, vsync: this); // 2개 탭 (일반, 미션)
   }
 
   @override
   void dispose() {
-    _tabController.dispose(); // 탭 컨트롤러 해제
+    _tabController.dispose(); // 해제
     super.dispose();
   }
 
   void _navigateToAddChat() {
-    String chatType = _tabController.index == 0 ? 'general' : 'open'; // 'general' 또는 'open'
+    String chatType = _tabController.index == 0 ? 'general' : 'open';
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddChatScreen(chatType: chatType),
+        builder: (context) => AddChatScreen(chatType: chatType), // 채팅방 생성 화면으로 이동
       ),
     );
   }
@@ -37,15 +37,12 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '채팅',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Text('채팅', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.lightBlue,
         elevation: 2,
         actions: [
           IconButton(
-            icon: Icon(Icons.add, color: Colors.white), // + 버튼
+            icon: Icon(Icons.add, color: Colors.white),
             onPressed: _navigateToAddChat,
           ),
         ],
@@ -56,14 +53,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
           indicatorColor: Colors.white,
           indicatorWeight: 3,
           tabs: [
-            Tab(
-              text: '일반채팅',
-              icon: Icon(Icons.chat_bubble_outline),
-            ),
-            Tab(
-              text: '미션채팅',
-              icon: Icon(Icons.assignment),
-            ),
+            Tab(text: '일반채팅', icon: Icon(Icons.chat_bubble_outline)),
+            Tab(text: '미션채팅', icon: Icon(Icons.assignment)),
           ],
         ),
       ),
@@ -78,8 +69,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
         child: TabBarView(
           controller: _tabController,
           children: [
-            GeneralRoomList(), // 일반 채팅 리스트 화면
-            OpenRoomList(), // 미션 채팅 리스트 화면
+            GeneralRoomList(), // ✅ 일반 채팅방 리스트 (Token 인증 기반)
+            OpenRoomList(), // ✅ 미션 채팅방 리스트 (Token 인증 기반)
           ],
         ),
       ),

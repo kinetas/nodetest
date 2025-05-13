@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart';
+import '../../SessionTokenManager.dart'; // ✅ Token 기반으로 수정
 
 class AddChatScreen extends StatefulWidget {
-  final String chatType; // 파라미터로 채팅방 유형 전달
+  final String chatType;
 
   const AddChatScreen({required this.chatType, Key? key}) : super(key: key);
 
@@ -22,19 +22,16 @@ class _AddChatScreenState extends State<AddChatScreen> {
     try {
       setState(() => _isLoading = true);
 
-      // API 요청 데이터
       final requestBody = {
-        'u2_id': _u2IdController.text, // 상대방 ID
+        'u2_id': _u2IdController.text,
         'roomName': _roomNameController.text.isEmpty
-            ? '${_u2IdController.text}-${widget.chatType}' // 기본 방 이름 설정
-            : _roomNameController.text, // 입력된 방 이름 사용
-        'r_type': widget.chatType, // 채팅방 유형
+            ? '${_u2IdController.text}-${widget.chatType}'
+            : _roomNameController.text,
+        'r_type': widget.chatType,
       };
 
-      // POST 요청
-      final response = await SessionCookieManager.post(
+      final response = await SessionTokenManager.post(
         apiUrl,
-        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestBody),
       );
 
@@ -47,7 +44,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방이 성공적으로 생성되었습니다!')),
           );
-          Navigator.pop(context); // 이전 화면으로 돌아감
+          Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방 생성 실패: ${responseData['message']}')),
@@ -72,10 +69,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          title,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.lightBlue,
         elevation: 2,
       ),
@@ -91,34 +85,21 @@ class _AddChatScreenState extends State<AddChatScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              _buildTextField(
-                controller: _u2IdController,
-                labelText: '상대방 사용자 ID',
-              ),
+              _buildTextField(_u2IdController, '상대방 사용자 ID'),
               SizedBox(height: 16),
-              _buildTextField(
-                controller: _roomNameController,
-                labelText: '채팅방 이름 (선택사항)',
-              ),
+              _buildTextField(_roomNameController, '채팅방 이름 (선택사항)'),
               SizedBox(height: 32),
               _isLoading
-                  ? CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
-              )
+                  ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue))
                   : ElevatedButton(
                 onPressed: _createChatRoom,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightBlue, // 버튼 배경색
-                  foregroundColor: Colors.white, // 버튼 텍스트 색상
+                  backgroundColor: Colors.lightBlue,
+                  foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
-                child: Text(
-                  '채팅방 생성',
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: Text('채팅방 생성', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),
@@ -127,10 +108,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-  }) {
+  Widget _buildTextField(TextEditingController controller, String labelText) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(

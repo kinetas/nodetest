@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'ProfileEditScreen.dart';
+import '../../../WebRTC/WebRTCtest.dart';
+import '../../../WebRTC/WebRTCtest2.dart';
 
 /// 중단부 설정 옵션 리스트를 표시하는 위젯
 /// 각 옵션 클릭 시 해당 기능 페이지로 이동하거나 콜백을 통해 처리
@@ -9,7 +11,7 @@ class SettingOptionsList extends StatelessWidget {
 
   const SettingOptionsList({
     super.key,
-    this.onProfileEdited, // nullable 처리
+    this.onProfileEdited,
   });
 
   @override
@@ -20,6 +22,8 @@ class SettingOptionsList extends StatelessWidget {
       '친구 관리',
       '기기 권한 설정',
       '보안 설정',
+      'Web RTC test',
+      'Web RTC test2',
     ];
 
     return Column(
@@ -43,6 +47,23 @@ class SettingOptionsList extends StatelessWidget {
                       }
                     }
                   });
+                }
+
+                else if (option == 'Web RTC test') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WebRTCtest(),
+                    ),
+                  );
+                }
+                else if (option == 'Web RTC test2') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WebRTCtest2(),
+                    ),
+                  );
                 } else {
                   print('$option 클릭됨 (아직 연결 안됨)');
                 }

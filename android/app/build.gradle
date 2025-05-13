@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.capstone_1_project"
+    namespace "com.example.capstone_1_project"
     compileSdk = 35 // compileSdkVersion 명시
     ndkVersion = flutter.ndkVersion
 

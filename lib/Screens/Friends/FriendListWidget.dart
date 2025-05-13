@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as badges; // Badge 패키지 임포트
-import 'dart:convert'; // JSON 파싱용
-import '../../SessionCookieManager.dart';
+import 'package:badges/badges.dart' as badges;
+import 'dart:convert';
+import '../../SessionTokenManager.dart'; // ✅ 토큰 기반 요청 처리
 import 'FriendSearchScreen.dart';
 import 'AddFriendScreen.dart';
 import 'FriendRequestScreen.dart';
-import 'FriendClick.dart'; // 팝업 형태의 FriendClick 위젯
+import 'FriendClick.dart';
 
 class FriendListWidget extends StatefulWidget {
   @override
@@ -13,33 +13,30 @@ class FriendListWidget extends StatefulWidget {
 }
 
 class _FriendListWidgetState extends State<FriendListWidget> {
-  List<String> friends = []; // 친구 목록 저장
-  int notificationCount = 0; // 친구 요청 알림 수
-  bool isLoadingFriends = true; // 친구 목록 로딩 상태
-  bool isLoadingNotifications = true; // 알림 로딩 상태
+  List<String> friends = [];
+  int notificationCount = 0;
+  bool isLoadingFriends = true;
+  bool isLoadingNotifications = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchFriends(); // 친구 목록 가져오기
-    _fetchNotificationCount(); // 알림 수 가져오기
+    _fetchFriends();
+    _fetchNotificationCount();
   }
 
-  // 친구 목록 가져오기
   Future<void> _fetchFriends() async {
     try {
-      final response = await SessionCookieManager.get(
+      final response = await SessionTokenManager.get(
         'http://27.113.11.48:3000/dashboard/friends/ifriends',
       );
 
+      print("📦 [Friends GET] ${response.statusCode} ${response.body}");
+
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
         setState(() {
-          friends = responseData['iFriends'] != null
-              ? List<String>.from(responseData['iFriends'])
-              : [];
-          isLoadingFriends = false;
+          friends = List<String>.from(responseData['iFriends'] ?? []);
         });
       } else {
         _showErrorSnackBar('친구 목록을 가져오는데 실패했습니다.');
@@ -47,24 +44,22 @@ class _FriendListWidgetState extends State<FriendListWidget> {
     } catch (e) {
       _showErrorSnackBar('네트워크 오류: $e');
     } finally {
-      setState(() {
-        isLoadingFriends = false;
-      });
+      setState(() => isLoadingFriends = false);
     }
   }
 
-  // 알림 수 가져오기 (친구 요청 수)
   Future<void> _fetchNotificationCount() async {
     try {
-      final response = await SessionCookieManager.get(
-        'http://54.180.54.31:3000/dashboard/friends/tfriends',
+      final response = await SessionTokenManager.get(
+        'http://27.113.11.48:3000/dashboard/friends/tfriends',
       );
+
+      print("📦 [Notifications GET] ${response.statusCode} ${response.body}");
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         setState(() {
-          notificationCount = responseData['receivedRequests']?.length ?? 0;
-          isLoadingNotifications = false;
+          notificationCount = (responseData['receivedRequests']?.length ?? 0);
         });
       } else {
         _showErrorSnackBar('알림 수를 가져오는데 실패했습니다.');
@@ -72,31 +67,26 @@ class _FriendListWidgetState extends State<FriendListWidget> {
     } catch (e) {
       _showErrorSnackBar('네트워크 오류: $e');
     } finally {
-      setState(() {
-        isLoadingNotifications = false;
-      });
+      setState(() => isLoadingNotifications = false);
     }
   }
 
-  // 에러 메시지 표시
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
-  // 친구 요청 화면으로 이동
   void _navigateToFriendRequests(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => FriendRequestScreen()),
     ).then((_) {
-      _fetchNotificationCount(); // 친구 요청 수 업데이트
-      _fetchFriends(); // 친구 목록 업데이트
+      _fetchNotificationCount();
+      _fetchFriends();
     });
   }
 
-  // 친구 검색 화면으로 이동
   void _navigateToFriendSearch(BuildContext context) {
     showDialog(
       context: context,
@@ -106,7 +96,6 @@ class _FriendListWidgetState extends State<FriendListWidget> {
     );
   }
 
-  // 친구 추가 화면으로 이동
   void _navigateToAddFriend(BuildContext context) {
     Navigator.push(
       context,
@@ -125,13 +114,11 @@ class _FriendListWidgetState extends State<FriendListWidget> {
             badges.Badge(
               showBadge: notificationCount > 0,
               badgeContent: Text(
-                '$notificationCount', // 알림 수 표시
+                '$notificationCount',
                 style: TextStyle(color: Colors.white, fontSize: 12),
               ),
               position: badges.BadgePosition.topEnd(top: 0, end: 3),
-              badgeStyle: badges.BadgeStyle(
-                badgeColor: Colors.red, // 기존 badgeColor 대체
-              ),
+              badgeStyle: badges.BadgeStyle(badgeColor: Colors.red),
               child: IconButton(
                 icon: Icon(Icons.notifications),
                 onPressed: () => _navigateToFriendRequests(context),
@@ -158,12 +145,9 @@ class _FriendListWidgetState extends State<FriendListWidget> {
             itemBuilder: (context, index) {
               final friendId = friends[index];
               return ListTile(
-                leading: CircleAvatar(
-                  child: Text(friendId[0]), // ID의 첫 글자 표시
-                ),
+                leading: CircleAvatar(child: Text(friendId[0])),
                 title: Text('친구 ID: $friendId'),
                 onTap: () {
-                  // 친구를 클릭하면 팝업 표시
                   showDialog(
                     context: context,
                     builder: (context) {

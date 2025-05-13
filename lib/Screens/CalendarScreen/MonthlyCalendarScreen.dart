@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../SessionCookieManager.dart'; // 세션 쿠키 관리자
+import '../../SessionTokenManager.dart'; // ✅ Token 기반으로 변경
 import 'dart:convert';
 
 class MonthlyCalendarScreen extends StatefulWidget {
@@ -9,7 +9,7 @@ class MonthlyCalendarScreen extends StatefulWidget {
 }
 
 class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
-  Map<String, int> taskCountPerDate = {}; // 날짜별 미션 개수
+  Map<String, int> taskCountPerDate = {};
   bool isLoading = true;
 
   @override
@@ -22,12 +22,11 @@ class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
     final url = 'http://27.113.11.48:3000/api/missions/missions/assigned';
 
     try {
-      final response = await SessionCookieManager.get(url);
+      final response = await SessionTokenManager.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as List<dynamic>;
 
-        // 날짜별 미션 개수 계산
         Map<String, int> tempTaskCount = {};
         for (var mission in data) {
           final deadline = mission['m_deadline'];
@@ -60,7 +59,6 @@ class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
     DateTime firstDayOfMonth = DateTime(month.year, month.month, 1);
     DateTime lastDayOfMonth = DateTime(month.year, month.month + 1, 0);
 
-    // 시작일과 끝일 맞추기 위해 추가된 전후 날짜
     DateTime startDate = firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday));
     DateTime endDate = lastDayOfMonth.add(Duration(days: 6 - lastDayOfMonth.weekday));
 
@@ -79,7 +77,7 @@ class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
 
   int _getTaskCountForDate(DateTime date) {
     final dateString = DateFormat('yyyy-MM-dd').format(date);
-    return taskCountPerDate[dateString] ?? 0; // 해당 날짜의 미션 개수 반환 (없으면 0)
+    return taskCountPerDate[dateString] ?? 0;
   }
 
   @override

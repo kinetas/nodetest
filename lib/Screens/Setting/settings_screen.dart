@@ -5,6 +5,7 @@ import '../../DeviceTokenManager.dart';
 import '../Login_page/StartLogin_screen.dart';
 import 'SettingWidgets/SettingOptionsList.dart';
 
+
 class SettingsScreen extends StatelessWidget {
   final VoidCallback onNavigateToHome;
   final VoidCallback onNavigateToChat;

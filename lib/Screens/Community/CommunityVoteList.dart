@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart';
-import 'CommunityVoteContent.dart'; // CommunityVoteContent import
+import '../../SessionTokenManager.dart'; // ✅ JWT 기반 세션 매니저
+import 'CommunityVoteContent.dart';
 
 class CommunityVoteList extends StatefulWidget {
   @override
@@ -22,48 +22,37 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
     final url = 'http://27.113.11.48:3000/api/cVote/';
 
     try {
-      final response = await SessionCookieManager.get(url);
+      final response = await SessionTokenManager.get(url); // ✅ 변경됨
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
         setState(() {
-          votes = data['votes'] ?? []; // null이면 빈 리스트로 처리
+          votes = data['votes'] ?? [];
           isLoading = false;
         });
       } else {
-        print('Failed to load votes: ${response.statusCode}');
-        setState(() {
-          isLoading = false;
-        });
+        print('❌ 투표 목록 로딩 실패: ${response.statusCode}');
+        setState(() => isLoading = false);
       }
     } catch (e) {
-      print('Error occurred while fetching votes: $e');
-      setState(() {
-        isLoading = false;
-      });
+      print('⚠️ 네트워크 오류: $e');
+      setState(() => isLoading = false);
     }
   }
 
   String _formatTitle(String? title, int maxLength) {
-    if (title == null || title.isEmpty) {
-      return '제목 없음'; // 기본값 설정
-    }
-    if (title.length > maxLength) {
-      return '${title.substring(0, maxLength)}...';
-    }
-    return title;
+    if (title == null || title.isEmpty) return '제목 없음';
+    return title.length > maxLength ? '${title.substring(0, maxLength)}...' : title;
   }
 
   String _formatDate(String? dateString) {
-    if (dateString == null || dateString.isEmpty) {
-      return '날짜 없음'; // 기본값 설정
-    }
+    if (dateString == null || dateString.isEmpty) return '날짜 없음';
     try {
       DateTime date = DateTime.parse(dateString);
       return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
     } catch (e) {
-      return '잘못된 날짜'; // 날짜 형식 오류 처리
+      return '잘못된 날짜';
     }
   }
 
@@ -71,11 +60,7 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(
-        child: CircularProgressIndicator(
-          color: Colors.lightBlue[400],
-        ),
-      )
+          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
           : Container(
         color: Colors.lightBlue[50],
         child: ListView.builder(
@@ -94,15 +79,14 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.8,
                       child: CommunityVoteContent(
-                        cNumber: vote['c_number'], // c_number 전달
+                        cNumber: vote['c_number'],
                       ),
                     ),
                   ),
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 8.0, horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                 child: Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -130,10 +114,7 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
                       SizedBox(height: 8),
                       Text(
                         '삭제 날짜: ${_formatDate(vote['c_deletedate'])}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
                   ),

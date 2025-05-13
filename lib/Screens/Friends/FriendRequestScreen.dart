@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저
+import '../../SessionTokenManager.dart'; // ✅ JWT 기반 세션 토큰 매니저 사용
 
-// 나에게 온 친구 요청 목록을 출력하고 수락할 수 있는 클래스
 class FriendRequestScreen extends StatefulWidget {
   @override
   _FriendRequestScreenState createState() => _FriendRequestScreenState();
 }
 
 class _FriendRequestScreenState extends State<FriendRequestScreen> {
-  List<String> receivedRequests = []; // 받은 요청
+  List<String> receivedRequests = [];
   bool isLoading = true;
 
   @override
@@ -18,76 +17,71 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
     _fetchReceivedRequests();
   }
 
-  // 받은 요청 가져오기
   Future<void> _fetchReceivedRequests() async {
+    print("📡 [GET] 친구 요청 목록 요청 중...");
     try {
-      final response = await SessionCookieManager.get(
+      final response = await SessionTokenManager.get(
         'http://27.113.11.48:3000/dashboard/friends/tfriends',
       );
 
+      print("📦 [Fetch Response] ${response.statusCode} ${response.body}");
+
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-
         setState(() {
-          receivedRequests = responseData['receivedRequests'] != null
-              ? List<String>.from(responseData['receivedRequests'])
-              : [];
+          receivedRequests = List<String>.from(responseData['receivedRequests'] ?? []);
           isLoading = false;
         });
       } else {
         setState(() => isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('받은 요청 목록을 가져오는데 실패했습니다.')),
-        );
+        _showSnack('받은 요청 목록을 가져오는데 실패했습니다.');
       }
     } catch (e) {
       setState(() => isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('네트워크 오류: $e')),
-      );
+      _showSnack('네트워크 오류: $e');
     }
   }
 
-  // 친구 요청 수락 또는 거절
   Future<void> _handleRequest(String friendId, bool accept) async {
+    final token = await SessionTokenManager.getToken();
     final url = accept
         ? 'http://27.113.11.48:3000/dashboard/friends/accept'
         : 'http://27.113.11.48:3000/dashboard/friends/reject';
 
+    print("📤 [POST] $url with f_id=$friendId");
+
     try {
-      final response = await SessionCookieManager.post(
+      final response = await SessionTokenManager.post(
         url,
-        headers: {'Content-Type': 'application/json'}, // 헤더 추가
-        body: json.encode({'f_id': friendId}), // friendId 전달
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'f_id': friendId}),
       );
+
+      print("📦 [POST 응답] ${response.statusCode} ${response.body}");
 
       final responseData = json.decode(response.body);
 
       if (response.statusCode == 200 && responseData['success'] == true) {
         setState(() {
-          receivedRequests.remove(friendId); // 요청 성공 시 목록에서 제거
+          receivedRequests.remove(friendId);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'] ?? '요청 처리 성공')),
-        );
+        _showSnack(responseData['message'] ?? '요청 처리 성공');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['message'] ?? '요청 처리 실패')),
-        );
+        _showSnack(responseData['message'] ?? '요청 처리 실패');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('네트워크 오류: $e')),
-      );
+      _showSnack('네트워크 오류: $e');
     }
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('받은 친구 요청'),
-      ),
+      appBar: AppBar(title: Text('받은 친구 요청')),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : receivedRequests.isEmpty
@@ -99,9 +93,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
           return Card(
             margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: ListTile(
-              leading: CircleAvatar(
-                child: Text(friendId[0]), // 요청 ID 첫 글자
-              ),
+              leading: CircleAvatar(child: Text(friendId[0])),
               title: Text('요청 ID: $friendId'),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,

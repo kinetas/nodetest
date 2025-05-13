@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart';
+import '../../SessionTokenManager.dart'; // ✅ SessionTokenManager로 전환
 
 class LatestPosts extends StatefulWidget {
   final VoidCallback onNavigateToCommunity;
@@ -25,34 +25,29 @@ class _LatestPostsState extends State<LatestPosts> {
     final url = 'http://27.113.11.48:3000/api/comumunity_missions/list';
 
     try {
-      final response = await SessionCookieManager.get(url);
+      final response = await SessionTokenManager.get(url); // ✅ 수정된 부분
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // 게시글 리스트를 가져와 상위 두 개만 선택하고 Map<String, String>으로 변환
         final missions = List<Map<String, dynamic>>.from(data['missions'] ?? []);
         setState(() {
           posts = missions
               .take(2)
               .map((mission) => {
             'title': mission['cr_title']?.toString() ?? '제목 없음',
-            'content': mission['content']?.toString() ?? '내용 없음',
+            'content': mission['contents']?.toString() ?? '내용 없음', // ✅ 'contents'로 수정
           })
               .toList();
           isLoading = false;
         });
       } else {
-        print('Failed to load latest posts: ${response.statusCode}');
-        setState(() {
-          isLoading = false;
-        });
+        print('📛 최신 게시글 로딩 실패: ${response.statusCode}');
+        setState(() => isLoading = false);
       }
     } catch (e) {
-      print('Error fetching latest posts: $e');
-      setState(() {
-        isLoading = false;
-      });
+      print('⚠️ 최신 게시글 요청 중 오류: $e');
+      setState(() => isLoading = false);
     }
   }
 
@@ -75,10 +70,10 @@ class _LatestPostsState extends State<LatestPosts> {
               color: primaryColor,
             ),
           ),
-          SizedBox(height: 10), // 제목과 게시글 간의 여백
+          SizedBox(height: 10),
           ...posts.map((post) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 16.0), // 게시글 간 여백
+              padding: const EdgeInsets.only(bottom: 16.0),
               child: GestureDetector(
                 onTap: widget.onNavigateToCommunity,
                 child: Container(
@@ -105,7 +100,7 @@ class _LatestPostsState extends State<LatestPosts> {
                           color: primaryColor,
                         ),
                       ),
-                      SizedBox(height: 8), // 제목과 내용 간의 여백
+                      SizedBox(height: 8),
                       Text(
                         post['content']!,
                         style: TextStyle(

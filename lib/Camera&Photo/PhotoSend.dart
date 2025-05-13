@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import '../SessionCookieManager.dart';
+import '../SessionTokenManager.dart'; // ✅ Token 기반으로 수정
 import 'dart:convert';
-import '../Screens/Mission/MissionCertification_screen.dart'; // 인증 요청 화면 import
+import '../Screens/Mission/MissionCertification_screen.dart';
 
 class PhotoSend extends StatefulWidget {
   final String imagePath;
@@ -13,7 +13,7 @@ class PhotoSend extends StatefulWidget {
   final String mId;
   final String missionAuthenticationAuthority;
 
-  PhotoSend({
+  const PhotoSend({
     required this.imagePath,
     required this.rId,
     required this.u2Id,
@@ -27,14 +27,13 @@ class PhotoSend extends StatefulWidget {
 
 class _PhotoSendState extends State<PhotoSend> {
   late IO.Socket socket;
-  String? _u1Id; // 유저 ID
-  bool _isLoading = true; // 로딩 상태 관리
-  TextEditingController _textController = TextEditingController(); // 메시지 입력 필드
+  String? _u1Id;
+  bool _isLoading = true;
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _initializeSocket();
     _loadUserId();
   }
 
@@ -77,20 +76,29 @@ class _PhotoSendState extends State<PhotoSend> {
 
   Future<void> _loadUserId() async {
     try {
-      final response = await SessionCookieManager.get('http://54.180.54.31:3000/api/user-info/user-id');
-      if (response.statusCode == 200) {
-        final userId = json.decode(response.body)['u_id'];
+      final token = await SessionTokenManager.getToken();
+      final response = await HttpClient()
+          .getUrl(Uri.parse('http://54.180.54.31:3000/api/user-info/user-id'))
+          .then((req) {
+        req.headers.set('Authorization', 'Bearer $token');
+        return req.close();
+      });
 
+      final responseBody = await response.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        final userId = json.decode(responseBody)['u_id'];
         setState(() {
           _u1Id = userId;
           _isLoading = false;
         });
+        _initializeSocket(); // ✅ 소켓 연결은 UserID 받은 후에 수행
       } else {
         throw Exception('Failed to fetch user ID.');
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching user ID.')),
+        SnackBar(content: Text('유저 정보 조회 실패')),
       );
       setState(() {
         _isLoading = false;
@@ -125,14 +133,14 @@ class _PhotoSendState extends State<PhotoSend> {
 
       socket.on('messageSent', (data) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Message sent successfully.')),
+          SnackBar(content: Text('메시지 전송 성공')),
         );
         _disconnectSocket();
         Navigator.of(context).popUntil((route) => route.isFirst);
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('메시지 전송 중 오류가 발생했습니다.')),
+        SnackBar(content: Text('메시지 전송 오류')),
       );
     }
   }
@@ -155,19 +163,14 @@ class _PhotoSendState extends State<PhotoSend> {
           backgroundColor: Colors.lightBlue[400],
         ),
         body: Center(
-          child: CircularProgressIndicator(
-            color: Colors.lightBlue[400],
-          ),
+          child: CircularProgressIndicator(color: Colors.lightBlue[400]),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Send Photo",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text("Send Photo", style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.lightBlue[400],
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -206,7 +209,7 @@ class _PhotoSendState extends State<PhotoSend> {
                       controller: _textController,
                       maxLength: 30,
                       decoration: InputDecoration(
-                        labelText: "Enter your message",
+                        labelText: "메시지 입력",
                         border: OutlineInputBorder(),
                         filled: true,
                         fillColor: Colors.white,

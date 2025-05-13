@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart'; // 세션 쿠키 관리자
+import '../../SessionTokenManager.dart'; // ✅ Token 기반으로 수정
 
 class WeeklyCalendar extends StatefulWidget {
   final VoidCallback onAddPressed;
@@ -14,8 +14,8 @@ class WeeklyCalendar extends StatefulWidget {
 }
 
 class _WeeklyCalendarState extends State<WeeklyCalendar> {
-  Map<String, int> taskCountPerDate = {}; // 날짜별 미션 개수 저장
-  bool isLoading = true; // 로딩 상태 관리
+  Map<String, int> taskCountPerDate = {};
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -27,12 +27,11 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
     final url = 'http://27.113.11.48:3000/api/missions/missions/assigned';
 
     try {
-      final response = await SessionCookieManager.get(url);
+      final response = await SessionTokenManager.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        // 날짜별 미션 개수 계산
         Map<String, int> tempTaskCount = {};
         for (var mission in data) {
           final deadline = mission['m_deadline'];
@@ -62,7 +61,7 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
 
   int _getTaskCountForDate(DateTime date) {
     final dateString = DateFormat('yyyy-MM-dd').format(date);
-    return taskCountPerDate[dateString] ?? 0; // 날짜의 미션 개수 반환 (없으면 0)
+    return taskCountPerDate[dateString] ?? 0;
   }
 
   List<Map<String, dynamic>> _generateWeeklyData() {
@@ -75,7 +74,7 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
       weekData.add({
         'day': daysOfWeek[currentDay.weekday % 7],
         'date': DateFormat('MM/dd').format(currentDay),
-        'tasks': _getTaskCountForDate(currentDay), // API에서 받아온 미션 개수 사용
+        'tasks': _getTaskCountForDate(currentDay),
       });
     }
     return weekData;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../SessionCookieManager.dart'; // 세션 쿠키 매니저
+import '../../SessionTokenManager.dart'; // ✅ Token 기반으로 변경
 import 'dart:convert';
 
 class DeleteChatDialog extends StatelessWidget {
@@ -11,16 +11,18 @@ class DeleteChatDialog extends StatelessWidget {
     final String apiUrl = 'http://27.113.11.48:3000/api/rooms/$u2Id';
 
     try {
-      final response = await SessionCookieManager.delete(apiUrl);
+      print('📤 [DELETE] 요청: $apiUrl');
+      final response = await SessionTokenManager.delete(apiUrl);
+
+      print('📥 [응답] ${response.statusCode} ${response.body}');
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
-          // 삭제 성공
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('채팅방이 성공적으로 삭제되었습니다.')),
           );
-          Navigator.pop(context, true); // true 값으로 팝업 닫기
+          Navigator.pop(context, true); // 성공 시 true 반환
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'] ?? '삭제 실패')),
@@ -32,6 +34,7 @@ class DeleteChatDialog extends StatelessWidget {
         );
       }
     } catch (e) {
+      print('❌ 네트워크 오류: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('네트워크 오류: $e')),
       );
@@ -45,7 +48,7 @@ class DeleteChatDialog extends StatelessWidget {
       content: Text('채팅방을 정말 삭제하시겠습니까?'),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, false), // 팝업 닫기
+          onPressed: () => Navigator.pop(context, false), // 취소 시 false 반환
           child: Text('아니오'),
         ),
         TextButton(

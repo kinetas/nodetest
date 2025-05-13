@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionCookieManager.dart';
+import '../../SessionTokenManager.dart'; // ✅ delete 메서드 사용
 
 class FriendClick extends StatelessWidget {
   final String friendId;
@@ -11,23 +11,23 @@ class FriendClick extends StatelessWidget {
     final String apiUrl = 'http://27.113.11.48:3000/dashboard/friends/delete';
 
     try {
-      final response = await SessionCookieManager.delete(
+      final response = await SessionTokenManager.delete(
         apiUrl,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'f_id': friendId}),
       );
 
+      print("🧨 [Delete Friend] ${response.statusCode} ${response.body}");
+
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
 
         if (responseData['success'] == true) {
-          // 성공적으로 삭제
-          Navigator.pop(context); // 팝업 닫기
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'] ?? '친구 삭제 성공')),
           );
         } else {
-          // 삭제 실패
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(responseData['message'] ?? '친구 삭제 실패')),
           );
@@ -38,7 +38,6 @@ class FriendClick extends StatelessWidget {
         );
       }
     } catch (e) {
-      // 네트워크 오류 처리
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('네트워크 오류: $e')),
       );
@@ -48,14 +47,12 @@ class FriendClick extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pop(context); // 팝업 외부를 클릭하면 닫힘
-      },
+      onTap: () => Navigator.pop(context),
       child: Material(
-        color: Colors.black.withOpacity(0.5), // 뒤 화면 흐리게
+        color: Colors.black.withOpacity(0.5),
         child: Center(
           child: Container(
-            width: MediaQuery.of(context).size.width * 2 / 3, // 화면 2/3 크기
+            width: MediaQuery.of(context).size.width * 2 / 3,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -84,13 +81,10 @@ class FriendClick extends StatelessWidget {
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.pop(context); // 알림 창 닫기
-                                      _deleteFriend(context); // 친구 삭제 요청
+                                      Navigator.pop(context);
+                                      _deleteFriend(context);
                                     },
-                                    child: Text(
-                                      '확인',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
+                                    child: Text('확인', style: TextStyle(color: Colors.red)),
                                   ),
                                 ],
                               );
@@ -103,7 +97,7 @@ class FriendClick extends StatelessWidget {
                 ),
                 CircleAvatar(
                   radius: 50,
-                  child: Text(friendId[0]), // ID의 첫 글자 표시
+                  child: Text(friendId[0]),
                 ),
                 SizedBox(height: 16),
                 Text(

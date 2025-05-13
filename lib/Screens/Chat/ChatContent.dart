@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:typed_data';
-import '../../SessionCookieManager.dart'; // 쿠키 매니저 사용
+import '../../SessionTokenManager.dart'; // ✅ Token 기반으로 수정
 
 class ChatContent extends StatefulWidget {
-  final String chatId; // 채팅방 ID
-  final String userId; // 현재 사용자 ID
-  final String otherUserId; // 상대방 ID
+  final String chatId;
+  final String userId;
+  final String otherUserId;
 
   const ChatContent({
     required this.chatId,
@@ -20,21 +20,21 @@ class ChatContent extends StatefulWidget {
 }
 
 class ChatContentState extends State<ChatContent> {
-  List<Map<String, dynamic>> messages = []; // 채팅 메시지 리스트
-  bool isLoading = true; // 로딩 상태
-  final ScrollController _scrollController = ScrollController(); // 스크롤 컨트롤러
+  List<Map<String, dynamic>> messages = [];
+  bool isLoading = true;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _fetchMessages(); // 메시지 가져오기 호출
+    _fetchMessages();
   }
 
   Future<void> _fetchMessages() async {
     final String apiUrl = 'http://27.113.11.48:3000/chat/messages/${widget.chatId}';
 
     try {
-      final response = await SessionCookieManager.get(apiUrl);
+      final response = await SessionTokenManager.get(apiUrl);
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
@@ -86,18 +86,9 @@ class ChatContentState extends State<ChatContent> {
         ),
       ),
       child: isLoading
-          ? Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
-        ),
-      )
+          ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue)))
           : messages.isEmpty
-          ? Center(
-        child: Text(
-          '메시지가 없습니다.',
-          style: TextStyle(color: Colors.grey, fontSize: 16),
-        ),
-      )
+          ? Center(child: Text('메시지가 없습니다.', style: TextStyle(color: Colors.grey, fontSize: 16)))
           : ListView.builder(
         controller: _scrollController,
         itemCount: messages.length,
@@ -106,14 +97,9 @@ class ChatContentState extends State<ChatContent> {
           final isSender = message['u1_id'] == widget.userId;
 
           return Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 5.0,
-              horizontal: 10.0,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             child: Align(
-              alignment: isSender
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
+              alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
               child: message['image'] != null
                   ? _buildImageMessage(message, isSender)
                   : _buildTextMessage(message, isSender),
@@ -137,11 +123,7 @@ class ChatContentState extends State<ChatContent> {
           bottomRight: isSender ? Radius.zero : Radius.circular(12),
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.grey.shade200, blurRadius: 5, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -149,18 +131,12 @@ class ChatContentState extends State<ChatContent> {
         children: [
           Text(
             message['message_contents'] ?? '빈 메시지',
-            style: TextStyle(
-              color: isSender ? Colors.white : Colors.black,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: isSender ? Colors.white : Colors.black, fontSize: 16),
           ),
           SizedBox(height: 5),
           Text(
             message['send_date'] ?? '',
-            style: TextStyle(
-              color: isSender ? Colors.white70 : Colors.black54,
-              fontSize: 10,
-            ),
+            style: TextStyle(color: isSender ? Colors.white70 : Colors.black54, fontSize: 10),
           ),
         ],
       ),
@@ -179,13 +155,7 @@ class ChatContentState extends State<ChatContent> {
             constraints: BoxConstraints(maxWidth: 200),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade200,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.grey.shade200, blurRadius: 5, offset: Offset(0, 2))],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -199,10 +169,7 @@ class ChatContentState extends State<ChatContent> {
             ),
           ),
           SizedBox(height: 5),
-          Text(
-            message['send_date'] ?? '',
-            style: TextStyle(color: Colors.black54, fontSize: 10),
-          ),
+          Text(message['send_date'] ?? '', style: TextStyle(color: Colors.black54, fontSize: 10)),
         ],
       );
     } catch (e) {

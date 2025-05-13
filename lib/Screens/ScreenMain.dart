@@ -4,8 +4,8 @@ import 'Chat/MainChatScreen.dart';
 import 'Mission/MissionScreen.dart';
 import 'Community/CommunityScreen.dart';
 import 'Profile/ProfileScreenMain.dart';
-//import 'Setting/settings_screen.dart'; 메인스크린에서 세팅스크린으로 가는길이 없어 주석처리
-
+import '../Screens/Login_page/LoginScreen.dart';
+import '../SessionTokenManager.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -14,14 +14,18 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  bool _isCheckingAuth = true;
+  bool _isAuthenticated = false;
 
   static late List<Widget> _widgetOptions;
 
   @override
   void initState() {
     super.initState();
+    _checkAuthentication();
+
     _widgetOptions = <Widget>[
-      HomeScreen(onNavigateToCommunity: () => _onItemTapped(3)), // 커뮤니티로 이동하는 콜백 전달
+      HomeScreen(onNavigateToCommunity: () => _onItemTapped(3)),
       ChatScreen(),
       MissionScreen(),
       CommunityScreen(),
@@ -31,16 +35,31 @@ class _MainScreenState extends State<MainScreen> {
         onNavigateToMission: () => _onItemTapped(2),
         onNavigateToCommunity: () => _onItemTapped(3),
       ),
-      /*SettingsScreen(
-        onNavigateToHome: () => _onItemTapped(0),
-        onNavigateToChat: () => _onItemTapped(1),
-        onNavigateToMission: () => _onItemTapped(2),
-        onNavigateToCommunity: () => _onItemTapped(3),
-      ),*/ //profile로 갈수있게 변경(세팅 스크린 코드는 수정 가능하게 그냥 주석처리)
     ];
   }
 
+  Future<void> _checkAuthentication() async {
+    print("🔐 [MainScreen] 로그인 상태 확인 중...");
+    final isLoggedIn = await SessionTokenManager.isLoggedIn();
+    print("✅ 로그인 여부: $isLoggedIn");
+
+    if (!isLoggedIn) {
+      print("⛔ 로그인 안됨 → 로그인 화면으로 이동합니다.");
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } else {
+      setState(() {
+        _isAuthenticated = true;
+        _isCheckingAuth = false;
+      });
+      print("🎉 인증 완료 → 메인화면 렌더링");
+    }
+  }
+
   void _onItemTapped(int index) {
+    print("📱 탭 선택됨: $index");
     setState(() {
       _selectedIndex = index;
     });
@@ -48,6 +67,16 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isCheckingAuth) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (!_isAuthenticated) {
+      return SizedBox.shrink();
+    }
+
     return Scaffold(
       body: _widgetOptions[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(

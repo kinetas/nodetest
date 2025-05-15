@@ -575,10 +575,20 @@ exports.getPopularyityCommunity = async (req, res) => {
     try {
         const communities = await CRoom.findAll({
             where: { popularity: true },
-            order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
+            order: [['deadline', 'ASC']],
         });
-        console.log("인기글: ", communities);
-        res.json({ communities });
+
+        const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
+            cr_title: c.cr_title,
+            contents: c.contents,
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
     } catch (error) {
         console.error('인기글 리스트 오류:', error);
         res.status(500).json({ message: '인기글 리스트를 불러오는 중 오류가 발생했습니다.' });

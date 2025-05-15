@@ -213,9 +213,10 @@ exports.createCommunityMission = async (req, res) => {
     const u_id = req.currentUserId; // JWT 인증된 사용자 ID 사용
     const cr_num = uuidv4();
     const cr_status = "match";
+    const maded_time = new Date();
 
     try {
-        await CRoom.create({ u_id, cr_num, cr_title, cr_status, contents, deadline, category });
+        await CRoom.create({ u_id, cr_num, cr_title, cr_status, contents, deadline, category, maded_time });
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 생성되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 생성 오류:', error);

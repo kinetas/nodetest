@@ -116,3 +116,36 @@ exports.getLeagueDetail = async (req, res) => {
     res.status(500).json({ message: '서버 오류', error: err.message });
   }
 };
+//미션수행시 lp 지급 api 
+exports.updateLpOnMission = async (req, res) => {
+  const { user_id, success } = req.body;
+
+  if (!user_id || success === undefined) {
+    return res.status(400).json({ message: 'user_id와 success 값이 필요합니다.' });
+  }
+
+  const lpToAdd = success ? 20 : 5;
+
+  try {
+    // LP 증가 처리
+    const [result] = await db.query(
+      `UPDATE user_league_status 
+       SET lp = lp + :lpToAdd 
+       WHERE user_id = :user_id`,
+      {
+        replacements: { lpToAdd, user_id },
+        type: QueryTypes.UPDATE
+      }
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: '해당 유저의 리그 정보가 없습니다.' });
+    }
+
+    return res.status(200).json({ message: `LP가 ${lpToAdd}만큼 증가했습니다.` });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류', error: err.message });
+  }
+};

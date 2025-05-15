@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../Mission/AchievementPanel_screen.dart'; // AchievementPanel 파일을 임포트
+import '../Mission/AchievementPanel_screen.dart';
 import '../CalendarScreen/WeeklyCalendarScreen.dart';
 import '../Friends/FriendListWidget.dart';
 import '../CalendarScreen/MonthlyCalendarScreen.dart';
-import '../Community/LatestPostList.dart'; // 최신 게시글 위젯 임포트
+import '../Community/LatestPostList.dart';
+import '../Mission/MyMission/MyMissionList.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onNavigateToCommunity;
@@ -16,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _showAchievementPanel = false;
+  DateTime? _selectedDate;
 
   void _toggleAchievementPanel() {
     setState(() {
@@ -26,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Colors.lightBlue;
-    final Color backgroundColor = Colors.lightBlue[50]!;
+    final Color backgroundColor = Colors.white;
 
     return Scaffold(
       appBar: AppBar(
@@ -52,22 +54,53 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 주간 캘린더
+                      // ✅ 주간 캘린더
                       WeeklyCalendar(
                         onAddPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => MonthlyCalendarScreen()),
+                            MaterialPageRoute(builder: (context) => MonthlyCalendarScreen()),
                           );
                         },
                         onGraphPressed: _toggleAchievementPanel,
+                        onDateSelected: (selected) {
+                          setState(() {
+                            _selectedDate = selected;
+                          });
+                        },
                       ),
+
+                      // ✅ 드롭다운 영역 (선택된 날짜의 미션)
+                      if (_selectedDate != null)
+                        AnimatedSwitcher(
+                          duration: Duration(milliseconds: 300),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: MyMissionList(
+                                key: ValueKey(_selectedDate),
+                                filterDate: _selectedDate,
+                              ),
+                            ),
+                          ),
+                        ),
+
                       SizedBox(height: 20),
 
-                      // 최신 게시글
+                      // ✅ 최신 게시글
                       LatestPosts(
-                        onNavigateToCommunity: widget.onNavigateToCommunity, // 이 줄 추가
+                        onNavigateToCommunity: widget.onNavigateToCommunity,
                       ),
                       SizedBox(height: 20),
                     ],
@@ -75,10 +108,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ];
             },
-            body: FriendListWidget(), // 친구 목록을 스크롤 가능한 본체로 설정
+            body: FriendListWidget(),
           ),
 
-          // 성취도 패널
+          // ✅ 성취도 패널
           if (_showAchievementPanel)
             Positioned.fill(
               child: GestureDetector(

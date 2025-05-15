@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON 변환을 위해 추가
 import 'package:intl/intl.dart'; // 날짜 포맷을 위해 추가
@@ -69,7 +70,7 @@ class _MyMissionListState extends State<MyMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade50,
+      backgroundColor: Colors.white,
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : missions.isEmpty
@@ -169,6 +170,129 @@ class _MyMissionListState extends State<MyMissionList> {
     if (dateString == null || dateString.isEmpty) {
       return null;
     }
+    try {
+      return DateTime.parse(dateString);
+    } catch (e) {
+      print('Invalid date format: $dateString, error: $e');
+      return null;
+    }
+  }
+}
+*/
+
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:intl/intl.dart';
+import '../../../SessionTokenManager.dart';
+import 'MyMissionCard.dart';
+
+class MyMissionList extends StatefulWidget {
+  final DateTime? filterDate;
+  final Key? key;
+
+  const MyMissionList({this.key, this.filterDate}) : super(key: key); // key 지원
+
+  @override
+  _MyMissionListState createState() => _MyMissionListState();
+}
+
+class _MyMissionListState extends State<MyMissionList> {
+  List<Map<String, dynamic>> missions = [];
+  bool isLoading = true;
+  String currentUserId = 'your_user_id';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMissions();
+  }
+
+  Future<void> fetchMissions() async {
+    try {
+      final response = await SessionTokenManager.get(
+        'http://27.113.11.48:3000/api/missions/missions/assigned',
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        final List<Map<String, dynamic>> fetchedMissions =
+        (responseData['missions'] as List<dynamic>)
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+
+        final DateTime today = DateTime.now();
+        final DateTime baseDate = widget.filterDate ?? today;
+
+        final List<Map<String, dynamic>> filteredMissions =
+        fetchedMissions.where((mission) {
+          final deadline = mission['m_deadline'];
+          if (deadline == null) return false;
+          final date = parseDateTime(deadline);
+          return date != null &&
+              date.year == baseDate.year &&
+              date.month == baseDate.month &&
+              date.day == baseDate.day;
+        }).toList();
+
+        setState(() {
+          missions = filteredMissions;
+          isLoading = false;
+        });
+      } else {
+        setState(() => isLoading = false);
+        print('Failed to load missions. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() => isLoading = false);
+      print('Error fetching missions: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : missions.isEmpty
+        ? SizedBox(
+      height: 200, // 미션이 없어도 일정 높이 확보
+      child: Center(
+        child: Text(
+          '미션 없음',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    )
+        : buildMissionList();
+  }
+
+
+  Widget buildMissionList() {
+    missions.sort((a, b) {
+      final dateA = parseDateTime(a['m_deadline']) ?? DateTime(1970);
+      final dateB = parseDateTime(b['m_deadline']) ?? DateTime(1970);
+      return dateA.compareTo(dateB);
+    });
+
+    return ListView(
+      children: missions.map((mission) {
+        final isRequestStatus = mission['m_status'] == "요청";
+        return AbsorbPointer(
+          absorbing: isRequestStatus,
+          child: Opacity(
+            opacity: isRequestStatus ? 0.5 : 1.0,
+            child: MissionCard(
+              mission: mission,
+              currentUserId: currentUserId,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  DateTime? parseDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) return null;
     try {
       return DateTime.parse(dateString);
     } catch (e) {

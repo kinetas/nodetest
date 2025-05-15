@@ -1,93 +1,175 @@
 import 'package:flutter/material.dart';
-import 'ProfileEditScreen.dart';
-import '../../../WebRTC/WebRTCtest.dart';
-import '../../../WebRTC/WebRTCtest2.dart';
+import 'package:permission_handler/permission_handler.dart';
+import '../SettingWidgets/ProfileEditScreen.dart';
 
-/// 중단부 설정 옵션 리스트를 표시하는 위젯
-/// 각 옵션 클릭 시 해당 기능 페이지로 이동하거나 콜백을 통해 처리
-class SettingOptionsList extends StatelessWidget {
-  /// ✅ 프로필 편집 결과를 상위 위젯으로 전달하는 콜백 (nullable)
+class SettingOptionsList extends StatefulWidget {
   final Function(String name, ImageProvider image)? onProfileEdited;
 
-  const SettingOptionsList({
-    super.key,
-    this.onProfileEdited,
-  });
+  const SettingOptionsList({super.key, this.onProfileEdited});
+
+  @override
+  State<SettingOptionsList> createState() => _SettingOptionsListState();
+}
+
+class _SettingOptionsListState extends State<SettingOptionsList> {
+  bool _isPublicExpanded = false;
+  bool _isSecurityExpanded = false;
+
+  int _publicOption = 0; // 0: 공개, 1: 친구만 공개, 2: 비공개
+  bool _autoLoginEnabled = true;
 
   @override
   Widget build(BuildContext context) {
-    final List<String> options = [
-      '프로필 편집',
-      '계정 공개 범위 설정',
-      '친구 관리',
-      '기기 권한 설정',
-      '보안 설정',
-      'Web RTC test',
-      'Web RTC test2',
-    ];
-
     return Column(
-      children: options.map((option) {
-        return Column(
-          children: [
-            InkWell(
-              onTap: () {
-                if (option == '프로필 편집') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileEditScreen(),
-                    ),
-                  ).then((result) {
-                    if (result != null && result is Map) {
-                      final String name = result['name'];
-                      final ImageProvider image = result['image'];
-                      if (onProfileEdited != null) {
-                        onProfileEdited!(name, image);
-                      }
-                    }
-                  });
+      children: [
+        /// ✅ 프로필 편집
+        _buildSimpleTile(
+          title: '프로필 편집',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileEditScreen()),
+            ).then((result) {
+              if (result != null && result is Map<String, dynamic>) {
+                final name = result['name'];
+                final image = result['image'];
+                if (widget.onProfileEdited != null) {
+                  widget.onProfileEdited!(name, image);
                 }
+              }
+            });
+          },
+        ),
 
-                else if (option == 'Web RTC test') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const WebRTCtest(),
+        /// ✅ 계정 공개 범위 설정
+        _buildExpandableTile(
+          title: '계정 공개 범위 설정',
+          isExpanded: _isPublicExpanded,
+          onTap: () => setState(() => _isPublicExpanded = !_isPublicExpanded),
+          child: Column(
+            children: List.generate(3, (index) {
+              final labels = ['공개', '친구만 공개', '비공개'];
+              return _buildRadioOption(
+                label: labels[index],
+                selected: _publicOption == index,
+                onTap: () => setState(() => _publicOption = index),
+              );
+            }),
+          ),
+        ),
+
+        /// ✅ 보안 설정
+        _buildExpandableTile(
+          title: '보안 설정',
+          isExpanded: _isSecurityExpanded,
+          onTap: () => setState(() => _isSecurityExpanded = !_isSecurityExpanded),
+          child: Column(
+            children: [
+              _buildRadioOption(
+                label: '자동 로그인',
+                selected: _autoLoginEnabled,
+                onTap: () => setState(() => _autoLoginEnabled = !_autoLoginEnabled),
+              ),
+
+              /// ✅ 비밀번호 관리 - 클릭 애니메이션만 적용
+              InkWell(
+                onTap: () {
+                  print('비밀번호 관리 클릭됨');
+                },
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Center(
+                    child: Text(
+                      '비밀번호 관리',
+                      style: const TextStyle(fontSize: 14),
                     ),
-                  );
-                }
-                else if (option == 'Web RTC test2') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const WebRTCtest2(),
-                    ),
-                  );
-                } else {
-                  print('$option 클릭됨 (아직 연결 안됨)');
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Center(
-                  child: Text(
-                    option,
-                    style: const TextStyle(fontSize: 16.0),
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+
+        /// ✅ 기기 권한 설정
+        _buildSimpleTile(
+          title: '기기 권한 설정',
+          onTap: () => openAppSettings(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSimpleTile({required String title, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        child: Center(
+          child: Text(
+            title,
+            style: const TextStyle(fontSize: 20),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandableTile({
+    required String title,
+    required bool isExpanded,
+    required VoidCallback onTap,
+    required Widget child,
+  }) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            child: Center(
+              child: Text(
+                title,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+              ),
             ),
-            const Divider(
-              height: 1,
-              thickness: 0.5,
-              color: Colors.grey,
-              indent: 16,
-              endIndent: 16,
-            ),
-          ],
-        );
-      }).toList(),
+          ),
+        ),
+        AnimatedCrossFade(
+          firstChild: const SizedBox.shrink(),
+          secondChild: child,
+          crossFadeState:
+          isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 200),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRadioOption({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 14)),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.circle,
+                size: 10,
+                color: selected ? Colors.blue : Colors.grey,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

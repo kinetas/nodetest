@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart'; // 날짜 포맷 변경을 위한 패키지
-import '../../../SessionCookieManager.dart';
+import '../../../SessionTokenManager.dart';
 
 class MyCompleteMissionList extends StatefulWidget {
   @override
@@ -20,8 +20,8 @@ class _MyCompleteMissionListState extends State<MyCompleteMissionList> {
 
   Future<void> fetchCompletedMissions() async {
     try {
-      // SessionCookieManager를 활용하여 API 호출
-      final response = await SessionCookieManager.get(
+      // SessionTokenManager를 활용하여 API 호출
+      final response = await SessionTokenManager.get(
         'http://27.113.11.48:3000/api/missions/missions/completed',
       );
 
@@ -64,7 +64,7 @@ class _MyCompleteMissionListState extends State<MyCompleteMissionList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue.shade50, // 배경색
+      backgroundColor: Colors.white, // 배경색
 
       body: isLoading
           ? Center(child: CircularProgressIndicator()) // 로딩 중

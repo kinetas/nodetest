@@ -93,7 +93,7 @@ router.get('/yearly', loginRequired, async (req, res) => {
 });
 
 // ✅ 성공한 미션 수 조회 API
-router.get('/getSuccessMissionNumber', loginRequired, async (req, res) => {
+router.get('/success-count', loginRequired, async (req, res) => {
     try {
         const userId = req.currentUserId;
         const successCount = await resultController.getSuccessMissionNumber(userId);
@@ -104,7 +104,7 @@ router.get('/getSuccessMissionNumber', loginRequired, async (req, res) => {
 });
 
 // ✅ 실패한 미션 수 조회 API
-router.get('/getFailMissionNumber', loginRequired, async (req, res) => {
+router.get('/fail-count', loginRequired, async (req, res) => {
     try {
         const userId = req.currentUserId;
         const failCount = await resultController.getFailMissionNumber(userId);

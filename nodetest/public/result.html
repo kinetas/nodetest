@@ -55,7 +55,7 @@
         };
 
         const fetchCount = (type, elementId) => {
-            fetch(`/result/${type}`, {
+            fetch(`/result/${type}-count`, {
                 headers: {
                     Authorization: `Bearer ${token}` 
                 }
@@ -70,8 +70,8 @@
             });
         };
 
-        fetchCount('getSuccessMissionNumber', 'successCount');
-        fetchCount('getFailMissionNumber', 'failCount');
+        fetchCount('success', 'successCount');
+        fetchCount('fail', 'failCount');
 
         fetchRate('daily', 'dailyRate');
         fetchRate('weekly', 'weeklyRate');

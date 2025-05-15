@@ -54,7 +54,7 @@ app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 app.use('/dashboard', timeConverterMiddleware, missionRoutes);
 app.use('/api/rooms', timeConverterMiddleware, loginRequired, roomRoutes);
 app.use('/api/missions', timeConverterMiddleware, loginRequired, missionRoutes);
-app.use('/result', timeConverterMiddleware, loginRequired, resultRoutes);
+app.use('/result', timeConverterMiddleware, resultRoutes);
 app.use('/dashboard/friends', timeConverterMiddleware, loginRequired, friendRoutes);
 app.use('/api/cVote', timeConverterMiddleware, loginRequired, cVoteRoutes);
 app.use('/api/comumunity_missions', timeConverterMiddleware, loginRequired, c_missionRoutes);

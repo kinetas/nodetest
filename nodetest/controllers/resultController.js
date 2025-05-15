@@ -167,3 +167,35 @@ exports.getYearlyAchievementRate = async (userId) => {
         throw error;
     }
 };
+
+// ✅ 성공한 미션 수 조회
+exports.getSuccessMissionNumber = async (userId) => {
+    try {
+        const successCount = await MResult.count({
+            where: {
+                u_id: userId,
+                m_status: '성공',
+            },
+        });
+        return successCount;
+    } catch (error) {
+        console.error('성공한 미션 수 조회 오류:', error);
+        throw error;
+    }
+};
+
+// ✅ 실패한 미션 수 조회
+exports.getFailMissionNumber = async (userId) => {
+    try {
+        const failCount = await MResult.count({
+            where: {
+                u_id: userId,
+                m_status: '실패',
+            },
+        });
+        return failCount;
+    } catch (error) {
+        console.error('실패한 미션 수 조회 오류:', error);
+        throw error;
+    }
+};

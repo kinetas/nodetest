@@ -92,4 +92,26 @@ router.get('/yearly', loginRequired, async (req, res) => {
     }
 });
 
+// ✅ 성공한 미션 수 조회 API
+router.get('/getSuccessMissionNumber', loginRequired, async (req, res) => {
+    try {
+        const userId = req.currentUserId;
+        const successCount = await resultController.getSuccessMissionNumber(userId);
+        res.json({ successCount });
+    } catch (error) {
+        res.status(500).json({ error: '성공한 미션 수 조회 실패' });
+    }
+});
+
+// ✅ 실패한 미션 수 조회 API
+router.get('/getFailMissionNumber', loginRequired, async (req, res) => {
+    try {
+        const userId = req.currentUserId;
+        const failCount = await resultController.getFailMissionNumber(userId);
+        res.json({ failCount });
+    } catch (error) {
+        res.status(500).json({ error: '실패한 미션 수 조회 실패' });
+    }
+});
+
 module.exports = router;

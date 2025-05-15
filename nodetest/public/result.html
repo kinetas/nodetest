@@ -59,10 +59,15 @@
 
         const token = localStorage.getItem('jwt_token'); // ✅ JWT 토큰
 
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/';
+        }
+
         const fetchRate = (type, elementId) => {
         fetch(`/result/${type}`, {
             headers: {
-            Authorization: `Bearer ${token}` // ✅ JWT 토큰 포함
+                Authorization: `Bearer ${token}` // ✅ JWT 토큰 포함
             }
         })
         .then(res => res.json())

@@ -108,6 +108,8 @@
                     <button onclick="acceptCommunityMission('${mission.cr_num}')">수락</button>
                     <button onclick="deleteCommunityMission('${mission.cr_num}')">삭제</button>
                     <button onclick="recommendCommunityMission('${mission.cr_num}')">추천</button>
+                    <button onclick="location.href='/community_comments.html?cr_num=${c.cr_num}'">상세보기</button>
+                    
                 `;
                 list.appendChild(listItem);
             });

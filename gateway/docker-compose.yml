@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  api_gateway:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # ✅ auth
+      - AUTH_SERVER1_URL=http://<EC2-AUTH1-IP>:8000
+      - AUTH_SERVER2_URL=http://<EC2-AUTH2-IP>:8000
+
+      # ✅ intent
+      - INTENT_SERVER_URL=http://<EC2-AI-IP>:8002
+
+      # ✅ rag
+      - RAG_SERVER_URL=http://<EC2-AI-IP>:8004
+
+      # ✅ nodetest
+      - NODETEST_URL=http://<EC2-NODE-IP>:3001
+
+      # ✅ webRTC
+      - WEBRTC_SERVER_URL=http://<EC2-WEBRTC-IP>:4000

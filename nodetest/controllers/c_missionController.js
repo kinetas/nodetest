@@ -202,6 +202,11 @@ const { Op } = require('sequelize'); // [추가됨]
 
 //============미션===============
 
+function shortenContent(content, maxLength = 100) {
+    if (!content) return '';
+    return content.length > maxLength ? content.slice(0, maxLength) + '...' : content;
+}
+
 // 커뮤니티 미션 생성 (JWT 적용)
 exports.createCommunityMission = async (req, res) => {
     const { cr_title, contents, deadline, category } = req.body;
@@ -438,6 +443,29 @@ exports.getCommunityMission = async (req, res) => {
     }
 };
 
+// 커뮤니티 미션 리스트 출력 - 내용 간략화 버전
+exports.getCommunityMissionSimple = async (req, res) => {
+    try {
+        const missions = await CRoom.findAll({
+            where: { community_type: 'mission' },
+            order: [['deadline', 'ASC']],
+        });
+
+        const missionList = missions.map(m => ({
+            cr_num: m.cr_num,
+            cr_title: m.cr_title,
+            contents: shortenContent(m.contents, 100),
+            cr_status: m.cr_status,
+            deadline: m.deadline
+        }));
+
+        res.json({ missions: missionList });
+    } catch (error) {
+        console.error('커뮤니티 미션 간략 리스트 오류:', error);
+        res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류 발생' });
+    }
+};
+
 
 //============일반===============
 
@@ -501,6 +529,31 @@ exports.printGeneralCommunity = async (req, res) => {
     } catch (error) {
         console.error('일반 커뮤니티 리스트 출력 오류:', error);
         res.status(500).json({ message: '일반 커뮤니티 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// 일반 커뮤니티 글 리스트 출력 - 내용 간략화 버전
+exports.printGeneralCommunitySimple = async (req, res) => {
+    try {
+        const communities = await CRoom.findAll({
+            where: { community_type: 'general' },
+            order: [['maded_time', 'DESC']]
+        });
+
+        const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
+            cr_title: c.cr_title,
+            contents: shortenContent(c.contents, 100),
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
+    } catch (error) {
+        console.error('일반 커뮤니티 간략 리스트 오류:', error);
+        res.status(500).json({ message: '일반 커뮤니티 리스트를 불러오는 중 오류 발생' });
     }
 };
 
@@ -592,6 +645,31 @@ exports.getPopularyityCommunity = async (req, res) => {
     } catch (error) {
         console.error('인기글 리스트 오류:', error);
         res.status(500).json({ message: '인기글 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// 인기글 리스트 출력 - 내용 간략화 버전
+exports.getPopularyityCommunitySimple = async (req, res) => {
+    try {
+        const communities = await CRoom.findAll({
+            where: { popularity: true },
+            order: [['deadline', 'ASC']],
+        });
+
+        const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
+            cr_title: c.cr_title,
+            contents: shortenContent(c.contents, 100),
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
+    } catch (error) {
+        console.error('인기글 간략 리스트 오류:', error);
+        res.status(500).json({ message: '인기글 리스트를 불러오는 중 오류 발생' });
     }
 };
 

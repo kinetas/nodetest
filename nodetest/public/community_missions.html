@@ -92,7 +92,8 @@
         }
 
         // 커뮤니티 미션 리스트 불러오기 (비공개가 아닌 이상 로그인 필요 없지만, 토큰 포함도 가능)
-        fetch('/api/comumunity_missions/list', {
+        // fetch('/api/comumunity_missions/list', {
+        fetch('/api/comumunity_missions/getCommunityMissionSimple', {
             headers: {
                 'Authorization': `Bearer ${token}` // ✅ 로그인 필요 없으면 제거 가능
             }
@@ -179,7 +180,8 @@
 
         // 일반 커뮤니티 리스트 로딩
         function loadGeneralCommunities() {
-            fetch('/api/comumunity_missions/printGeneralCommunityList', {
+            // fetch('/api/comumunity_missions/printGeneralCommunityList', {
+            fetch('/api/comumunity_missions/printGeneralCommunitySimple', {
                 headers: { 'Authorization': `Bearer ${token}` },
             })
             .then(response => response.json())
@@ -205,7 +207,8 @@
 
         // 인기글 리스트 로딩
         function loadpopularityCommunities() {
-            fetch('/api/comumunity_missions/getpopularyityCommunityList', {
+            // fetch('/api/comumunity_missions/getpopularyityCommunityList', {
+            fetch('/api/comumunity_missions/getpopularyityCommunitySimple', {
                 headers: { 'Authorization': `Bearer ${token}` },
             })
             .then(response => response.json())

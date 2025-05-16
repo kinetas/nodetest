@@ -1,12 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logDir = path.join(__dirname, '../logs');
-const logPath = path.join(logDir, 'user_actions.log');
-
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-}
+const logPath = path.join(process.cwd(), 'user_actions.log');;
 
 function logUserAction(userId, action, req) {
     const log = {

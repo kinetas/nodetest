@@ -121,6 +121,7 @@ exports.createMission = async (req, res) => {
                     missionAuthenticationAuthority,
                     category,
                 });
+                console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
                 await logUserAction(u1_id, 'create_mission', req);
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
@@ -187,6 +188,7 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
+            console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
             await logUserAction(u1_id, 'create_mission', req);
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
@@ -273,6 +275,7 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
+            console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
             await logUserAction(u1_id, 'create_mission', req);
 
             // ================ 알림 추가 - 디바이스 토큰 =======================

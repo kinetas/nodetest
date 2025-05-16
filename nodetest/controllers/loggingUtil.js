@@ -1,18 +1,23 @@
-const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
-async function logUserAction(userId, action, req) {
-    try {
-        await axios.post('http://27.113.11.48:3000/api/logs/log-action', {
-            userId,
-            action,
-        }, {
-            headers: {
-                Authorization: req.headers.authorization, // JWT 유지
-            }
-        });
-    } catch (e) {
-        console.error('🔴 로그 기록 실패:', e.message);
-    }
+const logDir = path.join(__dirname, '../logs');
+const logPath = path.join(logDir, 'user_actions.log');
+
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir);
+}
+
+function logUserAction(userId, action, req) {
+    const log = {
+        timestamp: new Date().toISOString(),
+        userId,
+        action,
+        ip: req.ip,
+        ua: req.headers['user-agent']
+    };
+
+    fs.appendFileSync(logPath, JSON.stringify(log) + '\n');
 }
 
 module.exports = { logUserAction };

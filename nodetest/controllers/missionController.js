@@ -10,7 +10,7 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
-const { logUserAction } = require('./loggingUtil');
+const { logUserAction } = require('../controllers/loggingUtil');
 
 // //============================================================================
 // const { io } = require('../socketServer');

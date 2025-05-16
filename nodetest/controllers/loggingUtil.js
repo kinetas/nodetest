@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function logUserAction(userId, action, req) {
     try {
-        await axios.post('http://localhost:3000/api/logs/log-action', {
+        await axios.post('http://27.113.11.48:3000/api/logs/log-action', {
             userId,
             action,
         }, {

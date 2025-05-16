@@ -10,6 +10,8 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
+const { logUserAction } = require('./loggingUtil');
+
 // //============================================================================
 // const { io } = require('../socketServer');
 // const RMessage = require('../models/messageModel'); // 메시지 모델 가져오기
@@ -119,6 +121,7 @@ exports.createMission = async (req, res) => {
                     missionAuthenticationAuthority,
                     category,
                 });
+                await logUserAction(u1_id, 'create_mission', req);
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
             
@@ -184,6 +187,7 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
+            await logUserAction(u1_id, 'create_mission', req);
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
@@ -269,6 +273,7 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
+            await logUserAction(u1_id, 'create_mission', req);
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
             
@@ -717,6 +722,7 @@ exports.successMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+        await logUserAction(u1_id, 'create_mission', req);
 
         // //==============================리워드 기능 추가==============================
         // if (mission.u1_id === mission.u2_id){
@@ -806,6 +812,7 @@ exports.failureMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+        await logUserAction(u1_id, 'create_mission', req);
 
         // 현재 시간 저장
         const currentTime = new Date();

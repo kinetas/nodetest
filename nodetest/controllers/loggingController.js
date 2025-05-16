@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const logPath = path.join(__dirname, '../logs/user_actions.log');
+const logDir = path.join(__dirname, '../logs');
+const logPath = path.join(logDir, 'user_actions.log');
+
+// 디렉토리가 없으면 생성
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir);
+}
 
 exports.logUserAction = (req, res) => {
     const userId = req.currentUserId || 'anonymous';

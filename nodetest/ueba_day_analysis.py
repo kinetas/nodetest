@@ -20,5 +20,14 @@ features = df.groupby('userId').apply(lambda g: pd.Series({
 model = IsolationForest(contamination=0.2)
 features['is_bot'] = model.fit_predict(features.drop(columns='userId'))
 
+# 룰 기반: avg_interval이 3초 미만이면 봇으로 간주
+features['rule_based_bot'] = features['avg_interval'] < 3.0
+
+# 모델과 수동 조건 중 하나라도 만족하면 is_bot_final = -1 (이상 사용자)
+features['is_bot_final'] = features.apply(
+    lambda row: -1 if (row['is_bot'] == -1 or row['rule_based_bot']) else 1,
+    axis=1
+)
+
 # 결과 확인
-print(features.sort_values('is_bot'))
+print(features.sort_values('is_bot_final'))

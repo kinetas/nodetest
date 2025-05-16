@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logPath = path.join(process.cwd(), 'user_actions.log');
+const logPath = path.join(__dirname, '../user_actions.log');
 
 function logUserAction(userId, action, req) {
     try {

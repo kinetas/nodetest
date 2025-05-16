@@ -64,10 +64,6 @@ app.use('/api/ai', aiRoutes);
 app.use('/api', leagueRoutes);
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제
 
-// =============논문================
-const loggingRoutes = require('./routes/loggingRoutes');
-app.use('/api/logs', loggingRoutes);
-
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));

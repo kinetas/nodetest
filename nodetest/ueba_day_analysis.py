@@ -1,6 +1,6 @@
 import json
-import pandas as pd
-from sklearn.ensemble import IsolationForest
+import pandas as pd # type: ignore
+from sklearn.ensemble import IsolationForest # type: ignore
 
 with open("logs/user_actions.log") as f:
     logs = [json.loads(line) for line in f]

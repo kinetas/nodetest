@@ -67,6 +67,12 @@
     <h2>인증 권한 부여 미션</h2>
     <ul id="grantedAuthorityMissions">로딩 중...</ul>
 
+    <h2>📊 미션 통계</h2>
+    <ul>
+        <li id="createMissionCount">생성한 미션 수: 로딩 중...</li>
+        <li id="assignedMissionCount">수행 중인 미션 수: 로딩 중...</li>
+    </ul>
+
     <!-- 미션 작업 UI -->
     <h2>미션 작업</h2>
     <div class="form-container">
@@ -589,6 +595,32 @@
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 권한자: ${m.missionAuthenticationAuthority}, 대상: ${m.u2_id}`;
             return li;
+        });
+
+        // 생성한 미션 수 가져오기
+        fetch('/dashboard/missions/createMissionCount', {
+            headers: { 'Authorization': `Bearer ${jwtToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('createMissionCount').textContent = `생성한 미션 수: ${data.createMissionCount}`;
+        })
+        .catch(err => {
+            console.error('생성한 미션 수 조회 실패:', err);
+            document.getElementById('createMissionCount').textContent = '생성한 미션 수 조회 실패';
+        });
+
+        // 수행 중인 미션 수 가져오기
+        fetch('/dashboard/missions/assignedMissionCount', {
+            headers: { 'Authorization': `Bearer ${jwtToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('assignedMissionCount').textContent = `수행 중인 미션 수: ${data.assignedMissionCount}`;
+        })
+        .catch(err => {
+            console.error('수행 중인 미션 수 조회 실패:', err);
+            document.getElementById('assignedMissionCount').textContent = '수행 중인 미션 수 조회 실패';
         });
     </script>
 </body>

@@ -24,6 +24,8 @@ router.get('/missions/friendAssigned', loginRequired, getFriendAssignedMissions)
 router.get('/missions/friendCompleted', loginRequired, getFriendCompletedMissions); //printmissionlist
 router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAuthority); //printmissionlist
 router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions); //printmissionlist
+router.get('/missions/getCreateMissionNumber', loginRequired, getCreateMissionNumber); //printmissionlist
+router.get('/missions/getAssignedMissionNumber', loginRequired, getAssignedMissionNumber); //printmissionlist
 
 router.post('/missioncreate', loginRequired, createMission); // dashboard
 router.delete('/missiondelete', loginRequired, deleteMission); //printmissionlist

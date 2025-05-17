@@ -614,6 +614,38 @@ exports.getMissionsWithGrantedAuthority = async (req, res) => {
     }
 };
 
+// 자신이 생성한 미션 수 출력
+exports.getCreateMissionNumber = async (req, res) => {
+    try {
+        const userId = req.currentUserId;
+        const count = await Mission.count({
+            where: { u1_id: userId }
+        });
+        res.json({ createMissionCount: count });
+    } catch (error) {
+        console.error('getCreateMissionNumber error:', error);
+        res.status(500).json({ message: '생성한 미션 수 조회 실패' });
+    }
+};
+
+// 자신이 수행 중인 미션 수 출력
+exports.getAssignedMissionNumber = async (req, res) => {
+    try {
+        const userId = req.currentUserId;
+        const count = await Mission.count({
+            where: {
+                u2_id: userId,
+                m_status: { [Op.in]: ['진행중', '요청'] },
+            },
+        });
+        res.json({ assignedMissionCount: count });
+    } catch (error) {
+        console.error('getAssignedMissionNumber error:', error);
+        res.status(500).json({ message: '수행 중인 미션 수 조회 실패' });
+    }
+};
+
+
 // 미션 인증 요청 함수
 exports.requestMissionApproval = async (req, res) => {
     const { m_id } = req.body; // 클라이언트에서 미션 ID 전달

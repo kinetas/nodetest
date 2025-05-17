@@ -4,8 +4,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt install -y \
     clang llvm gcc make libbpf-dev iproute2 \
-    bpfcc-tools bpftrace bpftool \
-    linux-headers-$(uname -r)
+    bpfcc-tools bpftrace \
+    linux-headers-generic \
+    linux-tools-generic \
+    linux-tools-$(uname -r)
 
 WORKDIR /app
 

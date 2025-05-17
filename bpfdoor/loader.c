@@ -40,8 +40,7 @@ int main() {
     link = bpf_program__attach_tracepoint(prog, "syscalls", "sys_enter_connect");
     if (libbpf_get_error(link)) {
         fprintf(stderr, "Failed to attach tracepoint\n");
-        link = NULL;
-        goto cleanup;
+        return 1;
     }
 
     printf("✅ BPF program loaded and attached! Press Ctrl+C to stop.\n");
@@ -50,7 +49,6 @@ int main() {
         sleep(1);
     }
 
-cleanup:
     bpf_link__destroy(link);
     bpf_object__close(obj);
     return 0;

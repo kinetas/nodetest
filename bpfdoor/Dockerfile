@@ -7,8 +7,8 @@ RUN apt update && apt install -y \
     bpfcc-tools bpftrace \
     linux-headers-generic \
     linux-tools-generic \
-    linux-tools-$(uname -r)
-
+    linux-tools-$(uname -r) \
+    linux-libc-dev linux-source
 WORKDIR /app
 
 COPY trace_connect.c .

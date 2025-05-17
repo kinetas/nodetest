@@ -598,7 +598,7 @@
         });
 
         // 생성한 미션 수 가져오기
-        fetch('/dashboard/missions/createMissionCount', {
+        fetch('/dashboard/missions/getCreateMissionNumber', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())
@@ -611,7 +611,7 @@
         });
 
         // 수행 중인 미션 수 가져오기
-        fetch('/dashboard/missions/assignedMissionCount', {
+        fetch('/dashboard/missions/getAssignedMissionNumber', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())

@@ -10,8 +10,6 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
-const { logUserAction } = require('../controllers/loggingUtil');
-
 // //============================================================================
 // const { io } = require('../socketServer');
 // const RMessage = require('../models/messageModel'); // 메시지 모델 가져오기
@@ -121,8 +119,6 @@ exports.createMission = async (req, res) => {
                     missionAuthenticationAuthority,
                     category,
                 });
-                console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
-                await logUserAction(u1_id, 'create_mission', req);
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
             
@@ -188,8 +184,6 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
-            console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
-            await logUserAction(u1_id, 'create_mission', req);
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
@@ -275,8 +269,6 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
-            console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
-            await logUserAction(u1_id, 'create_mission', req);
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
             

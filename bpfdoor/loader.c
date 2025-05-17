@@ -21,25 +21,25 @@ int main() {
 
     obj = bpf_object__open_file("trace_connect.o", NULL);
     if (libbpf_get_error(obj)) {
-        fprintf(stderr, "Failed to open BPF object\n");
+        fprintf(stderr, "❌ Failed to open BPF object\n");
         return 1;
     }
 
     err = bpf_object__load(obj);
     if (err) {
-        fprintf(stderr, "Failed to load BPF object\n");
+        fprintf(stderr, "❌ Failed to load BPF object\n");
         return 1;
     }
 
     prog = bpf_object__find_program_by_name(obj, "trace_connect");
     if (!prog) {
-        fprintf(stderr, "Failed to find BPF program\n");
+        fprintf(stderr, "❌ Failed to find BPF program\n");
         return 1;
     }
 
     link = bpf_program__attach_tracepoint(prog, "syscalls", "sys_enter_connect");
     if (libbpf_get_error(link)) {
-        fprintf(stderr, "Failed to attach tracepoint\n");
+        fprintf(stderr, "❌ Failed to attach tracepoint\n");
         return 1;
     }
 

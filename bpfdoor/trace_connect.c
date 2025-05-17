@@ -1,4 +1,4 @@
-#include <uapi/linux/ptrace.h>
+#include <linux/ptrace.h>
 #include <net/sock.h>
 #include <linux/inet.h>
 #include <linux/tcp.h>

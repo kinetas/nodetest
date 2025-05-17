@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 # 마운트 확인
-mount -t debugfs none /sys/kernel/debug || true
-mount -t bpffs bpffs /sys/fs/bpf || true
+#mount -t debugfs none /sys/kernel/debug || true
+#mount -t bpffs bpffs /sys/fs/bpf || true
 
 echo "[*] Building BPF..."
 make clean && make

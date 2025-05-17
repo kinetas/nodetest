@@ -1,7 +1,4 @@
 #include <linux/ptrace.h>
-#include <net/sock.h>
-#include <linux/inet.h>
-#include <linux/tcp.h>
 #include <linux/bpf.h>
 #include <bpf/bpf_helpers.h>
 

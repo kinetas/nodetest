@@ -9,6 +9,10 @@ RUN apt update && apt install -y \
     linux-tools-generic \
     linux-tools-$(uname -r) \
     linux-libc-dev linux-source
+
+# vmlinux.h 생성
+RUN bpftool btf dump file /sys/kernel/btf/vmlinux format c > /app/vmlinux.h
+
 WORKDIR /app
 
 COPY trace_connect.c .

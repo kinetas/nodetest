@@ -587,6 +587,23 @@ exports.getFriendCompletedMissions = async (req, res) => {
             },
         });
 
+        // 3. 각 미션에 대해 m_result 테이블에서 m_status, image 가져오기
+        const missionsWithStatus = await Promise.all(
+            completedMissions.map(async (mission) => {
+                const result = await MResult.findOne({
+                    where: { m_id: mission.m_id, u_id: userId },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                    mission_result_image: result?.mission_result_image || null,
+                };
+            })
+        );
+
         res.status(200).json({ missions });
     } catch (error) {
         console.error('친구가 완료한 미션 조회 오류:', error);

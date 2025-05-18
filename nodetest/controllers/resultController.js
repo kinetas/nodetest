@@ -11,6 +11,7 @@ exports.saveResult = async (m_id, u_id, m_deadline, m_status, category) => {
             m_deadline,
             m_status,
             category,
+            mission_result_image,
         });
         return { success: true, message: 'm_result에 데이터가 성공적으로 저장되었습니다.' };
     } catch (error) {

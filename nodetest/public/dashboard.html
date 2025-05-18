@@ -124,10 +124,10 @@
         .then(data => {
             document.getElementById('greeting').textContent = `Hello, ${data.userId}`;
             if (data.profile_image) {
-                const base64Image = btoa(
-                new Uint8Array(data.profile_image.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-                );
-                document.getElementById('profileImage').src = `data:image/jpeg;base64,${base64Image}`;
+                const uint8Array = new Uint8Array(data.profile_image.data);
+                const blob = new Blob([uint8Array], { type: 'image/jpeg' }); // 또는 image/png
+                const url = URL.createObjectURL(blob);
+                document.getElementById('profileImage').src = url;
             }
         })
         .catch(() => {

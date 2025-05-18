@@ -262,7 +262,22 @@
 
         fetchMissions('/dashboard/missions/completed', 'completedMissions', m => {
             const li = document.createElement('li');
-            li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}, 인증사진: ${m.mission_result_image}`;
+            li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
+            // ✅ 이미지가 존재하면 표시
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
+
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = '인증 이미지';
+                img.style.maxWidth = '200px';
+                img.style.marginTop = '10px';
+
+                li.appendChild(document.createElement('br'));
+                li.appendChild(img);
+            }
             return li;
         });
 

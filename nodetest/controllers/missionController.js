@@ -591,13 +591,14 @@ exports.getFriendCompletedMissions = async (req, res) => {
         const missionsWithStatus = await Promise.all(
             missions.map(async (mission) => {
                 const result = await MResult.findOne({
-                    where: { m_id: mission.m_id, u_id: userId },
+                    where: { m_id: mission.m_id, u_id: mission.u2_id },
                 });
 
                 return {
                     m_id: mission.m_id,
                     m_title: mission.m_title,
                     m_deadline: mission.m_deadline,
+                    u_id: mission.u2_id,
                     m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
                     mission_result_image: result?.mission_result_image || null,
                 };

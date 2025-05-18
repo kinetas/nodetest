@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const userInfoController = require('../controllers/userInfoController');
 const loginRequired = require('../middleware/loginRequired'); // ✅ JWT 미들웨어
+const multer = require('multer');
+const upload = multer();
 
 router.get('/user-id', loginRequired, userInfoController.getLoggedInUserId);
 router.get('/user-nickname', loginRequired, userInfoController.getLoggedInUserNickname);

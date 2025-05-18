@@ -115,7 +115,7 @@
         console.log("jwt_token: ", jwtToken)
 
         // ✅ 사용자 정보
-        fetch('/user-info', {
+        fetch('/api/user-info/user-all', {
             headers: {
                 'Authorization': `Bearer ${jwtToken}`
             }

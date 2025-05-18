@@ -262,7 +262,7 @@
 
         fetchMissions('/dashboard/missions/completed', 'completedMissions', m => {
             const li = document.createElement('li');
-            li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
+            li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}, 인증사진: ${m.mission_result_image}`;
             return li;
         });
 

@@ -484,6 +484,7 @@ exports.getCompletedMissions = async (req, res) => {
                     m_title: mission.m_title,
                     m_deadline: mission.m_deadline,
                     m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                    mission_result_image: mission.mission_image,
                 };
             })
         );

@@ -31,7 +31,8 @@ router.post('/missioncreate', loginRequired, createMission); // dashboard
 router.delete('/missiondelete', loginRequired, deleteMission); //printmissionlist
 router.post('/successMission', loginRequired, successMission); //printmissionlist
 router.post('/failureMission', loginRequired, failureMission); //printmissionlist
-router.post('/missionRequest', loginRequired, requestMissionApproval); //printmissionlist
+// router.post('/missionRequest', loginRequired, requestMissionApproval); //printmissionlist
+router.post('/missionRequest', loginRequired, upload.single('image'), requestMissionApproval);
 router.post('/missionVote', loginRequired, upload.single('c_image'), requestVoteForMission); //printmissionlist
 router.post('/printRoomMission', loginRequired, printRoomMission); //chat
 

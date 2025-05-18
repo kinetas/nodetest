@@ -666,10 +666,11 @@ exports.requestMissionApproval = async (req, res) => {
         }
 
         // 정확히 해당 미션만 상태를 "요청"으로 변경
-        const updated = await Mission.update(
-            { m_status: '요청' },
-            { where: { m_id, u2_id: userId } } // 정확히 조건 추가
-        );
+        const updated = await Mission.update({ 
+            m_status: '요청',
+            mission_image: req.file?.buffer || null
+        }, { where: { m_id, u2_id: userId }
+        });
 
         if (updated[0] === 0) {
             return res.status(400).json({ success: false, message: '미션 상태를 변경할 수 없습니다.' });

@@ -24,6 +24,10 @@ const MResult = sequelize.define('MResult', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  mission_result_image: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
 }, {
   tableName: 'm_result',
   timestamps: false,

@@ -604,7 +604,7 @@ exports.getFriendCompletedMissions = async (req, res) => {
             })
         );
 
-        res.status(200).json({ missionsWithStatus });
+        res.status(200).json({ missions: missionsWithStatus });
     } catch (error) {
         console.error('친구가 완료한 미션 조회 오류:', error);
         res.status(500).json({ message: '친구가 완료한 미션을 조회하는 중 오류가 발생했습니다.' });

@@ -589,7 +589,7 @@ exports.getFriendCompletedMissions = async (req, res) => {
 
         // 3. 각 미션에 대해 m_result 테이블에서 m_status, image 가져오기
         const missionsWithStatus = await Promise.all(
-            completedMissions.map(async (mission) => {
+            missions.map(async (mission) => {
                 const result = await MResult.findOne({
                     where: { m_id: mission.m_id, u_id: userId },
                 });
@@ -604,7 +604,7 @@ exports.getFriendCompletedMissions = async (req, res) => {
             })
         );
 
-        res.status(200).json({ missions });
+        res.status(200).json({ missionsWithStatus });
     } catch (error) {
         console.error('친구가 완료한 미션 조회 오류:', error);
         res.status(500).json({ message: '친구가 완료한 미션을 조회하는 중 오류가 발생했습니다.' });

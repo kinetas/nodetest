@@ -758,6 +758,7 @@ exports.successMission = async (req, res) => {
             currentTime, // 현재 시간 전달
             '성공',
             mission.category,
+            mission.mission_image,
         );
 
         // saveResultResponse가 성공하지 않은 경우
@@ -842,6 +843,7 @@ exports.failureMission = async (req, res) => {
             currentTime, // 현재 시간 전달
             '실패',
             mission.category,
+            mission.mission_image,
         );
 
         // saveResultResponse가 성공하지 않은 경우

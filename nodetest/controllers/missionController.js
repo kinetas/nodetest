@@ -880,7 +880,7 @@ exports.failureMission = async (req, res) => {
             const lpReq = {
                 body: {
                     user_id: mission.u2_id,
-                    success: true
+                    success: false
                 }
             };
             const lpRes = {

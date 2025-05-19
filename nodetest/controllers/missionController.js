@@ -10,13 +10,7 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
-const { logUserAction } = require('../controllers/loggingUtil');
-
-// //============================================================================
-// const { io } = require('../socketServer');
-// const RMessage = require('../models/messageModel'); // 메시지 모델 가져오기
-// const { sendMessage } = require('../socketServer'); // sendMessage 가져오기
-// //============================================================================
+const leagueController = require('../controllers/leagueController');
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
@@ -121,8 +115,6 @@ exports.createMission = async (req, res) => {
                     missionAuthenticationAuthority,
                     category,
                 });
-                console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
-                await logUserAction(u1_id, 'create_mission', req);
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
             
@@ -188,8 +180,6 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
-            console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
-            await logUserAction(u1_id, 'create_mission', req);
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {
@@ -275,8 +265,6 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
-            console.log('📌 로그 작성 직전:', u1_id, 'create_mission');
-            await logUserAction(u1_id, 'create_mission', req);
 
             // ================ 알림 추가 - 디바이스 토큰 =======================
             
@@ -496,6 +484,7 @@ exports.getCompletedMissions = async (req, res) => {
                     m_title: mission.m_title,
                     m_deadline: mission.m_deadline,
                     m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                    mission_result_image: result?.mission_result_image || null,
                 };
             })
         );
@@ -537,6 +526,7 @@ exports.getGivenCompletedMissions = async (req, res) => {
                     m_title: mission.m_title,
                     m_deadline: mission.m_deadline,
                     m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                    mission_result_image: result?.mission_result_image || null,
                 };
             })
         );
@@ -598,7 +588,25 @@ exports.getFriendCompletedMissions = async (req, res) => {
             },
         });
 
-        res.status(200).json({ missions });
+        // 3. 각 미션에 대해 m_result 테이블에서 m_status, image 가져오기
+        const missionsWithStatus = await Promise.all(
+            missions.map(async (mission) => {
+                const result = await MResult.findOne({
+                    where: { m_id: mission.m_id, u_id: mission.u2_id },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    u_id: mission.u2_id,
+                    m_status: result ? result.m_status : '정보 없음', // m_result의 m_status 값
+                    mission_result_image: result?.mission_result_image || null,
+                };
+            })
+        );
+
+        res.status(200).json({ missions: missionsWithStatus });
     } catch (error) {
         console.error('친구가 완료한 미션 조회 오류:', error);
         res.status(500).json({ message: '친구가 완료한 미션을 조회하는 중 오류가 발생했습니다.' });
@@ -621,6 +629,38 @@ exports.getMissionsWithGrantedAuthority = async (req, res) => {
         res.status(500).json({ message: '인증 권한 부여 미션을 조회하는 중 오류가 발생했습니다.' });
     }
 };
+
+// 자신이 생성한 미션 수 출력
+exports.getCreateMissionNumber = async (req, res) => {
+    try {
+        const userId = req.currentUserId;
+        const count = await Mission.count({
+            where: { u1_id: userId }
+        });
+        res.json({ createMissionCount: count });
+    } catch (error) {
+        console.error('getCreateMissionNumber error:', error);
+        res.status(500).json({ message: '생성한 미션 수 조회 실패' });
+    }
+};
+
+// 자신이 수행 중인 미션 수 출력
+exports.getAssignedMissionNumber = async (req, res) => {
+    try {
+        const userId = req.currentUserId;
+        const count = await Mission.count({
+            where: {
+                u2_id: userId,
+                m_status: { [Op.in]: ['진행중', '요청'] },
+            },
+        });
+        res.json({ assignedMissionCount: count });
+    } catch (error) {
+        console.error('getAssignedMissionNumber error:', error);
+        res.status(500).json({ message: '수행 중인 미션 수 조회 실패' });
+    }
+};
+
 
 // 미션 인증 요청 함수
 exports.requestMissionApproval = async (req, res) => {
@@ -646,10 +686,11 @@ exports.requestMissionApproval = async (req, res) => {
         }
 
         // 정확히 해당 미션만 상태를 "요청"으로 변경
-        const updated = await Mission.update(
-            { m_status: '요청' },
-            { where: { m_id, u2_id: userId } } // 정확히 조건 추가
-        );
+        const updated = await Mission.update({ 
+            m_status: '요청',
+            mission_image: req.file?.buffer || null
+        }, { where: { m_id, u2_id: userId }
+        });
 
         if (updated[0] === 0) {
             return res.status(400).json({ success: false, message: '미션 상태를 변경할 수 없습니다.' });
@@ -725,29 +766,6 @@ exports.successMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
-        await logUserAction(u1_id, 'create_mission', req);
-
-        // //==============================리워드 기능 추가==============================
-        // if (mission.u1_id === mission.u2_id){
-        //     await User.update(
-        //         { reward: Sequelize.literal('reward + 100') },
-        //         { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
-        //     );
-        // }
-        // else{
-        //     // 미션 생성자 reward 50 추가
-        //     await User.update(
-        //         // { reward: Sequelize.literal('reward + 50') },
-        //         { reward: Sequelize.literal('reward + 50') },
-        //         { where: { u_id: mission.u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
-        //     );
-        //     // 미션 성공자 reward 100 추가
-        //     await User.update(
-        //         { reward: Sequelize.literal('reward + 100') },
-        //         { where: { u_id: mission.u2_id } }
-        //     );
-        // }
-        // //==============================리워드 기능 추가==============================
 
         // 현재 시간 저장
         const currentTime = new Date();
@@ -760,6 +778,7 @@ exports.successMission = async (req, res) => {
             currentTime, // 현재 시간 전달
             '성공',
             mission.category,
+            mission.mission_image,
         );
 
         // saveResultResponse가 성공하지 않은 경우
@@ -769,6 +788,23 @@ exports.successMission = async (req, res) => {
                 message: `결과 저장 중 오류가 발생했습니다. controller: ${saveResultResponse.error || '알 수 없는 오류'}`,
                 error: saveResultResponse.error || '알 수 없는 오류',
             });
+        }
+
+        // ✅ LP 반영
+        try {
+            const lpReq = {
+                body: {
+                    user_id: mission.u2_id,
+                    success: true
+                }
+            };
+            const lpRes = {
+                status: () => ({ json: () => {} }),
+                json: () => {}
+            };
+            await leagueController.updateLpOnMission(lpReq, lpRes);
+        } catch (lpError) {
+            console.error('LP 업데이트 실패:', lpError);
         }
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
@@ -815,7 +851,6 @@ exports.failureMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
-        await logUserAction(u1_id, 'create_mission', req);
 
         // 현재 시간 저장
         const currentTime = new Date();
@@ -828,20 +863,8 @@ exports.failureMission = async (req, res) => {
             currentTime, // 현재 시간 전달
             '실패',
             mission.category,
+            mission.mission_image,
         );
-
-        // //==============================리워드 기능 추가==============================
-        // // 미션 생성자 reward 50 삭감
-        // await User.update(
-        //     { reward: Sequelize.literal('CASE WHEN reward - 25 < 0 THEN 0 ELSE reward - 25 END') },
-        //     { where: { u_id: u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
-        // );
-        // // 미션 성공자 reward 100 삭감
-        // await User.update(
-        //     { reward: Sequelize.literal('CASE WHEN reward - 50 < 0 THEN 0 ELSE reward - 50 END') },
-        //     { where: { u_id: mission.u2_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
-        // );
-        // //==============================리워드 기능 추가==============================
 
         // saveResultResponse가 성공하지 않은 경우
         if (!saveResultResponse.success) {
@@ -852,14 +875,22 @@ exports.failureMission = async (req, res) => {
             });
         }
 
-        // // saveResultResponse가 성공하지 않은 경우
-        // if (!saveResultResponse.success) {
-        //     return res.status(500).json({
-        //         success: false,
-        //         message: `결과 저장 중 오류가 발생했습니다.`,
-        //         error: saveResultResponse.error || '알 수 없는 오류',
-        //     });
-        // }
+        // ✅ LP 반영
+        try {
+            const lpReq = {
+                body: {
+                    user_id: mission.u2_id,
+                    success: true
+                }
+            };
+            const lpRes = {
+                status: () => ({ json: () => {} }),
+                json: () => {}
+            };
+            await leagueController.updateLpOnMission(lpReq, lpRes);
+        } catch (lpError) {
+            console.error('LP 업데이트 실패:', lpError);
+        }
 
         // ================ 알림 추가 - 디바이스 토큰 =======================
         if (u1_id !== mission.u2_id){
@@ -980,6 +1011,23 @@ exports.checkMissionDeadline = async () => {
                     m_deadline: new Date(deadline.getTime() - 10 * 60 * 1000), // 마감 기한을 10분 줄임
                 });
 
+                // ✅ LP 반영
+                try {
+                    const lpReq = {
+                        body: {
+                            user_id: mission.u2_id,
+                            success: true
+                        }
+                    };
+                    const lpRes = {
+                        status: () => ({ json: () => {} }),
+                        json: () => {}
+                    };
+                    await leagueController.updateLpOnMission(lpReq, lpRes);
+                } catch (lpError) {
+                    console.error('LP 업데이트 실패:', lpError);
+                }
+
                 await MResult.create({
                     m_id: mission.m_id,
                     u_id: mission.u2_id,
@@ -1022,6 +1070,23 @@ exports.checkMissionDeadline = async () => {
             ) {
                 // 2. 날짜가 변함
                 await mission.update({ m_status: '완료' });
+
+                // ✅ LP 반영
+                try {
+                    const lpReq = {
+                        body: {
+                            user_id: mission.u2_id,
+                            success: true
+                        }
+                    };
+                    const lpRes = {
+                        status: () => ({ json: () => {} }),
+                        json: () => {}
+                    };
+                    await leagueController.updateLpOnMission(lpReq, lpRes);
+                } catch (lpError) {
+                    console.error('LP 업데이트 실패:', lpError);
+                }
 
                 await MResult.create({
                     m_id: mission.m_id,

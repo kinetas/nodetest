@@ -126,7 +126,17 @@ async function runWeeklyLeagueEvaluation() {
               type: QueryTypes.UPDATE
             }
           );
-        }
+        // 포인트 50 지급
+        await db.query(
+          `INSERT INTO user_points (user_id, points)
+            VALUES (:user_id, 50)
+            ON DUPLICATE KEY UPDATE points = points + 50`,
+            {
+            replacements: { user_id },
+            type: QueryTypes.INSERT
+          }
+        );
+      }
 
         // ✅ 무조건 처리 완료로 표시
         processedUsers.add(userId);

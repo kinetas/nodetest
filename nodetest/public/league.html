@@ -75,7 +75,7 @@
 
     async function assignLeague() {
       const user_id = getUserId();
-      const res = await fetch(`${baseUrl}/league/assign`, {
+      const res = await fetch(`api/league/assign`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id })
@@ -86,7 +86,7 @@
 
     async function getLeagueDetail() {
       const user_id = getUserId();
-      const res = await fetch(`${baseUrl}/detail/${user_id}`);
+      const res = await fetch(`api/detail/${user_id}`);
       const data = await res.json();
 
       if (!data || !data.users) {
@@ -119,7 +119,7 @@
 
     async function updateLp(success) {
       const user_id = getUserId();
-      const res = await fetch(`${baseUrl}/mission-lp`, {
+      const res = await fetch(`api/mission-lp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id, success })

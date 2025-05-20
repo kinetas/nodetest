@@ -88,7 +88,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
           indicatorWeight: 3,
           tabs: [
             Tab(
-              text: '내 미션',
+              text: '미션',
               icon: Icon(Icons.list_alt), // 아이콘 추가
             ), // 1번 탭
             Tab(
@@ -99,18 +99,12 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.lightBlue.shade100, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: Colors.white,
         child: TabBarView(
           controller: _tabController,
           children: [
-            MyMissionList(), // 내 미션 리스트 (1번 탭)
-            MyCompleteMissionList(), // 완료한 미션 리스트 (2번 탭)
+            MyMissionList(),
+            MyCompleteMissionList(),
           ],
         ),
       ),

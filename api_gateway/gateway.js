@@ -67,6 +67,6 @@ app.use('/', createProxyMiddleware({
 }));
 
 // ✅ Gateway 서버 시작
-app.listen(3000, () => {
+app.listen(3000, '0.0.0.0', () => {
   console.log('🚪 API Gateway running on port 3000');
 });

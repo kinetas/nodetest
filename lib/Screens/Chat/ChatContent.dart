@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -175,6 +176,199 @@ class ChatContentState extends State<ChatContent> {
     } catch (e) {
       print("Image decoding error: $e");
       return Icon(Icons.broken_image, size: 100, color: Colors.grey);
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+}
+*/
+
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import '../../SessionTokenManager.dart';
+
+class ChatContent extends StatefulWidget {
+  final String chatId;
+  final String userId;
+  final String otherUserId;
+
+  const ChatContent({
+    required this.chatId,
+    required this.userId,
+    required this.otherUserId,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  ChatContentState createState() => ChatContentState();
+}
+
+class ChatContentState extends State<ChatContent> {
+  List<Map<String, dynamic>> messages = [];
+  bool isLoading = true;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMessages();
+  }
+
+  Future<void> _fetchMessages() async {
+    final String apiUrl = 'http://27.113.11.48:3000/chat/messages/${widget.chatId}';
+
+    try {
+      final response = await SessionTokenManager.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        setState(() {
+          messages = List<Map<String, dynamic>>.from(responseData);
+          isLoading = false;
+        });
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _scrollToBottom();
+        });
+      } else {
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      print('Error: $e');
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+  }
+
+  void addMessage(Map<String, dynamic> newMessage) {
+    setState(() {
+      messages.add(newMessage);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToBottom();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: isLoading
+          ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue)))
+          : messages.isEmpty
+          ? Center(child: Text('메시지가 없습니다.', style: TextStyle(color: Colors.grey, fontSize: 16)))
+          : ListView.builder(
+        controller: _scrollController,
+        itemCount: messages.length,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        itemBuilder: (context, index) {
+          final message = messages[index];
+          final isSender = message['u1_id'] == widget.userId;
+
+          return Align(
+            alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: message['image'] != null
+                  ? _buildImageMessage(message, isSender)
+                  : _buildTextMessage(message, isSender),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTextMessage(Map<String, dynamic> message, bool isSender) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+      constraints: BoxConstraints(maxWidth: 250),
+      decoration: BoxDecoration(
+        color: isSender ? Color(0xFFB3E5FC) : Color(0xFFF1F1F1),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(14),
+          topRight: Radius.circular(14),
+          bottomLeft: Radius.circular(isSender ? 14 : 0),
+          bottomRight: Radius.circular(isSender ? 0 : 14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            message['message_contents'] ?? '',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 15,
+              height: 1.4,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            _formatTime(message['send_date']),
+            style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImageMessage(Map<String, dynamic> message, bool isSender) {
+    try {
+      final List<dynamic> imageData = message['image']['data'];
+      final Uint8List imageBytes = Uint8List.fromList(imageData.cast<int>());
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            constraints: BoxConstraints(maxWidth: 200),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.grey.shade200,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.memory(
+                imageBytes,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.broken_image, size: 100, color: Colors.grey);
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          Text(
+            _formatTime(message['send_date']),
+            style: TextStyle(color: Colors.grey[600], fontSize: 10),
+          ),
+        ],
+      );
+    } catch (e) {
+      print("Image decoding error: $e");
+      return Icon(Icons.broken_image, size: 100, color: Colors.grey);
+    }
+  }
+
+  String _formatTime(String? dateTimeStr) {
+    if (dateTimeStr == null) return '';
+    try {
+      final dt = DateTime.parse(dateTimeStr).toLocal();
+      return "${dt.hour}:${dt.minute.toString().padLeft(2, '0')}";
+    } catch (e) {
+      return '';
     }
   }
 

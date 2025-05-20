@@ -3,7 +3,7 @@ FROM node:18
 WORKDIR /app
 
 # 소스 복사
-COPY . .
+COPY package*.json ./
 
 # 종속성 설치
 RUN npm install

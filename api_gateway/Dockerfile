@@ -12,4 +12,4 @@ RUN npm install
 RUN npm install -g pm2
 
 # PM2로 gateway.js 실행
-CMD ["pm2-runtime", "gateway.js"]
+CMD ["pm2-runtime", "/app/gateway.js"]

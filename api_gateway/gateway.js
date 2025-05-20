@@ -2,10 +2,14 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const fetch = require('node-fetch');
+require('dotenv').config();
 
 const app = express();
 
-const authTargets = ['http://auth_server_1:3000', 'http://auth_server_2:3000'];
+const authTargets = [
+  process.env.AUTH_SERVER1_URL,
+  process.env.AUTH_SERVER2_URL
+];
 let currentAuth = 0;
 
 // ✅ 비동기 헬스체크 함수
@@ -40,7 +44,7 @@ app.use('/auth', async (req, res, next) => {
 
 // ✅ /ai → rag_server
 app.use('/ai', createProxyMiddleware({
-  target: 'http://rag_server:8000',
+  target: process.env.RAG_SERVER_URL,
   changeOrigin: true,
   pathRewrite: {
     '^/ai': '', // ✅ 이거 꼭 있어야 함
@@ -49,7 +53,7 @@ app.use('/ai', createProxyMiddleware({
 
 // ✅ /intent → intent_server
 app.use('/intent', createProxyMiddleware({
-  target: 'http://intent_server:8002',
+  target: process.env.INTENT_SERVER_URL,
   changeOrigin: true,
   pathRewrite: {
     '^/intent': '',  // ✅ '/intent' 잘라내서 FastAPI에 보냄
@@ -58,7 +62,7 @@ app.use('/intent', createProxyMiddleware({
 
 // ✅ /mission → nodetest
 app.use('/', createProxyMiddleware({
-  target: 'http://nodetest:3000',
+  target: process.env.NODETEST_URL,
   changeOrigin: true,
 }));
 

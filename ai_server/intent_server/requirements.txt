@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-transformers==4.38.2
-torch==2.1.2
-accelerate==0.27.2  # ✅ 최신 버전으로 (또는 transformers 버전을 낮추려면 여기 유지)
-datasets
-evaluate
-scikit-learn
-torch==2.1.2

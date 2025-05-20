@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  nodetest:
+    build: .
+    container_name: nodetest
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: always

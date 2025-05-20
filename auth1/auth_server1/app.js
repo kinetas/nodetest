@@ -34,5 +34,5 @@ app.use((req, res) => {
 
 // ==================== 서버 시작 ====================
 app.listen(PORT, () => {
-    console.log('Auth server listening on port 3004');
+    console.log('Auth server listening on port 3000');
 });

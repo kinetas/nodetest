@@ -1,7 +1,9 @@
 version: "3.8"
 services:
   api_gateway:
-    build: .
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:

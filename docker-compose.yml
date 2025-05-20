@@ -4,10 +4,10 @@ services:
   mission:
     build:
       context: ./nodetest
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: mission
     ports:
       - "3000:3000"
     env_file:
-      - .env
+      - ./nodetest/.env
     restart: always

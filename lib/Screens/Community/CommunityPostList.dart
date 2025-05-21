@@ -108,7 +108,6 @@ class _CommunityPostListState extends State<CommunityPostList> {
 }
 */
 
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionTokenManager.dart';
@@ -136,16 +135,27 @@ class _CommunityPostListState extends State<CommunityPostList> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        setState(() {
-          missions = data['missions'];
-          isLoading = false;
-        });
+
+        // ✅ 응답 구조 확인 및 안전 파싱
+        final raw = data['missions'];
+        if (raw is List) {
+          setState(() {
+            missions = raw;
+            isLoading = false;
+          });
+        } else {
+          print('❗ missions가 리스트 타입이 아닙니다: $raw');
+          setState(() {
+            missions = [];
+            isLoading = false;
+          });
+        }
       } else {
-        print('Failed to load missions: ${response.statusCode}');
+        print('❌ 미션 요청 실패: ${response.statusCode}');
         setState(() => isLoading = false);
       }
     } catch (e) {
-      print('Error occurred while fetching missions: $e');
+      print('❗ 예외 발생: $e');
       setState(() => isLoading = false);
     }
   }
@@ -163,7 +173,12 @@ class _CommunityPostListState extends State<CommunityPostList> {
     }
 
     if (missions.isEmpty) {
-      return Center(child: Text('등록된 게시글이 없습니다.', style: TextStyle(color: Colors.grey)));
+      return Center(
+        child: Text(
+          '등록된 게시글이 없습니다.',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
     }
 
     return ListView.builder(

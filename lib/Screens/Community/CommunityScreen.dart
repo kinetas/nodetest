@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'CommunityVoteList.dart';
 import 'CommunityPostList.dart'; // CommunityPostList 클래스를 import
@@ -79,6 +80,91 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
             CommunityPostList(), // CommunityPostList 클래스를 게시판 탭으로 설정
             CommunityVoteList(), // 미션투표 탭은 별도의 클래스로 분리
           ],
+        ),
+      ),
+    );
+  }
+}
+*/
+
+
+import 'package:flutter/material.dart';
+import 'CommunityVoteList.dart';
+import 'CommunityPostList.dart';
+import 'AddPost.dart';
+import 'AddVote.dart';
+
+class CommunityScreen extends StatefulWidget {
+  @override
+  _CommunityScreenState createState() => _CommunityScreenState();
+}
+
+class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _onAddButtonPressed() {
+    if (_tabController.index == 0) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddPost()));
+    } else if (_tabController.index == 1) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddVote()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white, // ← 전체 배경 흰색 설정
+      appBar: AppBar(
+        backgroundColor: Colors.lightBlue,
+        elevation: 0,
+        title: Text(
+          '커뮤니티',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          if (_tabController.index == 0 || _tabController.index == 1)
+            IconButton(
+              icon: Icon(Icons.add, color: Colors.white),
+              onPressed: _onAddButtonPressed,
+            ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
+          tabs: [
+            Tab(icon: Icon(Icons.article_outlined), text: '게시판'),
+            Tab(icon: Icon(Icons.how_to_vote_outlined), text: '미션투표'),
+          ],
+        ),
+      ),
+      body: SafeArea( // ← 추가: 노치 영역 보호 및 전체 클립 보장
+        child: Container(
+          color: Colors.white, // ← 명확한 배경
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              CommunityPostList(),
+              CommunityVoteList(),
+            ],
+          ),
         ),
       ),
     );

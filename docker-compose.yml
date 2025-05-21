@@ -1,7 +1,8 @@
 version: "3.8"
 services:
   auth_server:
-    build: .
+    build: ./auth_server
+    container_name: auth_server
     ports:
       - "3000:3000"
     env_file:

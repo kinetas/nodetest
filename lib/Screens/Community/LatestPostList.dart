@@ -217,9 +217,10 @@ class _LatestPostsState extends State<LatestPosts> {
           ),
           SizedBox(height: 10),
 
-          // 게시글이 없을 때도 영역 유지
+          // 게시글이 없을 때
           if (posts.isEmpty)
             Container(
+              width: double.infinity,
               constraints: BoxConstraints(minHeight: 100),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -243,13 +244,14 @@ class _LatestPostsState extends State<LatestPosts> {
               ),
             ),
 
-          // 게시글이 있을 경우 리스트 렌더링
+          // 게시글 리스트 렌더링
           ...posts.map((post) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: GestureDetector(
                 onTap: widget.onNavigateToCommunity,
                 child: Container(
+                  width: double.infinity, // ✅ 좌우 길이 통일
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -263,12 +265,14 @@ class _LatestPostsState extends State<LatestPosts> {
                   ),
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start, // ✅ 좌측 정렬
                     children: [
                       Text(
                         post['title']!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: primaryColor,
                         ),
@@ -276,6 +280,8 @@ class _LatestPostsState extends State<LatestPosts> {
                       SizedBox(height: 8),
                       Text(
                         post['content']!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[800],

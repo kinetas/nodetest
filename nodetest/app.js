@@ -61,7 +61,7 @@ app.use('/api/comumunity_missions', timeConverterMiddleware, loginRequired, c_mi
 app.use('/chat', timeConverterMiddleware, loginRequired, chatRoutes);
 app.use('/api/recommendationMission', recommendationMissionRoutes); //미션 추천 라우트
 app.use('/api/ai', aiRoutes);
-app.use('/api', leagueRoutes);
+app.use('/league', leagueRoutes);
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
@@ -108,6 +108,9 @@ app.get('/recommendationMission', (req, res) => {
 });
 app.get('/findinfo', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
+});
+app.get('/league', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'league.html'));
 });
 
 // ==================== 기타 API ====================

@@ -1,9 +1,13 @@
 // ✅ Express API Gateway with auth failover (헬스체크 포함)
 const express = require('express');
+const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const fetch = require('node-fetch');
 
 const app = express();
+
+// ✅ 정적 파일 서빙
+app.use(express.static(path.join(__dirname, 'public')));
 
 const authTargets = ['http://auth_server_1:3000', 'http://auth_server_2:3000'];
 let currentAuth = 0;
@@ -61,6 +65,52 @@ app.use('/', createProxyMiddleware({
   target: 'http://nodetest:3000',
   changeOrigin: true,
 }));
+
+// ==================== 라우팅: HTML 정적 페이지 ====================
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+app.get('/community_missions', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'community_missions.html'));
+});
+app.get('/community_comments/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'community_comments.html'));
+});
+app.get('/user-info', loginRequired, (req, res) => {
+  res.json({ userId: req.currentUserId });    //JWT 토큰기반
+});
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+app.get('/rooms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'rooms.html'));
+});
+app.get('/cVote', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
+});
+app.get('/chat', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+});
+app.get('/result', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'result.html')); // result.html 경로
+});
+app.get('/printmissionlist', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'printmissionlist.html')); // printmissionlist.html 경로
+});
+app.get('/cVote/details/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'voteDetails.html'));
+});
+// 추천 미션 페이지 라우트
+app.get('/recommendationMission', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
+});
+app.get('/findinfo', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
+});
 
 // ✅ Gateway 서버 시작
 app.listen(3000, () => {

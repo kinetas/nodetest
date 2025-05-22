@@ -1,0 +1,139 @@
+<!-- public/rooms.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
+    <!-- Socket.io 클라이언트 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>방 목록</h1>
+    <ul id="roomList">Loading rooms...</ul> <!-- 방 목록을 표시할 요소 -->
+    <input type="text" id="userIdInput" placeholder="추가/삭제할 유저 ID 입력">
+    <input type="text" id="roomNameInput" placeholder="방 이름 입력"> <!-- 방 이름 입력 추가 -->
+    <input type="text" id="roomTypeInput" placeholder="방 타입 입력"> <!-- 수정 -->
+    <button onclick="addRoom()">방 추가</button>
+    <button onclick="deleteRoom()">방 삭제</button>
+    <button onclick="updateRoomName()">방 이름 변경</button>
+
+    <script>
+        //=====================================token======================================
+
+        const token = localStorage.getItem('jwt_token');
+        console.log("jwt_token(rooms.html:230): ", token);
+        if (!token) {
+            alert("로그인이 필요합니다.");
+            window.location.href = '/';
+        }
+
+        // ✅ 방 목록 불러오기
+        fetch('/api/rooms', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('roomList');
+            list.innerHTML = '';
+            (data.rooms || []).forEach(room => {
+                const li = document.createElement('li');
+                li.textContent = `${room.r_title}`;
+                const btn = document.createElement('button');
+                btn.textContent = "입장";
+                btn.onclick = () => joinRoom(room.r_id, room.u2_id);
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        });
+
+        function addRoom() {
+            const u1_id = sessionStorage.getItem('user_id')
+            const u2_id = document.getElementById('userIdInput').value;
+            const roomName = document.getElementById('roomNameInput').value;
+            const r_type = document.getElementById('roomTypeInput').value;
+            fetch('/api/rooms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}` // ✅ JWT 적용
+                },
+                body: JSON.stringify({ u1_id, u2_id, roomName, r_type })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function deleteRoom() {
+            const u2_id = document.getElementById('userIdInput').value;
+            const r_type = document.getElementById('roomTypeInput').value || 'general';
+            fetch(`/api/rooms/${u2_id}/${r_type}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function updateRoomName() {
+            const u2_id = document.getElementById('userIdInput').value;
+            const newRoomName = document.getElementById('roomNameInput').value;
+            const r_type = document.getElementById('roomTypeInput').value;
+            fetch('/api/rooms/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ u2_id, newRoomName, r_type })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function joinRoom(r_id, u2_id) {
+            fetch('/api/rooms/enter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ r_id, u2_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+            });
+        }
+
+    </script>
+</body>
+</html>

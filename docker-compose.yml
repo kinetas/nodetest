@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  signaling-server:
+    build: .
+    container_name: webrtc-signaling
+    ports:
+      - "3005:3005"
+    restart: unless-stopped
+
+  turn-server:
+    image: instrumentisto/coturn
+    container_name: turn
+    ports:
+      - "3478:3478"
+      - "5349:5349"
+      - "3478:3478/udp"
+      - "5349:5349/udp"
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf
+    command: ["-c", "/etc/coturn/turnserver.conf"]
+    restart: unless-stopped

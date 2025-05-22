@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: MyMissionList(
                                 key: ValueKey(_selectedDate),
+                                selectedDate: _selectedDate,
                               ),
                             ),
                           ),

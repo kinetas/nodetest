@@ -188,8 +188,9 @@ import 'MyMissionCard.dart';
 
 class MyMissionList extends StatefulWidget {
   final Key? key;
+  final DateTime? selectedDate;
 
-  const MyMissionList({this.key}) : super(key: key);
+  const MyMissionList({this.key, this.selectedDate}) : super(key: key);
 
   @override
   _MyMissionListState createState() => _MyMissionListState();
@@ -199,7 +200,6 @@ class _MyMissionListState extends State<MyMissionList> {
   List<Map<String, dynamic>> missions = [];
   bool isLoading = true;
   String currentUserId = 'your_user_id';
-  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -215,8 +215,13 @@ class _MyMissionListState extends State<MyMissionList> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        final dynamic rawMissions = responseData['missions'];
         final List<Map<String, dynamic>> fetchedMissions =
-        (responseData['missions'] as List<dynamic>)
+        rawMissions is List
+            ? rawMissions.map((item) => Map<String, dynamic>.from(item)).toList()
+            : (rawMissions as Map<String, dynamic>)
+            .values
             .map((item) => Map<String, dynamic>.from(item))
             .toList();
 
@@ -234,107 +239,40 @@ class _MyMissionListState extends State<MyMissionList> {
     }
   }
 
-  Future<void> _pickDate() async {
-    DateTime now = DateTime.now();
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate ?? now,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 1),
-      locale: const Locale('ko', 'KR'),
-    );
-
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
-
-  void _clearFilter() {
-    setState(() {
-      selectedDate = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 60), // 버튼 공간 확보
-          child: _buildMissionList(),
-        ),
-        Positioned(
-          top: 10,
-          right: 16,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              ElevatedButton.icon(
-                onPressed: _pickDate,
-                icon: Icon(Icons.calendar_today, size: 16),
-                label: Text(
-                  selectedDate == null
-                      ? '날짜'
-                      : DateFormat('MM/dd').format(selectedDate!),
-                  style: TextStyle(fontSize: 13),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding:
-                  EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  backgroundColor: Colors.lightBlue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-              if (selectedDate != null)
-                TextButton(
-                  onPressed: _clearFilter,
-                  child: Text(
-                    '전체 보기',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+    if (isLoading) {
+      return const Center(child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: CircularProgressIndicator(),
+      ));
+    }
 
-  Widget _buildMissionList() {
-    final filtered = selectedDate == null
+    final filtered = widget.selectedDate == null
         ? missions
         : missions.where((mission) {
-      final deadline = parseDateTime(mission['m_deadline']);
+      final deadline = parseDateTime(mission['m_deadline'])?.toLocal();
       if (deadline == null) return false;
-      return deadline.year == selectedDate!.year &&
-          deadline.month == selectedDate!.month &&
-          deadline.day == selectedDate!.day;
+      return deadline.year == widget.selectedDate!.year &&
+          deadline.month == widget.selectedDate!.month &&
+          deadline.day == widget.selectedDate!.day;
     }).toList();
 
-    filtered.sort((a, b) {
-      final dateA = parseDateTime(a['m_deadline']) ?? DateTime(1970);
-      final dateB = parseDateTime(b['m_deadline']) ?? DateTime(1970);
-      return dateA.compareTo(dateB);
-    });
-
     if (filtered.isEmpty) {
-      return Center(
-        child: Text(
-          '미션 없음',
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+      return const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center(
+          child: Text(
+            '미션 없음',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
         ),
       );
     }
 
     return ListView(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       children: filtered.map((mission) {
         final isRequestStatus = mission['m_status'] == "요청";
         return AbsorbPointer(

@@ -196,7 +196,7 @@ import '../../SessionTokenManager.dart';
 class WeeklyCalendar extends StatefulWidget {
   final VoidCallback onAddPressed;
   final VoidCallback onGraphPressed;
-  final void Function(DateTime?)? onDateSelected; // ✅ DateTime? 타입으로 변경
+  final void Function(DateTime?)? onDateSelected;
 
   WeeklyCalendar({
     required this.onAddPressed,
@@ -233,13 +233,16 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
     try {
       final response = await SessionTokenManager.get(url);
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> missionList = responseData['missions'] ?? [];
 
         Map<String, int> tempTaskCount = {};
-        for (var mission in data) {
+        for (var item in missionList) {
+          final mission = item as Map<String, dynamic>;
           final deadline = mission['m_deadline'];
           if (deadline != null) {
-            final date = DateFormat('yyyy-MM-dd').format(DateTime.parse(deadline));
+            final date = DateFormat('yyyy-MM-dd')
+                .format(DateTime.parse(deadline).toLocal());
             tempTaskCount[date] = (tempTaskCount[date] ?? 0) + 1;
           }
         }
@@ -250,15 +253,11 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
         });
       } else {
         print('Failed to fetch missions: ${response.statusCode}');
-        setState(() {
-          isLoading = false;
-        });
+        setState(() => isLoading = false);
       }
     } catch (e) {
       print('Error fetching missions: $e');
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     }
   }
 
@@ -273,16 +272,15 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
 
   void _goToToday() {
     setState(() {
-      selectedDate = today; // 파란색 강조를 오늘로 설정
+      selectedDate = today;
       currentPage = 10000;
       displayYear = today.year;
       displayMonth = today.month;
       _pageController.jumpToPage(currentPage);
     });
 
-    // ⛔ 드롭다운은 닫고 ✅ 파란색 강조는 유지
     if (widget.onDateSelected != null) {
-      widget.onDateSelected!(null); // 드롭다운만 없애기
+      widget.onDateSelected!(null);
     }
   }
 
@@ -311,14 +309,14 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
       ),
       child: Column(
         children: [
-          // 상단 월 표시 및 버튼들
           Row(
             children: [
               Expanded(
                 child: Center(
                   child: Text(
                     '$displayYear년 $displayMonth월',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -349,7 +347,7 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                 setState(() {
                   currentPage = index;
                   DateTime weekStart = _getStartOfWeek(
-                      today.add(Duration(days: (currentPage - 10000) * 7)));
+                      today.add(Duration(days: (index - 10000) * 7)));
                   displayYear = weekStart.year;
                   displayMonth = weekStart.month;
                 });
@@ -361,7 +359,8 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: List.generate(7, (dayOffset) {
-                    DateTime date = weekStart.add(Duration(days: dayOffset));
+                    DateTime date =
+                    weekStart.add(Duration(days: dayOffset));
                     bool isToday = date.year == today.year &&
                         date.month == today.month &&
                         date.day == today.day;
@@ -385,10 +384,13 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                         width: 50,
                         padding: EdgeInsets.symmetric(vertical: 6),
                         decoration: BoxDecoration(
-                          color: isSelected ? selectedColor : Colors.transparent,
+                          color: isSelected
+                              ? selectedColor
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(30),
                           border: isToday
-                              ? Border.all(color: selectedColor, width: 2)
+                              ? Border.all(
+                              color: selectedColor, width: 2)
                               : null,
                         ),
                         child: Column(
@@ -401,9 +403,11 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                                 fontWeight: FontWeight.bold,
                                 color: isSelected
                                     ? Colors.white
-                                    : (date.weekday == DateTime.sunday
+                                    : (date.weekday ==
+                                    DateTime.sunday
                                     ? Colors.red
-                                    : date.weekday == DateTime.saturday
+                                    : date.weekday ==
+                                    DateTime.saturday
                                     ? Colors.blue
                                     : Colors.black),
                               ),
@@ -414,7 +418,9 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: isSelected ? Colors.white : Colors.black,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
                             ),
                             SizedBox(height: 4),
@@ -422,7 +428,9 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                               '${taskCount}개',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isSelected ? Colors.white : Colors.grey[700],
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey[700],
                               ),
                             ),
                           ],

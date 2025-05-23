@@ -3,6 +3,10 @@ module.exports = {
       {
         name: "app",
         script: "app.js",
+      },
+      {
+        name: "socket",
+        script: "socketServer.js",
       }
     ],
   };

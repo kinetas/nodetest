@@ -51,7 +51,7 @@
                     localStorage.setItem('id_token', data.idToken);
                     localStorage.setItem('jwt_token', data.jwtToken);
                     alert('✅ Keycloak + JWT 로그인 완료!(index.html:104)');
-                    window.location.href = '/dashboard';
+                    window.location.href = '/mission/dashboard';
                 } else {
                     throw new Error(data.message || '로그인 실패(index.html:107)');
                 }

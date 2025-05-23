@@ -97,7 +97,7 @@
     <button onclick="window.location.href='/cVote'">커뮤니티 투표</button>
     <button onclick="window.location.href='/community_missions'">커뮤니티 미션</button>
 
-    <!-- public/dashboard.html -->
+    <!-- public/mission/dashboard.html -->
     <button onclick="window.location.href='/rooms'">방</button>
 
     <button onclick="window.location.href='/result'">달성률 보기</button>
@@ -115,7 +115,7 @@
         console.log("jwt_token: ", jwtToken)
 
         // ✅ 사용자 정보
-        fetch('/api/user-info/user-all', {
+        fetch('/mission/api/user-info/user-all', {
             headers: {
                 'Authorization': `Bearer ${jwtToken}`
             }
@@ -136,7 +136,7 @@
         });
 
         // ✅ 미션 목록
-        fetch('/dashboard/missions', {
+        fetch('/mission/dashboard/missions', {
             headers: {
                 'Authorization': `Bearer ${jwtToken}`
             }
@@ -153,7 +153,7 @@
         });
 
         // ✅ i_friend 목록
-        fetch('/dashboard/friends/ifriends', {
+        fetch('/mission/dashboard/friends/ifriends', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())
@@ -168,7 +168,7 @@
         });
 
         // ✅ t_friend 목록
-        fetch('/dashboard/friends/tfriends', {
+        fetch('/mission/dashboard/friends/tfriends', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())
@@ -202,7 +202,7 @@
                 category: document.getElementById('category').value,
             };
 
-            fetch('/dashboard/missioncreate', {
+            fetch('/mission/dashboard/missioncreate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -231,7 +231,7 @@
         function friendDelete() {
             const f_id = document.getElementById('if_id_input').value;
 
-            fetch('/dashboard/friends/delete', {
+            fetch('/mission/dashboard/friends/delete', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -250,7 +250,7 @@
         function friendRequestSend() {
             const f_id = document.getElementById('tf_id_input').value;
 
-            fetch('/dashboard/friends/request', {
+            fetch('/mission/dashboard/friends/request', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -269,7 +269,7 @@
         function friendRequestAccept() {
             const f_id = document.getElementById('tf_id_input').value;
 
-            fetch('/dashboard/friends/accept', {
+            fetch('/mission/dashboard/friends/accept', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -288,7 +288,7 @@
         function friendRequestReject() {
             const f_id = document.getElementById('tf_id_input').value;
 
-            fetch('/dashboard/friends/reject', {
+            fetch('/mission/dashboard/friends/reject', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -367,7 +367,7 @@
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
 
-        const response = await fetch('/api/user-info/chaingeProfileImage', {
+        const response = await fetch('/mission/api/user-info/chaingeProfileImage', {
             method: 'POST',
             headers: {
             'Authorization': `Bearer ${jwtToken}`

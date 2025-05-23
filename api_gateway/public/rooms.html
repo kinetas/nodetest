@@ -42,7 +42,7 @@
         }
 
         // ✅ 방 목록 불러오기
-        fetch('/api/rooms', {
+        fetch('/mission/api/rooms', {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -67,7 +67,7 @@
             const u2_id = document.getElementById('userIdInput').value;
             const roomName = document.getElementById('roomNameInput').value;
             const r_type = document.getElementById('roomTypeInput').value;
-            fetch('/api/rooms', {
+            fetch('/mission/api/rooms', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,7 +85,7 @@
         function deleteRoom() {
             const u2_id = document.getElementById('userIdInput').value;
             const r_type = document.getElementById('roomTypeInput').value || 'general';
-            fetch(`/api/rooms/${u2_id}/${r_type}`, {
+            fetch(`/mission/api/rooms/${u2_id}/${r_type}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,7 +103,7 @@
             const u2_id = document.getElementById('userIdInput').value;
             const newRoomName = document.getElementById('roomNameInput').value;
             const r_type = document.getElementById('roomTypeInput').value;
-            fetch('/api/rooms/update', {
+            fetch('/mission/api/rooms/update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -119,7 +119,7 @@
         }
 
         function joinRoom(r_id, u2_id) {
-            fetch('/api/rooms/enter', {
+            fetch('/mission/api/rooms/enter', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

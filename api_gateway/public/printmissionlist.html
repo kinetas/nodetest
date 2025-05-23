@@ -90,7 +90,7 @@
         <button type="submit">미션 요청</button>
     </form>
 
-    <button onclick="window.location.href='/dashboard'">대시보드로 돌아가기</button>
+    <button onclick="window.location.href='/mission/dashboard'">대시보드로 돌아가기</button>
 
     <script>
         //========================================token=====================================
@@ -113,7 +113,7 @@
                 formData.append('c_image', fileInput.files[0]);
             }
 
-            fetch('/dashboard/missionVote', {
+            fetch('/mission/dashboard/missionVote', {
                 method: 'POST',
                 headers: authHeaderKeyCloak,
                 body: formData
@@ -130,7 +130,7 @@
             const m_id = document.getElementById('m_id').value;
             if (!m_id) return alert("미션 ID를 입력하세요.");
 
-            fetch('/dashboard/missiondelete', {
+            fetch('/mission/dashboard/missiondelete', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -149,7 +149,7 @@
             const m_id = document.getElementById('m_id').value;
             if (!m_id) return alert("미션 ID를 입력하세요.");
 
-            fetch('/dashboard/successMission', {
+            fetch('/mission/dashboard/successMission', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -168,7 +168,7 @@
             const m_id = document.getElementById('m_id').value;
             if (!m_id) return alert("미션 ID를 입력하세요.");
 
-            fetch('/dashboard/failureMission', {
+            fetch('/mission/dashboard/failureMission', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -187,7 +187,7 @@
             const m_id = document.getElementById('m_id').value;
             if (!m_id) return alert("미션 ID를 입력하세요.");
 
-            fetch('/dashboard/missionRequest', {
+            fetch('/mission/dashboard/missionRequest', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -208,7 +208,7 @@
             formData.append('m_id', m_id);
             if (image) formData.append('image', image);
 
-            const response = await fetch('/dashboard/missionRequest', {
+            const response = await fetch('/mission/dashboard/missionRequest', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
@@ -237,7 +237,7 @@
                 .catch(err => console.error(`${endpoint} 오류:`, err));
         };
 
-        fetchMissions('/dashboard/missions/selfRequested', 'selfRequestedMissions', m => {
+        fetchMissions('/mission/dashboard/missions/selfRequested', 'selfRequestedMissions', m => {
             const li = document.createElement('li');
             li.className = 'mission-item';
             li.innerHTML = `
@@ -248,19 +248,19 @@
             return li;
         });
 
-        fetchMissions('/dashboard/missions/assigned', 'assignedMissions', m => {
+        fetchMissions('/mission/dashboard/missions/assigned', 'assignedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u2_id}, 마감일: ${m.m_deadline}`;
             return li;
         });
 
-        fetchMissions('/dashboard/missions/created', 'createdMissions', m => {
+        fetchMissions('/mission/dashboard/missions/created', 'createdMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 부여자: ${m.u1_id}, 수행자: ${m.u2_id}, 마감일: ${m.m_deadline}`;
             return li;
         });
 
-        fetchMissions('/dashboard/missions/completed', 'completedMissions', m => {
+        fetchMissions('/mission/dashboard/missions/completed', 'completedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
             // ✅ 이미지가 존재하면 표시
@@ -281,7 +281,7 @@
             return li;
         });
 
-        fetchMissions('/dashboard/missions/givenCompleted', 'givenCompletedMissions', m => {
+        fetchMissions('/mission/dashboard/missions/givenCompleted', 'givenCompletedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
             // ✅ 이미지가 존재하면 표시
@@ -302,13 +302,13 @@
             return li;
         });
 
-        fetchMissions('/dashboard/missions/friendAssigned', 'friendAssignedMissions', m => {
+        fetchMissions('/mission/dashboard/missions/friendAssigned', 'friendAssignedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u2_id}, 마감일: ${m.m_deadline}`;
             return li;
         });
 
-        fetchMissions('/dashboard/missions/friendCompleted', 'friendCompletedMissions', m => {
+        fetchMissions('/mission/dashboard/missions/friendCompleted', 'friendCompletedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u_id}, 완료일: ${m.m_deadline}`;
             // ✅ 이미지가 존재하면 표시
@@ -329,14 +329,14 @@
             return li;
         });
 
-        fetchMissions('/dashboard/missions/grantedAuthority', 'grantedAuthorityMissions', m => {
+        fetchMissions('/mission/dashboard/missions/grantedAuthority', 'grantedAuthorityMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 권한자: ${m.missionAuthenticationAuthority}, 대상: ${m.u2_id}`;
             return li;
         });
 
         // 생성한 미션 수 가져오기
-        fetch('/dashboard/missions/getCreateMissionNumber', {
+        fetch('/mission/dashboard/missions/getCreateMissionNumber', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())
@@ -349,7 +349,7 @@
         });
 
         // 수행 중인 미션 수 가져오기
-        fetch('/dashboard/missions/getAssignedMissionNumber', {
+        fetch('/mission/dashboard/missions/getAssignedMissionNumber', {
             headers: { 'Authorization': `Bearer ${jwtToken}` }
         })
         .then(res => res.json())

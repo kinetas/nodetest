@@ -34,7 +34,7 @@
             loadVoteDetails(c_number);
         }
         function loadVoteDetails() {
-            fetch(`/api/cVote/details?c_number=${c_number}`, {
+            fetch(`/mission/api/cVote/details?c_number=${c_number}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
@@ -58,7 +58,7 @@
         }
 
         function voteAction(action) {
-            fetch('/api/cVote/action', {
+            fetch('/mission/api/cVote/action', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json', 

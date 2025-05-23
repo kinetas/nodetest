@@ -66,9 +66,9 @@ app.use('/api', leagueRoutes);
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 
-app.get('/user-info', loginRequired, (req, res) => {
-    res.json({ userId: req.currentUserId });    //JWT 토큰기반
-});
+// app.get('/user-info', loginRequired, (req, res) => {
+//     res.json({ userId: req.currentUserId });    //JWT 토큰기반
+// });
 
 
 // ==================== 기타 API ====================

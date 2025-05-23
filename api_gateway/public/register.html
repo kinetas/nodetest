@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+</head>
+<body>
+    <h1>회원가입</h1>
+    <form id="registerForm">
+        <input type="text" id="u_id" placeholder="아이디" required><br><br>
+        <input type="password" id="u_password" placeholder="비밀번호" required><br><br>
+        <input type="text" id="u_nickname" placeholder="닉네임" required><br><br>
+        <input type="text" id="u_name" placeholder="이름" required><br><br>
+        <input type="date" id="u_birth" placeholder="생년월일" required><br><br>
+        <input type="text" id="u_mail" placeholder="메일" required><br><br>
+        <button type="submit">회원가입</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const body = {
+                u_id: document.getElementById("u_id").value,
+                u_password: document.getElementById("u_password").value,
+                u_mail: document.getElementById("u_mail").value,
+                u_nickname: document.getElementById("u_nickname").value,
+                u_name: document.getElementById("u_name").value,
+                u_birth: document.getElementById("u_birth").value,
+            };
+
+            // fetch('/api/auth/register-keycloak-direct', {
+            fetch('/auth/register-keycloak-direct', {   //MSA적용 시 사용
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("회원가입 성공! 로그인 페이지로 이동합니다.");
+                    window.location.href = "/";
+                } else {
+                    document.getElementById("result").textContent = data.message;
+                }
+            })
+            .catch((error) => {
+                console.error('Error(register.html:50):', error);
+                document.getElementById('result').textContent = `회원가입 중 ${error}오류가 발생했습니다.`;
+            });
+        });
+
+    </script>
+</body>
+</html>

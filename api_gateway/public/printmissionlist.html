@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>미션 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 15px 0;
+        }
+        .mission-item {
+            display: flex;
+            flex-wrap: wrap; /* 버튼이 너무 길면 줄바꿈 */
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            padding: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>미션 목록</h1>
+
+    <!-- 자신에게 생성한 진행중 상태의 미션 (투표 요청 가능) -->
+    <h2>자신에게 생성한 진행중 상태의 미션</h2>
+    <ul id="selfRequestedMissions">로딩 중...</ul>
+
+    <h2>수행해야 할 미션</h2>
+    <ul id="assignedMissions">로딩 중...</ul>
+
+    <h2>부여한 미션</h2>
+    <ul id="createdMissions">로딩 중...</ul>
+
+    <h2>완료한 미션</h2>
+    <ul id="completedMissions">로딩 중...</ul>
+
+    <h2>상대가 완료한 미션</h2>
+    <ul id="givenCompletedMissions">로딩 중...</ul>
+
+    <h2>친구가 수행해야 하는 미션</h2>
+    <ul id="friendAssignedMissions">로딩 중...</ul>
+
+    <h2>친구가 완료한 미션</h2>
+    <ul id="friendCompletedMissions">로딩 중...</ul>
+
+    <!-- ======= 인증 권한 부여 미션 추가 ======= -->
+    <h2>인증 권한 부여 미션</h2>
+    <ul id="grantedAuthorityMissions">로딩 중...</ul>
+
+    <h2>📊 미션 통계</h2>
+    <ul>
+        <li id="createMissionCount">생성한 미션 수: 로딩 중...</li>
+        <li id="assignedMissionCount">수행 중인 미션 수: 로딩 중...</li>
+    </ul>
+
+    <!-- 미션 작업 UI -->
+    <h2>미션 작업</h2>
+    <div class="form-container">
+        <input type="text" id="m_id" placeholder="미션 ID 입력">
+        <button onclick="deleteMission()">미션 삭제</button>
+        <button onclick="successMission()">미션 성공</button>
+        <button onclick="failureMission()">미션 실패</button>
+        <!-- <button onclick="requestMissionApproval()">미션 요청</button> -->
+    </div>
+
+    <!-- ✅ 미션 요청 UI -->
+    <form id="missionRequestForm">
+        <!-- <input type="text" id="m_id" name="m_id" placeholder="미션 ID 입력"> -->
+        <input type="file" id="missionImage" name="image" accept="image/*">
+        <button type="submit">미션 요청</button>
+    </form>
+
+    <button onclick="window.location.href='/dashboard'">대시보드로 돌아가기</button>
+
+    <script>
+        //========================================token=====================================
+        const jwtToken = localStorage.getItem('jwt_token');
+        console.log("jwt_token: ", jwtToken)
+        if (!jwtToken) {
+            alert("로그인이 필요합니다.(printmissionlist:422)");
+            location.href = '/';
+        }
+
+        const authHeaderKeyCloak = {
+            Authorization: `Bearer ${jwtToken}`
+        };
+
+        function requestVote(m_id) {
+            const fileInput = document.getElementById(`file-${m_id}`);
+            const formData = new FormData();
+            formData.append('m_id', m_id);
+            if (fileInput?.files[0]) {
+                formData.append('c_image', fileInput.files[0]);
+            }
+
+            fetch('/dashboard/missionVote', {
+                method: 'POST',
+                headers: authHeaderKeyCloak,
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) location.reload();
+            })
+            .catch(err => console.error('투표 요청 오류:', err));
+        }
+
+        function deleteMission() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) return alert("미션 ID를 입력하세요.");
+
+            fetch('/dashboard/missiondelete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaderKeyCloak
+                },
+                body: JSON.stringify({ m_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function successMission() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) return alert("미션 ID를 입력하세요.");
+
+            fetch('/dashboard/successMission', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaderKeyCloak
+                },
+                body: JSON.stringify({ m_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function failureMission() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) return alert("미션 ID를 입력하세요.");
+
+            fetch('/dashboard/failureMission', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaderKeyCloak
+                },
+                body: JSON.stringify({ m_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            });
+        }
+
+        function requestMissionApproval() {
+            const m_id = document.getElementById('m_id').value;
+            if (!m_id) return alert("미션 ID를 입력하세요.");
+
+            fetch('/dashboard/missionRequest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...authHeaderKeyCloak
+                },
+                body: JSON.stringify({ m_id })
+            })
+            .then(res => res.json())
+            .then(data => alert(data.message));
+        }
+
+        // 미션 요청 (+이미지)
+        document.getElementById('missionRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            const m_id = document.getElementById('m_id').value;
+            const image = document.getElementById('missionImage').files[0];
+            formData.append('m_id', m_id);
+            if (image) formData.append('image', image);
+
+            const response = await fetch('/dashboard/missionRequest', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                },
+                body: formData
+            });
+            const result = await response.json();
+            alert(result.message);
+            location.reload();
+        });
+
+        const fetchMissions = (endpoint, elementId, renderFn) => {
+            fetch(endpoint, { headers: authHeaderKeyCloak })
+                .then(res => res.json())
+                .then(data => {
+                    const el = document.getElementById(elementId);
+                    el.innerHTML = '';
+                    if (data.missions?.length > 0) {
+                        data.missions.forEach(m => {
+                            el.appendChild(renderFn(m));
+                        });
+                    } else {
+                        el.textContent = '해당 미션이 없습니다.';
+                    }
+                })
+                .catch(err => console.error(`${endpoint} 오류:`, err));
+        };
+
+        fetchMissions('/dashboard/missions/selfRequested', 'selfRequestedMissions', m => {
+            const li = document.createElement('li');
+            li.className = 'mission-item';
+            li.innerHTML = `
+                <span>미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}</span>
+                <input type="file" id="file-${m.m_id}" accept="image/*">
+                <button onclick="requestVote('${m.m_id}')">투표 요청</button>
+            `;
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/assigned', 'assignedMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u2_id}, 마감일: ${m.m_deadline}`;
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/created', 'createdMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 부여자: ${m.u1_id}, 수행자: ${m.u2_id}, 마감일: ${m.m_deadline}`;
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/completed', 'completedMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
+            // ✅ 이미지가 존재하면 표시
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
+
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = '인증 이미지';
+                img.style.maxWidth = '200px';
+                img.style.marginTop = '10px';
+
+                li.appendChild(document.createElement('br'));
+                li.appendChild(img);
+            }
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/givenCompleted', 'givenCompletedMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
+            // ✅ 이미지가 존재하면 표시
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
+
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = '인증 이미지';
+                img.style.maxWidth = '200px';
+                img.style.marginTop = '10px';
+
+                li.appendChild(document.createElement('br'));
+                li.appendChild(img);
+            }
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/friendAssigned', 'friendAssignedMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u2_id}, 마감일: ${m.m_deadline}`;
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/friendCompleted', 'friendCompletedMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u_id}, 완료일: ${m.m_deadline}`;
+            // ✅ 이미지가 존재하면 표시
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
+
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = '인증 이미지';
+                img.style.maxWidth = '200px';
+                img.style.marginTop = '10px';
+
+                li.appendChild(document.createElement('br'));
+                li.appendChild(img);
+            }
+            return li;
+        });
+
+        fetchMissions('/dashboard/missions/grantedAuthority', 'grantedAuthorityMissions', m => {
+            const li = document.createElement('li');
+            li.textContent = `미션 이름: ${m.m_title}, 권한자: ${m.missionAuthenticationAuthority}, 대상: ${m.u2_id}`;
+            return li;
+        });
+
+        // 생성한 미션 수 가져오기
+        fetch('/dashboard/missions/getCreateMissionNumber', {
+            headers: { 'Authorization': `Bearer ${jwtToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('createMissionCount').textContent = `생성한 미션 수: ${data.createMissionCount}`;
+        })
+        .catch(err => {
+            console.error('생성한 미션 수 조회 실패:', err);
+            document.getElementById('createMissionCount').textContent = '생성한 미션 수 조회 실패';
+        });
+
+        // 수행 중인 미션 수 가져오기
+        fetch('/dashboard/missions/getAssignedMissionNumber', {
+            headers: { 'Authorization': `Bearer ${jwtToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('assignedMissionCount').textContent = `수행 중인 미션 수: ${data.assignedMissionCount}`;
+        })
+        .catch(err => {
+            console.error('수행 중인 미션 수 조회 실패:', err);
+            document.getElementById('assignedMissionCount').textContent = '수행 중인 미션 수 조회 실패';
+        });
+    </script>
+</body>
+</html>

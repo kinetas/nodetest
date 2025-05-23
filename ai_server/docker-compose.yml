@@ -9,5 +9,21 @@ services:
   rag_server:
     build: ./rag_server
     ports:
-      - "8004:8004"
+      - "8000:8000"
     container_name: rag_server
+    depends_on:
+      - chroma
+    volumes:
+      - ./chroma-data:/chroma/chroma
+  chroma:
+    image: chromadb/chroma:0.5.0
+    container_name: chroma
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./chroma-data:/chroma/chroma
+    environment:
+    - IS_PERSISTENT=TRUE
+    - ALLOW_RESET=TRUE
+volumes:
+  chroma-data:

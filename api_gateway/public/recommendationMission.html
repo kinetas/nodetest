@@ -54,7 +54,7 @@
 
     <script>
         // 추천 미션 데이터 가져오기
-        fetch('/mission/api/recommendationMission')
+        fetch('/nodetest/api/recommendationMission')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP 에러: ${response.status} ${response.statusText}`);
@@ -99,7 +99,7 @@
             
         // 추천 미션 생성 요청
         function createMission(m_title) {
-            fetch('/mission/api/recommendationMission/create-mission', {
+            fetch('/nodetest/api/recommendationMission/create-mission', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

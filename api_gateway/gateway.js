@@ -105,10 +105,10 @@ app.use('/intent', createProxyMiddleware({
 }));
 
 // ✅ /mission → nodetest
-app.use('/mission', createProxyMiddleware({
+app.use('/nodetest', createProxyMiddleware({
   target: process.env.NODETEST_URL,
   changeOrigin: true,
-  pathRewrite: { '^/mission': '' },
+  pathRewrite: { '^/nodetest': '' },
 }));
 
 

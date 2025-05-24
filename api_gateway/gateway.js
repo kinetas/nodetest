@@ -104,6 +104,11 @@ app.use('/intent', createProxyMiddleware({
   },
 }));
 
+
+app.use('/nodetest', (req, res, next) => {
+  console.log('[GATEWAY]', req.method, req.originalUrl, req.headers.authorization);
+  next();
+});
 // ✅ /mission → nodetest
 app.use('/nodetest', createProxyMiddleware({
   target: process.env.NODETEST_URL,

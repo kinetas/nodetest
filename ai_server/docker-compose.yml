@@ -16,6 +16,8 @@ services:
       - chroma
     volumes:
       - ./chroma-data:/chroma/chroma
+    env_file:
+      - .env
     restart: always
   chroma:
     image: chromadb/chroma:0.5.0

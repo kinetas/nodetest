@@ -54,6 +54,9 @@ app.get('/recommendationMission', (req, res) => {
 app.get('/findinfo', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
 });
+app.get('/league', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'league.html'));
+});
 
 const authTargets = ['http://auth_server_1:3000', 'http://auth_server_2:3000'];
 let currentAuth = 0;

@@ -19,13 +19,13 @@ app.get('/community_missions', (req, res) => {
 app.get('/community_comments/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'community_comments.html'));
 });
-app.get('/user-info', loginRequired, (req, res) => {
-  res.json({ userId: req.currentUserId });    //JWT 토큰기반
-});
-// app.get('/', (req, res) => {
-//   res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-//   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// app.get('/user-info', loginRequired, (req, res) => {
+//   res.json({ userId: req.currentUserId });    //JWT 토큰기반
 // });
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });

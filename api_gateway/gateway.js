@@ -111,6 +111,10 @@ app.use('/nodetest', createProxyMiddleware({
   pathRewrite: { '^/nodetest': '' },
 }));
 
+app.get('/health', (req, res) => {
+  res.status(200).send('Healthy');
+});
+
 
 // ✅ Gateway 서버 시작
 app.listen(3000, '0.0.0.0', () => {

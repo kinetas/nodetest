@@ -39,7 +39,7 @@
         }
 
         const fetchRate = (type, elementId) => {
-        fetch(`/result/${type}`, {
+        fetch(`/nodetest/result/${type}`, {
             headers: {
                 Authorization: `Bearer ${token}` // ✅ JWT 토큰 포함
             }
@@ -55,7 +55,7 @@
         };
 
         const fetchCount = (type, elementId) => {
-            fetch(`/result/${type}-count`, {
+            fetch(`/nodetest/result/${type}-count`, {
                 headers: {
                     Authorization: `Bearer ${token}` 
                 }

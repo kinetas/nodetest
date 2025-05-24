@@ -48,7 +48,7 @@
             const deadline = document.getElementById('deadline').value;
             const category = document.getElementById('category').value;
 
-            fetch('/api/comumunity_missions/create', {
+            fetch('/nodetest/api/comumunity_missions/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +63,7 @@
 
         // ✅ 커뮤니티 미션 수락
         function acceptCommunityMission(cr_num) {
-            fetch('/api/comumunity_missions/accept', {
+            fetch('/nodetest/api/comumunity_missions/accept', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -78,7 +78,7 @@
 
         // ✅ 커뮤니티 미션 삭제
         function deleteCommunityMission(cr_num) {
-            fetch('/api/comumunity_missions/delete', {
+            fetch('/nodetest/api/comumunity_missions/delete', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +93,7 @@
 
         // 커뮤니티 미션 리스트 불러오기 (비공개가 아닌 이상 로그인 필요 없지만, 토큰 포함도 가능)
         // fetch('/api/comumunity_missions/list', {
-        fetch('/api/comumunity_missions/getCommunityMissionSimple', {
+        fetch('/nodetest/api/comumunity_missions/getCommunityMissionSimple', {
             headers: {
                 'Authorization': `Bearer ${token}` // ✅ 로그인 필요 없으면 제거 가능
             }
@@ -119,7 +119,7 @@
 
         // 커뮤니티 미션 추천
         function recommendCommunityMission(cr_num) {
-            fetch('/api/comumunity_missions/recommendCommunity', {
+            fetch('/nodetest/api/comumunity_missions/recommendCommunity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -146,7 +146,7 @@
             formData.append('community_type', 'general');
             if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
 
-            fetch('/api/comumunity_missions/createGeneralCommunity', {
+            fetch('/nodetest/api/comumunity_missions/createGeneralCommunity', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -162,7 +162,7 @@
         // 일반 커뮤니티 글 삭제
         function deleteGeneralCommunity(cr_num) {
             console.log("cr_num(html_delete): ", cr_num);
-            fetch('/api/comumunity_missions/deleteGeneralCommunity', {
+            fetch('/nodetest/api/comumunity_missions/deleteGeneralCommunity', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -181,7 +181,7 @@
         // 일반 커뮤니티 리스트 로딩
         function loadGeneralCommunities() {
             // fetch('/api/comumunity_missions/printGeneralCommunityList', {
-            fetch('/api/comumunity_missions/printGeneralCommunitySimple', {
+            fetch('/nodetest/api/comumunity_missions/printGeneralCommunitySimple', {
                 headers: { 'Authorization': `Bearer ${token}` },
             })
             .then(response => response.json())
@@ -208,7 +208,7 @@
         // 인기글 리스트 로딩
         function loadpopularityCommunities() {
             // fetch('/api/comumunity_missions/getpopularyityCommunityList', {
-            fetch('/api/comumunity_missions/getpopularyityCommunitySimple', {
+            fetch('/nodetest/api/comumunity_missions/getpopularyityCommunitySimple', {
                 headers: { 'Authorization': `Bearer ${token}` },
             })
             .then(response => response.json())

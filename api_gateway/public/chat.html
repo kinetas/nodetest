@@ -57,7 +57,7 @@
 
         // ✅ 페이지 로드시 메시지 불러오기
         window.onload = function() {
-            fetch(`/chat/messages/${roomId}`, {
+            fetch(`/nodetest/chat/messages/${roomId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -181,7 +181,7 @@
         function printRoomMission() {
             const u2_id = document.getElementById('u2_id_input').value;
 
-            fetch('/api/missions/printRoomMission', {
+            fetch('/nodetest/api/missions/printRoomMission', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

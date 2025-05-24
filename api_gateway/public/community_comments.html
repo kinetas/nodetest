@@ -43,7 +43,7 @@
 
     // 커뮤니티 글 상세 불러오기
     function loadCommunities() {
-        fetch('/api/comumunity_missions/getOneCommunity', {
+        fetch('/nodetest/api/comumunity_missions/getOneCommunity', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -82,7 +82,7 @@
 
     // 댓글 목록 불러오기
     function loadComments() {
-      fetch(`/api/comumunity_missions/getCommunityComments`, {
+      fetch(`/nodetest/api/comumunity_missions/getCommunityComments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +119,7 @@
       const comment = document.getElementById('commentInput').value;
       if (!comment.trim()) return alert('댓글을 입력하세요.');
 
-      fetch('/api/comumunity_missions/writeComment', {
+      fetch('/nodetest/api/comumunity_missions/writeComment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@
     function deleteComment(cc_num) {
       if (!confirm('정말 이 댓글을 삭제하시겠습니까?')) return;
 
-      fetch('/api/comumunity_missions/deleteComment', {
+      fetch('/nodetest/api/comumunity_missions/deleteComment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@
 
     // 댓글 추천
     function recommendComment(cc_num) {
-      fetch('/api/comumunity_missions/recommendComment', {
+      fetch('/nodetest/api/comumunity_missions/recommendComment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -110,9 +110,10 @@ app.use('/intent', createProxyMiddleware({
 }));
 
 // ✅ /mission → nodetest
-app.use('/', createProxyMiddleware({
+app.use('/nodetest', createProxyMiddleware({
   target: 'http://nodetest:3000',
   changeOrigin: true,
+  pathRewrite: { '^/nodetest': '' },
 }));
 
 

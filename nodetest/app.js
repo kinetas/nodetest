@@ -113,6 +113,11 @@ app.use('/league', leagueRoutes);
 //   res.sendFile(path.join(__dirname, 'public', 'league.html'));
 // });
 
+app.use((req, res, next) => {
+    console.log('[NODETEST]', req.method, req.originalUrl, req.headers.authorization);
+    next();
+  });
+
 // ==================== 기타 API ====================
 app.post('/api/rooms/enter', roomController.enterRoom);
 

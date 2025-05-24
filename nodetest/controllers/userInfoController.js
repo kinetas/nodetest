@@ -58,7 +58,12 @@ const extractUserIdFromToken = (req) => {
         attributes: { exclude: ['u_password', 'session_id', 'token'] },
       });
       if (user) {
-        return res.status(200).json(user);
+        // return res.status(200).json(user);
+        const userJson = user.toJSON();
+        if (user.profile_image) {
+          userJson.profile_image = user.profile_image.toString('base64');  // ✅ base64 변환
+        }
+        return res.status(200).json(userJson);
       } else {
         return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
       }

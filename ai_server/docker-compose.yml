@@ -4,7 +4,8 @@ services:
     build: ./intent_server
     ports:
       - "8002:8002"
-    container_name: intent1
+    container_name: intent_server
+    restart: always
 
   rag_server:
     build: ./rag_server
@@ -15,6 +16,7 @@ services:
       - chroma
     volumes:
       - ./chroma-data:/chroma/chroma
+    restart: always
   chroma:
     image: chromadb/chroma:0.5.0
     container_name: chroma
@@ -25,5 +27,6 @@ services:
     environment:
     - IS_PERSISTENT=TRUE
     - ALLOW_RESET=TRUE
+    restart: always
 volumes:
   chroma-data:

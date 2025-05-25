@@ -228,7 +228,7 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
   }
 
   Future<void> fetchAssignedMissions() async {
-    final url = 'http://27.113.11.48:3000/api/missions/missions/assigned';
+    final url = 'http://27.113.11.48:3000/nodetest/api/missions/missions/assigned';
 
     try {
       final response = await SessionTokenManager.get(url);

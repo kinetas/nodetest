@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'CreateMissionScreen.dart';
 import 'AchievementPanel_screen.dart';
@@ -17,12 +16,12 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this); // 탭 컨트롤러 초기화 (2개의 탭)
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabController.dispose(); // 탭 컨트롤러 해제
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -43,70 +42,62 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
+        backgroundColor: Colors.lightBlue,
+        elevation: 2,
+        title: const Text(
           '미션 목록',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
+        centerTitle: true,
         actions: [
-
           IconButton(
-            icon: Icon(Icons.bar_chart, color: Colors.white), // 달성률 아이콘
+            icon: const Icon(Icons.bar_chart, color: Colors.white),
             onPressed: _showAchievementPanel,
             tooltip: '달성률 보기',
           ),
           IconButton(
-            icon: Icon(Icons.send, color: Colors.white), // 비행기 모양 버튼
+            icon: const Icon(Icons.send, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => OtherMission(), // OtherMission 화면으로 이동
-                ),
+                MaterialPageRoute(builder: (context) => OtherMission()),
               );
             },
           ),
           IconButton(
-            icon: Icon(Icons.add, color: Colors.white),
+            icon: const Icon(Icons.add, color: Colors.white),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => MissionCreateScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => MissionCreateScreen()),
               );
             },
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          tabs: [
-            Tab(
-              text: '미션',
-              icon: Icon(Icons.list_alt), // 아이콘 추가
-            ), // 1번 탭
-            Tab(
-              text: '완료한 미션',
-              icon: Icon(Icons.check_circle_outline), // 아이콘 추가
-            ), // 2번 탭
-          ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(36),
+          child: TabBar(
+            controller: _tabController,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorColor: Colors.white,
+            indicatorWeight: 2,
+            labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            tabs: const [
+              Tab(text: '미션'),
+              Tab(text: '완료한 미션'),
+            ],
+          ),
         ),
       ),
-      body: Container(
-        color: Colors.white,
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-            MyMissionList(),
-            MyCompleteMissionList(),
-          ],
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          MyMissionList(),
+          MyCompleteMissionList(),
+        ],
       ),
     );
   }

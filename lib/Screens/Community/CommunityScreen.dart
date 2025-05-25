@@ -107,7 +107,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      setState(() {});
+      setState(() {}); // 탭 변경 시 버튼 조건 반영
     });
   }
 
@@ -128,44 +128,46 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ← 전체 배경 흰색 설정
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
-        elevation: 0,
-        title: Text(
+        elevation: 2,
+        title: const Text(
           '커뮤니티',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         actions: [
-          if (_tabController.index == 0 || _tabController.index == 1)
-            IconButton(
-              icon: Icon(Icons.add, color: Colors.white),
-              onPressed: _onAddButtonPressed,
-            ),
+          IconButton(
+            icon: const Icon(Icons.add, color: Colors.white),
+            onPressed: _onAddButtonPressed,
+          ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          tabs: [
-            Tab(icon: Icon(Icons.article_outlined), text: '게시판'),
-            Tab(icon: Icon(Icons.how_to_vote_outlined), text: '미션투표'),
-          ],
-        ),
-      ),
-      body: SafeArea( // ← 추가: 노치 영역 보호 및 전체 클립 보장
-        child: Container(
-          color: Colors.white, // ← 명확한 배경
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              CommunityPostList(),
-              CommunityVoteList(),
-            ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(36), // 탭 높이 축소
+          child: Container(
+            alignment: Alignment.center,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
+              indicatorWeight: 2,
+              labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              tabs: const [
+                Tab(text: '게시판'),
+                Tab(text: '미션투표'),
+              ],
+            ),
           ),
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          CommunityPostList(),
+          CommunityVoteList(),
+        ],
       ),
     );
   }

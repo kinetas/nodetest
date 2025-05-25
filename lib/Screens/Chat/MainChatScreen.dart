@@ -83,7 +83,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
 import 'package:flutter/material.dart';
 import 'GeneralRoomList.dart';
 import 'OpenRoomList.dart';
-import 'AddChat_screen.dart'; // 친구 검색 및 채팅 추가 화면
+import 'AddChat_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -118,7 +118,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue, // ✅ 배경을 흰색으로 고정
+      backgroundColor: Colors.lightBlue,
       appBar: AppBar(
         title: const Text(
           '채팅',
@@ -130,16 +130,23 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
         centerTitle: true,
         backgroundColor: Colors.lightBlue,
         elevation: 2,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          tabs: const [
-            Tab(icon: Icon(Icons.chat_bubble_outline), text: '일반채팅'),
-            Tab(icon: Icon(Icons.assignment), text: '미션채팅'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(36), // 탭 높이를 더 낮게 조정
+          child: Container(
+            alignment: Alignment.center,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
+              indicatorWeight: 2,
+              labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              tabs: const [
+                Tab(text: '일반채팅'),
+                Tab(text: '미션채팅'),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(

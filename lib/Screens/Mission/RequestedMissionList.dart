@@ -21,7 +21,7 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
   Future<void> fetchRequestedMissions() async {
     try {
       final response = await SessionCookieManager.get(
-        'http://27.113.11.48:3000/api/missions/missions/created_req',
+        'http://27.113.11.48:3000/nodetest/api/missions/missions/created_req',
       );
 
       if (response.statusCode == 200) {
@@ -206,8 +206,8 @@ class _RequestedMissionScreenState extends State<RequestedMissionScreen> {
   Future<void> _processMission(
       Map<String, dynamic> mission, String result) async {
     final url = result == '성공'
-        ? 'http://54.180.54.31:3000/api/missions/successMission'
-        : 'http://54.180.54.31:3000/api/missions/failureMission';
+        ? 'http://54.180.54.31:3000/nodetest/api/missions/successMission'
+        : 'http://54.180.54.31:3000/nodetest/api/missions/failureMission';
 
     final requestData = {
       'm_id': mission['m_id'],

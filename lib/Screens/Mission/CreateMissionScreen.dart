@@ -33,7 +33,7 @@ class _MissionCreateScreenState extends State<MissionCreateScreen> {
 
     try {
       final response = await SessionCookieManager.post(
-        'http://27.113.11.48:3000/api/missions/missioncreate',
+        'http://27.113.11.48:3000/nodetest/api/missions/missioncreate',
         headers: {'Content-Type': 'application/json'},
         body: json.encode(missionData),
       );

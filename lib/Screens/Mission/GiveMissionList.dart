@@ -21,7 +21,7 @@ class _GiveMissionListState extends State<GiveMissionList> {
   Future<void> fetchMissions() async {
     try {
       final response = await SessionCookieManager.get(
-        'http://27.113.11.48:3000/api/missions/missions/created',
+        'http://27.113.11.48:3000/nodetest/api/missions/missions/created',
       );
 
       print('Response Status Code: ${response.statusCode}');

@@ -172,7 +172,7 @@ class _MyCompleteMissionListState extends State<MyCompleteMissionList> {
   Future<void> fetchCompletedMissions() async {
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/api/missions/missions/completed',
+        'http://27.113.11.48:3000/nodetest/api/missions/missions/completed',
       );
 
       if (response.statusCode == 200) {

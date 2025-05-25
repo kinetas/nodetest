@@ -31,7 +31,7 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
   }
 
   Future<void> fetchVoteContent() async {
-    final url = 'http://27.113.11.48:3000/api/cVote/';
+    final url = 'http://27.113.11.48:3000/nodetest/api/cVote/';
 
     try {
       final response = await SessionTokenManager.get(url); // ✅ 변경됨

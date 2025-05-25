@@ -30,7 +30,7 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
   }
 
   Future<void> fetchPostContent() async {
-    final url = 'http://27.113.11.48:3000/api/comumunity_missions/list';
+    final url = 'http://27.113.11.48:3000/nodetest/api/comumunity_missions/list';
 
     try {
       final response = await SessionTokenManager.get(url); // ✅ 여기서 처리

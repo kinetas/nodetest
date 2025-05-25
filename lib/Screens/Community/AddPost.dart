@@ -16,7 +16,7 @@ class _AddPostState extends State<AddPost> {
   bool isLoading = false;
 
   Future<void> _createPost() async {
-    final url = 'http://27.113.11.48:3000/api/comumunity_missions/create';
+    final url = 'http://27.113.11.48:3000/nodetest/api/comumunity_missions/create';
 
     final body = json.encode({
       "cr_title": _titleController.text,

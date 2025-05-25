@@ -13,7 +13,7 @@ class _AddVoteState extends State<AddVote> {
   bool isLoading = false;
 
   Future<void> createVote() async {
-    final url = 'http://27.113.11.48:3000/api/cVote/create';
+    final url = 'http://27.113.11.48:3000/nodetest/api/cVote/create';
 
     final body = json.encode({
       "c_title": _titleController.text,

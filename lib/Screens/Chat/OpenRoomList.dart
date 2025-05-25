@@ -108,7 +108,7 @@ class _OpenRoomListState extends State<OpenRoomList> {
 
   Future<void> fetchOpenRooms() async {
     try {
-      final response = await SessionTokenManager.get('http://27.113.11.48:3000/api/rooms');
+      final response = await SessionTokenManager.get('http://27.113.11.48:3000/nodetest/api/rooms');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

@@ -220,7 +220,7 @@ class ChatContentState extends State<ChatContent> {
   }
 
   Future<void> _fetchMessages() async {
-    final String apiUrl = 'http://27.113.11.48:3000/chat/messages/${widget.chatId}';
+    final String apiUrl = 'http://27.113.11.48:3000/nodetest/chat/messages/${widget.chatId}';
 
     try {
       final response = await SessionTokenManager.get(apiUrl);

@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> {
         print('✅ access_token 수신: $accessToken');
 
         final jwtRes = await http.get(
-          Uri.parse("http://27.113.11.48:3000/api/auth/issueJwtFromKeycloak"),
+          Uri.parse("http://27.113.11.48:3000/nodetest/api/auth/issueJwtFromKeycloak"),
           headers: {
             "Authorization": "Bearer $accessToken",
           },

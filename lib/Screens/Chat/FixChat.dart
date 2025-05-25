@@ -29,7 +29,7 @@ class FixChat extends StatelessWidget {
               final newName = _renameController.text.trim();
               if (newName.isEmpty) return;
 
-              final url = 'http://27.113.11.48:3000/api/rooms/rename';
+              final url = 'http://27.113.11.48:3000/nodetest/api/rooms/rename';
               final body = json.encode({
                 'u2_id': u2Id,
                 'r_type': rType,

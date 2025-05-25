@@ -18,7 +18,7 @@ from openai import OpenAI
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
-USER_DB_API = "http://nodetest:3000/user-top-categories"
+USER_DB_API = "http://13.125.65.151:3000/nodetest/api/ai/user-top-categories"
 INTENT_API = "http://intent_server:8002/intent-classify"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

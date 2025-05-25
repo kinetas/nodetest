@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // ✅ 뒤로가기 버튼 제거
         title: Text(
           '홈 화면',
           style: TextStyle(
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: primaryColor,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),

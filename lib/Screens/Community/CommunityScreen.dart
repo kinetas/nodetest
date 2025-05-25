@@ -131,6 +131,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
+        automaticallyImplyLeading: false,
         elevation: 2,
         title: const Text(
           '커뮤니티',

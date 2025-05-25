@@ -45,6 +45,7 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.lightBlue,
+        automaticallyImplyLeading: false,
         elevation: 2,
         title: const Text(
           '미션 목록',

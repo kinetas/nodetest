@@ -120,6 +120,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: Colors.lightBlue,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           '채팅',
           style: TextStyle(

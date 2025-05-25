@@ -1033,6 +1033,7 @@ exports.checkMissionDeadline = async () => {
                     u_id: mission.u2_id,
                     m_deadline: originalDeadline, // 원래 마감 기한 저장
                     m_status: '실패',
+                    category: mission.category,
                 });
 
                 // //==============================리워드 기능 추가==============================
@@ -1093,6 +1094,7 @@ exports.checkMissionDeadline = async () => {
                     u_id: mission.u2_id,
                     m_deadline: originalDeadline, // 원래 마감 기한 저장
                     m_status: '실패',
+                    category: mission.category,
                 });
 
                 // //==============================리워드 기능 추가==============================

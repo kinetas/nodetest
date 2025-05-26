@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .form-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 300px;
+        }
+        .form-container input[type="text"],
+        .form-container input[type="date"] {
+            margin: 5px 0;
+            padding: 8px;
+            width: 100%;
+            font-size: 16px;
+        }
+        .form-container button {
+            margin: 10px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <!--<h1>Hello World</h1>--> <!-- 대시보드 페이지에서 Hello World 출력 -->
+    <h1 id="greeting">Loading...</h1> <!-- 세션에 저장된 유저 ID를 출력할 자리 -->
+    <img id="profileImage" src="" alt="프로필 이미지" width="100" height="100">
+    <form id="profileImageForm">
+      <input type="file" id="imageFile" accept="image/*">
+      <button type="submit">프로필 변경</button>
+    </form>
+    <ul id="missionList">Loading missions...</ul> <!-- 미션 리스트를 출력할 자리 -->
+
+    <!-- 미션 생성 폼 -->
+    <div class="form-container">
+        <h3>미션 생성</h3>
+        <div class="error" id="errorMessage"></div>
+        <input type="text" id="u2_id" placeholder="미션 받는 사용자 ID">
+        <input type="text" id="authenticationAuthority" placeholder="인증 권한을 가진 사용자 ID">
+        <input type="text" id="m_title" placeholder="미션 이름">
+        <input type="datetime-local" id="m_deadline" placeholder="미션 마감일">
+        <input type="text" id="m_reword" placeholder="보상">
+        <input type="text" id="category" placeholder="카테고리"> 
+        <button onclick="createMission()">미션 생성</button>
+    </div>
+
+    
+    <h2>i_friend 목록</h2>
+    <ul id="iFriendsList">로딩 중...</ul>
+    <div class="form-container">
+        <input type="text" id="if_id_input" placeholder="친구 ID 입력">
+        <button onclick="friendDelete()">친구 삭제</button> 
+    </div>
+    
+
+    <!-- <h2>t_friend 목록</h2>
+    <ul id="tFriendsList">로딩 중...</ul> -->
+    <h2>보낸 친구 요청</h2>
+    <ul id="sentRequestsList">로딩 중...</ul>
+    <h2>받은 친구 요청</h2>
+    <ul id="receivedRequestsList">로딩 중...</ul>
+    <div class="form-container">
+        <input type="text" id="tf_id_input" placeholder="친구 ID 입력">
+        <button onclick="friendRequestSend()">요청 보내기</button>
+        <button onclick="friendRequestAccept()">요청 수락</button>
+        <button onclick="friendRequestReject()">요청 거절</button>
+    </div>
+    
+
+    <button onclick="logout()">로그아웃</button>
+    <button onclick="window.location.href='/cVote'">커뮤니티 투표</button>
+    <button onclick="window.location.href='/community_missions'">커뮤니티 미션</button>
+
+    <!-- public/dashboard.html -->
+    <button onclick="window.location.href='/rooms'">방</button>
+
+    <button onclick="window.location.href='/result'">달성률 보기</button>
+
+    <button onclick="window.location.href='/printmissionlist'">미션 목록 보기</button>
+
+    <button onclick="window.location.href='/recommendationMission'">추천 미션 보기</button>
+
+    <button onclick="deleteAccountToken()">계정 탈퇴</button> <!-- 추가: 계정 탈퇴 버튼 -->
+
+    <button onclick="window.location.href='/ai.html'">AI</button>
+
+    <script>
+        const jwtToken = localStorage.getItem('jwt_token');
+        console.log("jwt_token: ", jwtToken)
+
+        // ✅ 사용자 정보
+        fetch('/nodetest/api/user-info/user-all', {
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('greeting').textContent = `Hello, ${data.u_id}`;
+            if (data.profile_image) {
+                const uint8Array = new Uint8Array(data.profile_image.data);
+                const blob = new Blob([uint8Array], { type: 'image/jpeg' }); // 또는 image/png
+                const url = URL.createObjectURL(blob);
+                document.getElementById('profileImage').src = url;
+            }
+        })
+        .catch(() => {
+            alert('인증 실패(dashboard:654). 로그인 페이지로 이동합니다.');
+            window.location.href = '/';
+        });
+
+        // ✅ 미션 목록
+        fetch('/nodetest/dashboard/missions', {
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('missionList');
+            list.innerHTML = '';
+            (data.missions || []).forEach(m => {
+                const li = document.createElement('li');
+                li.textContent = `${m.m_title} (받는이: ${m.u2_id})`;
+                list.appendChild(li);
+            });
+        });
+
+        // ✅ i_friend 목록
+        fetch('/nodetest/dashboard/friends/ifriends', {
+            headers: { 'Authorization': `Bearer ${jwtToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('iFriendsList');
+            list.innerHTML = '';
+            (data.iFriends || []).forEach(id => {
+                const li = document.createElement('li');
+                li.textContent = `친구 ID: ${id}`;
+                list.appendChild(li);
+            });
+        });
+
+        // ✅ t_friend 목록
+        fetch('/nodetest/dashboard/friends/tfriends', {
+            headers: { 'Authorization': `Bearer ${jwtToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const sent = document.getElementById('sentRequestsList');
+            const received = document.getElementById('receivedRequestsList');
+            sent.innerHTML = '';
+            received.innerHTML = '';
+
+            (data.sentRequests || []).forEach(id => {
+                const li = document.createElement('li');
+                li.textContent = `보낸 요청: ${id}`;
+                sent.appendChild(li);
+            });
+
+            (data.receivedRequests || []).forEach(id => {
+                const li = document.createElement('li');
+                li.textContent = `받은 요청: ${id}`;
+                received.appendChild(li);
+            });
+        });
+
+        // ✅ 미션 생성
+        function createMission() {
+            const payload = {
+                u2_id: document.getElementById('u2_id').value,
+                authenticationAuthority: document.getElementById('authenticationAuthority').value,
+                m_title: document.getElementById('m_title').value,
+                m_deadline: document.getElementById('m_deadline').value,
+                m_reword: document.getElementById('m_reword').value,
+                category: document.getElementById('category').value,
+            };
+
+            fetch('/nodetest/dashboard/missioncreate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(async res => {
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                return data;
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('생성 완료');
+                    location.reload();
+                } else {
+                    document.getElementById('errorMessage(dashboard:726)').textContent = data.message;
+                }
+            }).catch(err => {
+                alert("생성 중 오류(dashboard.html:729): " + err.message);
+            });
+        }
+
+        // ✅ 친구 삭제
+        function friendDelete() {
+            const f_id = document.getElementById('if_id_input').value;
+
+            fetch('/nodetest/dashboard/friends/delete', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify({ f_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) location.reload();
+            });
+        }
+
+        // ✅ 친구 요청 보내기
+        function friendRequestSend() {
+            const f_id = document.getElementById('tf_id_input').value;
+
+            fetch('/nodetest/dashboard/friends/request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify({ f_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) location.reload();
+            });
+        }
+
+        // ✅ 친구 요청 수락
+        function friendRequestAccept() {
+            const f_id = document.getElementById('tf_id_input').value;
+
+            fetch('/nodetest/dashboard/friends/accept', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify({ f_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) location.reload();
+            });
+        }
+
+        // ✅ 친구 요청 거절
+        function friendRequestReject() {
+            const f_id = document.getElementById('tf_id_input').value;
+
+            fetch('/nodetest/dashboard/friends/reject', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}`
+                },
+                body: JSON.stringify({ f_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) location.reload();
+            });
+        }
+
+        //로그아웃
+        function logout() {
+            console.log("id_token(dashboard.html:841): ", localStorage.getItem('id_token'))
+            // 웹 또는 Flutter 등에서 요청
+            // fetch('/api/auth/logoutToken', {
+            fetch('/auth/logoutToken', {    //MSA적용 시 사용
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                },
+                body: JSON.stringify({ idToken: localStorage.getItem('id_token') })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.logoutUrl) {
+                    localStorage.clear(); // 모든 토큰 제거
+                    window.location.href = data.logoutUrl; // ✅ Keycloak 로그아웃 URL로 이동
+                }
+            });
+        }
+
+        function deleteAccountToken() {
+            const token = localStorage.getItem('jwt_token'); // ✅ jwt_token으로 수정
+
+            if (!token) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+
+            if (confirm("정말 계정을 탈퇴하시겠습니까?")) {
+                // fetch('/api/auth/deleteAccountToken', {
+                fetch('/auth/deleteAccountToken', { //MSA적용 시 사용
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        localStorage.removeItem('jwt_token'); // ✅ 삭제 후 토큰 제거
+                        window.location.href = '/';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('계정 탈퇴 중 오류:', error);
+                    alert(`계정 탈퇴 중 오류(${error})가 발생했습니다.`);
+                });
+            }
+        }
+
+        //프로필 변경 요청
+        const form = document.getElementById('profileImageForm');
+        form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('imageFile');
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        const response = await fetch('/nodetest/api/user-info/chaingeProfileImage', {
+            method: 'POST',
+            headers: {
+            'Authorization': `Bearer ${jwtToken}`
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+        alert(result.message);
+        location.reload();
+        });
+    </script>
+</body>
+</html>

@@ -13,194 +13,14 @@ const { sequelize } = require('../models/comunity_roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨]
 
-// // 첫 번째 조건: 커뮤니티 미션 생성
-// exports.createCommunityMission = async (req, res) => {
-//     // const { cr_title } = req.body; // 제목 입력 받기
-//     const { cr_title, contents, deadline } = req.body;
-//     const u_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
-//     const cr_num = uuidv4(); // 랜덤 값 생성
-//     const cr_status = "match";
-//     const m1_status = "0";
-//     const m2_status = "0";
-
-//     try {
-//         // await CRoom.create({ u_id, cr_num, cr_title, cr_status, m1_status, m2_status });
-//         await CRoom.create({ u_id, cr_num, cr_title, cr_status, m1_status, m2_status, contents, deadline });
-//         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 생성되었습니다.' });
-//     } catch (error) {
-//         console.error('커뮤니티 미션 생성 오류:', error);
-//         res.status(500).json({ success: false, message: '커뮤니티 미션 생성 중 오류가 발생했습니다.' });
-//     }
-// };
-
-// // 두 번째 조건: 커뮤니티 미션 수락
-// exports.acceptCommunityMission = async (req, res) => {
-//     const { cr_num } = req.body; // 미션 번호 가져오기
-//     const u2_id = req.session.user.id; // 세션에서 사용자 ID 가져오기
-
-//     try {
-//         const mission = await CRoom.findOne({ where: { cr_num } });
-//         // const room = await Room.findOne({ where: { u1_id, u2_id } });
-//         if (!mission) {
-//             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
-//         }
-
-//         if (mission.u_id === u2_id) {
-//             return res.status(403).json({ success: false, message: '본인이 생성한 미션은 수락할 수 없습니다.' });
-//         }
-//         if(mission.cr_status == 'acc'){
-//             return res.status(403).json({ success: false, message: '이미 수락된 미션입니다.' });
-//         }
-
-//         // [추가됨] 방 존재 여부 확인
-//         const rooms = await Room.findAll({
-//             where: {
-//                 r_type: 'open', // 방 타입 조건
-//                 [Op.or]: [
-//                     { u1_id: mission.u_id, u2_id }, // 첫 번째 조합
-//                     { u1_id: u2_id, u2_id: mission.u_id } // 반대 조합
-//                 ]
-//             }
-//         });
-
-//         let rid_u1_u2 = uuidv4();
-//         let rid_u2_u1 = uuidv4();
-//         let rid_open = uuidv4();
-
-//         if (rooms.length === 0) {
-//             // [추가됨] 방 생성
-//             roomId = uuidv4();
-//             await Room.create({ 
-//                 u1_id: mission.u_id, 
-//                 u2_id, 
-//                 // r_id: rid_u1_u2, 
-//                 r_id: rid_open,
-//                 r_title: `${mission.u_id}-${u2_id}`, 
-//                 r_type: 'open' 
-//             });
-
-//             await Room.create({ 
-//                 u1_id: u2_id, 
-//                 u2_id: mission.u_id, 
-//                 // r_id: rid_u2_u1, 
-//                 r_id: rid_open,
-//                 r_title: `${u2_id}-${mission.u_id}`, 
-//                 r_type: 'open' 
-//             });
-//         } else {
-//             // [변경됨] 기존 방 ID 사용
-//             // rid_u1_u2 = rooms.find(r => r.u1_id === mission.u_id && r.u2_id === u2_id)?.r_id || uuidv4();
-//             // rid_u2_u1 = rooms.find(r => r.u1_id === u2_id && r.u2_id === mission.u_id)?.r_id || uuidv4();
-//             rid_open = rooms.find(r => r.u1_id === u2_id && r.u2_id === mission.u_id)?.r_id || uuidv4();
-//         }
-
-//         // 커뮤니티 미션 업데이트
-//         await mission.update({ u2_id, cr_status: 'acc' });
-
-
-//         // // Room 테이블에 데이터 생성
-//         // await Room.create({ 
-//         //     u1_id: mission.u_id, 
-//         //     u2_id, 
-//         //     r_id: rid_u1_u2, 
-//         //     r_title: `${mission.u_id}-${u2_id}`, 
-//         //     r_type: 'open' 
-//         // });
-
-//         // // 반대 Room 테이블에 데이터 생성
-//         // await Room.create({ 
-//         //     u1_id: u2_id, 
-//         //     u2_id: mission.u_id, 
-//         //     r_id: rid_u2_u1, 
-//         //     r_title: `${u2_id}-${mission.u_id}`, 
-//         //     r_type: 'open' 
-//         // });
-
-//         // Mission 테이블에 미션 생성
-//         const newMissionId1 = uuidv4();
-//         const newMissionId2 = uuidv4();
-//         const missionTitle = mission.cr_title;
-
-//         const currentDate = new Date();
-//         // const deadline = new Date(currentDate.setDate(currentDate.getDate() + 3));
-//         const deadline = mission.deadline ? mission.deadline : new Date(currentDate.setDate(currentDate.getDate() + 3));
-
-//         await Mission.create({
-//             m_id: newMissionId1,
-//             u1_id: mission.u_id,
-//             u2_id,
-//             m_title: missionTitle,
-//             m_deadline: deadline,
-//             m_reword: null,
-//             m_status: '진행중',
-//             // r_id: rid_u1_u2,
-//             r_id: rid_open,
-//             m_extended: false,
-//             missionAuthenticationAuthority: mission.u_id,
-//         });
-
-//         await Mission.create({
-//             m_id: newMissionId2,
-//             u1_id: u2_id,
-//             u2_id: mission.u_id,
-//             m_title: missionTitle,
-//             m_deadline: deadline,
-//             m_reword: null,
-//             m_status: '진행중',
-//             // r_id: rid_u2_u1,
-//             r_id: rid_open,
-//             m_extended: false,
-//             missionAuthenticationAuthority: u2_id,
-//         });
-
-//         // ================ 알림 추가 - 디바이스 토큰 =======================
-        
-//         const sendAcceptCommunityMissionNotification = await notificationController.sendAcceptCommunityMissionNotification(
-//             mission.u_id,
-//             missionTitle
-//         );
-
-//         if(!sendAcceptCommunityMissionNotification){
-//             return res.status(400).json({ success: false, message: '커뮤니티 미션 수락 알림 전송을 실패했습니다.' });
-//         }
-        
-//         // ================ 알림 추가 - 디바이스 토큰 =======================
-
-//         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
-//     } catch (error) {
-//         console.error('커뮤니티 미션 수락 오류:', error);
-//         res.status(500).json({ success: false, message: `커뮤니티 미션 수락 중 오류(${error})가 발생했습니다.` });
-//     }
-// };
-
-// // 세 번째 조건: 커뮤니티 미션 삭제
-// exports.deleteCommunityMission = async (req, res) => {
-//     const { cr_num } = req.body;
-//     const u_id = req.session.user.id;
-
-//     try {
-//         const mission = await CRoom.findOne({ where: { cr_num, u_id } });
-
-//         if (!mission) {
-//             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
-//         }
-
-//         if (mission.cr_status !== 'match') {
-//             return res.status(403).json({ success: false, message: 'match 상태의 미션만 삭제할 수 있습니다.' });
-//         }
-
-//         await mission.destroy();
-//         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 삭제되었습니다.' });
-//     } catch (error) {
-//         console.error('커뮤니티 미션 삭제 오류:', error);
-//         res.status(500).json({ success: false, message: '커뮤니티 미션 삭제 중 오류가 발생했습니다.' });
-//     }
-// };
-
-
 //======================Token===============================
 
 //============미션===============
+
+function shortenContent(content, maxLength = 100) {
+    if (!content) return '';
+    return content.length > maxLength ? content.slice(0, maxLength) + '...' : content;
+}
 
 // 커뮤니티 미션 생성 (JWT 적용)
 exports.createCommunityMission = async (req, res) => {
@@ -208,9 +28,10 @@ exports.createCommunityMission = async (req, res) => {
     const u_id = req.currentUserId; // JWT 인증된 사용자 ID 사용
     const cr_num = uuidv4();
     const cr_status = "match";
+    const maded_time = new Date();
 
     try {
-        await CRoom.create({ u_id, cr_num, cr_title, cr_status, contents, deadline, category });
+        await CRoom.create({ u_id, cr_num, cr_title, cr_status, contents, deadline, category, maded_time });
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 생성되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 생성 오류:', error);
@@ -438,6 +259,29 @@ exports.getCommunityMission = async (req, res) => {
     }
 };
 
+// 커뮤니티 미션 리스트 출력 - 내용 간략화 버전
+exports.getCommunityMissionSimple = async (req, res) => {
+    try {
+        const missions = await CRoom.findAll({
+            where: { community_type: 'mission' },
+            order: [['deadline', 'ASC']],
+        });
+
+        const missionList = missions.map(m => ({
+            cr_num: m.cr_num,
+            cr_title: m.cr_title,
+            contents: shortenContent(m.contents, 100),
+            cr_status: m.cr_status,
+            deadline: m.deadline
+        }));
+
+        res.json({ missions: missionList });
+    } catch (error) {
+        console.error('커뮤니티 미션 간략 리스트 오류:', error);
+        res.status(500).json({ message: '커뮤니티 미션 리스트를 불러오는 중 오류 발생' });
+    }
+};
+
 
 //============일반===============
 
@@ -501,6 +345,31 @@ exports.printGeneralCommunity = async (req, res) => {
     } catch (error) {
         console.error('일반 커뮤니티 리스트 출력 오류:', error);
         res.status(500).json({ message: '일반 커뮤니티 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// 일반 커뮤니티 글 리스트 출력 - 내용 간략화 버전
+exports.printGeneralCommunitySimple = async (req, res) => {
+    try {
+        const communities = await CRoom.findAll({
+            where: { community_type: 'general' },
+            order: [['maded_time', 'DESC']]
+        });
+
+        const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
+            cr_title: c.cr_title,
+            contents: shortenContent(c.contents, 100),
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
+    } catch (error) {
+        console.error('일반 커뮤니티 간략 리스트 오류:', error);
+        res.status(500).json({ message: '일반 커뮤니티 리스트를 불러오는 중 오류 발생' });
     }
 };
 
@@ -575,13 +444,48 @@ exports.getPopularyityCommunity = async (req, res) => {
     try {
         const communities = await CRoom.findAll({
             where: { popularity: true },
-            order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
+            order: [['deadline', 'ASC']],
         });
-        console.log("인기글: ", communities);
-        res.json({ communities });
+
+        const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
+            cr_title: c.cr_title,
+            contents: c.contents,
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
     } catch (error) {
         console.error('인기글 리스트 오류:', error);
         res.status(500).json({ message: '인기글 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// 인기글 리스트 출력 - 내용 간략화 버전
+exports.getPopularyityCommunitySimple = async (req, res) => {
+    try {
+        const communities = await CRoom.findAll({
+            where: { popularity: true },
+            order: [['deadline', 'ASC']],
+        });
+
+        const communityList = communities.map(c => ({
+            cr_num: c.cr_num,
+            cr_title: c.cr_title,
+            contents: shortenContent(c.contents, 100),
+            hits: c.hits,
+            recommended_num: c.recommended_num,
+            maded_time: c.maded_time,
+            image: c.image ? c.image.toString('base64') : null
+        }));
+
+        res.json({ communities: communityList });
+    } catch (error) {
+        console.error('인기글 간략 리스트 오류:', error);
+        res.status(500).json({ message: '인기글 리스트를 불러오는 중 오류 발생' });
     }
 };
 

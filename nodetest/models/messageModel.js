@@ -17,11 +17,6 @@ const RMessage = sequelize.define('RMessage', {
     primaryKey: false,
     allowNull: false,
   },
-  // message_num: {
-  //   type: DataTypes.STRING(20),
-  //   primaryKey: true,
-  //   allowNull: false,
-  // },
   message_num: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -39,11 +34,11 @@ const RMessage = sequelize.define('RMessage', {
   image: {
     type: DataTypes.BLOB('long'),
     allowNull: true,
-  }, // 변경된 부분 - 이미지 필드 추가
+  }, // 이미지 필드 추가
   image_type: {
     type: DataTypes.STRING(50),
     allowNull: true,
-  }, // 변경된 부분 - 이미지 타입 필드 추가
+  }, // 이미지 타입 필드 추가
   is_read: {
     type: TINYINT(1),
     allowNull: false,

@@ -64,10 +64,17 @@
             }
 
             const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : '';
-            list.innerHTML = `
-              제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
-              <br>${imgTag}<br>
-            `;
+            if(c.community_type === 'mission'){
+              list.innerHTML = `
+                제목: ${c.cr_title}, 내용: ${c.contents}, 마감기한: ${new Date(c.deadline).toLocaleString()},조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
+                <br>${imgTag}<br>
+              `;
+            }else if(c.community_type === 'general'){
+              list.innerHTML = `
+                제목: ${c.cr_title}, 내용: ${c.contents}, 조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}
+                <br>${imgTag}<br>
+              `;
+            }
         })
         .catch(error => console.error('커뮤니티 글 불러오기 오류:', error));
     }

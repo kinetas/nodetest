@@ -54,61 +54,69 @@ app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
 app.use('/dashboard', timeConverterMiddleware, missionRoutes);
 app.use('/api/rooms', timeConverterMiddleware, loginRequired, roomRoutes);
 app.use('/api/missions', timeConverterMiddleware, loginRequired, missionRoutes);
-app.use('/result', timeConverterMiddleware, loginRequired, resultRoutes);
+app.use('/result', timeConverterMiddleware, resultRoutes);
 app.use('/dashboard/friends', timeConverterMiddleware, loginRequired, friendRoutes);
 app.use('/api/cVote', timeConverterMiddleware, loginRequired, cVoteRoutes);
 app.use('/api/comumunity_missions', timeConverterMiddleware, loginRequired, c_missionRoutes);
 app.use('/chat', timeConverterMiddleware, loginRequired, chatRoutes);
 app.use('/api/recommendationMission', recommendationMissionRoutes); //미션 추천 라우트
 app.use('/api/ai', aiRoutes);
-app.use('/api', leagueRoutes);
+app.use('/league', leagueRoutes);
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
-app.get('/dashboard', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
-});
-app.get('/community_missions', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'community_missions.html'));
-});
-app.get('/community_comments/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'community_comments.html'));
-});
-app.get('/user-info', loginRequired, (req, res) => {
-    res.json({ userId: req.currentUserId });    //JWT 토큰기반
-});
-app.get('/', (req, res) => {
-    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-app.get('/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'register.html'));
-});
-app.get('/rooms', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'rooms.html'));
-});
-app.get('/cVote', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
-});
-app.get('/chat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'chat.html'));
-});
-app.get('/result', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'result.html')); // result.html 경로
-});
-app.get('/printmissionlist', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'printmissionlist.html')); // printmissionlist.html 경로
-});
-app.get('/cVote/details/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'voteDetails.html'));
-});
-// 추천 미션 페이지 라우트
-app.get('/recommendationMission', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
-});
-app.get('/findinfo', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
-});
+// app.get('/dashboard', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+// });
+// app.get('/community_missions', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'community_missions.html'));
+// });
+// app.get('/community_comments/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'community_comments.html'));
+// });
+// app.get('/user-info', loginRequired, (req, res) => {
+//     res.json({ userId: req.currentUserId });    //JWT 토큰기반
+// });
+// app.get('/', (req, res) => {
+//     res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+//     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// });
+// app.get('/register', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'register.html'));
+// });
+// app.get('/rooms', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'rooms.html'));
+// });
+// app.get('/cVote', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'cVote.html'));
+// });
+// app.get('/chat', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+// });
+// app.get('/result', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'result.html')); // result.html 경로
+// });
+// app.get('/printmissionlist', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'printmissionlist.html')); // printmissionlist.html 경로
+// });
+// app.get('/cVote/details/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'voteDetails.html'));
+// });
+// // 추천 미션 페이지 라우트
+// app.get('/recommendationMission', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'recommendationMission.html'));
+// });
+// app.get('/findinfo', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public', 'findinfo.html'));  // ID찾기, PW변경 == MSA적용 시 삭제
+// });
+// app.get('/league', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'public', 'league.html'));
+// });
+
+app.use((req, res, next) => {
+    console.log('[NODETEST]', req.method, req.originalUrl, req.headers.authorization);
+    next();
+  });
 
 // ==================== 기타 API ====================
 app.post('/api/rooms/enter', roomController.enterRoom);

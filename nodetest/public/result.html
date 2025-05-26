@@ -22,47 +22,26 @@
         <p>월간 달성률: <span id="monthlyRate">로딩 중...</span>%</p>
         <p>연간 달성률: <span id="yearlyRate">로딩 중...</span>%</p>
     </div>
+
+    <div id="missionCounts">
+        <p>성공한 미션 수: <span id="successCount">로딩 중...</span></p>
+        <p>실패한 미션 수: <span id="failCount">로딩 중...</span></p>
+    </div>
+
     <script>
-        // fetch('/result/daily')
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         console.log('일일 달성률:', data);
-        //         document.getElementById('dailyRate').textContent = data.dailyRate;
-        //     })
-        //     .catch(err => console.error('일일 달성률 API 호출 오류:', err));
-
-        // fetch('/result/weekly')
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         console.log('주간 달성률:', data);
-        //         document.getElementById('weeklyRate').textContent = data.weeklyRate;
-        //     })
-        //     .catch(err => console.error('주간 달성률 API 호출 오류:', err));
-
-        // fetch('/result/monthly')
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         console.log('월간 달성률:', data);
-        //         document.getElementById('monthlyRate').textContent = data.monthlyRate;
-        //     })
-        //     .catch(err => console.error('월간 달성률 API 호출 오류:', err));
-
-        // fetch('/result/yearly')
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         console.log('연간 달성률:', data);
-        //         document.getElementById('yearlyRate').textContent = data.yearlyRate;
-        //     })
-        //     .catch(err => console.error('연간 달성률 API 호출 오류:', err));
-
         //=======================token============================
 
         const token = localStorage.getItem('jwt_token'); // ✅ JWT 토큰
+        console.log("jwt_token(result.html:61): ", token);
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/';
+        }
 
         const fetchRate = (type, elementId) => {
         fetch(`/result/${type}`, {
             headers: {
-            Authorization: `Bearer ${token}` // ✅ JWT 토큰 포함
+                Authorization: `Bearer ${token}` // ✅ JWT 토큰 포함
             }
         })
         .then(res => res.json())
@@ -74,6 +53,25 @@
             document.getElementById(elementId).textContent = '오류';
         });
         };
+
+        const fetchCount = (type, elementId) => {
+            fetch(`/result/${type}-count`, {
+                headers: {
+                    Authorization: `Bearer ${token}` 
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById(elementId).textContent = data[`${type}Count`] ?? '0';
+            })
+            .catch(err => {
+                console.error(`${type} count API 오류:`, err);
+                document.getElementById(elementId).textContent = '오류';
+            });
+        };
+
+        fetchCount('success', 'successCount');
+        fetchCount('fail', 'failCount');
 
         fetchRate('daily', 'dailyRate');
         fetchRate('weekly', 'weeklyRate');

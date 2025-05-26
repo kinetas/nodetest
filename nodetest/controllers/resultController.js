@@ -3,7 +3,7 @@ const MResult = require('../models/m_resultModel'); // m_resultModel.js 연결
 const { Op } = require('sequelize');
 
 // m_result에 데이터 저장 함수
-exports.saveResult = async (m_id, u_id, m_deadline, m_status, category) => {
+exports.saveResult = async (m_id, u_id, m_deadline, m_status, category, mission_result_image) => {
     try {
         await MResult.create({
             m_id,
@@ -11,6 +11,7 @@ exports.saveResult = async (m_id, u_id, m_deadline, m_status, category) => {
             m_deadline,
             m_status,
             category,
+            mission_result_image,
         });
         return { success: true, message: 'm_result에 데이터가 성공적으로 저장되었습니다.' };
     } catch (error) {
@@ -164,6 +165,38 @@ exports.getYearlyAchievementRate = async (userId) => {
         return Math.round(rate * 10) / 10;
     } catch (error) {
         console.error('연간 달성률 계산 오류:', error);
+        throw error;
+    }
+};
+
+// ✅ 성공한 미션 수 조회
+exports.getSuccessMissionNumber = async (userId) => {
+    try {
+        const successCount = await MResult.count({
+            where: {
+                u_id: userId,
+                m_status: '성공',
+            },
+        });
+        return successCount;
+    } catch (error) {
+        console.error('성공한 미션 수 조회 오류:', error);
+        throw error;
+    }
+};
+
+// ✅ 실패한 미션 수 조회
+exports.getFailMissionNumber = async (userId) => {
+    try {
+        const failCount = await MResult.count({
+            where: {
+                u_id: userId,
+                m_status: '실패',
+            },
+        });
+        return failCount;
+    } catch (error) {
+        console.error('실패한 미션 수 조회 오류:', error);
         throw error;
     }
 };

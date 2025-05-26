@@ -1,21 +1,21 @@
-const db = require('../config/db');
+const sequelize = require('../config/db'); // ✅ Sequelize 인스턴스 명확히
 const { QueryTypes } = require('sequelize');
 
 async function runWeeklyLeagueEvaluation() {
   try {
-    const leagues = await db.query(
+    const leagues = await sequelize.query(
       `SELECT * FROM leagues ORDER BY level ASC`,
       { type: QueryTypes.SELECT }
     );
 
-    const processedUsers = new Set(); // 중복 방지
+    const processedUsers = new Set();
 
     for (const league of leagues) {
       const leagueId = league.league_id;
       const tier = league.tier;
       const level = league.level;
 
-      const users = await db.query(
+      const users = await sequelize.query(
         `SELECT user_id, lp FROM user_league_status WHERE league_id = :league_id ORDER BY lp DESC`,
         {
           replacements: { league_id: leagueId },
@@ -41,8 +41,7 @@ async function runWeeklyLeagueEvaluation() {
 
         if (processedUsers.has(userId)) continue;
 
-        // 현재 리그 확인 (중간에 이동한 유저는 건너뜀)
-        const [current] = await db.query(
+        const [current] = await sequelize.query(
           `SELECT league_id FROM user_league_status WHERE user_id = :user_id`,
           {
             replacements: { user_id: userId },
@@ -50,10 +49,9 @@ async function runWeeklyLeagueEvaluation() {
           }
         );
 
-        if (current.league_id !== leagueId) continue;
+        if (!current || current.league_id !== leagueId) continue;
 
-        // 정산 기록 저장
-        await db.query(
+        await sequelize.query(
           `INSERT INTO weekly_lp_history (user_id, week_start, week_end, league_id, lp)
            VALUES (:user_id, :week_start, :week_end, :league_id, :lp)`,
           {
@@ -74,7 +72,7 @@ async function runWeeklyLeagueEvaluation() {
           if (upperLeagues.length > 0) {
             const nextLeague = upperLeagues[Math.floor(Math.random() * upperLeagues.length)];
 
-            await db.query(
+            await sequelize.query(
               `UPDATE user_league_status SET league_id = :next_league, lp = 0 WHERE user_id = :user_id`,
               {
                 replacements: {
@@ -85,8 +83,7 @@ async function runWeeklyLeagueEvaluation() {
               }
             );
 
-            // 포인트 보상
-            await db.query(
+            await sequelize.query(
               `INSERT INTO user_points (user_id, points)
                VALUES (:user_id, 100)
                ON DUPLICATE KEY UPDATE points = points + 100`,
@@ -104,7 +101,7 @@ async function runWeeklyLeagueEvaluation() {
           if (lowerLeagues.length > 0) {
             const prevLeague = lowerLeagues[Math.floor(Math.random() * lowerLeagues.length)];
 
-            await db.query(
+            await sequelize.query(
               `UPDATE user_league_status SET league_id = :prev_league, lp = 0 WHERE user_id = :user_id`,
               {
                 replacements: {
@@ -119,16 +116,25 @@ async function runWeeklyLeagueEvaluation() {
 
         // 잔류
         else {
-          await db.query(
+          await sequelize.query(
             `UPDATE user_league_status SET lp = 0 WHERE user_id = :user_id`,
             {
               replacements: { user_id: userId },
               type: QueryTypes.UPDATE
             }
           );
+
+          await sequelize.query(
+            `INSERT INTO user_points (user_id, points)
+             VALUES (:user_id, 50)
+             ON DUPLICATE KEY UPDATE points = points + 50`,
+            {
+              replacements: { user_id: userId },
+              type: QueryTypes.INSERT
+            }
+          );
         }
 
-        // ✅ 무조건 처리 완료로 표시
         processedUsers.add(userId);
       }
     }

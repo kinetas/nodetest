@@ -123,6 +123,10 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  mission_image: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
 }, {
   tableName: 'misson', // ���� ���̺� �̸��� ���� �����մϴ�.
   timestamps: false,   // createdAt �� updatedAt �÷��� �������? �����Ƿ� false�� ����

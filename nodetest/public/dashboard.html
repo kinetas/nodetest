@@ -50,7 +50,11 @@
 <body>
     <!--<h1>Hello World</h1>--> <!-- 대시보드 페이지에서 Hello World 출력 -->
     <h1 id="greeting">Loading...</h1> <!-- 세션에 저장된 유저 ID를 출력할 자리 -->
-    <h2>미션 리스트</h2>
+    <img id="profileImage" src="" alt="프로필 이미지" width="100" height="100">
+    <form id="profileImageForm">
+      <input type="file" id="imageFile" accept="image/*">
+      <button type="submit">프로필 변경</button>
+    </form>
     <ul id="missionList">Loading missions...</ul> <!-- 미션 리스트를 출력할 자리 -->
 
     <!-- 미션 생성 폼 -->
@@ -102,6 +106,8 @@
 
     <button onclick="window.location.href='/recommendationMission'">추천 미션 보기</button>
 
+    <button onclick="window.location.href='/league'">리그</button>
+
     <button onclick="deleteAccountToken()">계정 탈퇴</button> <!-- 추가: 계정 탈퇴 버튼 -->
 
     <button onclick="window.location.href='/ai.html'">AI</button>
@@ -111,14 +117,20 @@
         console.log("jwt_token: ", jwtToken)
 
         // ✅ 사용자 정보
-        fetch('/user-info', {
+        fetch('/api/user-info/user-all', {
             headers: {
                 'Authorization': `Bearer ${jwtToken}`
             }
         })
         .then(res => res.json())
         .then(data => {
-            document.getElementById('greeting').textContent = `Hello, ${data.userId}`;
+            document.getElementById('greeting').textContent = `Hello, ${data.u_id}`;
+            if (data.profile_image) {
+                const uint8Array = new Uint8Array(data.profile_image.data);
+                const blob = new Blob([uint8Array], { type: 'image/jpeg' }); // 또는 image/png
+                const url = URL.createObjectURL(blob);
+                document.getElementById('profileImage').src = url;
+            }
         })
         .catch(() => {
             alert('인증 실패(dashboard:654). 로그인 페이지로 이동합니다.');
@@ -348,6 +360,27 @@
                 });
             }
         }
+
+        //프로필 변경 요청
+        const form = document.getElementById('profileImageForm');
+        form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('imageFile');
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+
+        const response = await fetch('/api/user-info/chaingeProfileImage', {
+            method: 'POST',
+            headers: {
+            'Authorization': `Bearer ${jwtToken}`
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+        alert(result.message);
+        location.reload();
+        });
     </script>
 </body>
 </html>

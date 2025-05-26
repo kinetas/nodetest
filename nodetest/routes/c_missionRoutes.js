@@ -12,15 +12,18 @@ router.post('/create', loginRequired, c_missionController.createCommunityMission
 router.post('/accept', loginRequired, c_missionController.acceptCommunityMission);
 router.delete('/delete', loginRequired, c_missionController.deleteCommunityMission);
 router.get('/list', loginRequired, c_missionController.getCommunityMission);
+router.get('/getCommunityMissionSimple', loginRequired, c_missionController.getCommunityMissionSimple);
 
 // 일반 커뮤니티
 router.post('/createGeneralCommunity', loginRequired, upload.single('image'), c_missionController.createCommunity);
 router.post('/deleteGeneralCommunity', loginRequired, c_missionController.deleteGeneralCommunity);
 router.get('/printGeneralCommunityList', loginRequired, c_missionController.printGeneralCommunity);
+router.get('/printGeneralCommunitySimple', loginRequired, c_missionController.printGeneralCommunitySimple);
 
 // 추천, 인기글
 router.post('/recommendCommunity', loginRequired, c_missionController.recommendCommunity);
 router.get('/getpopularyityCommunityList', loginRequired, c_missionController.getPopularyityCommunity);
+router.get('/getpopularyityCommunitySimple', loginRequired, c_missionController.getPopularyityCommunitySimple);
 
 // 댓글
 router.post('/getOneCommunity', loginRequired, c_missionController.getOneCommunity);    // community_comments.html

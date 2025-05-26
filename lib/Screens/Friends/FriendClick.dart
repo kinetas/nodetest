@@ -148,7 +148,7 @@ class FriendClick extends StatelessWidget {
   const FriendClick({required this.friendId});
 
   Future<void> _deleteFriend(BuildContext context) async {
-    final String apiUrl = 'http://27.113.11.48:3000/dashboard/friends/delete';
+    final String apiUrl = 'http://27.113.11.48:3000/auth/dashboard/friends/delete';
 
     try {
       final response = await SessionTokenManager.delete(
@@ -184,7 +184,7 @@ class FriendClick extends StatelessWidget {
   Future<void> _startVideoCall(BuildContext context) async {
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/api/user-info/user-id',
+        'http://27.113.11.48:3000/auth/api/user-info/user-id',
       );
 
       if (response.statusCode == 200) {
@@ -196,7 +196,6 @@ class FriendClick extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => WebRTCChatScreen(
-                myId: myId,
                 friendId: friendId,
               ),
             ),

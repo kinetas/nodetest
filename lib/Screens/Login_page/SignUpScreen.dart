@@ -173,7 +173,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       final response = await SessionCookieManager.post(
-        'http://27.113.11.48:3000/auth/register-keycloak-direct', // 회원가입 API 경로
+        'http://27.113.11.48:3000/auth/api/auth/register-keycloak-direct', // 회원가입 API 경로
         headers: {'Content-Type': 'application/json'},
         body: json.encode(signUpData),
       );

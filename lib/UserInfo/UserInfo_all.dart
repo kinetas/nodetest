@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../SessionTokenManager.dart';
 
 class UserInfoAll {
-  final String apiUrl = "http://27.113.11.48:3000/nodetest/api/user-info/user-all";
+  final String apiUrl = "http://27.113.11.48:3000/auth/api/user-info/user-all";
 
   Future<Map<String, dynamic>?> fetchUserInfo() async {
     try {

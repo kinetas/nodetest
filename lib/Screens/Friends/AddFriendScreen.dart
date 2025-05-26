@@ -42,7 +42,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     try {
       print("📤 보낸 요청 목록 API 호출 시작...");
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/dashboard/friends/tfriends',
+        'http://27.113.11.48:3000/auth/dashboard/friends/tfriends',
       );
       print("📥 응답 수신: ${response.statusCode}");
 
@@ -80,7 +80,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     try {
       print("📤 친구 요청 전송 중...");
       final response = await SessionTokenManager.post(
-        "http://27.113.11.48:3000/dashboard/friends/request",
+        "http://27.113.11.48:3000/auth/dashboard/friends/request",
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"f_id": friendId}),
       );

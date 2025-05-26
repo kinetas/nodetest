@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       print("📡 로그인 요청 시작...");
       final response = await http.post(
-        Uri.parse('http://27.113.11.48:3000/auth/keycloak-direct-login'),
+        Uri.parse('http://27.113.11.48:3000/auth/api/auth/keycloak-direct-login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': id,

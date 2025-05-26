@@ -15,7 +15,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
 
   Future<void> _resetPassword(BuildContext context) async {
-    final uri = Uri.parse("http://27.113.11.48:3000/api/auth/changePassword");
+    final uri = Uri.parse("http://27.113.11.48:3000/auth/api/auth/changePassword");
 
     // 비밀번호 확인 및 정규식 검증
     if (newPasswordController.text != confirmPasswordController.text) {

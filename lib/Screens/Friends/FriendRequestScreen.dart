@@ -21,7 +21,7 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
     print("📡 [GET] 친구 요청 목록 요청 중...");
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/dashboard/friends/tfriends',
+        'http://27.113.11.48:3000/auth/dashboard/friends/tfriends',
       );
 
       print("📦 [Fetch Response] ${response.statusCode} ${response.body}");
@@ -45,8 +45,8 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
   Future<void> _handleRequest(String friendId, bool accept) async {
     final token = await SessionTokenManager.getToken();
     final url = accept
-        ? 'http://27.113.11.48:3000/nodetest/dashboard/friends/accept'
-        : 'http://27.113.11.48:3000/nodetest/dashboard/friends/reject';
+        ? 'http://27.113.11.48:3000/auth/dashboard/friends/accept'
+        : 'http://27.113.11.48:3000/auth/dashboard/friends/reject';
 
     print("📤 [POST] $url with f_id=$friendId");
 

@@ -196,7 +196,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
   Future<void> _fetchFriends() async {
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/dashboard/friends/ifriends',
+        'http://27.113.11.48:3000/auth/dashboard/friends/ifriends',
       );
 
       print("📦 [Friends GET] ${response.statusCode} ${response.body}");
@@ -219,7 +219,7 @@ class _FriendListWidgetState extends State<FriendListWidget> {
   Future<void> _fetchNotificationCount() async {
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/dashboard/friends/tfriends',
+        'http://27.113.11.48:3000/auth/dashboard/friends/tfriends',
       );
 
       print("📦 [Notifications GET] ${response.statusCode} ${response.body}");

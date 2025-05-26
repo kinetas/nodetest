@@ -5,6 +5,7 @@ require('dotenv').config();
 
 // ==================== 미들웨어 & 유틸 ====================
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
+const loginRequired = require('./middleware/loginRequired'); // JWT 미들웨어 추가
 
 // ==================== 라우터 ====================
 const authRoutes = require('./route/authRoute');

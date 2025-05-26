@@ -35,11 +35,10 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    // reward: {
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false,
-    //     defaultValue: 0, // 기본값 설정 (선택 사항)
-    // }
+    profile_image: {
+        type: DataTypes.BLOB('long'),
+        allowNull: true,
+      },
 }, {
     tableName: 'user',
     timestamps: false

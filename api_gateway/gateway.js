@@ -85,7 +85,7 @@ app.use('/auth', async (req, res, next) => {
     target,
     changeOrigin: true,
     pathRewrite: {
-      '^/auth': '/api/auth', // ✅ 핵심! auth 서버가 기대하는 경로로 바꿔줌
+      '^/auth': '', // ✅ 핵심! auth 서버가 기대하는 경로로 바꿔줌
     }
   })(req, res, next);
 });

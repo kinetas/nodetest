@@ -8,6 +8,8 @@ const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
 
 // ==================== 라우터 ====================
 const authRoutes = require('./route/authRoute');
+const userInfoRoutes = require('./route/userInfoRoute');
+const friendRoutes = require('./route/friendRoute');
 
 // ==================== 앱 초기화 ====================
 const app = express();

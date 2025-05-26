@@ -206,6 +206,7 @@ exports.checkAndUpdateMissions = async () => {
                         u_id: mission.u2_id,
                         m_deadline: now,
                         m_status: '성공',
+                        category: mission.category,
                     });
 
                     // ================ 알림 추가 - 디바이스 토큰 =======================
@@ -253,6 +254,7 @@ exports.checkAndUpdateMissions = async () => {
                         u_id: mission.u2_id,
                         m_deadline: now,
                         m_status: '실패',
+                        category: mission.category,
                     });
 
                     // ================ 알림 추가 - 디바이스 토큰 =======================

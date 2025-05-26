@@ -24,7 +24,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
       return;
     }
-
     if (!passwordRegex.hasMatch(newPasswordController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("비밀번호는 최소 8자, 영어, 숫자, 특수문자를 포함해야 합니다.")),

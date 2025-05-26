@@ -13,7 +13,7 @@ dependencies:
   
   flutter_webrtc: 0.9.40 #WEB RTC
   
-  openid_client: ^0.4.9
+  openid_client: ^0.4.8
   uuid: ^4.3.1
   agora_rtc_engine: ^6.2.5
   permission_handler: ^11.3.1
@@ -35,10 +35,10 @@ dependencies:
   exif: ^3.3.0
   dio: ^5.2.0
   flutter_web_auth_2: ^2.0.2
-  firebase_core: ^3.8.1
+  firebase_core: ^3.13.0
   firebase_auth: ^5.0.0 # 예시로 인증 기능 추가
-  cloud_firestore: ^5.5.1
-  firebase_messaging: ^15.1.6
+  cloud_firestore: ^5.0.0
+  firebase_messaging: ^15.0.0
   app_links: ^3.1.0
   
   table_calendar: ^3.0.7

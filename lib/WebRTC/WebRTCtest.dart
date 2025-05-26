@@ -24,6 +24,7 @@ class _WebRTCtestState extends State<WebRTCtest> {
 
   bool _isMakingOffer = false;
   bool _isRemoteDescriptionSet = false;
+  bool _hasIncomingCall = false;  // 🔴 추가
 
   @override
   void initState() {
@@ -61,6 +62,24 @@ class _WebRTCtestState extends State<WebRTCtest> {
 
     _peer.init().then((_) {
       _localRenderer.srcObject = _peer.localStream;
+    });
+  }
+  void _acceptCall() async {
+    if (incomingOfferFrom.isEmpty) return;
+
+    final answer = await _peer.createAnswer();
+
+    _signaling.send(
+      incomingOfferFrom,
+      'answer',
+      {
+        ...answer.toMap(),
+        'from': myId,
+      },
+    );
+
+    setState(() {
+      _hasIncomingCall = false;
     });
   }
 
@@ -191,6 +210,11 @@ class _WebRTCtestState extends State<WebRTCtest> {
             onPressed: _startCall,
             child: const Text('Start Call'),
           ),
+          if (_hasIncomingCall)
+            ElevatedButton(
+              onPressed: _acceptCall,
+              child: const Text('📞 전화 받기'),
+            ),
         ],
       ),
     );

@@ -10,10 +10,13 @@ import 'screens/Login_page/StartLogin_screen.dart';
 import 'screens/ScreenMain.dart';
 import 'screens/Login_page/FindAccountScreen.dart';
 import 'package:http/http.dart' as http;
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 

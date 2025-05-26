@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel'); // User 모델 가져오기
+const User = require('../model/userModel'); // User 모델 가져오기
 
 const secretKey = process.env.JWT_SECRET_KEY;
 

@@ -31,9 +31,9 @@ class _SettingOptionsListState extends State<SettingOptionsList> {
               MaterialPageRoute(builder: (_) => const ProfileEditScreen()),
             ).then((result) {
               if (result != null && result is Map<String, dynamic>) {
-                final name = result['name'];
+                final name = result['name'] ?? ''; // ✅ null 방어
                 final image = result['image'];
-                if (widget.onProfileEdited != null) {
+                if (image != null && widget.onProfileEdited != null) {
                   widget.onProfileEdited!(name, image);
                 }
               }
@@ -138,8 +138,7 @@ class _SettingOptionsListState extends State<SettingOptionsList> {
         AnimatedCrossFade(
           firstChild: const SizedBox.shrink(),
           secondChild: child,
-          crossFadeState:
-          isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         ),
       ],

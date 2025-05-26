@@ -31,7 +31,7 @@
             const email = document.getElementById('email').value;
     
             // fetch('/api/auth/findUid', {
-            fetch('/auth/findUid', { //MSA적용 시 사용
+            fetch('/auth/api/auth/findUid', { //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -58,7 +58,7 @@
             const newPassword = document.getElementById('newPassword').value;
 
             // fetch('/api/auth/changePassword', {
-            fetch('/auth/changePassword', { //MSA적용 시 사용
+            fetch('/auth/api/auth/changePassword', { //MSA적용 시 사용
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

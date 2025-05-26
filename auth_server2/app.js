@@ -20,6 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // ==================== 라우팅 설정 ====================
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
+app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);
+app.use('/dashboard/friends', timeConverterMiddleware, loginRequired, friendRoutes);
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 // 헬스체크 라우트 추가 (Gateway에서 사용함)

@@ -1,7 +1,7 @@
 //=============================Token=============================
 const IFriend = require('../models/i_friendModel');
 const TFriend = require('../models/t_friendModel');
-const notificationController = require('../controllers/notificationController');
+// const notificationController = require('../controllers/notificationController');
 const getCurrentUserId = (req) => {
     return req.currentUserId || null; // app.js에서 설정된 currentUserId 사용
   };
@@ -91,22 +91,22 @@ exports.friendRequestSend = async (req, res) => {
                     return res.status(400).json({ success: false, message: '이미 친구입니다.' });
                 } else {
                     await TFriend.update({ f_status: 0, f_create: new Date() }, { where: { u_id, f_id } });
-                    const notify = await notificationController.sendFriendRequestNotification(u_id, f_id);
-                    if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
+                    // const notify = await notificationController.sendFriendRequestNotification(u_id, f_id);
+                    // if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
                     return res.json({ success: true, message: '다시 요청을 보냈습니다.' });
                 }
             } else if (existingRequest.f_status === 2) {
                 await TFriend.update({ f_status: 0, f_create: new Date() }, { where: { u_id, f_id } });
-                const notify = await notificationController.sendFriendRequestNotification(u_id, f_id);
-                if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
+                // const notify = await notificationController.sendFriendRequestNotification(u_id, f_id);
+                // if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
                 return res.json({ success: true, message: '다시 요청을 보냈습니다.' });
             }
         }
 
         if (!existingRequest && (!reverseRequest || reverseRequest.f_status !== 0)) {
             await TFriend.create({ u_id, f_id, f_create: new Date(), f_status: 0 });
-            const notify = await notificationController.sendFriendRequestNotification(u_id, f_id);
-            if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
+            // const notify = await notificationController.sendFriendRequestNotification(u_id, f_id);
+            // if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
             return res.json({ success: true, message: '친구 요청이 성공적으로 전송되었습니다.' });
         }
 
@@ -138,8 +138,8 @@ exports.friendRequestAccept = async (req, res) => {
         await IFriend.bulkCreate([{ u_id, f_id }, { u_id: f_id, f_id: u_id }]);
         await TFriend.update({ f_status: 1 }, { where: { u_id: f_id, f_id: u_id } });
 
-        const notify = await notificationController.sendFriendAcceptNotification(u_id, f_id);
-        if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
+        // const notify = await notificationController.sendFriendAcceptNotification(u_id, f_id);
+        // if (!notify) return res.status(400).json({ success: false, message: '알림 실패' });
 
         res.json({ success: true, message: '친구 요청 수락 완료' });
     } catch (error) {

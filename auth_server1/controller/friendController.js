@@ -1,6 +1,6 @@
 //=============================Token=============================
-const IFriend = require('../models/i_friendModel');
-const TFriend = require('../models/t_friendModel');
+const IFriend = require('../model/i_friendModel');
+const TFriend = require('../model/t_friendModel');
 // const notificationController = require('../controllers/notificationController');
 const getCurrentUserId = (req) => {
     return req.currentUserId || null; // app.js에서 설정된 currentUserId 사용

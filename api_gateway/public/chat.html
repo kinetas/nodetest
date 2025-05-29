@@ -51,6 +51,7 @@
         // ✅ Socket.io 연결: auth로 JWT 토큰 전달
         const socket = io("http://13.125.65.151", {
             path: '/socket.io',
+            transports: ["websocket"],
             // auth: { token, u1_id, u2_id }
             auth: { token }
         });

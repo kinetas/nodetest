@@ -130,7 +130,7 @@
             .then(res => res.json())
             .then(data => {
                 alert(data.message);
-                window.location.href = `/chat.html?r_id=${r_id}&u2_id=${u2_id}`;
+                window.location.href = `/chat?r_id=${r_id}&u2_id=${u2_id}`;
             });
         }
 

@@ -131,6 +131,7 @@ app.use('/socket.io', createProxyMiddleware({
 const server = http.createServer(app);
 
 server.on('upgrade', (req, socket, head) => {
+  console.log('[GATEWAY] WebSocket upgrade 요청 수신');
   app.emit('upgrade', req, socket, head);
 });
 // ✅ Gateway 서버 시작

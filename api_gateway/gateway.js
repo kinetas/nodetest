@@ -3,6 +3,8 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const fetch = require('node-fetch');
 const path = require('path');
+const http = require('http');
+
 require('dotenv').config();
 
 const app = express();
@@ -126,8 +128,12 @@ app.use('/socket.io', createProxyMiddleware({
   ws: true // ⭐ WebSocket 연결 허용
 }));
 
+const server = http.createServer(app);
 
+server.on('upgrade', (req, socket, head) => {
+  app.emit('upgrade', req, socket, head);
+});
 // ✅ Gateway 서버 시작
-app.listen(3000, '0.0.0.0', () => {
+server.listen(3000, '0.0.0.0', () => {
   console.log('🚪 API Gateway running on port 3000');
 });

@@ -1,7 +1,9 @@
+
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../../../UserInfo/UserInfo_all.dart';
 import '../../../UserInfo/UserInfo_MissionCount.dart';
+import '../../Loading.dart';
 
 class ProfileHeader extends StatefulWidget {
   const ProfileHeader({super.key});
@@ -39,7 +41,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
         if (userSnapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
-            child: Center(child: CircularProgressIndicator()),
+            child: Loading(),
           );
         }
 
@@ -88,7 +90,7 @@ class _ProfileHeaderState extends State<ProfileHeader> {
             if (missionSnapshot.connectionState == ConnectionState.waiting) {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 32),
-                child: Center(child: CircularProgressIndicator()),
+                child: Loading(),
               );
             }
 

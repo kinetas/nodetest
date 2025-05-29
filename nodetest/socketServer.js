@@ -478,7 +478,7 @@ console.log('User disconnected');
 */
 });
 
-server.listen(3001, () => {
+server.listen(3001, '0.0.0.0', () => {
   console.log('HTTP Server running on port 3001');
 });
 

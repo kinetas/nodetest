@@ -334,7 +334,7 @@ exports.acceptCommunityMission = async (req, res) => {
         // ✅ 2. 없으면 roomController의 addRoom 함수 호출 (내부 API 요청)
         if (!openRoom) {
             const addRoomRes = await axios.post(
-                'http://27.113.11.48:3000/api/rooms',
+                'http://13.125.65.151:3000/nodetest/api/rooms',
                 {
                     u2_id: mission.u_id,
                     r_type: 'open'

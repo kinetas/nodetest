@@ -113,7 +113,7 @@
                 formData.append('c_image', fileInput.files[0]);
             }
 
-            fetch('/dashboard/missionVote', {
+            fetch('/nodetest/dashboard/missionVote', {
                 method: 'POST',
                 headers: authHeaderKeyCloak,
                 body: formData
@@ -130,7 +130,7 @@
             const m_id = document.getElementById('m_id').value;
             if (!m_id) return alert("미션 ID를 입력하세요.");
 
-            fetch('/dashboard/missiondelete', {
+            fetch('/nodetest/dashboard/missiondelete', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

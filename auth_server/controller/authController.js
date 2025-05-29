@@ -208,7 +208,8 @@ exports.logoutToken = async (req, res) => {
     try {
         const { idToken } = req.body;
         console.log("id_token(authController.js:368): ", idToken)
-        const redirectUri = 'http://27.113.11.48:3000/'; // 로그아웃 후 돌아갈 경로
+        // const redirectUri = 'http://27.113.11.48:3000/'; // 로그아웃 후 돌아갈 경로
+        const redirectUri = 'http://13.125.65.151:3000/'; // 로그아웃 후 돌아갈 경로
 
         if (!idToken) {
             return res.status(400).json({

@@ -49,7 +49,7 @@
         console.log("유저 ID:", u1_id);
 
         // ✅ Socket.io 연결: auth로 JWT 토큰 전달
-        const socket = io("http://gateway-NLB-9bea32839ba94aa7.elb.ap-northeast-2.amazonaws.com", {
+        const socket = io("43.200.131.70:3001", {
             path: '/socket.io',
             transports: ["websocket"],
             // auth: { token, u1_id, u2_id }

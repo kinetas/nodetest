@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -33,7 +31,7 @@
 
             // KeyCloak + JWT 한번에 (index 화면에서 로그인)
             // fetch('/api/auth/keycloak-direct-login', {
-            fetch('/auth/keycloak-direct-login', {   //MSA적용 시 사용
+            fetch('/auth/api/auth/keycloak-direct-login', {   //MSA적용 시 사용
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),

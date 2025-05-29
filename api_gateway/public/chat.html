@@ -49,7 +49,7 @@
         console.log("유저 ID:", u1_id);
 
         // ✅ Socket.io 연결: auth로 JWT 토큰 전달
-        const socket = io("http://27.113.11.48:3001", {
+        const socket = io("http://13.125.65.151:3001", {
             path: '/socket.io',
             // auth: { token, u1_id, u2_id }
             auth: { token }

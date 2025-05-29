@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionTokenManager.dart'; // ✅ http 직접 사용 제거
+import '../../SessionTokenManager.dart';
 
 class CommunityPostContent extends StatefulWidget {
   final String crNum;
@@ -31,21 +30,14 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
 
   Future<void> fetchPostContent() async {
     final url = 'http://27.113.11.48:3000/nodetest/api/comumunity_missions/list';
-
     try {
-      final response = await SessionTokenManager.get(url); // ✅ 여기서 처리
-
-      print('📥 게시글 목록 응답: ${response.statusCode}');
-      print('📥 body: ${response.body}');
-
+      final response = await SessionTokenManager.get(url);
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['missions'];
-
         final mission = data.firstWhere(
               (mission) => mission['cr_num'] == widget.crNum,
           orElse: () => null,
         );
-
         if (mission != null) {
           setState(() {
             deadline = mission['deadline'] ?? '기한 없음';
@@ -65,7 +57,6 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
         });
       }
     } catch (e) {
-      print('❌ fetchPostContent error: $e');
       setState(() {
         content = '오류가 발생했습니다. 다시 시도해주세요.';
         isLoading = false;
@@ -74,24 +65,14 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
   }
 
   Future<void> acceptMission() async {
-    final token = await SessionTokenManager.getToken();
     final url = 'http://27.113.11.48:3000/api/comumunity_missions/accept';
     final body = json.encode({"cr_num": widget.crNum});
-
-    print('📤 미션 수락 요청: $body');
-
     try {
       final response = await SessionTokenManager.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: body,
       );
-
-      print('📥 수락 응답: ${response.statusCode}');
-      print('📥 수락 응답 바디: ${response.body}');
-
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('미션이 수락되었습니다!')),
@@ -103,7 +84,6 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
         );
       }
     } catch (e) {
-      print('❌ acceptMission error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
       );
@@ -119,61 +99,130 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
   @override
   Widget build(BuildContext context) {
     final bool isMatched = widget.crStatus == 'acc';
-    final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            width: size.width,
-            height: size.height,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.lightBlue[300]!, Colors.lightBlue[50]!],
-              ),
-            ),
+      backgroundColor: const Color(0xFFF7FAFC),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        foregroundColor: Colors.black,
+        title: const Text(
+          '게시글 상세',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
           ),
-          isLoading
-              ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
-              : SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(widget.crTitle,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                      textAlign: TextAlign.center),
-                  SizedBox(height: 8),
-                  Text(_getStatusLabel(widget.crStatus),
-                      style: TextStyle(fontSize: 18, color: Colors.white70),
-                      textAlign: TextAlign.center),
-                  SizedBox(height: 8),
-                  Text("미션 기한: $deadline",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                      textAlign: TextAlign.center),
-                  SizedBox(height: 16),
-                  Expanded(
-                    child: Container(
+        ),
+        centerTitle: true,
+      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
+          : SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 상태/마감일 라벨 (모던하게)
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 5, spreadRadius: 3),
-                        ],
+                        color: isMatched
+                            ? Colors.grey[200]
+                            : Colors.lightBlue[50],
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SingleChildScrollView(
-                          child: Text(content, style: TextStyle(fontSize: 16, color: Colors.black87)),
+                      child: Text(
+                        _getStatusLabel(widget.crStatus),
+                        style: TextStyle(
+                          color: isMatched
+                              ? Colors.grey[600]
+                              : Colors.lightBlue[800],
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
                         ),
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF1F3F8),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Color(0xFFBFD7ED), width: 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.calendar_today,
+                              color: Colors.lightBlue, size: 15),
+                          SizedBox(width: 5),
+                          Text(
+                            '마감일',
+                            style: TextStyle(
+                              color: Colors.lightBlue[800],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            deadline,
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                // 제목
+                Text(
+                  widget.crTitle,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
+                ),
+                SizedBox(height: 18),
+                // 본문(더 넓고 자연스럽게, 배경톤만 부드럽게)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.08),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: Colors.black87,
+                      height: 1.7,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 38),
+                // 미션 수락 버튼
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
                     onPressed: isMatched
                         ? null
                         : () async {
@@ -184,9 +233,13 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
                           content: Text('미션을 수락하시겠습니까?'),
                           actions: [
                             TextButton(
-                                onPressed: () => Navigator.pop(context, false), child: Text('취소')),
+                                onPressed: () =>
+                                    Navigator.pop(context, false),
+                                child: Text('취소')),
                             TextButton(
-                                onPressed: () => Navigator.pop(context, true), child: Text('확인')),
+                                onPressed: () =>
+                                    Navigator.pop(context, true),
+                                child: Text('확인')),
                           ],
                         ),
                       );
@@ -194,18 +247,25 @@ class _CommunityPostContentState extends State<CommunityPostContent> {
                         await acceptMission();
                       }
                     },
-                    child: Text('수락하기'),
+                    child: Text(
+                      '미션 수락하기',
+                      style: TextStyle(fontSize: 17),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isMatched ? Colors.grey : Colors.lightBlue[400],
-                      minimumSize: Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: isMatched
+                          ? Colors.grey[400]
+                          : Colors.lightBlue[400],
+                      minimumSize: Size(double.infinity, 52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

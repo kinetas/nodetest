@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionTokenManager.dart'; // ✅ http 제거, 토큰 매니저만 사용
+import '../../SessionTokenManager.dart';
 
 class AddVote extends StatefulWidget {
   @override
@@ -20,8 +20,6 @@ class _AddVoteState extends State<AddVote> {
       "c_contents": _contentController.text,
     });
 
-    print('📤 투표 생성 요청: $body');
-
     setState(() => isLoading = true);
 
     try {
@@ -30,9 +28,6 @@ class _AddVoteState extends State<AddVote> {
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-
-      print('📥 응답 상태 코드: ${response.statusCode}');
-      print('📥 응답 바디: ${response.body}');
 
       setState(() => isLoading = false);
 
@@ -47,7 +42,6 @@ class _AddVoteState extends State<AddVote> {
         );
       }
     } catch (e) {
-      print('❌ 네트워크 오류: $e');
       setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('오류가 발생했습니다. 다시 시도해주세요.')),
@@ -69,13 +63,13 @@ class _AddVoteState extends State<AddVote> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('투표 생성', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.lightBlue[400],
+        title: Text('투표 생성', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.lightBlue[300],
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
+          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[300]))
           : Container(
-        color: Colors.lightBlue[50],
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,18 +79,17 @@ class _AddVoteState extends State<AddVote> {
               decoration: InputDecoration(
                 labelText: '투표 제목',
                 labelStyle: TextStyle(color: Colors.lightBlue[800]),
-                filled: true,
-                fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.lightBlue[400]!, width: 2),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
+                counterStyle: TextStyle(color: Colors.grey[600]),
               ),
-              style: TextStyle(fontSize: 18),
               maxLength: 100,
+              style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 16),
             TextField(
@@ -106,25 +99,25 @@ class _AddVoteState extends State<AddVote> {
                 hintText: '투표 내용을 입력하세요.',
                 hintStyle: TextStyle(color: Colors.grey),
                 labelStyle: TextStyle(color: Colors.lightBlue[800]),
-                filled: true,
-                fillColor: Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.lightBlue[400]!, width: 2),
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
+                counterStyle: TextStyle(color: Colors.grey[600]),
               ),
               maxLines: 5,
               maxLength: 500,
+              style: TextStyle(fontSize: 16),
             ),
             Spacer(),
             ElevatedButton(
               onPressed: onSubmit,
-              child: Text('생성', style: TextStyle(fontSize: 18, color: Colors.white)),
+              child: Text('생성', style: TextStyle(fontSize: 18)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue[400],
+                backgroundColor: Colors.lightBlue[300],
                 minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),

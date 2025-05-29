@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:dio/dio.dart';
-import '../../SessionTokenManager.dart'; // ✅ 변경됨
+import '../../SessionTokenManager.dart';
 
 class CommunityVoteContent extends StatefulWidget {
   final String cNumber;
@@ -22,7 +21,6 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
   Uint8List? imageData;
   bool isLoading = true;
   bool isButtonDisabled = false;
-  final Dio _dio = Dio();
 
   @override
   void initState() {
@@ -34,7 +32,7 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
     final url = 'http://27.113.11.48:3000/nodetest/api/cVote/';
 
     try {
-      final response = await SessionTokenManager.get(url); // ✅ 변경됨
+      final response = await SessionTokenManager.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -135,66 +133,214 @@ class _CommunityVoteContentState extends State<CommunityVoteContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7FAFC),
       appBar: AppBar(
-        backgroundColor: Colors.lightBlue,
-        title: Text('투표 상세보기', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.white,
+        elevation: 1,
+        foregroundColor: Colors.black,
+        title: const Text(
+          '투표 상세보기',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
       ),
-      backgroundColor: Colors.lightBlue.shade50,
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          elevation: 5,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
+          : SafeArea(
+        child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(title, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                // 마감(삭제예정일) 라벨
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF1F3F8),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Color(0xFFBFD7ED), width: 1),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.event, color: Colors.lightBlue, size: 16),
+                          SizedBox(width: 5),
+                          Text(
+                            '삭제 예정일',
+                            style: TextStyle(
+                              color: Colors.lightBlue[800],
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            deletedate,
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.lightBlue[50],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.thumb_up_alt_outlined,
+                              color: Colors.lightBlue, size: 16),
+                          SizedBox(width: 4),
+                          Text('$good',
+                              style: TextStyle(
+                                  color: Colors.lightBlue[800],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13)),
+                          SizedBox(width: 10),
+                          Icon(Icons.thumb_down_alt_outlined,
+                              color: Colors.redAccent, size: 16),
+                          SizedBox(width: 4),
+                          Text('$bad',
+                              style: TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                // 제목
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
                 SizedBox(height: 16),
-                Text(content, style: TextStyle(fontSize: 16)),
-                SizedBox(height: 16),
-                Text("찬성: $good, 반대: $bad", style: TextStyle(fontSize: 16)),
-                SizedBox(height: 16),
-                Text("삭제 예정일: $deletedate", style: TextStyle(fontSize: 16)),
-                SizedBox(height: 16),
+                // 본문(더 넓고 자연스럽게)
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.08),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 17,
+                      color: Colors.black87,
+                      height: 1.7,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                // 이미지
                 if (imageData != null)
                   GestureDetector(
                     onTap: () => showDialog(
                       context: context,
-                      builder: (_) => Dialog(child: Image.memory(imageData!)),
+                      builder: (_) => Dialog(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Image.memory(imageData!),
+                        ),
+                      ),
                     ),
                     child: Container(
+                      margin: EdgeInsets.only(bottom: 8),
                       height: 200,
+                      width: double.infinity,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[100],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.memory(imageData!, fit: BoxFit.cover),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.memory(
+                          imageData!,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   )
                 else
-                  Text('이미지가 없습니다.', style: TextStyle(color: Colors.grey)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: isButtonDisabled ? null : () => postVote('good'),
-                      child: Text('찬성'),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.lightBlue),
+                  Container(
+                    alignment: Alignment.center,
+                    height: 90,
+                    margin: EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    ElevatedButton(
-                      onPressed: isButtonDisabled ? null : () => postVote('bad'),
-                      child: Text('반대'),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                    child: Text('이미지가 없습니다.',
+                        style: TextStyle(color: Colors.grey)),
+                  ),
+                SizedBox(height: 18),
+                // 투표 버튼
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: isButtonDisabled
+                            ? null
+                            : () => postVote('good'),
+                        icon: Icon(Icons.thumb_up_alt_outlined),
+                        label: Text('찬성'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.lightBlue,
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: isButtonDisabled
+                            ? null
+                            : () => postVote('bad'),
+                        icon: Icon(Icons.thumb_down_alt_outlined),
+                        label: Text('반대'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
+                SizedBox(height: 6),
               ],
             ),
           ),

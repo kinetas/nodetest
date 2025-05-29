@@ -1,140 +1,12 @@
-/*
-import 'package:flutter/material.dart';
-import 'dart:convert';
-import '../../SessionCookieManager.dart';
-
-class LatestPosts extends StatefulWidget {
-  final VoidCallback onNavigateToCommunity;
-
-  LatestPosts({required this.onNavigateToCommunity});
-
-  @override
-  _LatestPostsState createState() => _LatestPostsState();
-}
-
-class _LatestPostsState extends State<LatestPosts> {
-  List<Map<String, String>> posts = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchLatestPosts();
-  }
-
-  Future<void> fetchLatestPosts() async {
-    final url = 'http://27.113.11.48:3000/api/comumunity_missions/list';
-
-    try {
-      final response = await SessionCookieManager.get(url);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // 게시글 리스트를 가져와 상위 두 개만 선택하고 Map<String, String>으로 변환
-        final missions = List<Map<String, dynamic>>.from(data['missions'] ?? []);
-        setState(() {
-          posts = missions
-              .take(2)
-              .map((mission) => {
-            'title': mission['cr_title']?.toString() ?? '제목 없음',
-            'content': mission['content']?.toString() ?? '내용 없음',
-          })
-              .toList();
-          isLoading = false;
-        });
-      } else {
-        print('Failed to load latest posts: ${response.statusCode}');
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error fetching latest posts: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Color primaryColor = Colors.lightBlue[700]!;
-
-    return isLoading
-        ? Center(child: CircularProgressIndicator())
-        : Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '최신 게시글',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: primaryColor,
-            ),
-          ),
-          SizedBox(height: 10), // 제목과 게시글 간의 여백
-          ...posts.map((post) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16.0), // 게시글 간 여백
-              child: GestureDetector(
-                onTap: widget.onNavigateToCommunity,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        post['title']!,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
-                      ),
-                      SizedBox(height: 8), // 제목과 내용 간의 여백
-                      Text(
-                        post['content']!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ],
-      ),
-    );
-  }
-}
-*/
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionTokenManager.dart';
+import 'CommunityPostDialog.dart'; // 플로팅 카드 상세 뷰 위젯 임포트!
 
 class LatestPosts extends StatefulWidget {
   final VoidCallback onNavigateToCommunity;
 
-  const LatestPosts({required this.onNavigateToCommunity});
+  const LatestPosts({required this.onNavigateToCommunity, Key? key}) : super(key: key);
 
   @override
   _LatestPostsState createState() => _LatestPostsState();
@@ -163,8 +35,10 @@ class _LatestPostsState extends State<LatestPosts> {
         setState(() {
           posts = missions.take(2).map((mission) {
             return {
-              'title': mission['cr_title']?.toString() ?? '제목 없음',
-              'content': mission['content']?.toString() ?? '내용 없음',
+              'cr_num': mission['cr_num']?.toString() ?? '',
+              'cr_title': mission['cr_title']?.toString() ?? '제목 없음',
+              'cr_status': mission['cr_status']?.toString() ?? '',
+              'contents': mission['contents']?.toString() ?? '내용 없음',
             };
           }).toList();
           isLoading = false;
@@ -244,14 +118,25 @@ class _LatestPostsState extends State<LatestPosts> {
               ),
             ),
 
-          // 게시글 리스트 렌더링
+          // 게시글 리스트
           ...posts.map((post) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: GestureDetector(
-                onTap: widget.onNavigateToCommunity,
+                onTap: () {
+                  // 게시글 클릭 시 플로팅 상세카드 다이얼로그로
+                  showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (_) => CommunityPostDialog(
+                      crNum: post['cr_num'] ?? '',
+                      crTitle: post['cr_title'] ?? '',
+                      crStatus: post['cr_status'] ?? '',
+                    ),
+                  );
+                },
                 child: Container(
-                  width: double.infinity, // ✅ 좌우 길이 통일
+                  width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -265,10 +150,10 @@ class _LatestPostsState extends State<LatestPosts> {
                   ),
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // ✅ 좌측 정렬
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        post['title']!,
+                        post['cr_title'] ?? '',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -279,7 +164,7 @@ class _LatestPostsState extends State<LatestPosts> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        post['content']!,
+                        post['contents'] ?? '',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

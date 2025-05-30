@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>리그 기능 테스트 UI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    input, select, button {
+      margin: 5px;
+      padding: 5px 10px;
+      font-size: 1rem;
+    }
+    .section {
+      margin-bottom: 30px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 20px;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .rank-table {
+      margin-top: 10px;
+      border-collapse: collapse;
+    }
+    .rank-table th, .rank-table td {
+      border: 1px solid #aaa;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🛡️ 리그 기능 테스트 UI</h1>
+
+  <div class="section">
+    <label for="globalUserId"><strong>사용자 ID:</strong></label>
+    <input type="text" id="globalUserId" placeholder="자동 입력 중..." readonly>
+  </div>
+
+  <div class="section">
+    <h2>1️⃣ 리그 배정</h2>
+    <button onclick="assignLeague()">리그에 배정하기</button>
+  </div>
+
+  <div class="section">
+    <h2>2️⃣ 리그 정보 확인</h2>
+    <button onclick="getLeagueDetail()">내 리그 정보 보기</button>
+    <div id="leagueInfo"></div>
+  </div>
+
+  <div class="section">
+    <h2>3️⃣ 미션 수행 결과</h2>
+    <button onclick="updateLp(true)">✅ 미션 성공 (+20 LP)</button>
+    <button onclick="updateLp(false)">❌ 미션 실패 (+5 LP)</button>
+  </div>
+
+  <script>
+    let currentUserId = null;
+    const jwtToken = localStorage.getItem('jwt_token');
+
+    // ✅ 로그인된 사용자 정보 불러오기
+    async function fetchUserInfo() {
+      try {
+        const res = await fetch('/nodetest/api/user-info/user-all', {
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`
+          }
+        });
+
+        if (!res.ok) throw new Error("사용자 정보 요청 실패");
+
+        const data = await res.json();
+        currentUserId = data.u_id;
+        document.getElementById('globalUserId').value = currentUserId;
+      } catch (err) {
+        alert("로그인 정보 확인 실패. 로그인 페이지로 이동합니다.");
+        window.location.href = '/';
+      }
+    }
+
+    fetchUserInfo(); // 페이지 로딩 시 실행
+
+    function getUserId() {
+      if (!currentUserId) {
+        alert('사용자 정보를 불러오지 못했습니다.');
+        throw new Error('No user_id');
+      }
+      return currentUserId;
+    }
+
+    async function assignLeague() {
+      const user_id = getUserId();
+      const res = await fetch(`/nodetest/league/assign`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id })
+      });
+      const data = await res.json();
+      alert(data.message);
+    }
+
+    async function getLeagueDetail() {
+      const user_id = getUserId();
+      const res = await fetch(`/nodetest/league/detail/${user_id}`);
+
+      if (!res.ok) {
+        const text = await res.text();
+        alert(`오류: ${res.status} - ${text}`);
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!data || !data.users) {
+        document.getElementById('leagueInfo').innerHTML = "<p>리그 정보 없음</p>";
+        return;
+      }
+
+      const tableRows = data.users.map(u => `
+        <tr>
+          <td>${u.rank}</td>
+          <td>${u.user_id}</td>
+          <td>${u.lp}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('leagueInfo').innerHTML = `
+        <p><strong>리그:</strong> ${data.league_name} (${data.tier})</p>
+        <p><strong>내 LP:</strong> ${data.users.find(u => u.user_id === user_id)?.lp ?? 'N/A'}</p>
+        <p><strong>리그 순위:</strong></p>
+        <table class="rank-table">
+          <thead>
+            <tr><th>순위</th><th>유저ID</th><th>LP</th></tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function updateLp(success) {
+      const user_id = getUserId();
+      const res = await fetch(`/nodetest/league/mission-lp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id, success })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+    }
+  </script>
+
+</body>
+</html>

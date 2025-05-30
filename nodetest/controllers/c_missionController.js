@@ -337,6 +337,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 'http://13.125.65.151:3000/nodetest/api/rooms',
                 {
                     u2_id: mission.u_id,
+                    roomName: mission.cr_title,
                     r_type: 'open'
                 },
                 {

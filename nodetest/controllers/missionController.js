@@ -36,19 +36,23 @@ async function updateCommunityRoomStatusOnMissionComplete(mission) {
         }
       });
   
-      if (!cRoom) return; // 매칭되는 community_room이 없으면 종료
+      if (!cRoom) return;
   
-      // 3. 해당 미션이 m1인지 m2인지에 따라 상태 업데이트
-      if (cRoom.m1_id === mission.m_id) {
+      // 3. 문자열로 비교 (형 변환)
+      const mId = mission.m_id.toString();
+  
+      if (cRoom.m1_id?.toString() === mId) {
         await CRoom.update(
           { m1_status: mission.m_status },
           { where: { cr_num: cRoom.cr_num } }
         );
-      } else if (cRoom.m2_id === mission.m_id) {
+        console.log(`✅ community_room ${cRoom.cr_num}의 m1_status 업데이트 완료`);
+      } else if (cRoom.m2_id?.toString() === mId) {
         await CRoom.update(
           { m2_status: mission.m_status },
           { where: { cr_num: cRoom.cr_num } }
         );
+        console.log(`✅ community_room ${cRoom.cr_num}의 m2_status 업데이트 완료`);
       }
   
     } catch (err) {

@@ -13,6 +13,49 @@ const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 const leagueController = require('../controllers/leagueController');
 
+// 미션 완료 시 커뮤니티 미션인지 확인 후 커뮤니티 방에 미션 상태 업데이트
+async function updateCommunityRoomStatusOnMissionComplete(mission) {
+    try {
+      // 1. 해당 미션이 커뮤니티 미션인지 확인 (room.r_type == 'open')
+      const relatedRoom = await Room.findOne({
+        where: {
+          r_id: mission.r_id,
+          r_type: 'open'
+        }
+      });
+  
+      if (!relatedRoom) return; // 커뮤니티 미션이 아니면 종료
+  
+      // 2. 해당 미션과 매칭되는 community_room 찾기 (m1_id 또는 m2_id)
+      const cRoom = await CRoom.findOne({
+        where: {
+          [Sequelize.Op.or]: [
+            { m1_id: mission.m_id },
+            { m2_id: mission.m_id }
+          ]
+        }
+      });
+  
+      if (!cRoom) return; // 매칭되는 community_room이 없으면 종료
+  
+      // 3. 해당 미션이 m1인지 m2인지에 따라 상태 업데이트
+      if (cRoom.m1_id === mission.m_id) {
+        await CRoom.update(
+          { m1_status: mission.m_status },
+          { where: { cr_num: cRoom.cr_num } }
+        );
+      } else if (cRoom.m2_id === mission.m_id) {
+        await CRoom.update(
+          { m2_status: mission.m_status },
+          { where: { cr_num: cRoom.cr_num } }
+        );
+      }
+  
+    } catch (err) {
+      console.error('❌ 커뮤니티 미션 상태 업데이트 중 오류:', err);
+    }
+  }
+
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
     const { u2_id, authenticationAuthority, m_title, m_deadline, m_reword, category } = req.body;
@@ -768,6 +811,10 @@ exports.successMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        const updatedMission = await Mission.findOne({ where: { m_id } });
+        // 커뮤니티 미션 상태 업데이트
+        await updateCommunityRoomStatusOnMissionComplete(updatedMission);
+
         // 현재 시간 저장
         const currentTime = new Date();
 
@@ -852,6 +899,10 @@ exports.failureMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+
+        const updatedMission = await Mission.findOne({ where: { m_id } });
+        // 커뮤니티 미션 상태 업데이트
+        await updateCommunityRoomStatusOnMissionComplete(updatedMission);
 
         // 현재 시간 저장
         const currentTime = new Date();
@@ -1012,6 +1063,9 @@ exports.checkMissionDeadline = async () => {
                     m_deadline: new Date(deadline.getTime() - 10 * 60 * 1000), // 마감 기한을 10분 줄임
                 });
 
+                // 커뮤니티 미션 상태 업데이트 함수 호출
+                await updateCommunityRoomStatusOnMissionComplete(mission);
+
                 // ✅ LP 반영
                 try {
                     const lpReq = {
@@ -1072,6 +1126,9 @@ exports.checkMissionDeadline = async () => {
             ) {
                 // 2. 날짜가 변함
                 await mission.update({ m_status: '완료' });
+
+                // 커뮤니티 미션 상태 업데이트 함수 호출
+                await updateCommunityRoomStatusOnMissionComplete(mission);
 
                 // ✅ LP 반영
                 try {

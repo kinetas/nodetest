@@ -16,50 +16,58 @@ const leagueController = require('../controllers/leagueController');
 // 미션 완료 시 커뮤니티 미션인지 확인 후 커뮤니티 방에 미션 상태 업데이트
 async function updateCommunityRoomStatusOnMissionComplete(mission) {
     try {
-      console.log("🔍 mission.r_id:", mission.r_id);
-      // 1. 해당 미션이 커뮤니티 미션인지 확인 (room.r_type == 'open')
-      const relatedRoom = await Room.findOne({
-        where: {
-          r_id: mission.r_id,
-          r_type: 'open'
+        console.log("🔍 mission.r_id:", mission.r_id);
+        // 1. 해당 미션이 커뮤니티 미션인지 확인 (room.r_type == 'open')
+        const relatedRoom = await Room.findOne({
+            where: {
+                r_id: mission.r_id,
+                r_type: 'open'
+            }
+        });
+
+        if (!relatedRoom) {
+            console.log("❌ 해당 r_id를 가진 open room이 없습니다.");
+            return; // 커뮤니티 미션이 아니면 종료
         }
-      });
-  
-      if (!relatedRoom) {
-        console.log("❌ 해당 r_id를 가진 open room이 없습니다.");
-        return; // 커뮤니티 미션이 아니면 종료
-      }
-  
-      // 2. 해당 미션과 매칭되는 community_room 찾기 (m1_id 또는 m2_id)
-      const cRoom = await CRoom.findOne({
-        where: {
-          [Op.or]: [
-            { m1_id: mission.m_id },
-            { m2_id: mission.m_id }
-          ]
+
+        // 2. 해당 미션과 매칭되는 community_room 찾기 (m1_id 또는 m2_id)
+        const cRoom = await CRoom.findOne({
+            where: {
+                [Op.or]: [
+                { m1_id: mission.m_id },
+                { m2_id: mission.m_id }
+                ]
+            }
+        });
+
+        if (!cRoom) return;
+
+        // 3. 문자열로 비교 (형 변환)
+        const mId = mission.m_id.toString();
+
+        if (cRoom.m1_id && cRoom.m1_id.trim() === mission.m_id.trim()) {
+            await CRoom.update(
+                { m1_status: mission.m_status },
+                { where: { cr_num: cRoom.cr_num } }
+            );
+            console.log(`✅ cr_num ${cRoom.cr_num} - m1_status 업데이트 완료`);
+        } else if (cRoom.m2_id && cRoom.m2_id.trim() === mission.m_id.trim()) {
+            await CRoom.update(
+                { m2_status: mission.m_status },
+                { where: { cr_num: cRoom.cr_num } }
+            );
+            console.log(`✅ cr_num ${cRoom.cr_num} - m2_status 업데이트 완료`);
+        } else {
+            console.log(`⚠️ mission.m_id와 일치하는 m1_id/m2_id가 없습니다`);
         }
-      });
-  
-      if (!cRoom) return;
-  
-      // 3. 문자열로 비교 (형 변환)
-      const mId = mission.m_id.toString();
-  
-      if (cRoom.m1_id && cRoom.m1_id.trim() === mission.m_id.trim()) {
-        await CRoom.update(
-          { m1_status: mission.m_status },
-          { where: { cr_num: cRoom.cr_num } }
-        );
-        console.log(`✅ cr_num ${cRoom.cr_num} - m1_status 업데이트 완료`);
-      } else if (cRoom.m2_id && cRoom.m2_id.trim() === mission.m_id.trim()) {
-        await CRoom.update(
-          { m2_status: mission.m_status },
-          { where: { cr_num: cRoom.cr_num } }
-        );
-        console.log(`✅ cr_num ${cRoom.cr_num} - m2_status 업데이트 완료`);
-      } else {
-        console.log(`⚠️ mission.m_id와 일치하는 m1_id/m2_id가 없습니다`);
-      }
+
+        // ✅ m1_status, m2_status 모두 완료일 경우 해당 row 삭제
+        const updatedRoom = await CRoom.findOne({ where: { cr_num: cRoom.cr_num } });
+
+        if (updatedRoom.m1_status === '완료' && updatedRoom.m2_status === '완료') {
+            await CRoom.destroy({ where: { cr_num: updatedRoom.cr_num } });
+            console.log(`✅ community_room ${updatedRoom.cr_num} 삭제 완료 (m1, m2 모두 완료)`);
+        }
   
     } catch (err) {
       console.error('❌ 커뮤니티 미션 상태 업데이트 중 오류:', err);

@@ -9,48 +9,69 @@ const CommunityCommentCmtRecom = require('../models/comment_recommendationModel'
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const Sequelize = require('sequelize');
-const { sequelize } = require('../models/comunity_roomModel');
+// const { sequelize } = require('../models/comunity_roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨]
+const sequelize = require('../config/db');
 
 //======================Token===============================
 
 exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
+    //중간에 오류 발생 시 일부만 삭제되는 걸 방지
+    const t = await sequelize.transaction();
     try {
-        // 1. 이 방(cr_num)과 관련된 커뮤니티 댓글(cc_num) 조회
+        const cRoom = await CRoom.findOne({ where: { cr_num } });
+        if (!cRoom) return;
+
+        // 이 방(cr_num)과 관련된 커뮤니티 댓글(cc_num) 조회
         const comments = await CommunityComment.findAll({
             where: { cr_num },
-            attributes: ['cc_num']
+            attributes: ['cc_num'],
+            transaction: t
         });
 
         const ccNums = comments.map(comment => comment.cc_num);
 
-        // 2. 댓글 추천(comment_recommendation) 삭제 (cc_num 기준)
+        // 댓글 추천(comment_recommendation) 삭제 (cc_num 기준)
         if (ccNums.length > 0) {
             await CommunityCommentCmtRecom.destroy({
                 where: {
                     cc_num: ccNums
-                }
+                },
+                transaction: t
             });
         }
 
-        // 3. 커뮤니티 댓글 삭제
+        // 커뮤니티 댓글 삭제
         await CommunityComment.destroy({
-            where: { cr_num }
+            where: { cr_num },
+            transaction: t
         });
 
-        // 4. 커뮤니티 추천 삭제
+        // 커뮤니티 추천 삭제
         await CRecom.destroy({
-            where: { cr_num }
+            where: { cr_num },
+            transaction: t
         });
 
-        // 5. 커뮤니티 방 삭제
+        const missionIdsToDelete = [];
+        if (cRoom.m1_id) missionIdsToDelete.push(cRoom.m1_id);
+        if (cRoom.m2_id) missionIdsToDelete.push(cRoom.m2_id);
+
+        if (missionIdsToDelete.length > 0) {
+            await Mission.destroy({ where: { m_id: missionIdsToDelete }, transaction: t });
+        }
+
+        // 커뮤니티 방 삭제
         await CRoom.destroy({
-            where: { cr_num }
+            where: { cr_num },
+            transaction: t
         });
 
+        await t.commit();
         console.log(`✅ 커뮤니티 방 및 관련 댓글, 추천, 댓글추천 삭제 완료 (cr_num=${cr_num})`);
     } catch (err) {
+        await t.rollback();
         console.error('❌ 커뮤니티 방 관련 데이터 삭제 오류:', err);
     }
 };

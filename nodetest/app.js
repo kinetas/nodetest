@@ -61,7 +61,7 @@ app.use('/api/comumunity_missions', timeConverterMiddleware, loginRequired, c_mi
 app.use('/chat', timeConverterMiddleware, loginRequired, chatRoutes);
 app.use('/api/recommendationMission', recommendationMissionRoutes); //미션 추천 라우트
 app.use('/api/ai', aiRoutes);
-app.use('/api', leagueRoutes);
+app.use('/api/league', leagueRoutes);
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제
 
 // ==================== 라우팅: HTML 정적 페이지 ====================

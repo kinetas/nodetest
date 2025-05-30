@@ -1,6 +1,7 @@
 // controllers/missionController.js
 const Mission = require('../models/missionModel'); // Mission 모델 불러오기
 const Room = require('../models/roomModel'); // Room 모델 가져오기
+const CRoom = require('../models/comunity_roomModel');
 const MResult = require('../models/m_resultModel.js'); //MResult 모델 가져오기
 const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추가
 const CVote = require('../models/comunity_voteModel');
@@ -11,6 +12,69 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
 const leagueController = require('../controllers/leagueController');
+
+// 미션 완료 시 커뮤니티 미션인지 확인 후 커뮤니티 방에 미션 상태 업데이트
+async function updateCommunityRoomStatusOnMissionComplete(mission) {
+    try {
+        console.log("🔍 mission.r_id:", mission.r_id);
+        // 1. 해당 미션이 커뮤니티 미션인지 확인 (room.r_type == 'open')
+        const relatedRoom = await Room.findOne({
+            where: {
+                r_id: mission.r_id,
+                r_type: 'open'
+            }
+        });
+
+        if (!relatedRoom) {
+            console.log("❌ 해당 r_id를 가진 open room이 없습니다.");
+            return; // 커뮤니티 미션이 아니면 종료
+        }
+
+        // 2. 해당 미션과 매칭되는 community_room 찾기 (m1_id 또는 m2_id)
+        const cRoom = await CRoom.findOne({
+            where: {
+                [Op.or]: [
+                { m1_id: mission.m_id },
+                { m2_id: mission.m_id }
+                ]
+            }
+        });
+
+        if (!cRoom) return;
+
+        // 3. 문자열로 비교 (형 변환)
+        const mId = mission.m_id.toString();
+
+        if (cRoom.m1_id && cRoom.m1_id.trim() === mission.m_id.trim()) {
+            await CRoom.update(
+                { m1_status: mission.m_status },
+                { where: { cr_num: cRoom.cr_num } }
+            );
+            console.log(`✅ cr_num ${cRoom.cr_num} - m1_status 업데이트 완료`);
+        } else if (cRoom.m2_id && cRoom.m2_id.trim() === mission.m_id.trim()) {
+            await CRoom.update(
+                { m2_status: mission.m_status },
+                { where: { cr_num: cRoom.cr_num } }
+            );
+            console.log(`✅ cr_num ${cRoom.cr_num} - m2_status 업데이트 완료`);
+        } else {
+            console.log(`⚠️ mission.m_id와 일치하는 m1_id/m2_id가 없습니다`);
+        }
+
+        // ✅ m1_status, m2_status 모두 완료일 경우 해당 row 삭제
+        const updatedRoom = await CRoom.findOne({ where: { cr_num: cRoom.cr_num } });
+
+        if (updatedRoom.m1_status === '완료' && updatedRoom.m2_status === '완료') {
+            // await CRoom.destroy({ where: { cr_num: updatedRoom.cr_num } });
+            const { deleteCommunityRoomAndRelatedData } = require('../controllers/c_missionController');
+            await deleteCommunityRoomAndRelatedData(cRoom.cr_num);
+            console.log(`✅ community_room ${updatedRoom.cr_num} 삭제 완료 (m1, m2 모두 완료)`);
+        }
+  
+    } catch (err) {
+      console.error('❌ 커뮤니티 미션 상태 업데이트 중 오류:', err);
+    }
+  }
 
 // 미션 생성 함수
 exports.createMission = async (req, res) => {
@@ -767,6 +831,10 @@ exports.successMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        const updatedMission = await Mission.findOne({ where: { m_id } });
+        // 커뮤니티 미션 상태 업데이트
+        await updateCommunityRoomStatusOnMissionComplete(updatedMission);
+
         // 현재 시간 저장
         const currentTime = new Date();
 
@@ -851,6 +919,10 @@ exports.failureMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+
+        const updatedMission = await Mission.findOne({ where: { m_id } });
+        // 커뮤니티 미션 상태 업데이트
+        await updateCommunityRoomStatusOnMissionComplete(updatedMission);
 
         // 현재 시간 저장
         const currentTime = new Date();
@@ -1011,6 +1083,9 @@ exports.checkMissionDeadline = async () => {
                     m_deadline: new Date(deadline.getTime() - 10 * 60 * 1000), // 마감 기한을 10분 줄임
                 });
 
+                // 커뮤니티 미션 상태 업데이트 함수 호출
+                await updateCommunityRoomStatusOnMissionComplete(mission);
+
                 // ✅ LP 반영
                 try {
                     const lpReq = {
@@ -1071,6 +1146,9 @@ exports.checkMissionDeadline = async () => {
             ) {
                 // 2. 날짜가 변함
                 await mission.update({ m_status: '완료' });
+
+                // 커뮤니티 미션 상태 업데이트 함수 호출
+                await updateCommunityRoomStatusOnMissionComplete(mission);
 
                 // ✅ LP 반영
                 try {

@@ -33,7 +33,7 @@ async function updateCommunityRoomStatusOnMissionComplete(mission) {
       // 2. 해당 미션과 매칭되는 community_room 찾기 (m1_id 또는 m2_id)
       const cRoom = await CRoom.findOne({
         where: {
-          [Sequelize.Op.or]: [
+          [Op.or]: [
             { m1_id: mission.m_id },
             { m2_id: mission.m_id }
           ]

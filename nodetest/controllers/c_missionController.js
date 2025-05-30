@@ -359,10 +359,16 @@ exports.acceptCommunityMission = async (req, res) => {
 
         const deadline = mission.deadline || new Date();
 
+        const m1_id = uuidv4();
+        const m2_id = uuidv4();
+        await mission.update({ m1_id, m2_id });
+        console.log("m1_id: ", m1_id);
+        console.log("community_room - m1_id: ", mission.m1_id);
+
         // ✅ 4. 양방향 미션 생성
         await Mission.bulkCreate([
             {
-                m_id: uuidv4(),
+                m_id: m1_id,
                 u1_id: mission.u_id,
                 u2_id,
                 m_title: mission.cr_title,
@@ -374,7 +380,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 category: mission.category,
             },
             {
-                m_id: uuidv4(),
+                m_id: m2_id,
                 u1_id: u2_id,
                 u2_id: mission.u_id,
                 m_title: mission.cr_title,

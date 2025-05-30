@@ -25,11 +25,11 @@ const CRoom = sequelize.define('CRoom', {
     },
     m1_id: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
     },
     m2_id: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
     },
     m1_status: {
         type: DataTypes.STRING(5),

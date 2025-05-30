@@ -5,7 +5,6 @@ const CRoom = sequelize.define('CRoom', {
     u_id: {
         type: DataTypes.STRING(20),
         allowNull: false,
-        primaryKey: true,
     },
     cr_num: {
         type: DataTypes.STRING(40),
@@ -23,6 +22,14 @@ const CRoom = sequelize.define('CRoom', {
     u2_id: {
         type: DataTypes.STRING(20),
         allowNull: true,
+    },
+    m1_id: {
+        type: DataTypes.STRING(50),
+        allowNull: false,
+    },
+    m2_id: {
+        type: DataTypes.STRING(50),
+        allowNull: false,
     },
     m1_status: {
         type: DataTypes.STRING(5),

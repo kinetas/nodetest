@@ -65,7 +65,9 @@ async function updateCommunityRoomStatusOnMissionComplete(mission) {
         const updatedRoom = await CRoom.findOne({ where: { cr_num: cRoom.cr_num } });
 
         if (updatedRoom.m1_status === '완료' && updatedRoom.m2_status === '완료') {
-            await CRoom.destroy({ where: { cr_num: updatedRoom.cr_num } });
+            // await CRoom.destroy({ where: { cr_num: updatedRoom.cr_num } });
+            const { deleteCommunityRoomAndRelatedData } = require('../controllers/c_missionController');
+            await deleteCommunityRoomAndRelatedData(cRoom.cr_num);
             console.log(`✅ community_room ${updatedRoom.cr_num} 삭제 완료 (m1, m2 모두 완료)`);
         }
   

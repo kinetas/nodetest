@@ -18,7 +18,7 @@ const { Op } = require('sequelize'); // [추가됨]
 exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
     try {
         // 1. 이 방(cr_num)과 관련된 커뮤니티 댓글(cc_num) 조회
-        const comments = await CComment.findAll({
+        const comments = await CommunityComment.findAll({
             where: { cr_num },
             attributes: ['cc_num']
         });
@@ -27,7 +27,7 @@ exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
 
         // 2. 댓글 추천(comment_recommendation) 삭제 (cc_num 기준)
         if (ccNums.length > 0) {
-            await CCommentRec.destroy({
+            await CommunityCommentCmtRecom.destroy({
                 where: {
                     cc_num: ccNums
                 }
@@ -35,12 +35,12 @@ exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
         }
 
         // 3. 커뮤니티 댓글 삭제
-        await CComment.destroy({
+        await CommunityComment.destroy({
             where: { cr_num }
         });
 
         // 4. 커뮤니티 추천 삭제
-        await CRecommendation.destroy({
+        await CRecom.destroy({
             where: { cr_num }
         });
 

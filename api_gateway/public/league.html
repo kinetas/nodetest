@@ -68,7 +68,7 @@
     // ✅ 로그인된 사용자 정보 불러오기
     async function fetchUserInfo() {
       try {
-        const res = await fetch('/nodetest/api/user-info/user-all', {
+        const res = await fetch('auth/api/user-info/user-all', {
           headers: {
             'Authorization': `Bearer ${jwtToken}`
           }

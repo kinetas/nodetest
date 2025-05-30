@@ -64,9 +64,15 @@
 
         function addRoom() {
             const u1_id = sessionStorage.getItem('user_id')
-            const u2_id = document.getElementById('userIdInput').value;
+            const u2_id = document.getElementById('userIdInput').value.trim;
             const roomName = document.getElementById('roomNameInput').value;
             const r_type = document.getElementById('roomTypeInput').value;
+
+            if (!u2_id) {
+                alert("상대 유저 ID를 입력해주세요.");
+                return;
+            }
+            
             fetch('/nodetest/api/rooms', {
                 method: 'POST',
                 headers: {

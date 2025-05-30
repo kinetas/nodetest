@@ -431,6 +431,43 @@ exports.deleteCommunityMission = async (req, res) => {
     }
 };
 
+// ✅ 서로 커뮤니티 미션 완료 시 자동 삭제
+exports.deleteCommunityMissionComplete = async (r_id) => {
+    try {
+        // 1. r_type이 'open'인 방의 r_id를 가지는 미션들 중에서
+        //    서로 주고받은 커뮤니티 미션이 둘 다 "완료" 상태인지 확인
+        const missions = await Mission.findAll({
+            where: {
+                r_id,
+                m_status: '완료'
+            }
+        });
+
+        if (missions.length < 2) {
+            console.log(`[❌] 아직 두 사람 모두 완료하지 않았습니다. (${r_id})`);
+            return { success: false, message: '아직 두 사람 모두 완료하지 않았습니다.' };
+        }
+
+        const [m1, m2] = missions;
+
+        // 2. 두 미션의 쌍방 조건 (서로 u1/u2 뒤바뀜)이 맞는지 확인
+        if (!(m1.u1_id === m2.u2_id && m1.u2_id === m2.u1_id)) {
+            console.log(`[⚠️] 서로 쌍방 미션이 아님. (${r_id})`);
+            return { success: false, message: '쌍방 커뮤니티 미션이 아닙니다.' };
+        }
+
+        // 3. 삭제 수행
+        await Mission.destroy({ where: { r_id } });
+        console.log(`[✅] 커뮤니티 미션 쌍방 완료되어 삭제됨. (${r_id})`);
+
+        return { success: true, message: '쌍방 커뮤니티 미션이 삭제되었습니다.' };
+
+    } catch (error) {
+        console.error(`deleteCommunityMissionComplete 오류:`, error);
+        return { success: false, message: `삭제 중 오류: ${error.message}` };
+    }
+};
+
 // 커뮤니티 미션 불러오기 (JWT 적용)
 exports.getCommunityMission = async (req, res) => {
     try {

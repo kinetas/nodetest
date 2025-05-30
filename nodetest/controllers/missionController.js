@@ -6,6 +6,7 @@ const IFriend = require('../models/i_friendModel'); // 친구 관계 모델 추�
 const CVote = require('../models/comunity_voteModel');
 const resultController = require('../controllers/resultController'); // resultController 가져오기
 const roomController = require('../controllers/roomController');
+const c_missionController = require('../controllers/c_missionController');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
@@ -767,6 +768,11 @@ exports.successMission = async (req, res) => {
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
 
+        // 미션 완료 처리 후
+        if (mission.r_id && mission.r_type === 'open') {
+            await c_missionController.deleteCommunityMissionComplete(mission.r_id);
+        }
+
         // 현재 시간 저장
         const currentTime = new Date();
 
@@ -851,6 +857,11 @@ exports.failureMission = async (req, res) => {
             { m_status: '완료' },
             { where: { m_id, u1_id } } // u1_id를 조건에 포함하여 로그인된 사용자의 미션만 업데이트
         );
+
+        // 미션 완료 처리 후
+        if (mission.r_id && mission.r_type === 'open') {
+            await c_missionController.deleteCommunityMissionComplete(mission.r_id);
+        }
 
         // 현재 시간 저장
         const currentTime = new Date();
@@ -1011,6 +1022,11 @@ exports.checkMissionDeadline = async () => {
                     m_deadline: new Date(deadline.getTime() - 10 * 60 * 1000), // 마감 기한을 10분 줄임
                 });
 
+                // 미션 완료 처리 후
+                if (mission.r_id && mission.r_type === 'open') {
+                    await c_missionController.deleteCommunityMissionComplete(mission.r_id);
+                }
+
                 // ✅ LP 반영
                 try {
                     const lpReq = {
@@ -1071,6 +1087,11 @@ exports.checkMissionDeadline = async () => {
             ) {
                 // 2. 날짜가 변함
                 await mission.update({ m_status: '완료' });
+
+                // 미션 완료 처리 후
+                if (mission.r_id && mission.r_type === 'open') {
+                    await c_missionController.deleteCommunityMissionComplete(mission.r_id);
+                }
 
                 // ✅ LP 반영
                 try {

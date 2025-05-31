@@ -69,41 +69,41 @@ async function updateCommunityRoomStatusOnMissionComplete(mission) {
             const { deleteCommunityRoomAndRelatedData } = require('../controllers/c_missionController');
             await deleteCommunityRoomAndRelatedData(cRoom.cr_num);
             console.log(`✅ community_room ${updatedRoom.cr_num} 삭제 완료 (m1, m2 모두 완료)`);
-        }
 
-        // 커뮤니티 방 삭제 이후, 관련 open 타입 Room도 검토 및 삭제
-        const userA = updatedRoom.u_id;
-        const userB = updatedRoom.u2_id;
+            // 커뮤니티 방 삭제 이후, 관련 open 타입 Room도 검토 및 삭제
+            const userA = updatedRoom.u_id;
+            const userB = updatedRoom.u2_id;
 
-        // 현재 두 유저 간의 모든 커뮤니티 미션 중 상태가 완료되지 않은 것이 있는지 확인
-        const remaining = await CRoom.findOne({
-            where: {
-                [Op.or]: [
-                    { u_id: userA, u2_id: userB },
-                    { u_id: userB, u2_id: userA }
-                ],
-                cr_status: 'acc',
-                [Op.or]: [
-                    { m1_status: { [Op.ne]: '완료' } },
-                    { m2_status: { [Op.ne]: '완료' } }
-                ]
-            }
-        });
-
-        if (!remaining) {
-            // 완료되지 않은 커뮤니티 미션이 없다면 open 타입 방 삭제
-            await Room.destroy({
+            // 현재 두 유저 간의 모든 커뮤니티 미션 중 상태가 완료되지 않은 것이 있는지 확인
+            const remaining = await CRoom.findOne({
                 where: {
-                    r_type: 'open',
                     [Op.or]: [
-                        { u1_id: userA, u2_id: userB },
-                        { u1_id: userB, u2_id: userA }
+                        { u_id: userA, u2_id: userB },
+                        { u_id: userB, u2_id: userA }
+                    ],
+                    cr_status: 'acc',
+                    [Op.or]: [
+                        { m1_status: { [Op.ne]: '완료' } },
+                        { m2_status: { [Op.ne]: '완료' } }
                     ]
                 }
             });
-            console.log(`🧹 ${userA} - ${userB} 간의 open 타입 방 삭제 완료`);
-        } else {
-            console.log(`⏳ 아직 완료되지 않은 커뮤니티 미션이 있어 open 방 유지됨`);
+
+            if (!remaining) {
+                // 완료되지 않은 커뮤니티 미션이 없다면 open 타입 방 삭제
+                await Room.destroy({
+                    where: {
+                        r_type: 'open',
+                        [Op.or]: [
+                            { u1_id: userA, u2_id: userB },
+                            { u1_id: userB, u2_id: userA }
+                        ]
+                    }
+                });
+                console.log(`🧹 ${userA} - ${userB} 간의 open 타입 방 삭제 완료`);
+            } else {
+                console.log(`⏳ 아직 완료되지 않은 커뮤니티 미션이 있어 open 방 유지됨`);
+            }
         }
     } catch (err) {
       console.error('❌ 커뮤니티 미션 상태 업데이트 중 오류:', err);

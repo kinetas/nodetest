@@ -125,7 +125,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 r_type: 'open',
                 [Op.or]: [
                     { u1_id: mission.u_id, u2_id },
-                    // { u1_id: u2_id, u2_id: mission.u_id }
+                    { u1_id: u2_id, u2_id: mission.u_id }
                 ]
             }
         });
@@ -146,9 +146,20 @@ exports.acceptCommunityMission = async (req, res) => {
                 }
             );
 
-            if (addRoomRes.data && addRoomRes.data.room) {
-                openRoom = addRoomRes.data.room;
-            }
+            // if (addRoomRes.data && addRoomRes.data.room) {
+            //     openRoom = addRoomRes.data.room;
+            // }
+
+            // ✅ 방 생성 직후 다시 조회 (양방향 대응)
+            openRoom = await Room.findOne({
+                where: {
+                    r_type: 'open',
+                    [Op.or]: [
+                        { u1_id: mission.u_id, u2_id },
+                        { u1_id: u2_id, u2_id: mission.u_id }
+                    ]
+                }
+            });
         }
 
         const rid_open = openRoom?.r_id;

@@ -27,6 +27,11 @@ exports.addRoom = async (req, res) => {
     const type = r_type || "general";
 
     try {
+        // ✅ 입력 누락 방지
+        if (!u2_id || u2_id.trim() === '') {
+            return res.status(400).json({ message: '상대 유저 ID를 입력해주세요.' });
+        }
+        
         // ✅ 1. 자기 자신에게 방 생성 요청일 경우
         if (u1_id === u2_id) {
             await exports.initAddRoom({ body: { u1_id, roomName } });

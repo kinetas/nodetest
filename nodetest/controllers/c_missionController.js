@@ -9,11 +9,72 @@ const CommunityCommentCmtRecom = require('../models/comment_recommendationModel'
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const Sequelize = require('sequelize');
-const { sequelize } = require('../models/comunity_roomModel');
+// const { sequelize } = require('../models/comunity_roomModel');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨]
+const sequelize = require('../config/db');
 
 //======================Token===============================
+
+exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
+    //중간에 오류 발생 시 일부만 삭제되는 걸 방지
+    const t = await sequelize.transaction();
+    try {
+        const cRoom = await CRoom.findOne({ where: { cr_num } });
+        if (!cRoom) return;
+
+        // 이 방(cr_num)과 관련된 커뮤니티 댓글(cc_num) 조회
+        const comments = await CommunityComment.findAll({
+            where: { cr_num },
+            attributes: ['cc_num'],
+            transaction: t
+        });
+
+        const ccNums = comments.map(comment => comment.cc_num);
+
+        // 댓글 추천(comment_recommendation) 삭제 (cc_num 기준)
+        if (ccNums.length > 0) {
+            await CommunityCommentCmtRecom.destroy({
+                where: {
+                    cc_num: ccNums
+                },
+                transaction: t
+            });
+        }
+
+        // 커뮤니티 댓글 삭제
+        await CommunityComment.destroy({
+            where: { cr_num },
+            transaction: t
+        });
+
+        // 커뮤니티 추천 삭제
+        await CRecom.destroy({
+            where: { cr_num },
+            transaction: t
+        });
+
+        const missionIdsToDelete = [];
+        if (cRoom.m1_id) missionIdsToDelete.push(cRoom.m1_id);
+        if (cRoom.m2_id) missionIdsToDelete.push(cRoom.m2_id);
+
+        if (missionIdsToDelete.length > 0) {
+            await Mission.destroy({ where: { m_id: missionIdsToDelete }, transaction: t });
+        }
+
+        // 커뮤니티 방 삭제
+        await CRoom.destroy({
+            where: { cr_num },
+            transaction: t
+        });
+
+        await t.commit();
+        console.log(`✅ 커뮤니티 방 및 관련 댓글, 추천, 댓글추천 삭제 완료 (cr_num=${cr_num})`);
+    } catch (err) {
+        await t.rollback();
+        console.error('❌ 커뮤니티 방 관련 데이터 삭제 오류:', err);
+    }
+};
 
 //============미션===============
 
@@ -38,83 +99,6 @@ exports.createCommunityMission = async (req, res) => {
         res.status(500).json({ success: false, message: '커뮤니티 미션 생성 중 오류가 발생했습니다.' });
     }
 };
-
-// // 커뮤니티 미션 수락 (JWT 적용)
-// exports.acceptCommunityMission = async (req, res) => {
-//     const { cr_num } = req.body;
-//     const u2_id = req.currentUserId; // JWT 인증된 사용자 ID 사용
-
-//     try {
-//         const mission = await CRoom.findOne({ where: { cr_num } });
-
-//         if (!mission) {
-//             return res.status(404).json({ success: false, message: '해당 미션이 존재하지 않습니다.' });
-//         }
-
-//         if (mission.u_id === u2_id) {
-//             return res.status(403).json({ success: false, message: '본인이 생성한 미션은 수락할 수 없습니다.' });
-//         }
-//         if (mission.cr_status == 'acc') {
-//             return res.status(403).json({ success: false, message: '이미 수락된 미션입니다.' });
-//         }
-
-//         // 기존 방 조회 후 없으면 방 생성
-//         const existingRooms = await Room.findAll({
-//             where: {
-//                 r_type: 'open',
-//                 [Op.or]: [
-//                     { u1_id: mission.u_id, u2_id },
-//                     { u1_id: u2_id, u2_id: mission.u_id }
-//                 ]
-//             }
-//         });
-
-//         let rid_open = uuidv4();
-
-//         if (existingRooms.length === 0) {
-//             await Room.create({ u1_id: mission.u_id, u2_id, r_id: rid_open, r_type: 'open' });
-//             await Room.create({ u1_id: u2_id, u2_id: mission.u_id, r_id: rid_open, r_type: 'open' });
-//         } else {
-//             rid_open = existingRooms[0].r_id;
-//         }
-
-//         // 커뮤니티 미션 상태 업데이트
-//         await mission.update({ u2_id, cr_status: 'acc' });
-
-//         // Mission 테이블에 미션 생성
-//         const newMissionId1 = uuidv4();
-//         const newMissionId2 = uuidv4();
-//         const missionTitle = mission.cr_title;
-//         const deadline = mission.deadline ? mission.deadline : new Date();
-
-//         await Mission.create({
-//             m_id: newMissionId1,
-//             u1_id: mission.u_id,
-//             u2_id,
-//             m_title: missionTitle,
-//             m_deadline: deadline,
-//             m_status: '진행중',
-//             r_id: rid_open,
-//             m_extended: false,
-//         });
-
-//         await Mission.create({
-//             m_id: newMissionId2,
-//             u1_id: u2_id,
-//             u2_id: mission.u_id,
-//             m_title: missionTitle,
-//             m_deadline: deadline,
-//             m_status: '진행중',
-//             r_id: rid_open,
-//             m_extended: false,
-//         });
-
-//         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 수락되었습니다.' });
-//     } catch (error) {
-//         console.error('커뮤니티 미션 수락 오류:', error);
-//         res.status(500).json({ success: false, message: `커뮤니티 미션 수락 중 오류(${error})가 발생했습니다.` });
-//     }
-// };
 
 // ✅ 커뮤니티 미션 수락 (roomController의 addRoom 사용)
 exports.acceptCommunityMission = async (req, res) => {
@@ -152,6 +136,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 'http://27.113.11.48:3000/api/rooms',
                 {
                     u2_id: mission.u_id,
+                    roomName: mission.cr_title,
                     r_type: 'open'
                 },
                 {
@@ -161,9 +146,20 @@ exports.acceptCommunityMission = async (req, res) => {
                 }
             );
 
-            if (addRoomRes.data && addRoomRes.data.room) {
-                openRoom = addRoomRes.data.room;
-            }
+            // if (addRoomRes.data && addRoomRes.data.room) {
+            //     openRoom = addRoomRes.data.room;
+            // }
+
+            // ✅ 방 생성 직후 다시 조회 (양방향 대응)
+            openRoom = await Room.findOne({
+                where: {
+                    r_type: 'open',
+                    [Op.or]: [
+                        { u1_id: mission.u_id, u2_id },
+                        { u1_id: u2_id, u2_id: mission.u_id }
+                    ]
+                }
+            });
         }
 
         const rid_open = openRoom?.r_id;
@@ -173,10 +169,16 @@ exports.acceptCommunityMission = async (req, res) => {
 
         const deadline = mission.deadline || new Date();
 
+        const m1_id = uuidv4();
+        const m2_id = uuidv4();
+        await mission.update({ m1_id, m2_id });
+        console.log("m1_id: ", m1_id);
+        console.log("community_room - m1_id: ", mission.m1_id);
+
         // ✅ 4. 양방향 미션 생성
         await Mission.bulkCreate([
             {
-                m_id: uuidv4(),
+                m_id: m1_id,
                 u1_id: mission.u_id,
                 u2_id,
                 m_title: mission.cr_title,
@@ -188,7 +190,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 category: mission.category,
             },
             {
-                m_id: uuidv4(),
+                m_id: m2_id,
                 u1_id: u2_id,
                 u2_id: mission.u_id,
                 m_title: mission.cr_title,
@@ -237,7 +239,11 @@ exports.deleteCommunityMission = async (req, res) => {
             return res.status(403).json({ success: false, message: 'match 상태의 미션만 삭제할 수 있습니다.' });
         }
 
-        await mission.destroy();
+        // await mission.destroy();
+
+        // community_room 및 관련된 댓글/추천 등도 함께 삭제
+        await deleteCommunityRoomAndRelatedData(cr_num);
+        
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 삭제되었습니다.' });
     } catch (error) {
         console.error('커뮤니티 미션 삭제 오류:', error);

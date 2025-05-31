@@ -70,39 +70,24 @@ async function updateCommunityRoomStatusOnMissionComplete(mission) {
             await deleteCommunityRoomAndRelatedData(cRoom.cr_num);
             console.log(`✅ community_room ${updatedRoom.cr_num} 삭제 완료 (m1, m2 모두 완료)`);
 
-            // 커뮤니티 방 삭제 이후, 관련 open 타입 Room도 검토 및 삭제
-            const userA = updatedRoom.u_id;
-            const userB = updatedRoom.u2_id;
-
-            // 현재 두 유저 간의 모든 커뮤니티 미션 중 상태가 완료되지 않은 것이 있는지 확인
-            const remaining = await CRoom.findOne({
+            // ✅ 방 삭제 조건을 community_room 기준이 아닌 해당 r_id를 참조한 mission 기준으로
+            const isAllMissionsDone = await Mission.findAll({
                 where: {
-                    [Op.or]: [
-                        { u_id: userA, u2_id: userB },
-                        { u_id: userB, u2_id: userA }
-                    ],
-                    cr_status: 'acc',
-                    [Op.or]: [
-                        { m1_status: { [Op.ne]: '완료' } },
-                        { m2_status: { [Op.ne]: '완료' } }
-                    ]
+                    r_id: mission.r_id,
+                    m_status: { [Op.ne]: '완료' } // 아직 완료 안 된 미션이 하나라도 있는지
                 }
             });
 
-            if (!remaining) {
-                // 완료되지 않은 커뮤니티 미션이 없다면 open 타입 방 삭제
+            if (isAllMissionsDone.length === 0) {
+                // 모든 미션 완료 → 방 삭제 가능
                 await Room.destroy({
                     where: {
-                        r_type: 'open',
-                        [Op.or]: [
-                            { u1_id: userA, u2_id: userB },
-                            { u1_id: userB, u2_id: userA }
-                        ]
+                        r_id: mission.r_id
                     }
                 });
-                console.log(`🧹 ${userA} - ${userB} 간의 open 타입 방 삭제 완료`);
+                console.log(`🧹 r_id ${mission.r_id} 에 대한 open 타입 방 삭제 완료`);
             } else {
-                console.log(`⏳ 아직 완료되지 않은 커뮤니티 미션이 있어 open 방 유지됨`);
+                console.log(`⏳ r_id ${mission.r_id}에 완료되지 않은 미션이 아직 존재함`);
             }
         }
     } catch (err) {

@@ -125,7 +125,7 @@ exports.acceptCommunityMission = async (req, res) => {
                 r_type: 'open',
                 [Op.or]: [
                     { u1_id: mission.u_id, u2_id },
-                    { u1_id: u2_id, u2_id: mission.u_id }
+                    // { u1_id: u2_id, u2_id: mission.u_id }
                 ]
             }
         });

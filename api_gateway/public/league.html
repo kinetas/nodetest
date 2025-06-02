@@ -97,7 +97,7 @@
 
     async function assignLeague() {
       const user_id = getUserId();
-      const res = await fetch(`/nodetest/api/league/assign`, {
+      const res = await fetch(`/nodetest/api/league/league/assign`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

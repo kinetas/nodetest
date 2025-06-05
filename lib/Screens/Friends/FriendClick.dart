@@ -1,7 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionTokenManager.dart'; // ✅ delete 메서드 사용
+
+// WebRTCtest 임포트 (영상통화 UI로 이동할 때 필요)
+import '../../WebRTC/WebRTCtest.dart';
 
 class FriendClick extends StatelessWidget {
   final String friendId;
@@ -109,6 +111,18 @@ class FriendClick extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // 영상통화 버튼(WebRTCtest)
+                    IconButton(
+                      icon: Icon(Icons.call, size: 32, color: Colors.lightBlue),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => WebRTCtest(), // friendId 인자 없이도 동작
+                          ),
+                        );
+                      },
+                    ),
                     IconButton(
                       icon: Icon(Icons.chat, size: 32, color: Colors.blue),
                       onPressed: () {

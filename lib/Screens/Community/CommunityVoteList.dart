@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionTokenManager.dart'; // ✅ JWT 기반 세션 매니저
 import 'CommunityVoteContent.dart';
+import '../Loading.dart';
 
 class CommunityVoteList extends StatefulWidget {
   @override
@@ -60,7 +61,7 @@ class _CommunityVoteListState extends State<CommunityVoteList> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.lightBlue[400]))
+          ? const Loading()//Loading.dart불러오기
           : Container(
         color: Colors.lightBlue[50],
         child: ListView.builder(

@@ -49,9 +49,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     socket.onConnect((_) {
       print('[SOCKET] ✅ Connected to server');
+      // joinRoom 시에도 u1_id 빼고 보내기!
       socket.emit('joinRoom', {
         'r_id': widget.roomData['r_id'],
-        'u1_id': widget.roomData['u1_id'],
         'u2_id': widget.roomData['u2_id'],
       });
       print('[SOCKET] Join room emitted');
@@ -91,12 +91,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
+    // *** u1_id, send_date 등 필요 없는 값 빼고, HTML 예제와 동일하게 보냄 ***
     final data = {
       'r_id': widget.roomData['r_id'],
-      'u1_id': widget.roomData['u1_id'],
       'u2_id': widget.roomData['u2_id'],
       'message_contents': text,
-      'send_date': DateTime.now().toIso8601String(),
+      // 'image': ... // 추후 이미지 전송시 추가
+      // 'image_type': ... // 추후 이미지 전송시 추가
     };
 
     print('[SOCKET] 📨 Sending message to server: $data');
@@ -107,7 +108,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     });
 
     // UX상 즉시 내 채팅창에 메시지 추가 (서버에서 다시 push될 수도 있음)
-    _chatContentKey.currentState?.addMessage(data);
+    // 서버 응답이 와서 중복되는 경우 이 라인 삭제해도 무방
+    _chatContentKey.currentState?.addMessage({
+      ...data,
+      'u1_id': widget.roomData['u1_id'], // 이 값은 화면 표시용으로만 사용
+      'send_date': DateTime.now().toIso8601String(), // 즉시 갱신
+    });
 
     _messageController.clear();
   }

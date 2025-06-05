@@ -121,7 +121,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       return;
     }
 
-    final uri = Uri.parse('http://27.113.11.48:3000/nodetest/api/user-info/chaingeProfileImage');
+    final uri = Uri.parse('http://27.113.11.48:3000/auth/api/user-info/chaingeProfileImage');
     final token = await SessionTokenManager.getToken();
 
     if (token == null) {

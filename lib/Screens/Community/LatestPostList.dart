@@ -39,6 +39,7 @@ class _LatestPostsState extends State<LatestPosts> {
               'cr_title': mission['cr_title']?.toString() ?? '제목 없음',
               'cr_status': mission['cr_status']?.toString() ?? '',
               'contents': mission['contents']?.toString() ?? '내용 없음',
+              'deadline': mission['deadline']?.toString() ?? '',
             };
           }).toList();
           isLoading = false;
@@ -54,6 +55,17 @@ class _LatestPostsState extends State<LatestPosts> {
       setState(() {
         isLoading = false;
       });
+    }
+  }
+
+  // 날짜 포맷 변환 (2025-05-30T11:55:00.000Z -> 2025년 5월 30일 20시 55분)
+  String formatDeadline(String? isoString) {
+    if (isoString == null || isoString.isEmpty) return '';
+    try {
+      final dateTime = DateTime.parse(isoString).toLocal();
+      return '${dateTime.year}년 ${dateTime.month}월 ${dateTime.day}일 ${dateTime.hour}시 ${dateTime.minute}분';
+    } catch (e) {
+      return isoString;
     }
   }
 
@@ -162,7 +174,25 @@ class _LatestPostsState extends State<LatestPosts> {
                           color: primaryColor,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 6),
+                      // 마감일 표기
+                      if ((post['deadline'] ?? '').isNotEmpty)
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today, color: Colors.lightBlue, size: 16),
+                            SizedBox(width: 4),
+                            Text(
+                              formatDeadline(post['deadline']),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.lightBlue[800],
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      if ((post['deadline'] ?? '').isNotEmpty)
+                        SizedBox(height: 8),
                       Text(
                         post['contents'] ?? '',
                         maxLines: 2,

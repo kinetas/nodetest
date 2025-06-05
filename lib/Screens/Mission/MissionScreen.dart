@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'CreateMissionScreen.dart';
+import 'package:capstone_1_project/Screens/Mission/CreateMissionScreen.dart';
 import 'AchievementPanel_screen.dart';
 import 'MyMission/MyMissionList.dart';
 import 'MyMission/MyCompleteMissionList.dart';
 import 'OtherMission.dart';
+import 'ChatBotAI/AIChatConversationScreen.dart'; // ✅ 채팅 인터페이스로 변경됨
 
 class MissionScreen extends StatefulWidget {
   @override
@@ -39,6 +40,31 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
     );
   }
 
+  void _openAIMissionFlow() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AIChatConversationScreen()),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MissionCreateScreen(
+            initialTitle: result['title'],          // ✅ 제목 전달
+            initialMessage: result['message'],      // ✅ 본문 전달
+            initialCategory: result['category'],
+            aiSource: result['source'],
+            isAIMission: true,
+          ),
+        ),
+      );
+
+      // ✅ 돌아오면 다시 채팅으로 복귀
+      _openAIMissionFlow();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +94,8 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
             },
           ),
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
+            icon: const Icon(Icons.edit, color: Colors.white),
+            tooltip: '일반 미션 직접 생성',
             onPressed: () {
               Navigator.push(
                 context,
@@ -99,6 +126,12 @@ class _MissionScreenState extends State<MissionScreen> with SingleTickerProvider
           MyMissionList(),
           MyCompleteMissionList(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'AI 추천 미션 생성',
+        onPressed: _openAIMissionFlow,
+        child: Icon(Icons.smart_toy),
+        backgroundColor: Colors.deepPurple,
       ),
     );
   }

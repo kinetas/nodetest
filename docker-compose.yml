@@ -26,6 +26,8 @@ services:
       - mysql
     env_file:
       - ./nodetest/.env
+    volumes:
+      - ./gateway/public/vote_images:/app/public/vote_images
 
 
   rag_server:
@@ -131,6 +133,8 @@ services:
       - nodetest
       - rag_server
       - intent_server
+    volumes:
+      - ./gateway/public/vote_images:/app/public/vote_images
 
 
 

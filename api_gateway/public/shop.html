@@ -23,7 +23,7 @@
     // ✅ 사용자 정보 가져오기
     async function fetchUserInfoAndPoints() {
       try {
-        const res = await fetch('/api/user-info/user-all', {
+        const res = await fetch('/aute/api/user-info/user-all', {
           headers: {
             'Authorization': `Bearer ${jwtToken}`
           }
@@ -34,7 +34,7 @@
         const user = await res.json();
         currentUserId = user.u_id;
 
-        const pointsRes = await fetch(`/shop/points/${currentUserId}`);
+        const pointsRes = await fetch(`/nodetest/shop/points/${currentUserId}`);
         if (!pointsRes.ok) throw new Error("포인트 조회 실패");
 
         const pointsData = await pointsRes.json();
@@ -65,7 +65,7 @@
     async function buyItem(itemId) {
       if (!currentUserId) return alert("사용자 정보 없음");
 
-      const res = await fetch('/shop/buy', {
+      const res = await fetch('/nodetest/shop/buy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUserId, item_id: itemId })

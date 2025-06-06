@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>상점</title>
+  <style>
+    .item-card {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px;
+      width: 200px;
+      display: inline-block;
+    }
+    .item-card img {
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎁 상점</h1>
+  <p id="userPoints">포인트 로딩 중...</p>
+  <div id="shopContainer"></div>
+
+  <script>
+    const userId = localStorage.getItem('user_id') || 'test_user'; // 필요 시 변경
+
+    async function loadPoints() {
+      const res = await fetch(`/api/user-info/user-points/${userId}`);
+      const data = await res.json();
+      document.getElementById('userPoints').innerText = `보유 포인트: ${data.points}P`;
+    }
+
+    async function loadItems() {
+      const res = await fetch('/shop/items');
+      const items = await res.json();
+
+      const container = document.getElementById('shopContainer');
+      container.innerHTML = '';
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+          <img src="${item.image_url}" alt="${item.name}">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          <strong>${item.price}P</strong><br/>
+          <button onclick="buyItem(${item.item_id})">구매</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function buyItem(itemId) {
+      const res = await fetch('/shop/buy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, item_id: itemId })
+      });
+
+      const result = await res.json();
+      alert(result.message || result.error);
+      loadPoints();
+    }
+
+    loadPoints();
+    loadItems();
+  </script>
+</body>
+</html>

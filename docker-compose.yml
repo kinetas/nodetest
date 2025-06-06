@@ -110,7 +110,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./api_gateway/public/profile_images:/usr/src/app/public/profile_images
+      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
   auth_server_2:
     build: ./auth_server2
@@ -122,7 +122,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - ./api_gateway/public/profile_images:/usr/src/app/public/profile_images
+      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
   gateway:
     build: ./api_gateway
@@ -139,7 +139,7 @@ services:
       - intent_server
     volumes:
       - /home/gogi/docker/api_gateway/public/vote_images:/app/public/vote_images
-      - ./api_gateway/public/profile_images:/usr/src/app/public/profile_images
+      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
 
 

@@ -47,7 +47,11 @@
 
     // ✅ 아이템 목록 불러오기
     async function loadItems() {
-      const res = await fetch('/nodetest/shop/items');
+      const res = await fetch('/nodetest/shop/items', {
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`
+          }
+        });
       const items = await res.json();
 
       const list = document.getElementById('itemList');
@@ -67,7 +71,7 @@
 
       const res = await fetch('/nodetest/shop/buy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${jwtToken}`},
         body: JSON.stringify({ user_id: currentUserId, item_id: itemId })
       });
 

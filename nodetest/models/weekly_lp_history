@@ -1,0 +1,30 @@
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+
+const WeeklyLpHistory = sequelize.define('weekly_lp_history', {
+    user_id: {
+        type: DataTypes.STRING(50),
+        allowNull: false
+    },
+    week_start: {
+        type: DataTypes.DATE,
+        allowNull: false
+    },
+    week_end: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    league_id: {
+        type: DataTypes.STRING(50),
+        allowNull: true
+    },
+    lp: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+}, {
+    tableName: 'weekly_lp_history',
+    timestamps: false
+});
+
+module.exports = WeeklyLpHistory;

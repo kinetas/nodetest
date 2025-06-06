@@ -9,6 +9,10 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
 //===================================================token================================================
+
+const uploadDir = path.join(__dirname, '../public/vote_images');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
 exports.getVotes = async (req, res) => {
     try {
         const votes = await CVote.findAll({
@@ -35,18 +39,54 @@ exports.getMyVotes = async (req, res) => {
     }
 };
 
+// exports.createVote = async (req, res) => {
+//     const { c_title, c_contents } = req.body;
+//     const u_id = req.currentUserId; // ✅ JWT에서 추출
+//     const c_image = req.file ? req.file.buffer : null;
+
+//     if (!u_id || !c_title || !c_contents) {
+//         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
+//     }
+
+//     const c_number = uuidv4();
+//     if (!uuidValidate(c_number)) {
+//         return res.status(500).json({ success: false, message: "UUID 생성 실패" });
+//     }
+
+//     try {
+//         const newVote = await CVote.create({
+//             u_id,
+//             c_number,
+//             c_title,
+//             c_contents,
+//             c_good: 0,
+//             c_bad: 0,
+//             c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+//             c_image
+//         });
+//         res.json({ success: true, vote: newVote });
+//     } catch (error) {
+//         console.error("Error creating vote:", error);
+//         res.status(500).json({ success: false, message: "투표 생성 실패" });
+//     }
+// };
 exports.createVote = async (req, res) => {
     const { c_title, c_contents } = req.body;
-    const u_id = req.currentUserId; // ✅ JWT에서 추출
-    const c_image = req.file ? req.file.buffer : null;
+    const u_id = req.currentUserId;
+    const file = req.file;
+    const c_number = uuidv4();
 
-    if (!u_id || !c_title || !c_contents) {
+    if (!u_id || !c_title || !c_contents || !uuidValidate(c_number)) {
         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
     }
 
-    const c_number = uuidv4();
-    if (!uuidValidate(c_number)) {
-        return res.status(500).json({ success: false, message: "UUID 생성 실패" });
+    let imageUrl = null;
+    if (file) {
+        const ext = path.extname(file.originalname);
+        const fileName = `${c_number}${ext}`;
+        const filePath = path.join(uploadDir, fileName);
+        fs.writeFileSync(filePath, file.buffer);
+        imageUrl = `/vote_images/${fileName}`;
     }
 
     try {
@@ -58,11 +98,10 @@ exports.createVote = async (req, res) => {
             c_good: 0,
             c_bad: 0,
             c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-            c_image
+            c_image: imageUrl
         });
         res.json({ success: true, vote: newVote });
     } catch (error) {
-        console.error("Error creating vote:", error);
         res.status(500).json({ success: false, message: "투표 생성 실패" });
     }
 };
@@ -149,7 +188,8 @@ exports.getVoteDetails = async (req, res) => {
                 c_good: vote.c_good,
                 c_bad: vote.c_bad,
                 c_deletedate: vote.c_deletedate,
-                c_image: vote.c_image ? vote.c_image.toString('base64') : null,
+                // c_image: vote.c_image ? vote.c_image.toString('base64') : null,
+                c_image: vote.c_image || null,
             },
         });
     } catch (error) {

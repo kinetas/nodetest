@@ -1,70 +1,85 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>상점</title>
   <style>
-    .item-card {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 10px;
-      width: 200px;
-      display: inline-block;
-    }
-    .item-card img {
-      max-width: 100%;
-    }
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    .item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .item img { max-width: 100px; }
   </style>
 </head>
 <body>
-  <h1>🎁 상점</h1>
-  <p id="userPoints">포인트 로딩 중...</p>
-  <div id="shopContainer"></div>
+
+  <h1>🛒 상점</h1>
+  <p><strong>내 포인트:</strong> <span id="userPoints">로딩 중...</span></p>
+
+  <div id="itemList"></div>
 
   <script>
-    const userId = localStorage.getItem('user_id') || 'test_user'; // 필요 시 변경
+    const jwtToken = localStorage.getItem('jwt_token');
+    let currentUserId = null;
 
-    async function loadPoints() {
-      const res = await fetch(`/auth/api/user-info/user-points/${userId}`);
-      const data = await res.json();
-      document.getElementById('userPoints').innerText = `보유 포인트: ${data.points}P`;
+    // ✅ 사용자 정보 가져오기
+    async function fetchUserInfoAndPoints() {
+      try {
+        const res = await fetch('/api/user-info/user-all', {
+          headers: {
+            'Authorization': `Bearer ${jwtToken}`
+          }
+        });
+
+        if (!res.ok) throw new Error("사용자 정보 요청 실패");
+
+        const user = await res.json();
+        currentUserId = user.u_id;
+
+        const pointsRes = await fetch(`/shop/points/${currentUserId}`);
+        if (!pointsRes.ok) throw new Error("포인트 조회 실패");
+
+        const pointsData = await pointsRes.json();
+        document.getElementById('userPoints').innerText = `${pointsData.points} P`;
+      } catch (err) {
+        alert('사용자 정보를 불러오지 못했습니다. 로그인 페이지로 이동합니다.');
+        window.location.href = '/';
+      }
     }
 
+    // ✅ 아이템 목록 불러오기
     async function loadItems() {
-      const res = await fetch('/nodetest/shop/items');
+      const res = await fetch('/shop/items');
       const items = await res.json();
 
-      const container = document.getElementById('shopContainer');
-      container.innerHTML = '';
-
-      items.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.innerHTML = `
+      const list = document.getElementById('itemList');
+      list.innerHTML = items.map(item => `
+        <div class="item">
           <img src="${item.image_url}" alt="${item.name}">
-          <h3>${item.name}</h3>
+          <p><strong>${item.name}</strong> (${item.price}P)</p>
           <p>${item.description}</p>
-          <strong>${item.price}P</strong><br/>
           <button onclick="buyItem(${item.item_id})">구매</button>
-        `;
-        container.appendChild(card);
-      });
+        </div>
+      `).join('');
     }
 
+    // ✅ 아이템 구매
     async function buyItem(itemId) {
-      const res = await fetch('/nodetest/shop/buy', {
+      if (!currentUserId) return alert("사용자 정보 없음");
+
+      const res = await fetch('/shop/buy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, item_id: itemId })
+        body: JSON.stringify({ user_id: currentUserId, item_id: itemId })
       });
 
       const result = await res.json();
-      alert(result.message || result.error);
-      loadPoints();
+      alert(result.message);
+      fetchUserInfoAndPoints(); // 구매 후 포인트 갱신
     }
 
-    loadPoints();
+    // 초기 실행
+    fetchUserInfoAndPoints();
     loadItems();
   </script>
+
 </body>
 </html>

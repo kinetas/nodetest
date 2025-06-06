@@ -1,5 +1,11 @@
+const fs = require('fs');
+const path = require('path');
+
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel'); // User 모델 가져오기
+
+const uploadDir = path.join(__dirname, '..', '..', 'public', 'profile_images');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
@@ -79,8 +85,21 @@ const extractUserIdFromToken = (req) => {
     }
   
     try {
-      await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
-      res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.' });
+      const ext = path.extname(req.file.originalname);
+      const fileName = `${uuidv4()}${ext}`;
+      const filePath = path.join(uploadDir, fileName);
+
+      // 이미지 저장
+      fs.writeFileSync(filePath, req.file.buffer);
+
+      // DB에 저장할 URL 경로
+      const imageUrl = `/profile_images/${fileName}`;
+
+      // await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
+      // DB 업데이트
+      await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
+      
+      res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.', imageUrl });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });

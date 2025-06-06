@@ -15,6 +15,7 @@ const voteImageDir = path.join(__dirname, 'public', 'vote_images');
 if (!fs.existsSync(voteImageDir)) fs.mkdirSync(voteImageDir, { recursive: true });
 
 app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+app.use('/profile_images', express.static(path.join(__dirname, 'public/profile_images')));
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {

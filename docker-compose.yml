@@ -109,6 +109,8 @@ services:
       - ./auth_server1/.env
     depends_on:
       - mysql
+    volumes:
+      - ./api_gateway/public/profile_images:/usr/src/app/public/profile_images
 
   auth_server_2:
     build: ./auth_server2
@@ -119,6 +121,8 @@ services:
       - ./auth_server2/.env
     depends_on:
       - mysql
+    volumes:
+      - ./api_gateway/public/profile_images:/usr/src/app/public/profile_images
 
   gateway:
     build: ./api_gateway

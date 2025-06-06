@@ -6,7 +6,7 @@ const shopController = require('../controllers/shopController');
 
 router.get('/items', shopController.getShopItems);
 router.post('/buy', shopController.buyItem);
-router.get('/user-info/user-points/:user_id', async (req, res) => {
+router.get('/points/:user_id', async (req, res) => {
   const { user_id } = req.params;
   try {
     const result = await db.query(

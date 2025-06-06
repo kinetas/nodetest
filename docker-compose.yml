@@ -139,6 +139,7 @@ services:
       - intent_server
     volumes:
       - /home/gogi/docker/api_gateway/public/vote_images:/app/public/vote_images
+      - ./api_gateway/public/profile_images:/usr/src/app/public/profile_images
 
 
 

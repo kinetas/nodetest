@@ -7,6 +7,8 @@ const MResult = require('../models/m_resultModel');
 const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
+const path = require('path');
+const fs = require('fs');
 
 //===================================================token================================================
 

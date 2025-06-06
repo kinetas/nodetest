@@ -3,7 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'SignUpScreen.dart';
 import 'LoginScreen.dart';
 import 'FindAccountScreen.dart';
-import '../ScreenMain.dart'; // Update the path if necessary
 
 class StartLoginScreen extends StatelessWidget {
   const StartLoginScreen({Key? key}) : super(key: key);
@@ -21,26 +20,23 @@ class StartLoginScreen extends StatelessWidget {
           return Column(
             children: [
               SizedBox(height: screenHeight * 0.3),
+
+              /// ✅ 클릭 불가능한 로고 텍스트
               Center(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainScreen()),
-                    );
-                  },
-                  child: Text(
-                    '챌린지업',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                      letterSpacing: 2.0,
-                    ),
+                child: Text(
+                  '챌린지업',
+                  style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                    letterSpacing: 2.0,
                   ),
                 ),
               ),
+
               SizedBox(height: screenHeight * 0.25),
+
+              /// 로그인 & 회원가입 버튼
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -87,7 +83,10 @@ class StartLoginScreen extends StatelessWidget {
                   ),
                 ],
               ),
+
               SizedBox(height: 15),
+
+              /// 아이디/비밀번호 찾기
               TextButton(
                 onPressed: () {
                   Navigator.push(
@@ -104,7 +103,10 @@ class StartLoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
               Spacer(),
+
+              /// 인스타그램 링크
               GestureDetector(
                 onTap: () async {
                   final url = Uri.parse('https://www.instagram.com/hav_eyoueat_en/');
@@ -124,6 +126,7 @@ class StartLoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
               SizedBox(height: 20),
             ],
           );

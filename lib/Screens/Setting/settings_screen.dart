@@ -4,6 +4,7 @@ import '../../SessionCookieManager.dart';
 import '../../DeviceTokenManager.dart';
 import '../Login_page/StartLogin_screen.dart';
 import 'SettingWidgets/SettingOptionsList.dart';
+import '../../SessionTokenManager.dart';
 
 class SettingsScreen extends StatelessWidget {
   final VoidCallback onNavigateToHome;
@@ -37,12 +38,12 @@ class SettingsScreen extends StatelessWidget {
         print("[DEBUG] Logout Failed: ${response.statusCode}");
       }
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-
+      // ✅ 세션 및 토큰 삭제
+      await SessionTokenManager.clearToken(); // << 추가됨
       await SessionCookieManager.clearSessionCookie();
       DeviceTokenManager().clearToken();
 
+      // ✅ 사용자 피드백 및 라우팅
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('로그아웃되었습니다.')),
       );

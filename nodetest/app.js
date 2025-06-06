@@ -63,7 +63,7 @@ app.use('/chat', timeConverterMiddleware, loginRequired, chatRoutes);
 app.use('/api/recommendationMission', recommendationMissionRoutes); //미션 추천 라우트
 app.use('/api/ai', aiRoutes);
 app.use('/league', leagueRoutes);
-app.use('/shop', shopRoutes);
+app.use('/shop', loginRequired, shopRoutes);
 
 
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제

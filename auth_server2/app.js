@@ -33,7 +33,7 @@ app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
 });
 
-app.use('/profile_images', express.static(path.join(__dirname, '..', 'public', 'profile_images')));
+app.use('/profile_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'profile_images')));
 
 // ==================== 404 처리 ====================
 app.use((req, res) => {

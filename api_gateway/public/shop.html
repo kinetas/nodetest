@@ -31,8 +31,11 @@
 
         if (!res.ok) throw new Error("사용자 정보 요청 실패");
 
+        console.log(res);
         const user = await res.json();
         currentUserId = user.u_id;
+        
+        console.log(currentUserId);
 
         const pointsRes = await fetch(`/nodetest/shop/user-info/user-points/${currentUserId}`, {
           headers: {
@@ -40,8 +43,10 @@
           }
         });
         if (!pointsRes.ok) throw new Error("포인트 조회 실패");
+        console.log(pointsRes);
 
         const pointsData = await pointsRes.json();
+        console.log(pointsData);
         document.getElementById('userPoints').innerText = `${pointsData.points} P`;
       } catch (err) {
         alert('사용자 정보를 불러오지 못했습니다. 로그인 페이지로 이동합니다.');

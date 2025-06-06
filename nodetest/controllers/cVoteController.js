@@ -12,8 +12,8 @@ const fs = require('fs');
 
 //===================================================token================================================
 
-const uploadDir = path.join(__dirname, '../public/vote_images');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+const uploadDir = path.join(__dirname, '..', '..', 'gateway', 'public', 'vote_images');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 exports.getVotes = async (req, res) => {
     try {

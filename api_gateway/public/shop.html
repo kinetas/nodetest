@@ -34,7 +34,7 @@
         const user = await res.json();
         currentUserId = user.u_id;
 
-        const pointsRes = await fetch(`/nodetest/shop/points/${currentUserId}`, {
+        const pointsRes = await fetch(`/nodetest/shop/user-info/user-points/${currentUserId}`, {
           headers: {
             'Authorization': `Bearer ${jwtToken}`
           }

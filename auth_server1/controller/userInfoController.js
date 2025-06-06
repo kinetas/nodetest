@@ -4,7 +4,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel'); // User 모델 가져오기
 
-const uploadDir = path.join(__dirname, '..', '..', 'public', 'profile_images');
+const uploadDir = path.join('/usr/src/app', 'public', 'profile_images');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const secretKey = process.env.JWT_SECRET_KEY;

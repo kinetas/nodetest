@@ -161,6 +161,15 @@ exports.deleteVote = async (req, res) => {
         if (!vote) {
             return res.status(404).json({ success: false, message: "삭제할 투표를 찾을 수 없습니다." });
         }
+
+        // 이미지 파일이 존재하면 파일 시스템에서도 삭제
+        if (vote.c_image) {
+            const imagePath = path.join(uploadDir, path.basename(vote.c_image));
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath); // 파일 삭제
+            }
+        }
+
         await vote.destroy();
         res.json({ success: true, message: "투표가 삭제되었습니다." });
     } catch (error) {

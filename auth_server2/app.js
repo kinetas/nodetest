@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 
 // ==================== 미들웨어 & 유틸 ====================
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
@@ -31,6 +32,8 @@ app.use('/dashboard/friends', timeConverterMiddleware, loginRequired, friendRout
 app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
 });
+
+app.use('/profile_images', express.static(path.join(__dirname, '..', 'public', 'profile_images')));
 
 // ==================== 404 처리 ====================
 app.use((req, res) => {

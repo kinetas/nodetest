@@ -23,7 +23,7 @@
     // ✅ 사용자 정보 가져오기
     async function fetchUserInfoAndPoints() {
       try {
-        const res = await fetch('/auth/api/user-info/user-all', {
+        const res = await fetch('/shop/points/${userId}', {
           headers: {
             'Authorization': `Bearer ${jwtToken}`
           }

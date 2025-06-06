@@ -37,7 +37,7 @@ const CVote = sequelize.define('CVote', {
   //   allowNull: true,
   // },
   c_image: {
-      type: DataTypes.STRING(255), // 이미지 데이터를 BLOB으로 저장
+      type: DataTypes.STRING(255), // 이미지 데이터를 경로로 저장하기 위해 STRING type
       allowNull: true,
     },
 }, {

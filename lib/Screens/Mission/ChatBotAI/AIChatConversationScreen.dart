@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../../SessionTokenManager.dart';
+import 'ChatBotAI_widget.dart'; // ✅ 말풍선 위젯 import
 
 class AIChatConversationScreen extends StatefulWidget {
   @override
@@ -12,10 +13,13 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
   final TextEditingController _controller = TextEditingController();
   List<Map<String, dynamic>> messages = [];
   bool isLoading = false;
+  String? lastUserInput;
 
-  Future<void> _sendMessage() async {
-    final text = _controller.text.trim();
+  Future<void> _sendMessage({String? overrideText}) async {
+    final text = overrideText ?? _controller.text.trim();
     if (text.isEmpty) return;
+
+    lastUserInput = text;
 
     setState(() {
       messages.add({'sender': 'user', 'text': text});
@@ -42,12 +46,12 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
     );
 
     if (response.statusCode == 200) {
-      final json = jsonDecode(utf8.decode(response.bodyBytes)); // ✅ 한글 깨짐 방지
+      final json = jsonDecode(utf8.decode(response.bodyBytes));
       setState(() {
         messages.add({
           'sender': 'ai',
           'text': json["message"],
-          'message': json["message"], // ✅ message 본문 따로 저장
+          'message': json["message"],
           'title': json["title"],
           'category': json["category"],
           'source': json["source"],
@@ -69,33 +73,69 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
     final isUser = message['sender'] == 'user';
     final isAI = message['sender'] == 'ai';
 
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 4),
-        padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isUser ? Colors.blue[100] : Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    if (!isAI) {
+      return ChatBotAIWidget(
+        message: message['text'] ?? '',
+        isUser: isUser,
+      );
+    }
+
+    return ChatBotAIWidget(
+      message: message['text'] ?? '',
+      isUser: false,
+      onAddPressed: () {
+        Navigator.pop(context, {
+          'title': message['title'],
+          'message': message['message'],
+          'category': message['category'],
+          'source': message['source'],
+        });
+      },
+      onRetryPressed: lastUserInput != null
+          ? () => _sendMessage(overrideText: lastUserInput)
+          : null,
+    );
+  }
+
+  Widget _buildInputArea() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 6, 12, 12),
+        child: Row(
           children: [
-            Text(message['text'] ?? ''),
-            if (isAI) ...[
-              SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context, {
-                    'title': message['title'],
-                    'message': message['message'], // ✅ 정확한 본문 전달
-                    'category': message['category'],
-                    'source': message['source'],
-                  });
-                },
-                child: Text("이 미션 추가하기"),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      offset: Offset(0, 2),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText: "카테고리나 메시지를 입력",
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: (_) => _sendMessage(),
+                ),
               ),
-            ],
+            ),
+            SizedBox(width: 8),
+            CircleAvatar(
+              backgroundColor: Colors.blue[600],
+              radius: 24,
+              child: IconButton(
+                icon: Icon(Icons.send, color: Colors.white),
+                onPressed: _sendMessage,
+              ),
+            ),
           ],
         ),
       ),
@@ -105,12 +145,17 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("AI 미션 채팅")),
+      backgroundColor: Color(0xFFF4F6FA),
+      appBar: AppBar(
+        title: Text("AI 미션 채팅"),
+        backgroundColor: Colors.blue[700],
+        elevation: 2,
+      ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.all(12),
+              padding: EdgeInsets.symmetric(vertical: 8),
               itemCount: messages.length,
               itemBuilder: (context, index) => _buildMessage(messages[index]),
             ),
@@ -120,24 +165,7 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
               padding: const EdgeInsets.all(8.0),
               child: CircularProgressIndicator(),
             ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(hintText: "카테고리나 메시지를 입력"),
-                    onSubmitted: (_) => _sendMessage(),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
-          ),
+          _buildInputArea(),
         ],
       ),
     );

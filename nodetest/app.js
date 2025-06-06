@@ -49,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 // ==================== 정적 파일 제공 ====================
 // Static folder to serve the HTML file
 app.use(express.static('public'));
-app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+app.use('/vote_images', express.static(path.join(__dirname, '..', 'gateway', 'public', 'vote_images')));
 
 // ==================== 라우팅 설정 ====================
 // app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);

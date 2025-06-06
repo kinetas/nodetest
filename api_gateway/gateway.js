@@ -57,6 +57,9 @@ app.get('/findinfo', (req, res) => {
 app.get('/league', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'league.html'));
 });
+app.get('/shop', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'shop.html'));
+});
 
 const authTargets = ['http://auth_server_1:3000', 'http://auth_server_2:3000'];
 let currentAuth = 0;

@@ -25,13 +25,13 @@
     const userId = localStorage.getItem('user_id') || 'test_user'; // 필요 시 변경
 
     async function loadPoints() {
-      const res = await fetch(`/api/user-info/user-points/${userId}`);
+      const res = await fetch(`/auth/api/user-info/user-points/${userId}`);
       const data = await res.json();
       document.getElementById('userPoints').innerText = `보유 포인트: ${data.points}P`;
     }
 
     async function loadItems() {
-      const res = await fetch('/shop/items');
+      const res = await fetch('/nodetest/shop/items');
       const items = await res.json();
 
       const container = document.getElementById('shopContainer');
@@ -52,7 +52,7 @@
     }
 
     async function buyItem(itemId) {
-      const res = await fetch('/shop/buy', {
+      const res = await fetch('/nodetest/shop/buy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: userId, item_id: itemId })

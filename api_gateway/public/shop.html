@@ -44,7 +44,7 @@
         const pointsData = await pointsRes.json();
         document.getElementById('userPoints').innerText = `${pointsData.points} P`;
       } catch (err) {
-        alert('사용자 정보를 불러오지 못했습니다. 로그인 페이지로 이동합니다.', err);
+        alert('사용자 정보를 불러오지 못했습니다. 로그인 페이지로 이동합니다.');
         window.location.href = '/';
       }
     }

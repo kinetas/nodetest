@@ -40,22 +40,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _checkJwtStatus() async {
-    final isValid = await SessionTokenManager.isLoggedIn();
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('jwt_token');
     setState(() {
-      _isLoggedIn = isValid;
+      _isLoggedIn = token != null;
       _checkedLogin = true;
     });
-
-    if (!isValid) {
-      print("🔒 유효하지 않은 토큰 → 로그인 필요");
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("다시 로그인 해주세요!")),
-        );
-      });
-      await SessionTokenManager.clearToken(); // 토큰 정리
-    }
-
     print("✅ 로그인 체크 결과: $_isLoggedIn");
   }
 

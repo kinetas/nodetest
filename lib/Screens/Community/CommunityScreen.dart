@@ -1,5 +1,11 @@
+/*
 import 'package:flutter/material.dart';
+import 'CommunityVoteList.dart';
+import 'CommunityPostList.dart'; // CommunityPostList 클래스를 import
+import 'AddPost.dart'; // AddPost 화면 import
+import 'AddVote.dart'; // AddVote 화면 import
 
+// CommunityScreen: 커뮤니티 메인 화면
 class CommunityScreen extends StatefulWidget {
   @override
   _CommunityScreenState createState() => _CommunityScreenState();
@@ -8,14 +14,12 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<String> _tabTitles = ['전체', '자유게시판', '인기글', '미션구인', '미션투표'];
-
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: _tabTitles.length, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      setState(() {}); // 탭 변경 시 FAB 조건 반영
+      setState(() {}); // Tab 변경 시 상태 갱신
     });
   }
 
@@ -26,29 +30,99 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   }
 
   void _onAddButtonPressed() {
-    final label = _tabTitles[_tabController.index];
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label 글 작성 화면으로 이동')),
-    );
+    // 현재 탭에 따라 다른 화면으로 이동
+    if (_tabController.index == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddPost()), // 게시판 탭 -> AddPost 화면
+      );
+    } else if (_tabController.index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddVote()), // 미션투표 탭 -> AddVote 화면
+      );
+    }
   }
 
-  Widget _buildDummyTab(String label) {
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: 8,
-      separatorBuilder: (_, __) => Divider(color: Colors.grey[300]),
-      itemBuilder: (context, index) => ListTile(
-        leading: const Icon(Icons.article),
-        title: Text('$label 글 제목 $index'),
-        subtitle: Text('$label 내용의 첫 줄 미리보기입니다.'),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$label 글 $index 선택됨')),
-          );
-        },
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '커뮤니티',
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+        backgroundColor: Colors.lightBlue[400],
+        actions: [
+          if (_tabController.index == 0 || _tabController.index == 1) // 게시판(0) 또는 미션투표(1)에서만 + 버튼 표시
+            IconButton(
+              icon: Icon(Icons.add, color: Colors.white),
+              onPressed: _onAddButtonPressed, // + 버튼 클릭 시 동작
+            ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          tabs: [
+            Tab(text: '게시판'),
+            Tab(text: '미션투표'),
+          ],
+        ),
+        elevation: 0, // 그림자 제거로 깔끔한 디자인
+      ),
+      body: Container(
+        color: Colors.lightBlue[50],
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            CommunityPostList(), // CommunityPostList 클래스를 게시판 탭으로 설정
+            CommunityVoteList(), // 미션투표 탭은 별도의 클래스로 분리
+          ],
+        ),
       ),
     );
+  }
+}
+*/
+
+
+import 'package:flutter/material.dart';
+import 'CommunityVoteList.dart';
+import 'CommunityPostList.dart';
+import 'AddPost.dart';
+import 'AddVote.dart';
+
+class CommunityScreen extends StatefulWidget {
+  @override
+  _CommunityScreenState createState() => _CommunityScreenState();
+}
+
+class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {}); // 탭 변경 시 버튼 조건 반영
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _onAddButtonPressed() {
+    if (_tabController.index == 0) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddPost()));
+    } else if (_tabController.index == 1) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => AddVote()));
+    }
   }
 
   @override
@@ -56,50 +130,45 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.lightBlue,
         automaticallyImplyLeading: false,
-        elevation: 1,
-        centerTitle: true,
+        elevation: 2,
         title: const Text(
           '커뮤니티',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search, color: Colors.black),
-            onPressed: () {
-              // 검색 기능 예정
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('검색 기능 준비 중')),
-              );
-            },
+            icon: const Icon(Icons.add, color: Colors.white),
+            onPressed: _onAddButtonPressed,
           ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(40),
+          preferredSize: Size.fromHeight(36), // 탭 높이 축소
           child: Container(
-            alignment: Alignment.centerLeft,
+            alignment: Alignment.center,
             child: TabBar(
               controller: _tabController,
-              isScrollable: true,
-              labelColor: Colors.lightBlue,
-              unselectedLabelColor: Colors.black54,
-              indicatorColor: Colors.lightBlue,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
               indicatorWeight: 2,
               labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              tabs: _tabTitles.map((title) => Tab(text: title)).toList(),
+              tabs: const [
+                Tab(text: '게시판'),
+                Tab(text: '미션투표'),
+              ],
             ),
           ),
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: _tabTitles.map((title) => _buildDummyTab(title)).toList(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onAddButtonPressed,
-        backgroundColor: Colors.lightBlueAccent,
-        child: const Icon(Icons.edit),
+        children: [
+          CommunityPostList(),
+          CommunityVoteList(),
+        ],
       ),
     );
   }

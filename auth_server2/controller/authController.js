@@ -235,6 +235,27 @@ exports.logoutToken = async (req, res) => {
         // JWT 쿠키 방식일 경우 삭제 가능
         res.clearCookie('jwt_token');
 
+        // ✅ id_token에서 userId 직접 복호화 (DB용 ID)
+        const tokenInfoRes = await axios.get(
+            'http://27.113.11.48:8080/realms/master/protocol/openid-connect/userinfo',
+            {
+                headers: { Authorization: `Bearer ${idToken}` }
+            }
+        );
+
+        const userId = tokenInfoRes.data.preferred_username || tokenInfoRes.data.sub;
+        if (!userId) {
+            return res.status(400).json({ success: false, message: '사용자 정보를 찾을 수 없습니다.' });
+        }
+
+        // ✅ 디바이스 토큰 제거
+        const user = await User.findOne({ where: { u_id: userId } });
+        if (user) {
+            user.token = null;
+            await user.save();
+            console.log(`✅ 로그아웃 시 DB의 토큰 삭제 완료 (user: ${userId})`);
+        }
+
         // Keycloak 로그아웃 URL 생성
         const logoutUrl = `http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout?` +
                           `id_token_hint=${encodeURIComponent(idToken)}&` +

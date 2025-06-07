@@ -776,11 +776,12 @@ exports.requestMissionApproval = async (req, res) => {
 
         // 이미지 저장 처리
         let imagePath = null;
+        const uploadDirVote = path.join('/app', 'public', 'vote_images');
         if (req.file) {
             const filename = `${m_id}_${Date.now()}.jpg`; // 파일명 유니크하게 구성
-            const savePath = path.join(uploadDir, filename);
+            const savePath = path.join(uploadDirVote, filename);
             fs.writeFileSync(savePath, req.file.buffer);
-            imagePath = `/mission_images/${filename}`; // URL 경로 저장
+            imagePath = `/vote_images/${filename}`; // URL 경로 저장
         }
 
         // 정확히 해당 미션만 상태를 "요청"으로 변경

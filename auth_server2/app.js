@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 
 // ==================== 미들웨어 & 유틸 ====================
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');
@@ -20,6 +21,9 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static('public'));
+app.use('/profile_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'profile_images')));
 
 // ==================== 라우팅 설정 ====================
 app.use('/api/auth', timeConverterMiddleware, authRoutes);

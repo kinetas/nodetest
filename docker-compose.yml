@@ -26,6 +26,8 @@ services:
       - mysql
     env_file:
       - ./nodetest/.env
+    volumes:
+      - /home/gogi/docker/api_gateway/public/vote_images:/app/public/vote_images
 
 
   rag_server:
@@ -107,6 +109,8 @@ services:
       - ./auth_server1/.env
     depends_on:
       - mysql
+    volumes:
+      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
   auth_server_2:
     build: ./auth_server2
@@ -117,6 +121,8 @@ services:
       - ./auth_server2/.env
     depends_on:
       - mysql
+    volumes:
+      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
   gateway:
     build: ./api_gateway
@@ -131,6 +137,9 @@ services:
       - nodetest
       - rag_server
       - intent_server
+    volumes:
+      - /home/gogi/docker/api_gateway/public/vote_images:/app/public/vote_images
+      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
 
 

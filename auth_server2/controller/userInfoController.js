@@ -77,10 +77,12 @@ const extractUserIdFromToken = (req) => {
   exports.chaingeProfileImage = async (req, res) => {
     const userId = extractUserIdFromToken(req);
     if (!userId) {
+      console.log('❌ 사용자 토큰 추출 실패');
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
   
     if (!req.file) {
+      console.log('❌ 파일 업로드 안 됨');
       return res.status(400).json({ message: '프로필 이미지가 업로드되지 않았습니다.' });
     }
   

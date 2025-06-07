@@ -77,10 +77,12 @@ const extractUserIdFromToken = (req) => {
   exports.chaingeProfileImage = async (req, res) => {
     const userId = extractUserIdFromToken(req);
     if (!userId) {
+      console.log('❌ 사용자 토큰 추출 실패');
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
   
     if (!req.file) {
+      console.log('❌ 파일 업로드 안 됨');
       return res.status(400).json({ message: '프로필 이미지가 업로드되지 않았습니다.' });
     }
   
@@ -98,10 +100,10 @@ const extractUserIdFromToken = (req) => {
       // await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
       // DB 업데이트
       await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
-      
+      console.log(`✅ 프로필 이미지 저장 완료: ${imageUrl}`);
       res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.', imageUrl });
     } catch (error) {
-      console.error(error);
+      console.error('❌ 서버 오류:', error);
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
   };

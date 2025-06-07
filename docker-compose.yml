@@ -40,7 +40,6 @@ services:
     #   - "8000"
     depends_on:
       - chroma
-      # - ollama
     volumes:
       - ./chroma-data:/chroma/chroma
 
@@ -54,13 +53,7 @@ services:
     environment:
     - IS_PERSISTENT=TRUE
     - ALLOW_RESET=TRUE
-  # ollama:
-  #   image: ollama/ollama
-  #   container_name: ollama
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
+    restart: always
 
   intent_server:
     build: ./intent_server
@@ -71,6 +64,7 @@ services:
       - "8002"
     volumes:
       - ./models/intent_model:/app/intent_model
+    restart: always
 
     
   webRTC_server:
@@ -103,6 +97,7 @@ services:
   auth_server_1:
     build: ./auth_server1
     container_name: auth_server_1
+    restart: always
     expose:
       - "3000"
     env_file:
@@ -115,6 +110,7 @@ services:
   auth_server_2:
     build: ./auth_server2
     container_name: auth_server_2
+    restart: always
     expose:
       - "3000"
     env_file:
@@ -127,6 +123,7 @@ services:
   gateway:
     build: ./api_gateway
     container_name: api_gateway
+    restart: always
     ports:
       - "3000:3000"  # 외부 노출은 오직 Gateway
     env_file:
@@ -189,4 +186,3 @@ services:
 volumes:
   mysql-data:
   chroma-data:
-  # ollama_data:

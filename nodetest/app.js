@@ -51,6 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/vote_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'vote_images')));
 app.use('/mission_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'mission_images')));
+app.use('/result_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'result_images')));
 
 // ==================== 라우팅 설정 ====================
 // app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);

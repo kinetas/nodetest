@@ -1,6 +1,12 @@
 // controllers/resultController.js
+const fs = require('fs');
+const path = require('path');
+
 const MResult = require('../models/m_resultModel'); // m_resultModel.js 연결
 const { Op } = require('sequelize');
+
+const uploadDir = path.join('/app', 'public', 'result_images');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 // m_result에 데이터 저장 함수
 exports.saveResult = async (m_id, u_id, m_deadline, m_status, category, mission_result_image) => {

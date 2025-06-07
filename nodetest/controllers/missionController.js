@@ -776,12 +776,11 @@ exports.requestMissionApproval = async (req, res) => {
 
         // 이미지 저장 처리
         let imagePath = null;
-        const uploadDirVote = path.join('/app', 'public', 'vote_images');
         if (req.file) {
             const filename = `${m_id}_${Date.now()}.jpg`; // 파일명 유니크하게 구성
-            const savePath = path.join(uploadDirVote, filename);
+            const savePath = path.join(uploadDir, filename);
             fs.writeFileSync(savePath, req.file.buffer);
-            imagePath = `/vote_images/${filename}`; // URL 경로 저장
+            imagePath = `/mission_images/${filename}`; // URL 경로 저장
         }
 
         // 정확히 해당 미션만 상태를 "요청"으로 변경
@@ -1300,12 +1299,13 @@ exports.requestVoteForMission = async (req, res) => {
         }
 
         let imageUrl = null;
+        const uploadDirVote = path.join('/app', 'public', 'vote_images');
         if (req.file) {
             const fileExt = path.extname(req.file.originalname);
             const fileName = `${uuidv4()}${fileExt}`;
-            const savePath = path.join(uploadDir, fileName);
+            const savePath = path.join(uploadDirVote, fileName);
             fs.writeFileSync(savePath, req.file.buffer);
-            imageUrl = `/mission_images/${fileName}`; // ⬅ URL 경로 저장
+            imageUrl = `/vote_images/${fileName}`; // ⬅ URL 경로 저장
         }
 
         // ===== 미션 상태를 "요청"으로 변경 =====

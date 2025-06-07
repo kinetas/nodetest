@@ -243,10 +243,7 @@ exports.logoutToken = async (req, res) => {
             }
         );
 
-        const userId = tokenInfoRes.data.preferred_username || tokenInfoRes.data.sub;
-        if (!userId) {
-            return res.status(400).json({ success: false, message: '사용자 정보를 찾을 수 없습니다.' });
-        }
+        const userId = req.currentUserId;
 
         // ✅ 디바이스 토큰 제거
         const user = await User.findOne({ where: { u_id: userId } });

@@ -1310,7 +1310,7 @@ exports.requestVoteForMission = async (req, res) => {
 
         // ===== 미션 상태를 "요청"으로 변경 =====
         const updated = await Mission.update(
-            { m_status: '요청' }, // 상태를 "요청"으로 변경
+            { m_status: '요청', mission_image: imageUrl }, // 상태를 "요청"으로 변경
             { where: { m_id } }  // m_id 조건으로 업데이트
         );
 

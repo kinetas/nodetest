@@ -15,9 +15,12 @@ const voteImageDir = path.join(__dirname, 'public', 'vote_images');
 if (!fs.existsSync(voteImageDir)) fs.mkdirSync(voteImageDir, { recursive: true });
 const profileImageDir = path.join(__dirname, 'public', 'profile_images');
 if (!fs.existsSync(profileImageDir)) fs.mkdirSync(profileImageDir, { recursive: true });
+const missionImageDir = path.join(__dirname, 'public', 'mission_images');
+if (!fs.existsSync(missionImageDir)) fs.mkdirSync(missionImageDir, { recursive: true });
 
 app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
 app.use('/profile_images', express.static(path.join(__dirname, 'public', 'profile_images')));
+app.use('/mission_images', express.static(path.join(__dirname, 'public', 'mission_images')));
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {

@@ -11,7 +11,13 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
+const fs = require('fs');
+const path = require('path');
+
 const leagueController = require('../controllers/leagueController');
+
+const uploadDir = path.join('/app', 'public', 'mission_images');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 // 미션 완료 시 커뮤니티 미션인지 확인 후 커뮤니티 방에 미션 상태 업데이트
 async function updateCommunityRoomStatusOnMissionComplete(mission) {
@@ -768,11 +774,21 @@ exports.requestMissionApproval = async (req, res) => {
             return res.status(403).json({ success: false, message: '미션 수행자만 요청할 수 있습니다.' });
         }
 
+        // 이미지 저장 처리
+        let imagePath = null;
+        if (req.file) {
+            const filename = `${m_id}_${Date.now()}.jpg`; // 파일명 유니크하게 구성
+            const savePath = path.join(uploadDir, filename);
+            fs.writeFileSync(savePath, req.file.buffer);
+            imagePath = `/mission_images/${filename}`; // URL 경로 저장
+        }
+
         // 정확히 해당 미션만 상태를 "요청"으로 변경
         const updated = await Mission.update({ 
-            m_status: '요청',
-            mission_image: req.file?.buffer || null
-        }, { where: { m_id, u2_id: userId }
+                m_status: '요청',
+                // mission_image: req.file?.buffer || null
+                mission_image: imagePath
+            }, { where: { m_id, u2_id: userId }
         });
 
         if (updated[0] === 0) {

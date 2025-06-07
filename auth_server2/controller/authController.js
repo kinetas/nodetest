@@ -85,7 +85,7 @@ exports.registerKeycloakDirect = async (req, res) => {
 
 // KeyCloak + JWT (index화면에서 로그인)
 exports.keycloakDirectLogin = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, deviceToken } = req.body;
 
     try {
         //Keycloak 로그인으로 access_token 획득
@@ -125,6 +125,14 @@ exports.keycloakDirectLogin = async (req, res) => {
 
         if (!payload.userId) {
             return res.status(400).json({ success: false, message: '유효한 사용자 ID를 얻지 못했습니다.' });
+        }
+
+        if (deviceToken) {
+            const user = await User.findOne({ where: { u_id: payload.userId } });
+            if (user) {
+                user.token = deviceToken;
+                await user.save();
+            }
         }
 
         //JWT 발급

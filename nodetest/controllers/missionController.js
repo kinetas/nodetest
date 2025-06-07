@@ -1283,7 +1283,7 @@ exports.getRequestedSelfMissions = async (req, res) => {
 // 개인 미션을 투표에 업로드
 exports.requestVoteForMission = async (req, res) => {
     const { m_id } = req.body;
-    const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리
+    // const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리
     // const c_image = req.file ? req.file : null;
 
     if (!m_id) {
@@ -1298,7 +1298,16 @@ exports.requestVoteForMission = async (req, res) => {
             return res.status(404).json({ success: false, message: '해당 미션을 찾을 수 없습니다.' });
         }
 
-        // ===== 추가된 기능: 미션 상태를 "요청"으로 변경 =====
+        let imageUrl = null;
+        if (req.file) {
+            const fileExt = path.extname(req.file.originalname);
+            const fileName = `${uuidv4()}${fileExt}`;
+            const savePath = path.join(uploadDir, fileName);
+            fs.writeFileSync(savePath, req.file.buffer);
+            imageUrl = `/mission_images/${fileName}`; // ⬅ URL 경로 저장
+        }
+
+        // ===== 미션 상태를 "요청"으로 변경 =====
         const updated = await Mission.update(
             { m_status: '요청' }, // 상태를 "요청"으로 변경
             { where: { m_id } }  // m_id 조건으로 업데이트
@@ -1322,7 +1331,7 @@ exports.requestVoteForMission = async (req, res) => {
             c_good: 0,
             c_bad: 0,
             c_deletedate,
-            c_image, // 사진 저장 (null일 수도 있음)
+            c_image: imageUrl, // 사진 저장 (null일 수도 있음)
         });
 
         res.json({ success: true, message: '투표가 성공적으로 생성되었습니다.', vote: newVote });

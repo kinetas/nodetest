@@ -235,14 +235,6 @@ exports.logoutToken = async (req, res) => {
         // JWT 쿠키 방식일 경우 삭제 가능
         res.clearCookie('jwt_token');
 
-        // ✅ id_token에서 userId 직접 복호화 (DB용 ID)
-        const tokenInfoRes = await axios.get(
-            'http://27.113.11.48:8080/realms/master/protocol/openid-connect/userinfo',
-            {
-                headers: { Authorization: `Bearer ${idToken}` }
-            }
-        );
-
         const userId = req.currentUserId;
 
         // ✅ 디바이스 토큰 제거

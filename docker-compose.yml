@@ -143,6 +143,7 @@ services:
       - /home/gogi/docker/api_gateway/public/mission_images:/app/public/mission_images
       - /home/gogi/docker/api_gateway/public/community_images:/app/public/community_images
       - /home/gogi/docker/api_gateway/public/chat_message_images:/app/public/chat_message_images
+      - /home/gogi/docker/api_gateway/public/models:/app/public/models
 
 
 

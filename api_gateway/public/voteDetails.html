@@ -48,8 +48,7 @@
                         document.getElementById('voteGood').innerText = data.vote.c_good;
                         document.getElementById('voteBad').innerText = data.vote.c_bad;
                         if (data.vote.c_image) {
-                            // document.getElementById('voteImage').innerHTML = `<img src="data:image/jpeg;base64,${data.vote.c_image}" alt="투표 이미지" style="max-width: 100%;">`;
-                            document.getElementById('voteImage').innerHTML = `<img src="${data.vote.c_image}" alt="투표 이미지" style="max-width: 100%;">`;
+                            document.getElementById('voteImage').innerHTML = `<img src="data:image/jpeg;base64,${data.vote.c_image}" alt="투표 이미지" style="max-width: 100%;">`;
                         }
                     } else {
                         alert(data.message);

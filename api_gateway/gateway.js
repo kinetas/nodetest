@@ -4,35 +4,10 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const fetch = require('node-fetch');
 const path = require('path');
 const http = require('http');
-const fs = require('fs');
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+
 require('dotenv').config();
 
 const app = express();
-
-const fs = require('fs');
-
-// ✅ 정적 파일 서빙 디렉토리 설정
-const publicDir = path.join(__dirname, 'public');
-const profileImageDir = path.join(publicDir, 'profile_images');
-const voteImageDir = path.join(publicDir, 'vote_images');
-const missionImageDir = path.join(publicDir, 'mission_images');
-const communityImageDir = path.join(publicDir, 'community_images');
-const chatMessageImageDir = path.join(publicDir, 'chat_message_images');
-
-[profileImageDir, voteImageDir, missionImageDir, communityImageDir, chatMessageImageDir].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
-
-// ✅ 정적 서빙
-app.use(express.static(publicDir));
-app.use('/profile_images', express.static(profileImageDir));
-app.use('/vote_images', express.static(voteImageDir));
-app.use('/mission_images', express.static(missionImageDir));
-app.use('/community_images', express.static(communityImageDir));
-app.use('/chat_message_images', express.static(chatMessageImageDir));
-
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {
@@ -79,21 +54,6 @@ app.get('/findinfo', (req, res) => {
 app.get('/league', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'league.html'));
 });
-
-// ✅ 프로필 이미지 업로드 엔드포인트
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_, __, cb) => cb(null, profileImageDir),
-    filename: (_, file, cb) => cb(null, uuidv4() + path.extname(file.originalname))
-  })
-});
-
-app.post('/api/upload-profile-image', upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ message: '이미지 파일이 없습니다.' });
-  const imageUrl = `/profile_images/${req.file.filename}`;
-  res.json({ imageUrl });
-});
-
 
 const authTargets = [
   process.env.AUTH_SERVER1_URL,

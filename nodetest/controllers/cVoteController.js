@@ -218,35 +218,44 @@ exports.createVote = [
           const uuidFileName = uuidv4() + path.extname(req.file.originalname);
   
           const formData = new FormData();
-          formData.append('file', req.file.buffer, uuidFileName);
-  
-          // GATEWAY 서버로 이미지 전송
-          await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
-            headers: formData.getHeaders(),
+          formData.append('file', req.file.buffer, {
+            filename: uuidFileName,
+            contentType: req.file.mimetype,
           });
   
-          imageNameToSave = uuidFileName;
+          const response = await axios.post(
+            'http://13.125.65.151:3000/upload/vote-image',
+            formData,
+            { headers: formData.getHeaders() }
+          );
+  
+          if (response.status !== 200) {
+            throw new Error('이미지 업로드 실패');
+          }
+  
+          imageNameToSave = uuidFileName; // DB에 저장할 이미지 이름
         }
   
-        // 실제 DB 저장
-        const { c_title, c_contents, c_writer } = req.body;
+        const { c_title, c_contents } = req.body;
+        const u_id = req.currentUserId; // ✅ JWT에서 사용자 ID 추출
+  
         await CVote.create({
-            u_id: req.currentUserId,
-            c_number: uuidv4(),
-            c_title,
-            c_contents,
-            c_good: 0,
-            c_bad: 0,
-            c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-            c_image: imageNameToSave,
+          u_id,
+          c_number: uuidv4(),
+          c_title,
+          c_contents,
+          c_good: 0,
+          c_bad: 0,
+          c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3일 후
+          c_image: imageNameToSave,
         });
   
         res.status(200).json({ success: true, message: '투표 생성 완료' });
       } catch (err) {
-        console.error('🛑 오류 발생:', err);
+        console.error('🛑 투표 생성 중 오류:', err);
         res.status(500).json({ success: false, message: '투표 생성 실패' });
       }
-    }
+    },
   ];
 
 // exports.createVote = async (req, res) => {

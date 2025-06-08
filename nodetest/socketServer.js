@@ -18,16 +18,12 @@ const server = http.createServer(app);
 const admin = require('firebase-admin');
 const { getMessaging } = require('firebase-admin/messaging');
 const path = require('path');
-const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
 const User = require('./models/userModel');
 const NotificationLog = require('./models/notificationModel')
 // Firebase Admin SDK 초기화
 const serviceAccountPath = path.join(__dirname, 'firebase-adminsdk.json');
 let serviceAccount;
 
-const uploadDir = path.join('/app', 'public', 'chat_message_images');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const jwt = require('jsonwebtoken');
 const secretKey = process.env.JWT_SECRET_KEY || 'your_secret_key';
@@ -327,7 +323,7 @@ socket.on('joinRoom', async (data) => {
 
 
   socket.on('sendMessage', async (data) => {
-    console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
+    //console.log('Received data from client:', data); // 클라이언트로부터 받은 데이터를 로그로 출력 (수정된 부분)
     const u1_id = await getUserIdFromSocket(socket); // ✅ 핵심
     const { message_contents, r_id, u2_id, image, image_type} = data;
     // const { message_contents, r_id, u1_id, u2_id, image, image_type, is_read } = data;
@@ -355,38 +351,18 @@ socket.on('joinRoom', async (data) => {
 }
 
 try {
-  //===========BLOB 방식============
-  // let fileBuffer = null;
+  let fileBuffer = null;
 
-  // // 이미지 데이터가 있는 경우 처리
-  // if (image) {
-  //   try {
-  //     fileBuffer = Buffer.from(image, 'base64');
-  //   } catch (bufferError) {
-  //     console.error('이미지를 버퍼로 변환 중 오류:', bufferError);
-  //     socket.emit('errorMessage', '잘못된 이미지 데이터');
-  //     return;
-  //   }
-  // }
-  //===========BLOB 방식============
-
-  let imageUrl = null;
-
-    if (image) {
-      try {
-        const buffer = Buffer.from(image, 'base64');
-        const fileName = `${u1_id}_${Date.now()}_${uuidv4()}.jpg`;
-        const uploadDir = path.join('/app', 'public', 'chat_message_images');
-        const savePath = path.join(uploadDir, fileName);
-        fs.writeFileSync(savePath, buffer);
-        imageUrl = `/chat_message_images/${fileName}`;
-      } catch (err) {
-        console.error('이미지 저장 오류:', err);
-        socket.emit('errorMessage', '이미지 저장 중 오류 발생');
-        return;
-      }
+  // 이미지 데이터가 있는 경우 처리
+  if (image) {
+    try {
+      fileBuffer = Buffer.from(image, 'base64');
+    } catch (bufferError) {
+      console.error('이미지를 버퍼로 변환 중 오류:', bufferError);
+      socket.emit('errorMessage', '잘못된 이미지 데이터');
+      return;
     }
-
+  }
   // Sequelize를 사용하여 메시지 저장
   const newMessage = await RMessage.create({
     u1_id,
@@ -394,14 +370,12 @@ try {
     r_id,
     message_contents: message_contents || null, // 메시지가 없으면 null로 저장
     send_date: new Date(), // KST 시간 설정
-    // image: fileBuffer, // BLOB 방식
-    image: imageUrl,
+    image: fileBuffer,
     image_type: image_type || null,
     is_read:1
   });
   //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
     // 상대방 연결 상태 확인
-	
     const receiverSocketId = userSockets.get(u2_id);
     const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);
     if (isReceiverConnected) {
@@ -418,8 +392,7 @@ try {
     r_id,
     message_contents: message_contents || '[이미지]', // 클라이언트에서 기본 메시지
     send_date: newMessage.send_date,//여기서 보낼 때 시간 뜸
-    // image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
-    image: imageUrl,
+    image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
     is_read: newMessage.is_read,
   });
   console.log(`Sending message to room ${r_id}:`, {
@@ -427,23 +400,12 @@ try {
     r_id,
     message_contents,
     send_date: newMessage.send_date,
-    // image: fileBuffer ? fileBuffer.toString('base64') : null,
-    image: imageUrl,
+    image: fileBuffer ? fileBuffer.toString('base64') : null,
     is_read: newMessage.is_read,
   });
   
-	if (!isReceiverConnected) {
-  console.log(`User ${u2_id} is offline, sending FCM notification`);
-  try {
-    await sendNotification(u2_id, '새로운 메시지 도착', message_contents || '[이미지]');
-  } catch (err) {
-    console.error('❌ FCM 알림 전송 실패:', err.message);
-  }
-}
 
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
-
-	/*
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
 
@@ -477,7 +439,6 @@ try {
     console.log(`Notification sent to user ${userId}:`, response);
     return response;
   }
-	*/
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {
     const { r_id, u1_id } = data;
@@ -517,7 +478,7 @@ console.log('User disconnected');
 */
 });
 
-server.listen(3001, () => {
+server.listen(3001, '0.0.0.0', () => {
   console.log('HTTP Server running on port 3001');
 });
 

@@ -70,12 +70,8 @@ const CRoom = sequelize.define('CRoom', {
         type: DataTypes.DATE,
         allowNull: true,
     },
-    // image: {
-    //     type: DataTypes.BLOB('long'),
-    //     allowNull: true,
-    // },
     image: {
-        type: DataTypes.STRING,
+        type: DataTypes.BLOB('long'),
         allowNull: true,
     },
     // ✅ 인기글 여부 (10분 내 추천수 5 이상 또는 추천수 30 이상)

@@ -372,22 +372,54 @@
         //프로필 변경 요청
         const form = document.getElementById('profileImageForm');
         form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fileInput = document.getElementById('imageFile');
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
+            e.preventDefault();
+            const fileInput = document.getElementById('imageFile');
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
 
-        const response = await fetch('/auth/api/user-info/chaingeProfileImage', {
-            method: 'POST',
-            headers: {
-            'Authorization': `Bearer ${jwtToken}`
-            },
-            body: formData
-        });
+            try {
+                // ✅ 1단계: GATEWAY 서버에 이미지 업로드 (자기 자신에 요청)
+                const gatewayOrigin = window.location.origin;  // 예: http://localhost:3000 또는 http://13.125.x.x:3000
 
-        const result = await response.json();
-        alert(result.message);
-        location.reload();
+                const uploadRes = await fetch(`${gatewayOrigin}/api/upload-profile-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const uploadData = await uploadRes.json();
+                const imageUrl = uploadData.imageUrl;  // 예: "/profile_images/uuid.png"
+
+                // ✅ 2단계: AUTH 서버로 프록시 통해 이미지 URL 저장 요청
+                const jwtToken = localStorage.getItem('jwt_token'); // 또는 다른 방식으로 가져오기
+
+                const response = await fetch('/auth/api/user-info/chaingeProfileImage', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${jwtToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ imageUrl })  // 문자열 하나 전달
+                });
+
+                const result = await response.json();
+                alert(result.message);
+                location.reload();
+            } catch (err) {
+                console.error('❌ 프로필 이미지 변경 실패:', err);
+                alert('프로필 변경 중 오류 발생');
+            }
+
+            // const response = await fetch('/auth/api/user-info/chaingeProfileImage', {
+            //     method: 'POST',
+            //     headers: {
+            //     'Authorization': `Bearer ${jwtToken}`
+            //     },
+            //     body: formData
+            // });
+
+            // const result = await response.json();
+            // alert(result.message);
+            // location.reload();
         });
     </script>
 </body>

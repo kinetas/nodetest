@@ -10,6 +10,7 @@ router.get('/user-id', loginRequired, userInfoController.getLoggedInUserId);
 router.get('/user-nickname', loginRequired, userInfoController.getLoggedInUserNickname);
 router.get('/user-all', loginRequired, userInfoController.getLoggedInUserAll);
 
-router.post('/chaingeProfileImage', loginRequired, upload.single('image'), userInfoController.chaingeProfileImage);
+// router.post('/chaingeProfileImage', loginRequired, upload.single('image'), userInfoController.chaingeProfileImage);
+router.post('/chaingeProfileImage', loginRequired, userInfoController.chaingeProfileImage);
 
 module.exports = router;

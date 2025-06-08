@@ -376,6 +376,7 @@ try {
   });
   //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
     // 상대방 연결 상태 확인
+	
     const receiverSocketId = userSockets.get(u2_id);
     const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);
     if (isReceiverConnected) {
@@ -404,8 +405,18 @@ try {
     is_read: newMessage.is_read,
   });
   
+	if (!isReceiverConnected) {
+  console.log(`User ${u2_id} is offline, sending FCM notification`);
+  try {
+    await sendNotification(u2_id, '새로운 메시지 도착', message_contents || '[이미지]');
+  } catch (err) {
+    console.error('❌ FCM 알림 전송 실패:', err.message);
+  }
+}
 
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
+
+	/*
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
 
@@ -439,6 +450,7 @@ try {
     console.log(`Notification sent to user ${userId}:`, response);
     return response;
   }
+	*/
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {
     const { r_id, u1_id } = data;

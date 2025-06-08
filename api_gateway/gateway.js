@@ -9,6 +9,8 @@ require('dotenv').config();
 
 const app = express();
 
+app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));

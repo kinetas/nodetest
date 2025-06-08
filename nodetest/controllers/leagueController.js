@@ -181,7 +181,7 @@ exports.getUserInfoById = async (req, res) => {
     // ✅ DB에서 직접 유저 정보 조회
     const [user] = await db.query(
       `SELECT u_id, u_nickname, u_name, u_birth, profile_image 
-       FROM users WHERE u_id = :user_id`,
+       FROM user WHERE u_id = :user_id`,
       { replacements: { user_id }, type: QueryTypes.SELECT }
     );
 

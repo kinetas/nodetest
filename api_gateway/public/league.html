@@ -98,27 +98,35 @@
 
     //유저정보 보기
     async function viewUserInfo(user_id) {
-    try {
-      const res = await fetch(`/nodetest/league/user-info/${user_id}`);
-      if (!res.ok) throw new Error("유저 정보 불러오기 실패");
+  try {
+    const res = await fetch(`/nodetest/league/user-info/${user_id}`, {
+      headers: {
+        'x-user-id': currentUserId // 로그인한 유저 ID를 명시
+      }
+    });
 
-      const user = await res.json();
-
-      document.getElementById('userDetail').innerHTML = `
-        <h3>👤 유저 정보</h3>
-        <img src="/profile_images/${user.profile_image}" alt="프로필" width="80" style="border-radius: 50%; border: 1px solid #ccc;" />
-        <p><strong>닉네임:</strong> ${user.u_nickname}</p>
-        <p><strong>이름:</strong> ${user.u_name}</p>
-        <p><strong>생년월일:</strong> ${user.u_birth}</p>
-        <p><strong>리그:</strong> ${user.league_name} (${user.tier})</p>
-        <p><strong>LP:</strong> ${user.lp}</p>
-        <p><strong>총 미션 수:</strong> ${user.mission_total}</p>
-        <p><strong>미션 성공률:</strong> ${user.mission_success_rate}%</p>
-      `;
-    } catch (err) {
-      alert("유저 정보를 불러오는 데 실패했습니다.");
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText);
     }
+
+    const user = await res.json();
+
+    document.getElementById('userDetail').innerHTML = `
+      <h3>👤 유저 정보</h3>
+      <img src="/profile_images/${user.profile_image}" width="80" />
+      <p><strong>닉네임:</strong> ${user.u_nickname}</p>
+      <p><strong>이름:</strong> ${user.u_name}</p>
+      <p><strong>생년월일:</strong> ${user.u_birth}</p>
+      <p><strong>리그:</strong> ${user.league_name} (${user.tier})</p>
+      <p><strong>LP:</strong> ${user.lp}</p>
+      <p><strong>총 미션 수:</strong> ${user.mission_total}</p>
+      <p><strong>미션 성공률:</strong> ${user.mission_success_rate}%</p>
+    `;
+  } catch (err) {
+    alert(`유저 정보를 불러오는 데 실패했습니다: ${err.message}`);
   }
+}
     async function assignLeague() {
       const user_id = getUserId();
       const res = await fetch(`/nodetest/league/assign`, {

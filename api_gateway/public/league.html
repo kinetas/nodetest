@@ -129,8 +129,12 @@
     const user = await res.json();
     if (user.model_file) {
   document.getElementById('userDetail').innerHTML += `
-    <model-viewer src="/models/${user.model_file}" auto-rotate camera-controls 
-      style="width: 300px; height: 300px;"></model-viewer>
+    <model-viewer src="/models/${user.model_file}" 
+    autoplay
+    auto-rotate 
+    camera-controls 
+      style="width: 300px; height: 300px;">
+    </model-viewer>
   `;
 }
 

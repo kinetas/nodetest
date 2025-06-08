@@ -81,42 +81,25 @@ const extractUserIdFromToken = (req) => {
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
   
-    // if (!req.file) {
-    //   return res.status(400).json({ message: '프로필 이미지가 업로드되지 않았습니다.' });
-    // }
-  
-    const { imageUrl } = req.body;
-
-    if (!imageUrl || typeof imageUrl !== 'string') {
-      return res.status(400).json({ message: '이미지 경로가 필요합니다.' });
+    if (!req.file) {
+      return res.status(400).json({ message: '프로필 이미지가 업로드되지 않았습니다.' });
     }
-
-    // try {
-    //   const ext = path.extname(req.file.originalname);
-    //   const fileName = `${uuidv4()}${ext}`;
-    //   const filePath = path.join(uploadDir, fileName);
-
-    //   // 이미지 저장
-    //   fs.writeFileSync(filePath, req.file.buffer);
-
-    //   // DB에 저장할 URL 경로
-    //   const imageUrl = `/profile_images/${fileName}`;
-
-    //   await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
-    //   console.log(`✅ 프로필 이미지 저장 완료: ${imageUrl}`);
-    //   // await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
-    //   res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.' });
-
-    try {
-      await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
-      console.log(`✅ 프로필 이미지 URL 저장 완료: ${imageUrl}`);
   
-      res.status(200).json({
-        success: true,
-        message: '프로필 이미지가 성공적으로 변경되었습니다.',
-        imageUrl
-      });
+    try {
+      const ext = path.extname(req.file.originalname);
+      const fileName = `${uuidv4()}${ext}`;
+      const filePath = path.join(uploadDir, fileName);
 
+      // 이미지 저장
+      fs.writeFileSync(filePath, req.file.buffer);
+
+      // DB에 저장할 URL 경로
+      const imageUrl = `/profile_images/${fileName}`;
+
+      await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
+      console.log(`✅ 프로필 이미지 저장 완료: ${imageUrl}`);
+      // await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
+      res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });

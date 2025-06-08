@@ -180,7 +180,7 @@ exports.getUserInfoById = async (req, res) => {
     }
 
     // 3. Auth 서버에서 유저 정보 요청
-    await axios.get(`http://auth_server:3000/auth/api/user-info/${user_id}`);
+    await axios.get(`http://auth_server_1:3000/auth/api/user-info/${user_id}`);
     const user = authRes.data;
 
     // 4. LP, 리그명, 티어 정보 가져오기

@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const { QueryTypes } = require('sequelize');
 
+//상점 아이템 조회
 exports.getShopItems = async (req, res) => {
   try {
     const items = await db.query(`SELECT * FROM shop_items`, {
@@ -12,6 +13,8 @@ exports.getShopItems = async (req, res) => {
   }
 };
 
+
+//보유 포인트 조회
 exports.getUserPoints = async (req, res) => {
   const { user_id } = req.params;
   try {
@@ -29,6 +32,40 @@ exports.getUserPoints = async (req, res) => {
   }
 };
 
+//내가 가진 아이템 전체 조회
+exports.getMyItems = async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const items = await db.query(
+      `SELECT s.item_id, s.name, s.description, s.image_url, s.model_file, s.item_type
+       FROM user_items ui
+       JOIN shop_items s ON ui.item_id = s.item_id
+       WHERE ui.user_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const [selected] = await db.query(
+      `SELECT selected_item_id FROM user WHERE u_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    res.json({
+      items,
+      selected_item_id: selected?.selected_item_id ?? null,
+    });
+  } catch (err) {
+    res.status(500).json({ error: '아이템 정보 조회 실패', detail: err.message });
+  }
+};
+
+//아이템 구매
 exports.buyItem = async (req, res) => {
   const { user_id, item_id } = req.body;
 

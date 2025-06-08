@@ -12,3 +12,5 @@ services:
     env_file:
       - ./nodetest/.env
     restart: always
+    volumes:
+      - home/ubuntu/docker/api_gateway/public/vote_images:/app/public/vote_images

@@ -68,7 +68,6 @@ app.use('/api/recommendationMission', recommendationMissionRoutes); //미션 추
 app.use('/api/ai', aiRoutes);
 app.use('/league', leagueRoutes);
 app.use('/shop', loginRequired, shopRoutes);
-app.use('/auth/api/user-info', authRoutes);
 
 // app.use('/api/auth', timeConverterMiddleware, authRoutes);//MSA적용 시 삭제
 

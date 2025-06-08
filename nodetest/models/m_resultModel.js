@@ -24,8 +24,12 @@ const MResult = sequelize.define('MResult', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  // mission_result_image: {
+  //   type: DataTypes.BLOB('long'),
+  //   allowNull: true,
+  // },
   mission_result_image: {
-    type: DataTypes.BLOB('long'),
+    type: DataTypes.STRING,
     allowNull: true,
   },
 }, {

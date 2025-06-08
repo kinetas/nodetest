@@ -36,8 +36,12 @@ const RMessage = sequelize.define('RMessage', {
     type: DataTypes.STRING(100),
     allowNull: true,
   },
+  // image: {
+  //   type: DataTypes.BLOB('long'),
+  //   allowNull: true,
+  // }, // 변경된 부분 - 이미지 필드 추가
   image: {
-    type: DataTypes.BLOB('long'),
+    type: DataTypes.STRING,
     allowNull: true,
   }, // 변경된 부분 - 이미지 필드 추가
   image_type: {

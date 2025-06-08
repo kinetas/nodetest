@@ -14,6 +14,12 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨]
 const sequelize = require('../config/db');
 
+const path = require('path');
+const fs = require('fs');
+
+const uploadDir = path.join('/app', 'public', 'community_images');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
 //======================Token===============================
 
 exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
@@ -295,11 +301,20 @@ exports.getCommunityMissionSimple = async (req, res) => {
 // 일반 커뮤니티 생성 함수
 exports.createCommunity = async (req, res) => {
     const { cr_title, contents, community_type } = req.body;
-    const image = req.file ? req.file.buffer : null;
+    // const image = req.file ? req.file.buffer : null;
     const u_id = req.currentUserId;
     const cr_num = uuidv4();
 
     try {
+        // 이미지 저장 처리
+        if (req.file) {
+            const fileExt = path.extname(req.file.originalname);
+            const fileName = `${cr_num}_${Date.now()}${fileExt}`;
+            const savePath = path.join(uploadDir, fileName);
+            fs.writeFileSync(savePath, req.file.buffer);
+            imageUrl = `/community_images/${fileName}`; // URL 경로만 저장
+        }
+        
         await CRoom.create({
             u_id, cr_num, cr_title, contents, community_type,
             hits: 0, recommended_num: 0, maded_time: new Date(), image

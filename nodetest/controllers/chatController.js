@@ -116,16 +116,31 @@ exports.getMessages = async (r_id) => {
     });
     // return messages.map(msg => msg.toJSON());
 
+    //=========BLOB 방식===========
+    // return messages.map(msg => {
+    //   const json = msg.toJSON();
+
+    //   // ✅ image가 존재하면 base64로 변환
+    //   if (json.image) {
+    //     json.image = Buffer.from(json.image).toString('base64');
+    //   }
+
+    //   return json;
+    // });
+    //=========BLOB 방식===========
+
     return messages.map(msg => {
       const json = msg.toJSON();
 
-      // ✅ image가 존재하면 base64로 변환
+      // ✅ 이미지 URL이 존재할 경우, 전체 경로 붙이기
       if (json.image) {
-        json.image = Buffer.from(json.image).toString('base64');
+        const serverUrl = 'http://27.113.11.48:3000'; // ← 실제 API 서버 주소로 교체하세요
+        json.image = `${serverUrl}${json.image}`;
       }
 
       return json;
     });
+
 
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);

@@ -143,6 +143,10 @@
       <p><strong>LP:</strong> ${user.lp}</p>
       <p><strong>총 미션 수:</strong> ${user.mission_total}</p>
       <p><strong>미션 성공률:</strong> ${user.mission_success_rate}%</p>
+      ${user.model_file 
+        ? `<model-viewer src="/models/${user.model_file}" auto-rotate camera-controls 
+            style="width: 300px; height: 300px;"></model-viewer>`
+        : '<p><em>선택된 캐릭터 모델이 없습니다.</em></p>'}
     `;
   } catch (err) {
     alert(`유저 정보를 불러오는 데 실패했습니다: ${err.message}`);

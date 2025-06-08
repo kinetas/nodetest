@@ -152,38 +152,44 @@ exports.updateLpOnMission = async (req, res) => {
 
 exports.getUserInfoById = async (req, res) => {
   const { user_id } = req.params;
-  const requester_id = req.headers['x-user-id']; // 로그인 유저 ID
+  const requester_id = req.headers['x-user-id'];
 
   if (!requester_id) {
-    return res.status(400).json({ message: '로그인 사용자 ID가 필요합니다.' });
+    return res.status(400).json({ message: '로그인한 사용자 ID가 필요합니다.' });
   }
 
   try {
-    // 1. 로그인 유저 리그 확인
+    // 요청자와 대상 유저가 같은 리그에 있는지 확인
     const [requester] = await db.query(
       `SELECT league_id FROM user_league_status WHERE user_id = :uid`,
       { replacements: { uid: requester_id }, type: QueryTypes.SELECT }
     );
 
-    // 2. 대상 유저 리그 확인
     const [target] = await db.query(
       `SELECT league_id FROM user_league_status WHERE user_id = :uid`,
       { replacements: { uid: user_id }, type: QueryTypes.SELECT }
     );
 
     if (!requester || !target) {
-      return res.status(404).json({ message: '리그 정보가 존재하지 않습니다.' });
+      return res.status(404).json({ message: '리그 정보가 없습니다.' });
     }
 
     if (requester.league_id !== target.league_id) {
       return res.status(403).json({ message: '같은 리그 유저만 조회할 수 있습니다.' });
     }
 
-    // 3. Auth 서버에서 유저 정보 요청
-    await axios.get(`http://auth_server_1:3000/auth/api/user-info/${user_id}`);
-    const user = authRes.data;
+    // ✅ DB에서 직접 유저 정보 조회
+    const [user] = await db.query(
+      `SELECT u_id, u_nickname, u_name, u_birth, profile_image 
+       FROM users WHERE u_id = :user_id`,
+      { replacements: { user_id }, type: QueryTypes.SELECT }
+    );
 
-    // 4. LP, 리그명, 티어 정보 가져오기
+    if (!user) {
+      return res.status(404).json({ message: '해당 유저가 존재하지 않습니다.' });
+    }
+
+    // 리그 정보도 같이 조회
     const [leagueInfo] = await db.query(
       `SELECT l.name AS league_name, l.tier, uls.lp 
        FROM user_league_status uls
@@ -195,11 +201,11 @@ exports.getUserInfoById = async (req, res) => {
       }
     );
 
-    // 5. 미션 통계
+    // 미션 성공률 조회
     const [missionStats] = await db.query(
       `SELECT COUNT(*) AS total,
               SUM(CASE WHEN success = true THEN 1 ELSE 0 END) AS success_count
-         FROM m_result WHERE u_id = :user_id`,
+       FROM m_result WHERE u_id = :user_id`,
       { replacements: { user_id }, type: QueryTypes.SELECT }
     );
 
@@ -215,7 +221,7 @@ exports.getUserInfoById = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('유저 정보 조회 중 오류:', err);
+    console.error('❗ 유저 정보 조회 실패:', err);
     return res.status(500).json({ message: '서버 오류', error: err.message });
   }
 };

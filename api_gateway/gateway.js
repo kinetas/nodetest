@@ -5,19 +5,30 @@ const fetch = require('node-fetch');
 const path = require('path');
 const http = require('http');
 const multer = require('multer');
+const fs = require('fs');
 
 require('dotenv').config();
 
 const app = express();
 
-// ✅ 정적 폴더 제공 (이미지 접근용)
-app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+// ✅ 업로드 경로
+const uploadDir = path.join(__dirname, 'public', 'vote_images');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// ✅ 업로드 API (mission 서버가 파일 전송할 때 사용)
-const upload = multer({ dest: path.join(__dirname, 'public', 'vote_images') });
+// ✅ storage 설정: 원본 파일명으로 저장
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => cb(null, file.originalname) // 이게 핵심!
+});
+
+const upload = multer({ storage });
+
+// ✅ 파일 업로드 엔드포인트
 app.post('/upload/vote-image', upload.single('file'), (req, res) => {
-    console.log('📥 이미지 업로드 완료:', req.file.filename);
-    res.status(200).json({ success: true });
+  console.log('📥 업로드 완료:', req.file.originalname);
+  res.status(200).json({ success: true });
 });
 
 // ==================== 라우팅: HTML 정적 페이지 ====================

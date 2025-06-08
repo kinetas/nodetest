@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const path = require('path');
 
 // ==================== 미들웨어 & 유틸 ====================
 const timeConverterMiddleware = require('./middleware/timeConverterMiddleware');

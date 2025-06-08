@@ -159,7 +159,7 @@ exports.getUserInfoById = async (req, res) => {
   }
 
   try {
-    // 요청자와 대상 유저가 같은 리그에 있는지 확인
+    // 요청자와 대상 유저의 리그 확인
     const [requester] = await db.query(
       `SELECT league_id FROM user_league_status WHERE user_id = :uid`,
       { replacements: { uid: requester_id }, type: QueryTypes.SELECT }
@@ -178,7 +178,7 @@ exports.getUserInfoById = async (req, res) => {
       return res.status(403).json({ message: '같은 리그 유저만 조회할 수 있습니다.' });
     }
 
-    // ✅ DB에서 직접 유저 정보 조회
+    // 유저 기본 정보 조회 (user 테이블에서)
     const [user] = await db.query(
       `SELECT u_id, u_nickname, u_name, u_birth, profile_image 
        FROM user WHERE u_id = :user_id`,
@@ -189,7 +189,7 @@ exports.getUserInfoById = async (req, res) => {
       return res.status(404).json({ message: '해당 유저가 존재하지 않습니다.' });
     }
 
-    // 리그 정보도 같이 조회
+    // 리그 정보 조회
     const [leagueInfo] = await db.query(
       `SELECT l.name AS league_name, l.tier, uls.lp 
        FROM user_league_status uls
@@ -201,11 +201,13 @@ exports.getUserInfoById = async (req, res) => {
       }
     );
 
-    // 미션 성공률 조회
+    // 미션 성공률 계산 (요청 제외, 완료=성공, 실패=실패)
     const [missionStats] = await db.query(
-      `SELECT COUNT(*) AS total,
-              SUM(CASE WHEN success = true THEN 1 ELSE 0 END) AS success_count
-       FROM m_result WHERE u_id = :user_id`,
+      `SELECT 
+         SUM(CASE WHEN m_status = '완료' THEN 1 ELSE 0 END) AS success_count,
+         SUM(CASE WHEN m_status IN ('완료', '실패') THEN 1 ELSE 0 END) AS total
+       FROM m_result
+       WHERE u_id = :user_id`,
       { replacements: { user_id }, type: QueryTypes.SELECT }
     );
 
@@ -213,7 +215,7 @@ exports.getUserInfoById = async (req, res) => {
       ? Math.round((missionStats.success_count / missionStats.total) * 100)
       : 0;
 
-    return res.json({
+    res.json({
       ...user,
       ...leagueInfo,
       mission_total: missionStats.total,

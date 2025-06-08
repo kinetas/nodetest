@@ -8,6 +8,7 @@ const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
+const multer = require('multer');
 const axios = require('axios');
 const FormData = require('form-data');
 const path = require('path');
@@ -204,54 +205,98 @@ exports.getMyVotes = async (req, res) => {
     }
 };
 
-exports.createVote = async (req, res) => {
-    const { c_title, c_contents } = req.body;
-    const u_id = req.currentUserId; // ✅ JWT에서 추출
-    // const c_image = req.file ? req.file.buffer : null;
+// 메모리 저장소 설정 (파일은 직접 저장하지 않음)
+const upload = multer({ storage: multer.memoryStorage() });
 
-    if (!u_id || !c_title || !c_contents) {
-        return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
-    }
-
-    const c_number = uuidv4();
-    if (!uuidValidate(c_number)) {
-        return res.status(500).json({ success: false, message: "UUID 생성 실패" });
-    }
-
-    const ext = req.file ? path.extname(req.file.originalname) : null;
-    const imageFileName = req.file ? `${c_number}${ext}` : null;
-
-    try {
-        // ✅ 이미지가 있으면 Gateway 서버에 전송
+exports.createVote = [
+    upload.single('c_image'),
+    async (req, res) => {
+      let imageNameToSave = null;
+  
+      try {
         if (req.file) {
-            const formData = new FormData();
-            formData.append('file', req.file.buffer, imageFileName);  // ← 세 번째 인자로 저장될 이름 지정
-
-            const response = await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
-                headers: formData.getHeaders(),
-            });
-
-            if (response.status !== 200) {
-                throw new Error('이미지 업로드 실패');
-            }
+          const uuidFileName = uuidv4() + path.extname(req.file.originalname);
+  
+          const formData = new FormData();
+          formData.append('file', req.file.buffer, uuidFileName);
+  
+          // GATEWAY 서버로 이미지 전송
+          await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
+            headers: formData.getHeaders(),
+          });
+  
+          imageNameToSave = uuidFileName;
         }
-
-        const newVote = await CVote.create({
-            u_id,
-            c_number,
+  
+        // 실제 DB 저장
+        const { c_title, c_contents, c_writer } = req.body;
+        await CVote.create({
+            u_id: req.currentUserId,
+            c_number: uuidv4(),
             c_title,
             c_contents,
             c_good: 0,
             c_bad: 0,
             c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-            c_image: imageFileName
+            c_image: imageNameToSave,
         });
-        res.json({ success: true, vote: newVote });
-    } catch (error) {
-        console.error("Error creating vote:", error);
-        res.status(500).json({ success: false, message: "투표 생성 실패" });
+  
+        res.status(200).json({ success: true, message: '투표 생성 완료' });
+      } catch (err) {
+        console.error('🛑 오류 발생:', err);
+        res.status(500).json({ success: false, message: '투표 생성 실패' });
+      }
     }
-};
+  ];
+
+// exports.createVote = async (req, res) => {
+//     const { c_title, c_contents } = req.body;
+//     const u_id = req.currentUserId; // ✅ JWT에서 추출
+//     // const c_image = req.file ? req.file.buffer : null;
+
+//     if (!u_id || !c_title || !c_contents) {
+//         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
+//     }
+
+//     const c_number = uuidv4();
+//     if (!uuidValidate(c_number)) {
+//         return res.status(500).json({ success: false, message: "UUID 생성 실패" });
+//     }
+
+//     const ext = req.file ? path.extname(req.file.originalname) : null;
+//     const imageFileName = req.file ? `${c_number}${ext}` : null;
+
+//     try {
+//         // ✅ 이미지가 있으면 Gateway 서버에 전송
+//         if (req.file) {
+//             const formData = new FormData();
+//             formData.append('file', req.file.buffer, imageFileName);  // ← 세 번째 인자로 저장될 이름 지정
+
+//             const response = await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
+//                 headers: formData.getHeaders(),
+//             });
+
+//             if (response.status !== 200) {
+//                 throw new Error('이미지 업로드 실패');
+//             }
+//         }
+
+//         const newVote = await CVote.create({
+//             u_id,
+//             c_number,
+//             c_title,
+//             c_contents,
+//             c_good: 0,
+//             c_bad: 0,
+//             c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+//             c_image: imageFileName
+//         });
+//         res.json({ success: true, vote: newVote });
+//     } catch (error) {
+//         console.error("Error creating vote:", error);
+//         res.status(500).json({ success: false, message: "투표 생성 실패" });
+//     }
+// };
 
 exports.voteAction = async (req, res) => {
     const { c_number, action } = req.body;

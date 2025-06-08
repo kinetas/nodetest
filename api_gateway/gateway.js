@@ -4,12 +4,21 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const fetch = require('node-fetch');
 const path = require('path');
 const http = require('http');
+const multer = require('multer');
 
 require('dotenv').config();
 
 const app = express();
 
+// ✅ 정적 폴더 제공 (이미지 접근용)
 app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+
+// ✅ 업로드 API (mission 서버가 파일 전송할 때 사용)
+const upload = multer({ dest: path.join(__dirname, 'public', 'vote_images') });
+app.post('/upload/vote-image', upload.single('file'), (req, res) => {
+    console.log('📥 이미지 업로드 완료:', req.file.filename);
+    res.status(200).json({ success: true });
+});
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {

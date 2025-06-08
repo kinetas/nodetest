@@ -114,7 +114,7 @@ exports.getMessages = async (r_id) => {
       where: { r_id },
       order: [['send_date', 'ASC']]
     });
-    return messages.map(msg => msg.toJSON());
+    // return messages.map(msg => msg.toJSON());
 
     //========BLOB 방식============
     // return messages.map(msg => {
@@ -127,6 +127,18 @@ exports.getMessages = async (r_id) => {
 
     //   return json;
     // });
+
+    return messages.map(msg => {
+      const json = msg.toJSON();
+
+      // ✅ 이미지 URL이 존재할 경우, 전체 경로 붙이기
+      if (json.image) {
+        const serverUrl = 'http://27.113.11.48:3000'; // ← 실제 API 서버 주소로 교체하세요
+        json.image = `${serverUrl}${json.image}`;
+      }
+
+      return json;
+    });
 
   } catch (error) {
     console.error('Error fetching messages with Sequelize:', error);

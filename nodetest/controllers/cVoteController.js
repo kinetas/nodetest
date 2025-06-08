@@ -218,20 +218,22 @@ exports.createVote = async (req, res) => {
         return res.status(500).json({ success: false, message: "UUID 생성 실패" });
     }
 
-    let imageFileName = null;
+    const ext = req.file ? path.extname(req.file.originalname) : null;
+    const imageFileName = req.file ? `${c_number}${ext}` : null;
 
     try {
-        // ✅ 이미지 파일 있으면 gateway 서버로 전송
+        // ✅ 이미지가 있으면 Gateway 서버에 전송
         if (req.file) {
-            const ext = path.extname(req.file.originalname);
-            imageFileName = `${c_number}${ext}`;
-
             const formData = new FormData();
-            formData.append('file', req.file.buffer, imageFileName);
+            formData.append('file', req.file.buffer, imageFileName);  // ← 세 번째 인자로 저장될 이름 지정
 
-            await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
+            const response = await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
                 headers: formData.getHeaders(),
             });
+
+            if (response.status !== 200) {
+                throw new Error('이미지 업로드 실패');
+            }
         }
 
         const newVote = await CVote.create({

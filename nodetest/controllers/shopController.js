@@ -12,6 +12,23 @@ exports.getShopItems = async (req, res) => {
   }
 };
 
+exports.getUserPoints = async (req, res) => {
+  const { user_id } = req.params;
+  try {
+    const result = await db.query(
+      `SELECT points FROM user_points WHERE user_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT,
+      }
+    );
+    const points = result[0]?.points || 0;
+    res.json({ points });
+  } catch (err) {
+    res.status(500).json({ error: '포인트 조회 실패' });
+  }
+};
+
 exports.buyItem = async (req, res) => {
   const { user_id, item_id } = req.body;
 
@@ -67,7 +84,7 @@ exports.buyItem = async (req, res) => {
         type: QueryTypes.INSERT,
       }
     );
-
+    
     res.json({ message: '아이템 구매 성공' });
   } catch (err) {
     res.status(500).json({ error: '구매 처리 실패' });

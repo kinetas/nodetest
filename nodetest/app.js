@@ -53,6 +53,7 @@ app.use('/vote_images', express.static(path.join(__dirname, '..', 'api_gateway',
 app.use('/mission_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'mission_images')));
 app.use('/community_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'community_images')));
 app.use('/chat_message_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'chat_message_images')));
+app.use('/models', express.static(path.join(__dirname,'api_gateway', 'public', 'models')));
 
 // ==================== 라우팅 설정 ====================
 // app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);

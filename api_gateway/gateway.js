@@ -9,6 +9,29 @@ require('dotenv').config();
 
 const app = express();
 
+const fs = require('fs');
+
+// ✅ 정적 파일 서빙
+app.use(express.static(path.join(__dirname, 'public')));
+
+const voteImageDir = path.join(__dirname, 'public', 'vote_images');
+if (!fs.existsSync(voteImageDir)) fs.mkdirSync(voteImageDir, { recursive: true });
+const profileImageDir = path.join(__dirname, 'public', 'profile_images');
+if (!fs.existsSync(profileImageDir)) fs.mkdirSync(profileImageDir, { recursive: true });
+const missionImageDir = path.join(__dirname, 'public', 'mission_images');
+if (!fs.existsSync(missionImageDir)) fs.mkdirSync(missionImageDir, { recursive: true });
+const communityImageDir = path.join(__dirname, 'public', 'community_images');
+if (!fs.existsSync(communityImageDir)) fs.mkdirSync(communityImageDir, { recursive: true });
+const chatMessageImageDir  = path.join(__dirname, 'public', 'chat_message_images');
+if (!fs.existsSync(chatMessageImageDir )) fs.mkdirSync(chatMessageImageDir , { recursive: true });
+
+app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+app.use('/profile_images', express.static(path.join(__dirname, 'public', 'profile_images')));
+app.use('/mission_images', express.static(path.join(__dirname, 'public', 'mission_images')));
+app.use('/community_images', express.static(path.join(__dirname, 'public', 'community_images')));
+app.use('/chat_message_images', express.static(path.join(__dirname, 'public', 'chat_message_images')));
+
+
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));

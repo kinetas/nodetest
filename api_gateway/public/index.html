@@ -10,6 +10,7 @@
     <form id="loginForm">
         <input type="text" id="u_id" placeholder="아이디" required><br><br>
         <input type="password" id="u_password" placeholder="비밀번호" required><br><br>
+        <input type="text" id="device_token" placeholder="디바이스 토큰 입력" required><br><br>
         <button id="keycloakDirectLoginButton">Keycloak 직접 로그인</button>
     </form>
     <div id="result"></div>
@@ -28,13 +29,14 @@
 
             const username = document.getElementById('u_id').value;
             const password = document.getElementById('u_password').value;
+            const deviceToken = document.getElementById('device_token').value;
 
             // KeyCloak + JWT 한번에 (index 화면에서 로그인)
             // fetch('/api/auth/keycloak-direct-login', {
             fetch('/auth/api/auth/keycloak-direct-login', {   //MSA적용 시 사용
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username, password, deviceToken }),
             })
             .then(response => {
                 if (!response.ok) throw new Error('로그인 실패(index.html:93)');
@@ -45,9 +47,11 @@
                     console.log("accesstoken(index.html:98): ", data.accessToken);
                     console.log("idToken(index.html:99): ", data.idToken);
                     console.log("jwtToken(index.html:100): ", data.jwtToken);
+                    console.log("deviceToken: ", data.deviceToken);
                     localStorage.setItem('access_token', data.accessToken);
                     localStorage.setItem('id_token', data.idToken);
                     localStorage.setItem('jwt_token', data.jwtToken);
+                    localStorage.setItem('device_Token', data.deviceToken);
                     alert('✅ Keycloak + JWT 로그인 완료!(index.html:104)');
                     window.location.href = '/dashboard';
                 } else {

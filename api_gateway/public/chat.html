@@ -79,7 +79,8 @@
                 if (data.image) {
                     const img = document.createElement("img");
                     // img.src = `data:image/jpeg;base64,${data.image}`;
-                    img.src = `data:${data.image_type};base64,${data.image}`;
+                    // img.src = `data:${data.image_type};base64,${data.image}`;
+                    img.src = data.image; // ✅ URL 방식
                     img.style.maxWidth = "200px";
                     messageElement.appendChild(img);
                 }
@@ -110,7 +111,8 @@
             if (data.image) {
                 const img = document.createElement("img");
                 // img.src = `data:image/jpeg;base64,${data.image}`;
-                img.src = `data:${data.image_type};base64,${data.image}`;
+                // img.src = `data:${data.image_type};base64,${data.image}`;
+                img.src = data.image; // ✅ URL 방식
                 img.style.maxWidth = "200px";
                 messageElement.appendChild(img);
             }

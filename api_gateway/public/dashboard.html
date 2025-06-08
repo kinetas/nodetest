@@ -125,12 +125,20 @@
         .then(res => res.json())
         .then(data => {
             document.getElementById('greeting').textContent = `Hello, ${data.u_id}`;
+            // if (data.profile_image) {
+            //     const uint8Array = new Uint8Array(data.profile_image.data);
+            //     const blob = new Blob([uint8Array], { type: 'image/jpeg' }); // 또는 image/png
+            //     const url = URL.createObjectURL(blob);
+            //     document.getElementById('profileImage').src = url;
+            // }
+
             if (data.profile_image) {
-                const uint8Array = new Uint8Array(data.profile_image.data);
-                const blob = new Blob([uint8Array], { type: 'image/jpeg' }); // 또는 image/png
-                const url = URL.createObjectURL(blob);
-                document.getElementById('profileImage').src = url;
+                document.getElementById('profileImage').src = data.profile_image;
             }
+                // } else {
+            //     document.getElementById('profileImage').src = '/default_profile.png'; // 기본 이미지가 있다면
+            // }
+
         })
         .catch(() => {
             alert('인증 실패(dashboard:654). 로그인 페이지로 이동합니다.');

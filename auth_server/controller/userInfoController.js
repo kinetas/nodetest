@@ -1,12 +1,5 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel'); // User 모델 가져오기
-
-const uploadDir = path.join('/app', 'public', 'profile_images');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
@@ -86,19 +79,7 @@ const extractUserIdFromToken = (req) => {
     }
   
     try {
-      const ext = path.extname(req.file.originalname);
-      const fileName = `${uuidv4()}${ext}`;
-      const filePath = path.join(uploadDir, fileName);
-
-      // 이미지 저장
-      fs.writeFileSync(filePath, req.file.buffer);
-
-      // DB에 저장할 URL 경로
-      const imageUrl = `/profile_images/${fileName}`;
-
-      await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
-      console.log(`✅ 프로필 이미지 저장 완료: ${imageUrl}`);
-      // await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
+      await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
       res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.' });
     } catch (error) {
       console.error(error);

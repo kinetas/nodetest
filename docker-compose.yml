@@ -12,3 +12,8 @@ services:
     env_file:
       - ./nodetest/.env
     restart: always
+    volumes:
+      - /home/ubuntu/docker/msa_gateway/public/vote_images:/app/public/vote_images
+      - /home/ubuntu/docker/msa_gateway/public/mission_images:/app/public/mission_images
+      - /home/ubuntu/docker/msa_gateway/public/community_images:/app/public/community_images
+      - /home/ubuntu/docker/msa_gateway/public/chat_message_images:/app/public/chat_message_images

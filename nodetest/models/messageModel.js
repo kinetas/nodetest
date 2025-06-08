@@ -31,10 +31,14 @@ const RMessage = sequelize.define('RMessage', {
     type: DataTypes.STRING(100),
     allowNull: true,
   },
+  // image: {
+  //   type: DataTypes.BLOB('long'),
+  //   allowNull: true,
+  // },
   image: {
-    type: DataTypes.BLOB('long'),
+    type: DataTypes.STRING,
     allowNull: true,
-  }, // 이미지 필드 추가
+  },
   image_type: {
     type: DataTypes.STRING(50),
     allowNull: true,

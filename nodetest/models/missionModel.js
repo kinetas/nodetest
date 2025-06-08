@@ -123,8 +123,12 @@ const Mission = sequelize.define('Mission', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  // mission_image: {
+  //   type: DataTypes.BLOB('long'),
+  //   allowNull: true,
+  // },
   mission_image: {
-    type: DataTypes.BLOB('long'),
+    type: DataTypes.STRING,
     allowNull: true,
   },
 }, {

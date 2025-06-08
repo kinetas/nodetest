@@ -21,13 +21,13 @@ const {
 exports.registerKeycloakDirect = async (req, res) => {
     const { u_id, u_password, u_mail, u_nickname, u_name, u_birth } = req.body;
 
-     // ✅ 닉네임 중복 확인
-     const existing = await User.findOne({ where: { u_nickname } });
-     if (existing) {
-         return res.status(409).json({ success: false, message: '이미 사용 중인 닉네임입니다.' });
-     }
-
     try {
+        // ✅ 닉네임 중복 확인
+        const existing = await User.findOne({ where: { u_nickname } });
+        if (existing) {
+            return res.status(409).json({ success: false, message: '이미 사용 중인 닉네임입니다.' });
+        }
+        
         // 1. 관리자 토큰 발급
         const tokenRes = await axios.post(
             'http://27.113.11.48:8080/realms/master/protocol/openid-connect/token',

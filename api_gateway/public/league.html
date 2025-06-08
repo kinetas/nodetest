@@ -62,6 +62,21 @@
     <button onclick="updateLp(false)">❌ 미션 실패 (+5 LP)</button>
   </div>
 
+  <div class="section">
+  <h2>🛍️ 상점 이동</h2>
+  <button onclick="goToShop()">상점으로 이동하기</button>
+</div>
+
+  <div class="section">
+  <h2>🎒 내 아이템 보기</h2>
+  <button onclick="viewMyItems()">내 아이템 열기</button>
+  <div id="myItemsSection"></div>
+</div>
+<div style="margin-bottom: 20px;">
+  <button onclick="goBackToLeague()">🏁 닫기</button>
+</div>
+
+<model-viewer id="charModel" src="" auto-rotate camera-controls style="width: 300px; height: 300px;"></model-viewer>
   <script>
     let currentUserId = null;
     const jwtToken = localStorage.getItem('jwt_token');
@@ -190,6 +205,50 @@
       const data = await res.json();
       alert(data.message);
     }
+    
+    
+    async function viewMyItems() {
+  const user_id = getUserId();
+
+  const res = await fetch(`/shop/my-items/${user_id}`);
+  const data = await res.json();
+
+  const { items, selected_item_id } = data;
+
+  if (!items.length) {
+    document.getElementById('myItemsSection').innerHTML = "<p>보유한 아이템이 없습니다.</p>";
+    return;
+  }
+
+  // 아이템 목록 표시
+  const html = items.map(item => `
+    <div style="border:1px solid #aaa; padding:10px; margin:10px; display:inline-block;">
+      <img src="/${item.image_url}" width="100"><br>
+      <strong>${item.name}</strong><br>
+      <small>${item.description}</small><br>
+      ${item.item_id === selected_item_id ? '<span style="color:green;">[선택됨]</span>' : ''}
+    </div>
+  `).join('');
+
+  document.getElementById('myItemsSection').innerHTML = html;
+
+  // 선택된 캐릭터 모델 렌더링
+  const selected = items.find(i => i.item_id === selected_item_id && i.item_type === 'character');
+  if (selected?.model_file) {
+    document.getElementById('charModel').src = `/models/${selected.model_file}`;
+  } else {
+    document.getElementById('charModel').src = '';
+  }
+}
+
+function goToShop() {
+  window.location.href = '/shop';
+  }
+
+function goBackToLeague() {
+    window.location.href = '/league'; // 리그 페이지 경로로 이동
+  }  
+  
   </script>
 
 </body>

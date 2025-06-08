@@ -11,6 +11,9 @@ require('dotenv').config();
 
 const app = express();
 
+// ✅ 정적 폴더 제공 (이미지 접근용)
+app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
+
 // ✅ 업로드 경로
 const uploadDir = path.join(__dirname, 'public', 'vote_images');
 if (!fs.existsSync(uploadDir)) {

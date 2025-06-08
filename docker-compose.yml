@@ -10,3 +10,9 @@ services:
     restart: always
     volumes:
       - /home/ubuntu/docker/nodetest/api_gateway/public/profile_images:/app/public/profile_images
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    external: true

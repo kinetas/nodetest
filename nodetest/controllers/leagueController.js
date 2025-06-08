@@ -189,6 +189,17 @@ exports.getUserInfoById = async (req, res) => {
       return res.status(404).json({ message: '해당 유저가 존재하지 않습니다.' });
     }
 
+    // 선택된 캐릭터 정보 조회
+const [selectedItem] = await db.query(
+  `SELECT s.model_file FROM user u
+   JOIN shop_items s ON u.selected_item_id = s.item_id
+   WHERE u.u_id = :user_id`,
+  {
+    replacements: { user_id },
+    type: QueryTypes.SELECT
+  }
+);
+
     // 리그 정보 조회
     const [leagueInfo] = await db.query(
       `SELECT l.name AS league_name, l.tier, uls.lp 
@@ -219,7 +230,8 @@ exports.getUserInfoById = async (req, res) => {
       ...user,
       ...leagueInfo,
       mission_total: missionStats.total,
-      mission_success_rate: successRate
+      mission_success_rate: successRate,
+      model_file: selectedItem?.model_file || null
     });
 
   } catch (err) {

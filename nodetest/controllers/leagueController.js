@@ -149,3 +149,60 @@ exports.updateLpOnMission = async (req, res) => {
     res.status(500).json({ message: '서버 오류', error: err.message });
   }
 };
+
+exports.getUserInfoById = async (req, res) => {
+  const { user_id } = req.params;
+
+  try {
+    const [user] = await db.query(
+      `SELECT u_id, u_nickname, u_name, u_birth, profile_image 
+       FROM users WHERE u_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: '유저 정보를 찾을 수 없습니다.' });
+    }
+
+    const [leagueInfo] = await db.query(
+      `SELECT l.name AS league_name, l.tier, uls.lp 
+       FROM user_league_status uls
+       JOIN leagues l ON uls.league_id = l.league_id
+       WHERE uls.user_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT
+      }
+    );
+
+    const [missionStats] = await db.query(
+      `SELECT 
+        COUNT(*) AS total,
+        SUM(CASE WHEN success = true THEN 1 ELSE 0 END) AS success_count
+       FROM m_result
+       WHERE u_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: QueryTypes.SELECT
+      }
+    );
+
+    const successRate = missionStats.total > 0
+      ? Math.round((missionStats.success_count / missionStats.total) * 100)
+      : 0;
+
+    res.json({
+      ...user,
+      ...leagueInfo,
+      mission_total: missionStats.total,
+      mission_success_rate: successRate
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: '서버 오류', error: err.message });
+  }
+};

@@ -164,12 +164,12 @@ const upload = multer({ storage });
 
 //     if (!message_contents || !r_id || !u1_id || !u2_id) {
 //       let missingFields = [];
-      
+
 //       if (!message_contents) missingFields.push('message_contents');
 //       if (!r_id) missingFields.push('r_id');
 //       if (!u1_id) missingFields.push('u1_id');
 //       if (!u2_id) missingFields.push('u2_id');
-      
+
 //       console.error(`소켓 서버에서 필수 값 누락: ${missingFields.join(', ')}`);
 //       socket.emit('errorMessage', `필수 값이 누락되었습니다: ${missingFields.join(', ')}`);
 //       return;
@@ -195,7 +195,7 @@ const upload = multer({ storage });
 
 //  // 4. API 서버로부터의 응답을 소켓 서버가 받아 클라이언트로 전송
 //     io.to(data.r_id).emit('receiveMessage', response.data);
-//     } 
+//     }
 //     catch (error) {
 //       console.error('Error sending message to API server:', error);
 //       socket.emit('errorMessage', 'Failed to send message');
@@ -376,6 +376,7 @@ try {
   });
   //console.log('DB 저장 성공:', newMessage); // DB 저장 확인 로그 추가
     // 상대방 연결 상태 확인
+
     const receiverSocketId = userSockets.get(u2_id);
     const isReceiverConnected = receiverSocketId && io.sockets.sockets.get(receiverSocketId);
     if (isReceiverConnected) {
@@ -385,7 +386,7 @@ try {
       );
       io.to(receiverSocketId).emit('messageRead', { r_id, u1_id });
   }
-  
+
    // 메시지 브로드캐스트,  안전성 검사
   io.to(r_id).emit('receiveMessage', {
     u1_id,
@@ -403,9 +404,19 @@ try {
     image: fileBuffer ? fileBuffer.toString('base64') : null,
     is_read: newMessage.is_read,
   });
-  
+
+        if (!isReceiverConnected) {
+  console.log(`User ${u2_id} is offline, sending FCM notification`);
+  try {
+    await sendNotification(u2_id, '새로운 메시지 도착', message_contents || '[이미지]');
+  } catch (err) {
+    console.error('❌ FCM 알림 전송 실패:', err.message);
+  }
+}
 
   //상대방 소켓 연결 안되어있을시 FCM 알림 호출
+
+        /*
   if (!isReceiverConnected) {
     console.log(`User ${u2_id} is offline, sending FCM notification`);
 
@@ -439,6 +450,7 @@ try {
     console.log(`Notification sent to user ${userId}:`, response);
     return response;
   }
+        */
   // 메시지 읽음 처리
   socket.on('markAsRead', async (data) => {
     const { r_id, u1_id } = data;
@@ -456,7 +468,7 @@ try {
     }
 });
 }
-  
+
   catch (error) {
   console.error('DB 저장 오류:', error); // DB 저장 실패 시 에러 로그 출력
   if (error.name === 'SequelizeValidationError') {

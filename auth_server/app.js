@@ -21,6 +21,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(express.static('public'));
+app.use('/profile_images', express.static(path.join(__dirname, '..', 'api_gateway', 'public', 'profile_images')));
+
 // ==================== 라우팅 설정 ====================
 app.use('/api/auth', timeConverterMiddleware, authRoutes);
 app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);

@@ -21,6 +21,12 @@ const {
 exports.registerKeycloakDirect = async (req, res) => {
     const { u_id, u_password, u_mail, u_nickname, u_name, u_birth } = req.body;
 
+     // ✅ 닉네임 중복 확인
+     const existing = await User.findOne({ where: { u_nickname } });
+     if (existing) {
+         return res.status(409).json({ success: false, message: '이미 사용 중인 닉네임입니다.' });
+     }
+
     try {
         // 1. 관리자 토큰 발급
         const tokenRes = await axios.post(
@@ -78,7 +84,7 @@ exports.registerKeycloakDirect = async (req, res) => {
 
 // KeyCloak + JWT (index화면에서 로그인)
 exports.keycloakDirectLogin = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, deviceToken } = req.body;
 
     try {
         //Keycloak 로그인으로 access_token 획득
@@ -118,6 +124,14 @@ exports.keycloakDirectLogin = async (req, res) => {
 
         if (!payload.userId) {
             return res.status(400).json({ success: false, message: '유효한 사용자 ID를 얻지 못했습니다.' });
+        }
+
+        if (deviceToken) {
+            const user = await User.findOne({ where: { u_id: payload.userId } });
+            if (user) {
+                user.token = deviceToken;
+                await user.save();
+            }
         }
 
         //JWT 발급
@@ -220,6 +234,17 @@ exports.logoutToken = async (req, res) => {
 
         // JWT 쿠키 방식일 경우 삭제 가능
         res.clearCookie('jwt_token');
+
+        const userId = req.currentUserId;
+
+        // ✅ 디바이스 토큰 제거
+        const user = await User.findOne({ where: { u_id: userId } });
+        if (user) {
+            user.token = null;
+            await user.save();
+            console.log(`✅ 로그아웃 시 DB의 토큰 삭제 완료 (user: ${userId})`);
+        }
+ 
 
         // Keycloak 로그아웃 URL 생성
         const logoutUrl = `http://27.113.11.48:8080/realms/master/protocol/openid-connect/logout?` +

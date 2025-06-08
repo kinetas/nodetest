@@ -22,9 +22,14 @@ if (!fs.existsSync(uploadDir)) {
 
 // ✅ storage 설정: 원본 파일명으로 저장
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, file.originalname) // 이게 핵심!
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname); // ✅ originalname 대신 위에서 지정한 uuidFileName 사용됨
+  }
 });
+
 
 const upload = multer({ storage });
 

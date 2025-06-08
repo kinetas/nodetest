@@ -8,6 +8,10 @@ const User = require('../models/userModel');
 const notificationController = require('../controllers/notificationController'); // notificationController 가져오기
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 
+const axios = require('axios');
+const FormData = require('form-data');
+const path = require('path');
+
 // // 투표 리스트 가져오기
 // exports.getVotes = async (req, res) => {
 //     try {
@@ -203,7 +207,7 @@ exports.getMyVotes = async (req, res) => {
 exports.createVote = async (req, res) => {
     const { c_title, c_contents } = req.body;
     const u_id = req.currentUserId; // ✅ JWT에서 추출
-    const c_image = req.file ? req.file.buffer : null;
+    // const c_image = req.file ? req.file.buffer : null;
 
     if (!u_id || !c_title || !c_contents) {
         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
@@ -214,7 +218,22 @@ exports.createVote = async (req, res) => {
         return res.status(500).json({ success: false, message: "UUID 생성 실패" });
     }
 
+    let imageFileName = null;
+
     try {
+        // ✅ 이미지 파일 있으면 gateway 서버로 전송
+        if (req.file) {
+            const ext = path.extname(req.file.originalname);
+            imageFileName = `${c_number}${ext}`;
+
+            const formData = new FormData();
+            formData.append('file', req.file.buffer, imageFileName);
+
+            await axios.post('http://13.125.65.151:3000/upload/vote-image', formData, {
+                headers: formData.getHeaders(),
+            });
+        }
+
         const newVote = await CVote.create({
             u_id,
             c_number,
@@ -223,7 +242,7 @@ exports.createVote = async (req, res) => {
             c_good: 0,
             c_bad: 0,
             c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-            c_image
+            c_image: imageFileName
         });
         res.json({ success: true, vote: newVote });
     } catch (error) {

@@ -4,40 +4,10 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const fetch = require('node-fetch');
 const path = require('path');
 const http = require('http');
-const multer = require('multer');
-const fs = require('fs');
 
 require('dotenv').config();
 
 const app = express();
-
-// ✅ 정적 폴더 제공 (이미지 접근용)
-app.use('/vote_images', express.static(path.join(__dirname, 'public', 'vote_images')));
-
-// ✅ 업로드 경로
-const uploadDir = path.join(__dirname, 'public', 'vote_images');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// ✅ storage 설정: 원본 파일명으로 저장
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname); // ✅ originalname 대신 위에서 지정한 uuidFileName 사용됨
-  }
-});
-
-
-const upload = multer({ storage });
-
-// ✅ 파일 업로드 엔드포인트
-app.post('/upload/vote-image', upload.single('file'), (req, res) => {
-  console.log('📥 업로드 완료:', req.file.originalname);
-  res.status(200).json({ success: true });
-});
 
 // ==================== 라우팅: HTML 정적 페이지 ====================
 app.get('/dashboard', (req, res) => {

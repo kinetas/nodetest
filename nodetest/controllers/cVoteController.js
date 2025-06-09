@@ -205,7 +205,13 @@ exports.createVote = async (req, res) => {
     const u_id = req.currentUserId; // ✅ JWT에서 추출
     const c_image = req.file ? req.file.buffer : null;
 
+    
+
+
     if (!u_id || !c_title || !c_contents) {
+        console.log("uid: ", u_id);
+        console.log("c_title: ", c_title);
+        console.log("c_contents: ", c_contents);
         return res.status(400).json({ success: false, message: "필수 값이 누락되었습니다." });
     }
 

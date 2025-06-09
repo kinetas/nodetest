@@ -46,7 +46,7 @@ class _PhotoSendState extends State<PhotoSend> {
 
   Future<void> _initializeSocket() async {
     socket = IO.io(
-      'http://54.180.54.31:3001',
+      'http://27.113.11.48:3001',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -78,7 +78,7 @@ class _PhotoSendState extends State<PhotoSend> {
     try {
       final token = await SessionTokenManager.getToken();
       final response = await HttpClient()
-          .getUrl(Uri.parse('http://54.180.54.31:3000/api/user-info/user-id'))
+          .getUrl(Uri.parse('http://27.113.11.48:3000/auth/api/user-info/user-id'))
           .then((req) {
         req.headers.set('Authorization', 'Bearer $token');
         return req.close();

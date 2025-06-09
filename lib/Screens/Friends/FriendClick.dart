@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionTokenManager.dart'; // ✅ delete 메서드 사용
-
-// WebRTCtest 임포트 (영상통화 UI로 이동할 때 필요)
-import '../../WebRTC/WebRTCtest.dart';
+import '../../SessionTokenManager.dart';
+import '../../WebRTC/NewWebRTC/Call.dart'; // ✅ 수정된 경로
+import '../../UserInfo/UserInfo_Id.dart'; // ✅ userId 가져오기 위한 import
 
 class FriendClick extends StatelessWidget {
   final String friendId;
@@ -11,7 +10,7 @@ class FriendClick extends StatelessWidget {
   const FriendClick({required this.friendId});
 
   Future<void> _deleteFriend(BuildContext context) async {
-    final String apiUrl = 'http://27.113.11.48:3000/dashboard/friends/delete';
+    final String apiUrl = 'http://27.113.11.48:3000/auth/dashboard/friends/delete';
 
     try {
       final response = await SessionTokenManager.delete(
@@ -45,6 +44,29 @@ class FriendClick extends StatelessWidget {
         SnackBar(content: Text('네트워크 오류: $e')),
       );
     }
+  }
+
+  void _startVideoCall(BuildContext context) async {
+    final userInfo = UserInfoId();
+    final myId = await userInfo.fetchUserId();
+
+    if (myId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('내 ID를 불러올 수 없습니다.')),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CallScreen(
+          isCaller: true,
+          myId: myId,
+          friendId: friendId,
+        ),
+      ),
+    );
   }
 
   @override
@@ -111,17 +133,9 @@ class FriendClick extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // 영상통화 버튼(WebRTCtest)
                     IconButton(
                       icon: Icon(Icons.call, size: 32, color: Colors.lightBlue),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => WebRTCtest(), // friendId 인자 없이도 동작
-                          ),
-                        );
-                      },
+                      onPressed: () => _startVideoCall(context), // ✅ 수정된 버튼
                     ),
                     IconButton(
                       icon: Icon(Icons.chat, size: 32, color: Colors.blue),

@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
+import 'SessionTokenManager.dart';
 
 class DeviceTokenManager {
   static final DeviceTokenManager _instance = DeviceTokenManager._internal();
@@ -10,7 +13,7 @@ class DeviceTokenManager {
 
   DeviceTokenManager._internal();
 
-  /// 디바이스 토큰 가져오기
+  /// 디바이스 토큰 가져오기 (null 허용)
   Future<String?> getDeviceToken() async {
     if (_deviceToken != null) {
       print("[DEBUG] Returning cached device token: $_deviceToken");
@@ -28,13 +31,16 @@ class DeviceTokenManager {
     }
   }
 
-  /// 디바이스 토큰 초기화 (로그아웃 시 사용 가능)
+
+  /// 로그아웃 시 초기화
   void clearToken() {
     print("[DEBUG] Clearing device token.");
     _deviceToken = null;
   }
 
-  /// 디바이스 토큰 상태 확인
+
+
+  /// 디버그 용도
   void debugTokenStatus() {
     if (_deviceToken == null) {
       print("[DEBUG] Device token is null.");

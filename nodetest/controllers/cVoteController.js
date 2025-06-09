@@ -206,6 +206,9 @@ exports.createVote = async (req, res) => {
     const c_image = req.file ? req.file.buffer : null;
 
     
+    console.log("uid: ", u_id);
+    console.log("c_title: ", c_title);
+    console.log("c_contents: ", c_contents);
 
 
     if (!u_id || !c_title || !c_contents) {

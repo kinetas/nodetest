@@ -128,24 +128,41 @@ exports.updateLpOnMission = async (req, res) => {
 
   try {
     // LP 증가 처리
-    const [result] = await db.query(
+    const result = await db.query(
       `UPDATE user_league_status 
        SET lp = lp + :lpToAdd 
        WHERE user_id = :user_id`,
       {
         replacements: { lpToAdd, user_id },
-        type: QueryTypes.UPDATE
+        type: db.QueryTypes.UPDATE,
       }
     );
 
-    if (result.affectedRows === 0) {
+    // result는 [result, metadata] 혹은 [affectedCount] 형태일 수 있음
+    // 따라서 affectedRows 대신 배열 내 적절한 값을 사용
+    const affectedRows = Array.isArray(result) ? (result[1] || result[0]) : result;
+
+    if (!affectedRows || affectedRows === 0) {
       return res.status(404).json({ message: '해당 유저의 리그 정보가 없습니다.' });
     }
 
-    return res.status(200).json({ message: `LP가 ${lpToAdd}만큼 증가했습니다.` });
+    // 업데이트 후 현재 LP 조회
+    const [updated] = await db.query(
+      `SELECT lp FROM user_league_status WHERE user_id = :user_id`,
+      {
+        replacements: { user_id },
+        type: db.QueryTypes.SELECT,
+      }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: '해당 유저의 리그 정보가 없습니다.' });
+    }
+
+    return res.status(200).json({ message: `LP가 ${lpToAdd}만큼 증가했습니다. 현재 LP: ${updated.lp}` });
 
   } catch (err) {
-    console.error(err);
+    console.error('❗ updateLpOnMission error:', err);
     res.status(500).json({ message: '서버 오류', error: err.message });
   }
 };

@@ -20,7 +20,7 @@ class ChatContent extends StatefulWidget {
 }
 
 class ChatContentState extends State<ChatContent> {
-  List<Map<String, dynamic>> messages = [];
+  final ValueNotifier<List<Map<String, dynamic>>> messagesNotifier = ValueNotifier([]);
   bool isLoading = true;
   final ScrollController _scrollController = ScrollController();
 
@@ -35,23 +35,17 @@ class ChatContentState extends State<ChatContent> {
 
     try {
       final response = await SessionTokenManager.get(apiUrl);
-
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        setState(() {
-          messages = List<Map<String, dynamic>>.from(responseData);
-          isLoading = false;
-        });
-
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollToBottom();
-        });
-      } else {
-        setState(() => isLoading = false);
+        messagesNotifier.value = List<Map<String, dynamic>>.from(responseData);
       }
     } catch (e) {
       print('Error: $e');
-      setState(() => isLoading = false);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     }
   }
 
@@ -62,13 +56,8 @@ class ChatContentState extends State<ChatContent> {
   }
 
   void addMessage(Map<String, dynamic> newMessage) {
-    setState(() {
-      messages.add(newMessage);
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
+    messagesNotifier.value = [...messagesNotifier.value, newMessage];
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
   @override
@@ -76,137 +65,58 @@ class ChatContentState extends State<ChatContent> {
     return Container(
       color: Colors.white,
       child: isLoading
-          ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue)))
-          : messages.isEmpty
-          ? Center(child: Text('메시지가 없습니다.', style: TextStyle(color: Colors.grey, fontSize: 16)))
-          : ListView(
-        controller: _scrollController,
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        children: _buildMessageList(),
+          ? Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
+        ),
+      )
+          : ValueListenableBuilder<List<Map<String, dynamic>>>(
+        valueListenable: messagesNotifier,
+        builder: (context, messages, _) {
+          if (messages.isEmpty) {
+            return Center(
+              child: Text('메시지가 없습니다.',
+                  style: TextStyle(color: Colors.grey, fontSize: 16)),
+            );
+          }
+
+          return ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+            itemCount: messages.length,
+            itemBuilder: (context, index) {
+              final message = messages[index];
+              final isSender = message['u1_id'] == widget.userId;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Align(
+                  alignment:
+                  isSender ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: isSender
+                        ? CrossAxisAlignment.end
+                        : CrossAxisAlignment.start,
+                    children: [
+                      message['image'] != null
+                          ? _buildImageMessage(message, isSender)
+                          : _buildTextMessage(message, isSender),
+                      Padding(
+                        padding: EdgeInsets.only(top: 2, left: 4, right: 4),
+                        child: Text(
+                          _formatTime(message['send_date']),
+                          style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
     );
-  }
-
-  List<Widget> _buildMessageList() {
-    List<Widget> widgets = [];
-    String? lastDate;
-    for (int i = 0; i < messages.length; i++) {
-      final message = messages[i];
-      final isSender = message['u1_id'] == widget.userId;
-      final dateTime = message['send_date'] ?? '';
-      final date = dateTime.length >= 10 ? dateTime.substring(0, 10) : '';
-
-      // 날짜라벨 (00시 넘어갈 때)
-      if (lastDate != date) {
-        widgets.add(
-          Center(
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 10),
-              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
-                  SizedBox(width: 6),
-                  Text(
-                    _formatDateFull(message['send_date']),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-        lastDate = date;
-      }
-    }
-
-    // 시간표기: 같은 화자/같은 분이면 마지막 메시지에만 시간
-    // 메시지들을 그룹화(화자, 분 단위로)
-    List<_MsgGroup> grouped = [];
-    for (int i = 0; i < messages.length; i++) {
-      final msg = messages[i];
-      final user = msg['u1_id'];
-      final dateTimeStr = msg['send_date'] ?? '';
-      DateTime? dt;
-      try { dt = DateTime.parse(dateTimeStr).toLocal(); } catch (_) {}
-      String minuteKey = dt != null ? "${user}_${dt.year}_${dt.month}_${dt.day}_${dt.hour}_${dt.minute}" : "";
-
-      if (grouped.isNotEmpty &&
-          grouped.last.minuteKey == minuteKey) {
-        grouped.last.messages.add(msg);
-      } else {
-        grouped.add(_MsgGroup(user: user, minuteKey: minuteKey, messages: [msg]));
-      }
-    }
-
-    // 실제 위젯화
-    lastDate = null;
-    for (var group in grouped) {
-      for (int i = 0; i < group.messages.length; i++) {
-        final msg = group.messages[i];
-        final isSender = msg['u1_id'] == widget.userId;
-        final dateTime = msg['send_date'] ?? '';
-        final date = dateTime.length >= 10 ? dateTime.substring(0, 10) : '';
-
-        if (lastDate != date) {
-          widgets.add(
-            Center(
-              child: Container(
-                margin: EdgeInsets.symmetric(vertical: 10),
-                padding: EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
-                    SizedBox(width: 6),
-                    Text(
-                      _formatDateFull(msg['send_date']),
-                      style: TextStyle(fontSize: 14, color: Colors.grey[800]),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-          lastDate = date;
-        }
-
-        widgets.add(
-          Align(
-            alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-            child: Column(
-              crossAxisAlignment: isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                msg['image'] != null
-                    ? _buildImageMessage(msg, isSender)
-                    : _buildTextMessage(msg, isSender),
-                if (i == group.messages.length - 1)
-                  Padding(
-                    padding: EdgeInsets.only(top: 2, left: 4, right: 4),
-                    child: Text(
-                      _formatTime(msg['send_date']),
-                      style: TextStyle(fontSize: 11, color: Colors.grey[500]),
-                    ),
-                  ),
-                // ✅ 버블 간격 항상 유지!
-                SizedBox(height: 8),
-              ],
-            ),
-          ),
-        );
-      }
-    }
-
-    return widgets;
   }
 
   Widget _buildTextMessage(Map<String, dynamic> message, bool isSender) {
@@ -260,17 +170,6 @@ class ChatContentState extends State<ChatContent> {
     }
   }
 
-  String _formatDateFull(String? dateTimeStr) {
-    if (dateTimeStr == null) return '';
-    try {
-      final dt = DateTime.parse(dateTimeStr).toLocal();
-      final weekDays = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일'];
-      return "${dt.year}년 ${dt.month}월 ${dt.day}일 ${weekDays[dt.weekday-1]}";
-    } catch (e) {
-      return '';
-    }
-  }
-
   String _formatTime(String? dateTimeStr) {
     if (dateTimeStr == null) return '';
     try {
@@ -286,13 +185,7 @@ class ChatContentState extends State<ChatContent> {
   @override
   void dispose() {
     _scrollController.dispose();
+    messagesNotifier.dispose();
     super.dispose();
   }
-}
-
-class _MsgGroup {
-  final String user;
-  final String minuteKey;
-  final List<Map<String, dynamic>> messages;
-  _MsgGroup({required this.user, required this.minuteKey, required this.messages});
 }

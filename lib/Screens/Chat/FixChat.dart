@@ -58,7 +58,7 @@ class FixChat extends StatelessWidget {
   }
 
   Future<void> _deleteRoom(BuildContext context) async {
-    final url = 'http://27.113.11.48:3000/api/rooms/delete';
+    final url = 'http://27.113.11.48:3000/nodetest/api/rooms/delete';
     final body = json.encode({
       'u2_id': u2Id,
       'r_type': rType,

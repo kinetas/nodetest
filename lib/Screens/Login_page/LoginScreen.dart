@@ -5,6 +5,9 @@ import '../ScreenMain.dart';
 import '../../SessionTokenManager.dart';
 import 'SignUpScreen.dart';
 import 'FindAccountScreen.dart';
+import '../../DeviceTokenManager.dart';
+import '../../WebRTC/WebRTCService/CallbackupVersion.dart'; // ✅ signaling 연결
+import '../../UserInfo/UserInfo_Id.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -16,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _autoLogin = false;
   String _resultMessage = '';
+  Signaling? _signaling;
 
   @override
   void initState() {
@@ -30,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (isLoggedIn) {
       print("🚀 자동 로그인 → MainScreen 이동");
+      _connectSignaling();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => MainScreen()),
@@ -37,15 +42,31 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _connectSignaling() async {
+    final myId = await UserInfoId().fetchUserId();
+    if (myId != null) {
+      _signaling = Signaling(url: 'ws://27.113.11.48:3005/ws');
+      _signaling!.setMyId(myId);
+      _signaling!.setOnMessage((from, type, payload) {
+        print("📨 signaling 메시지 수신: $type from $from");
+      });
+      _signaling!.connect();
+      print("🔗 signaling 서버에 연결 시도 완료");
+    } else {
+      print("⚠️ JWT에서 userId 추출 실패");
+    }
+  }
+
   Future<void> _login() async {
     final id = _idController.text.trim();
     final pw = _passwordController.text.trim();
+    final deviceToken = await DeviceTokenManager().getDeviceToken();
 
-    print("📥 입력된 ID: '$id', PW: '${'*' * pw.length}'");
+    print("📥 입력된 ID: '$id', PW: '\${'*' * pw.length}', Token: $deviceToken");
 
-    if (id.isEmpty || pw.isEmpty) {
+    if (id.isEmpty || pw.isEmpty || deviceToken == null) {
       setState(() {
-        _resultMessage = '아이디와 비밀번호를 입력하세요.';
+        _resultMessage = '아이디, 비밀번호, 또는 디바이스 토큰이 비어 있습니다.';
       });
       print("❌ 입력값 부족");
       return;
@@ -59,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
         body: jsonEncode({
           'username': id,
           'password': pw,
+          'deviceToken': deviceToken,
         }),
       );
       print("📨 응답 코드: ${response.statusCode}");
@@ -73,6 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
           await SessionTokenManager.saveToken(jwtToken);
           print("✅ JWT 저장 완료");
+
+          await _connectSignaling(); // ✅ 로그인 후 signaling 연결
 
           print("🚀 MainScreen으로 이동");
           Navigator.pushReplacement(

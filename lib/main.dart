@@ -1,28 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:app_links/app_links.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:capstone_1_project/SessionTokenManager.dart';
+import 'package:capstone_1_project/UserInfo/UserInfo_Id.dart';
+import 'firebase_options.dart';
 import 'screens/Login_page/StartLogin_screen.dart';
 import 'screens/ScreenMain.dart';
 import 'screens/Login_page/FindAccountScreen.dart';
-import 'package:http/http.dart' as http;
-import 'firebase_options.dart';
+import 'WebRTC/NewWebRTC/Call.dart';
+import 'WebRTC/NewWebRTC/RingScreen.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('📩 백그라운드 메시지 수신: ${message.messageId}');
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const iosSettings = DarwinInitializationSettings();
+  const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    _handleFCMClick(initialMessage);
+  }
+
   runApp(MyApp());
+}
+
+void _handleFCMClick(RemoteMessage message) {
+  final data = message.data;
+  final fromId = data['fromId'] ?? 'unknown';
+  final toId = data['toId'] ?? 'unknown';
+
+  navigatorKey.currentState?.push(
+    MaterialPageRoute(
+      builder: (_) => RingScreen(
+        callerId: fromId,
+        myId: toId,
+      ),
+    ),
+  );
+}
+
+void _sendSignalingMessage(String type, String from, String to) async {
+  final token = await SessionTokenManager.getToken();
+  if (token == null) return;
+
+  final channel = WebSocketChannel.connect(Uri.parse('ws://27.113.11.48:3005'));
+
+  final authMessage = {
+    'type': 'auth',
+    'token': token,
+  };
+  channel.sink.add(json.encode(authMessage));
+
+  final message = {
+    'type': type,
+    'from': from,
+    'to': to,
+  };
+
+  Future.delayed(Duration(milliseconds: 500), () {
+    channel.sink.add(json.encode(message));
+    channel.sink.close();
+  });
 }
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -37,6 +99,47 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _checkJwtStatus();
     _initDeepLinks();
+    _setupFCM();
+  }
+
+  void _setupFCM() async {
+    final token = await FirebaseMessaging.instance.getToken();
+    print('📲 디바이스 토큰: $token');
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        flutterLocalNotificationsPlugin.show(
+          0,
+          message.notification!.title ?? '알림',
+          message.notification!.body ?? '',
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'default_channel_id', '기본 채널',
+              channelDescription: '기본 푸시 알림 채널',
+              importance: Importance.max,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      }
+
+      final fromId = message.data['fromId'] ?? 'unknown';
+      final toId = message.data['toId'] ?? 'unknown';
+
+      if (navigatorKey.currentContext != null) {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (_) => RingScreen(
+              callerId: fromId,
+              myId: toId,
+            ),
+          ),
+        );
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleFCMClick);
   }
 
   Future<void> _checkJwtStatus() async {
@@ -47,38 +150,27 @@ class _MyAppState extends State<MyApp> {
     });
 
     if (!isValid) {
-      print("🔒 유효하지 않은 토큰 → 로그인 필요");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("다시 로그인 해주세요!")),
         );
       });
-      await SessionTokenManager.clearToken(); // 토큰 정리
+      await SessionTokenManager.clearToken();
     }
-
-    print("✅ 로그인 체크 결과: $_isLoggedIn");
   }
 
   void _initDeepLinks() async {
     _appLinks = AppLinks();
-
     try {
       final uri = await _appLinks.getInitialAppLink();
-      if (uri != null) {
-        print('📥 초기 딥링크 URI: $uri');
-        _processUri(uri);
-      }
+      if (uri != null) _processUri(uri);
     } catch (e) {
-      print('❌ 초기 URI 처리 오류: $e');
+      print('❌ 초기 URI 오류: $e');
     }
-
-    _sub = _appLinks.uriLinkStream.listen((Uri? uri) {
-      if (uri != null) {
-        print('📥 실시간 딥링크 URI: $uri');
-        _processUri(uri);
-      }
+    _sub = _appLinks.uriLinkStream.listen((uri) {
+      if (uri != null) _processUri(uri);
     }, onError: (err) {
-      print('❌ 실시간 URI 처리 오류: $err');
+      print('❌ 실시간 URI 오류: $err');
     });
   }
 
@@ -88,29 +180,19 @@ class _MyAppState extends State<MyApp> {
       final params = Uri.splitQueryString(fragment);
       final accessToken = params['access_token'];
       if (accessToken != null) {
-        print('✅ access_token 수신: $accessToken');
-
         final jwtRes = await http.get(
           Uri.parse("http://27.113.11.48:3000/nodetest/api/auth/issueJwtFromKeycloak"),
-          headers: {
-            "Authorization": "Bearer $accessToken",
-          },
+          headers: {"Authorization": "Bearer $accessToken"},
         );
-
         if (jwtRes.statusCode == 200) {
           final jwtToken = json.decode(jwtRes.body)['token'];
           await SessionTokenManager.saveToken(jwtToken);
-          print("✅ JWT 저장 완료");
-
           if (mounted && !_deepLinked) {
             setState(() {
               _deepLinked = true;
               _isLoggedIn = true;
             });
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => MainScreen()),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MainScreen()));
           }
         } else {
           print("❌ JWT 발급 실패: ${jwtRes.statusCode}");
@@ -130,19 +212,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     if (!_checkedLogin) {
-      return MaterialApp(
-        home: Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
-      );
+      return MaterialApp(home: Scaffold(body: Center(child: CircularProgressIndicator())));
     }
 
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      supportedLocales: [
-        Locale('en', 'US'),
-        Locale('ko', 'KR'),
-      ],
+      supportedLocales: [Locale('en', 'US'), Locale('ko', 'KR')],
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

@@ -5,14 +5,13 @@ import '../../DeviceTokenManager.dart';
 import '../Login_page/StartLogin_screen.dart';
 import 'SettingWidgets/SettingOptionsList.dart';
 import '../../SessionTokenManager.dart';
+import '../../DeviceTokenManager.dart';
 
 class SettingsScreen extends StatelessWidget {
   final VoidCallback onNavigateToHome;
   final VoidCallback onNavigateToChat;
   final VoidCallback onNavigateToMission;
   final VoidCallback onNavigateToCommunity;
-
-  /// 프로필 편집 시 콜백
   final Function(String newName, ImageProvider newImage)? onProfileEdited;
 
   const SettingsScreen({
@@ -27,8 +26,12 @@ class SettingsScreen extends StatelessWidget {
   /// 로그아웃 로직
   Future<void> _logout(BuildContext context) async {
     try {
+      // ✅ 서버에 FCM 토큰 제거 요청
+
+
+      // ✅ 로그아웃 API 호출
       final response = await SessionCookieManager.post(
-        'http://27.113.11.48:3000/api/auth/logout',
+        'http://27.113.11.48:3000/auth/api/auth/logoutToken',
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -39,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
       }
 
       // ✅ 세션 및 토큰 삭제
-      await SessionTokenManager.clearToken(); // << 추가됨
+      await SessionTokenManager.clearToken();
       await SessionCookieManager.clearSessionCookie();
       DeviceTokenManager().clearToken();
 
@@ -76,14 +79,14 @@ class SettingsScreen extends StatelessWidget {
         children: [
           const SizedBox(height: 8),
 
-          /// 중단 기능 버튼 (설정 옵션 리스트)
+          /// 설정 기능 리스트
           SettingOptionsList(
             onProfileEdited: onProfileEdited,
           ),
 
           const Spacer(),
 
-          /// 하단 로그아웃 버튼
+          /// 로그아웃 버튼
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             child: ElevatedButton(

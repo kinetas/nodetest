@@ -38,6 +38,7 @@ dependencies:
   firebase_core: ^3.13.0
   firebase_auth: ^5.0.0 # 예시로 인증 기능 추가
   cloud_firestore: ^5.0.0
+  flutter_local_notifications: 14.1.1
   firebase_messaging: ^15.0.0
   app_links: ^3.1.0
   
@@ -52,6 +53,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  jwt_decoder: ^2.0.1
   flutter_launcher_icons: ^0.14.2  # 새로 추가된 부분
 
 

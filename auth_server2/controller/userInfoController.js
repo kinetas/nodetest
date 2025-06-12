@@ -80,7 +80,7 @@ const extractUserIdFromToken = (req) => {
   
     try {
       await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
-      res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.', imageUrl });
+      res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: '서버 오류가 발생했습니다.' });

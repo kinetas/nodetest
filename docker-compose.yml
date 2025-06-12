@@ -26,11 +26,6 @@ services:
       - mysql
     env_file:
       - ./nodetest/.env
-    volumes:
-      - /home/gogi/docker/api_gateway/public/vote_images:/app/public/vote_images
-      - /home/gogi/docker/api_gateway/public/mission_images:/app/public/mission_images
-      - /home/gogi/docker/api_gateway/public/community_images:/app/public/community_images
-      - /home/gogi/docker/api_gateway/public/chat_message_images:/app/public/chat_message_images
 
 
   rag_server:
@@ -107,8 +102,6 @@ services:
       - ./auth_server1/.env
     depends_on:
       - mysql
-    volumes:
-      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
   auth_server_2:
     build: ./auth_server2
@@ -120,8 +113,6 @@ services:
       - ./auth_server2/.env
     depends_on:
       - mysql
-    volumes:
-      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
 
   gateway:
     build: ./api_gateway
@@ -138,12 +129,8 @@ services:
       - rag_server
       - intent_server
     volumes:
-      - /home/gogi/docker/api_gateway/public/vote_images:/app/public/vote_images
-      - /home/gogi/docker/api_gateway/public/profile_images:/app/public/profile_images
-      - /home/gogi/docker/api_gateway/public/mission_images:/app/public/mission_images
-      - /home/gogi/docker/api_gateway/public/community_images:/app/public/community_images
-      - /home/gogi/docker/api_gateway/public/chat_message_images:/app/public/chat_message_images
       - /home/gogi/docker/api_gateway/public/models:/app/public/models
+
 
 
 

@@ -39,6 +39,10 @@ const User = sequelize.define('user', {
         type: DataTypes.BLOB('long'),
         allowNull: true,
     },
+    selected_item_id:{
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    }
 }, {
     tableName: 'user',
     timestamps: false

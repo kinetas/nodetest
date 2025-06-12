@@ -49,6 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 // ==================== 정적 파일 제공 ====================
 // Static folder to serve the HTML file
 app.use(express.static('public'));
+app.use('/models', express.static(path.join(__dirname,'api_gateway', 'public', 'models')));
 
 // ==================== 라우팅 설정 ====================
 // app.use('/api/user-info', timeConverterMiddleware, userInfoRoutes);

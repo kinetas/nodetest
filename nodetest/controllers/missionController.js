@@ -11,13 +11,7 @@ const notificationController = require('../controllers/notificationController');
 const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // Sequelize의 연산자 가져오기
 
-const fs = require('fs');
-const path = require('path');
-
 const leagueController = require('../controllers/leagueController');
-
-const uploadDir = path.join('/app', 'public', 'mission_images');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 // 미션 완료 시 커뮤니티 미션인지 확인 후 커뮤니티 방에 미션 상태 업데이트
 async function updateCommunityRoomStatusOnMissionComplete(mission) {
@@ -774,20 +768,10 @@ exports.requestMissionApproval = async (req, res) => {
             return res.status(403).json({ success: false, message: '미션 수행자만 요청할 수 있습니다.' });
         }
 
-        // 이미지 저장 처리
-        let imagePath = null;
-        if (req.file) {
-            const filename = `${m_id}_${Date.now()}.jpg`; // 파일명 유니크하게 구성
-            const savePath = path.join(uploadDir, filename);
-            fs.writeFileSync(savePath, req.file.buffer);
-            imagePath = `/mission_images/${filename}`; // URL 경로 저장
-        }
-
         // 정확히 해당 미션만 상태를 "요청"으로 변경
         const updated = await Mission.update({ 
                 m_status: '요청',
-                // mission_image: req.file?.buffer || null
-                mission_image: imagePath
+                mission_image: req.file?.buffer || null
             }, { where: { m_id, u2_id: userId }
         });
 
@@ -1283,7 +1267,7 @@ exports.getRequestedSelfMissions = async (req, res) => {
 // 개인 미션을 투표에 업로드
 exports.requestVoteForMission = async (req, res) => {
     const { m_id } = req.body;
-    // const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리
+    const c_image = req.file ? req.file.buffer : null; // 사진 데이터 처리
     // const c_image = req.file ? req.file : null;
 
     if (!m_id) {
@@ -1298,19 +1282,9 @@ exports.requestVoteForMission = async (req, res) => {
             return res.status(404).json({ success: false, message: '해당 미션을 찾을 수 없습니다.' });
         }
 
-        let imageUrl = null;
-        const uploadDirVote = path.join('/app', 'public', 'vote_images');
-        if (req.file) {
-            const fileExt = path.extname(req.file.originalname);
-            const fileName = `${uuidv4()}${fileExt}`;
-            const savePath = path.join(uploadDirVote, fileName);
-            fs.writeFileSync(savePath, req.file.buffer);
-            imageUrl = `/vote_images/${fileName}`; // ⬅ URL 경로 저장
-        }
-
         // ===== 미션 상태를 "요청"으로 변경 =====
         const updated = await Mission.update(
-            { m_status: '요청', mission_image: imageUrl }, // 상태를 "요청"으로 변경
+            { m_status: '요청', c_image }, // 상태를 "요청"으로 변경
             { where: { m_id } }  // m_id 조건으로 업데이트
         );
 
@@ -1332,7 +1306,7 @@ exports.requestVoteForMission = async (req, res) => {
             c_good: 0,
             c_bad: 0,
             c_deletedate,
-            c_image: imageUrl, // 사진 저장 (null일 수도 있음)
+            c_image, // 사진 저장 (null일 수도 있음)
         });
 
         res.json({ success: true, message: '투표가 성공적으로 생성되었습니다.', vote: newVote });

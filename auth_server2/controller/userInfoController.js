@@ -1,7 +1,3 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
-
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel'); // User 모델 가져오기
 
@@ -78,30 +74,15 @@ const extractUserIdFromToken = (req) => {
   exports.chaingeProfileImage = async (req, res) => {
     const userId = extractUserIdFromToken(req);
     if (!userId) {
-      console.log('❌ 사용자 토큰 추출 실패');
       return res.status(401).json({ message: '유효하지 않은 토큰입니다.' });
     }
   
     if (!req.file) {
-      console.log('❌ 파일 업로드 안 됨');
       return res.status(400).json({ message: '프로필 이미지가 업로드되지 않았습니다.' });
     }
   
     try {
-      const ext = path.extname(req.file.originalname);
-      const fileName = `${uuidv4()}${ext}`;
-      const filePath = path.join(uploadDir, fileName);
-
-      // 이미지 저장
-      fs.writeFileSync(filePath, req.file.buffer);
-
-      // DB에 저장할 URL 경로
-      const imageUrl = `/profile_images/${fileName}`;
-
-      // await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
-      // DB 업데이트
-      await User.update({ profile_image: imageUrl }, { where: { u_id: userId } });
-      
+      await User.update({ profile_image: req.file.buffer }, { where: { u_id: userId } });
       res.status(200).json({ success: true, message: '프로필 이미지가 성공적으로 변경되었습니다.', imageUrl });
     } catch (error) {
       console.error(error);

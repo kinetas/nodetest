@@ -31,12 +31,8 @@ const RMessage = sequelize.define('RMessage', {
     type: DataTypes.STRING(100),
     allowNull: true,
   },
-  // image: {
-  //   type: DataTypes.BLOB('long'),
-  //   allowNull: true,
-  // },
   image: {
-    type: DataTypes.STRING,
+    type: DataTypes.BLOB('long'),
     allowNull: true,
   },
   image_type: {

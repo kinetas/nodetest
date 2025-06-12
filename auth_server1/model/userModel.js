@@ -35,8 +35,12 @@ const User = sequelize.define('user', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    // profile_image: {
+    //     type: DataTypes.BLOB('long'),
+    //     allowNull: true,
+    // },
     profile_image: {
-        type: DataTypes.BLOB('long'),
+        type: DataTypes.STRING,
         allowNull: true,
     },
 }, {

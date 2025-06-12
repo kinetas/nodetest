@@ -1,9 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../model/userModel'); // User 모델 가져오기
 
-const uploadDir = path.join('/app', 'public', 'profile_images');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
 const secretKey = process.env.JWT_SECRET_KEY;
 
 // JWT로부터 사용자 ID 추출하는 유틸 함수

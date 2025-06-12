@@ -263,26 +263,14 @@
         fetchMissions('/nodetest/dashboard/missions/completed', 'completedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
-            // // ✅ 이미지가 존재하면 표시 (BLOB 방식)
-            // if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
-            //     const byteArray = new Uint8Array(m.mission_result_image.data);
-            //     const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
-            //     const url = URL.createObjectURL(blob);
+            // ✅ 이미지가 존재하면 표시 (BLOB 방식)
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
 
-            //     const img = document.createElement('img');
-            //     img.src = url;
-            //     img.alt = '인증 이미지';
-            //     img.style.maxWidth = '200px';
-            //     img.style.marginTop = '10px';
-
-            //     li.appendChild(document.createElement('br'));
-            //     li.appendChild(img);
-            // }
-
-            // ✅ URL 방식으로 저장된 이미지가 존재할 경우 직접 출력
-            if (m.mission_result_image) {
                 const img = document.createElement('img');
-                img.src = m.mission_result_image;  // 서버로부터 받은 이미지 경로 (/result_images/파일명)
+                img.src = url;
                 img.alt = '인증 이미지';
                 img.style.maxWidth = '200px';
                 img.style.marginTop = '10px';
@@ -296,26 +284,14 @@
         fetchMissions('/nodetest/dashboard/missions/givenCompleted', 'givenCompletedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 마감일: ${m.m_deadline}, 상태: ${m.m_status}`;
-            // // ✅ 이미지가 존재하면 표시 (BLOB 방식)
-            // if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
-            //     const byteArray = new Uint8Array(m.mission_result_image.data);
-            //     const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
-            //     const url = URL.createObjectURL(blob);
+            // ✅ 이미지가 존재하면 표시 (BLOB 방식)
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
 
-            //     const img = document.createElement('img');
-            //     img.src = url;
-            //     img.alt = '인증 이미지';
-            //     img.style.maxWidth = '200px';
-            //     img.style.marginTop = '10px';
-
-            //     li.appendChild(document.createElement('br'));
-            //     li.appendChild(img);
-            // }
-
-            // ✅ URL 방식으로 저장된 이미지가 존재할 경우 직접 출력
-            if (m.mission_result_image) {
                 const img = document.createElement('img');
-                img.src = m.mission_result_image;  // 서버로부터 받은 이미지 경로 (/result_images/파일명)
+                img.src = url;
                 img.alt = '인증 이미지';
                 img.style.maxWidth = '200px';
                 img.style.marginTop = '10px';
@@ -335,26 +311,14 @@
         fetchMissions('/nodetest/dashboard/missions/friendCompleted', 'friendCompletedMissions', m => {
             const li = document.createElement('li');
             li.textContent = `미션 이름: ${m.m_title}, 수행자: ${m.u_id}, 완료일: ${m.m_deadline}`;
-            // // ✅ 이미지가 존재하면 표시 (BLOB 방식)
-            // if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
-            //     const byteArray = new Uint8Array(m.mission_result_image.data);
-            //     const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
-            //     const url = URL.createObjectURL(blob);
+            // ✅ 이미지가 존재하면 표시 (BLOB 방식)
+            if (m.mission_result_image && m.mission_result_image.data && m.mission_result_image.data.length > 0) {
+                const byteArray = new Uint8Array(m.mission_result_image.data);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' }); // 혹은 image/png
+                const url = URL.createObjectURL(blob);
 
-            //     const img = document.createElement('img');
-            //     img.src = url;
-            //     img.alt = '인증 이미지';
-            //     img.style.maxWidth = '200px';
-            //     img.style.marginTop = '10px';
-
-            //     li.appendChild(document.createElement('br'));
-            //     li.appendChild(img);
-            // }
-
-            // ✅ URL 방식으로 저장된 이미지가 존재할 경우 직접 출력
-            if (m.mission_result_image) {
                 const img = document.createElement('img');
-                img.src = m.mission_result_image;  // 서버로부터 받은 이미지 경로 (/result_images/파일명)
+                img.src = url;
                 img.alt = '인증 이미지';
                 img.style.maxWidth = '200px';
                 img.style.marginTop = '10px';

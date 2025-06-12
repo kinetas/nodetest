@@ -63,8 +63,7 @@
               return;
             }
 
-            // const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : ''; //BLOB 방식
-            const imgTag = c.image ? `<img src="${c.image}" width="100">` : '';
+            const imgTag = c.image ? `<img src="data:image/png;base64,${c.image}" width="100">` : ''; //BLOB 방식
             if(c.community_type === 'mission'){
               list.innerHTML = `
                 제목: ${c.cr_title}, 내용: ${c.contents}, 마감기한: ${new Date(c.deadline).toLocaleString()},조회수: ${c.hits}, 추천수: ${c.recommended_num}, 생성시간: ${new Date(c.maded_time).toLocaleString()}

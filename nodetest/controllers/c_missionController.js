@@ -242,7 +242,7 @@ exports.deleteCommunityMission = async (req, res) => {
         // await mission.destroy();
 
         // community_room 및 관련된 댓글/추천 등도 함께 삭제
-        await deleteCommunityRoomAndRelatedData(cr_num);
+        await exports.deleteCommunityRoomAndRelatedData(cr_num);
         
         res.json({ success: true, message: '커뮤니티 미션이 성공적으로 삭제되었습니다.' });
     } catch (error) {

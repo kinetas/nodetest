@@ -301,7 +301,7 @@ exports.createCommunity = async (req, res) => {
     try {
         await CRoom.create({
             u_id, cr_num, cr_title, contents, community_type,
-            hits: 0, recommended_num: 0, maded_time: new Date(), image
+            hits: 0, recommended_num: 0, maded_time: new Date(), image, popularity: 0
         });
         res.json({ success: true, message: '일반 커뮤니티가 성공적으로 생성되었습니다.' });
     } catch (error) {

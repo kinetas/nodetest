@@ -78,7 +78,15 @@
   <button onclick="goBackToLeague()">🏁 닫기</button>
 </div>
 
-<model-viewer id="charModel" src="" auto-rotate camera-controls style="width: 300px; height: 300px;"></model-viewer>
+<model-viewer
+  id="charModel"
+  src=""
+  autoplay
+  animation-name="Animation"
+  auto-rotate
+  camera-controls
+  style="width: 300px; height: 300px;">
+</model-viewer>
   <script>
     let currentUserId = null;
     const jwtToken = localStorage.getItem('jwt_token');
@@ -114,7 +122,7 @@
     }
 
     //유저정보 보기
-    async function viewUserInfo(user_id) {
+   async function viewUserInfo(user_id) {
   try {
     const res = await fetch(`/nodetest/league/user-info/${user_id}`, {
       headers: {
@@ -126,20 +134,13 @@
       const errText = await res.text();
       throw new Error(errText);
     }
+
     const user = await res.json();
-    if (user.model_file) {
-  document.getElementById('userDetail').innerHTML += `
-    <model-viewer src="/models/${user.model_file}" 
-    autoplay
-    auto-rotate 
-    camera-controls 
-      style="width: 300px; height: 300px;">
-    </model-viewer>
-  `;
-}
+    const container = document.getElementById('userDetail');
+    container.innerHTML = ''; // 기존 내용 제거
 
-
-    document.getElementById('userDetail').innerHTML = `
+    // 기본 유저 정보 UI
+    const infoHtml = `
       <h3>👤 유저 정보</h3>
       <img src="/profile_images/${user.profile_image}" width="80" />
       <p><strong>닉네임:</strong> ${user.u_nickname}</p>
@@ -149,11 +150,26 @@
       <p><strong>LP:</strong> ${user.lp}</p>
       <p><strong>총 미션 수:</strong> ${user.mission_total}</p>
       <p><strong>미션 성공률:</strong> ${user.mission_success_rate}%</p>
-      ${user.model_file 
-        ? `<model-viewer src="/models/${user.model_file}" auto-rotate camera-controls 
-            style="width: 300px; height: 300px;"></model-viewer>`
-        : '<p><em>선택된 캐릭터 모델이 없습니다.</em></p>'}
     `;
+
+    container.innerHTML = infoHtml;
+
+    // 모델이 있을 경우 <model-viewer> 생성
+    if (user.model_file) {
+      const viewer = document.createElement('model-viewer');
+      viewer.setAttribute('src', `/models/${user.model_file}`);
+      viewer.setAttribute('autoplay', '');
+      viewer.setAttribute('animation-name', 'Animation');
+      viewer.setAttribute('auto-rotate', '');
+      viewer.setAttribute('camera-controls', '');
+      viewer.style.width = '300px';
+      viewer.style.height = '300px';
+      viewer.style.marginTop = '20px';
+      container.appendChild(viewer);
+    } else {
+      container.innerHTML += `<p><em>선택된 캐릭터 모델이 없습니다.</em></p>`;
+    }
+
   } catch (err) {
     alert(`유저 정보를 불러오는 데 실패했습니다: ${err.message}`);
   }

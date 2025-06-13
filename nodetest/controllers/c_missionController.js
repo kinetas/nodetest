@@ -548,12 +548,6 @@ exports.writeComment = async (req, res) => {
     const u_id = req.currentUserId;
 
     try {
-        // 사용자 닉네임 조회
-        const user = await User.findOne({ where: { u_id } });
-        if (!user) {
-            return res.status(404).json({ success: false, message: '사용자를 찾을 수 없습니다.' });
-        }
-
         // 댓글 생성
         await CommunityComment.create({
             cc_num: uuidv4(),
@@ -563,6 +557,25 @@ exports.writeComment = async (req, res) => {
             comment,
             created_time: new Date()
         });
+
+        // ==============  추가  ====================
+        // 커뮤니티 조회
+        const cr = await CRoom.findOne({ where: { cr_num } });
+        if (!cr) {
+            return res.status(404).json({ success: false, message: '커뮤니티를 찾을 수 없습니다.' });
+        }
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        const sendCommentNotification = await notificationController.sendCommentNotification(
+            cr.u1_id,   //알림 받을 사람 = 커뮤니티 작성자
+            comment,
+            cr.cr_title
+        );
+
+        if(!sendCommentNotification){
+            return res.status(400).json({ success: false, message: '댓글 송신 알림 전송을 실패했습니다.' });
+        }
+        // ================ 알림 추가 - 디바이스 토큰 =======================
+        // ==============  추가  ====================
 
         res.json({ success: true, message: '댓글이 성공적으로 작성되었습니다.' });
     } catch (error) {

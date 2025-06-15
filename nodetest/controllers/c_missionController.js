@@ -572,7 +572,7 @@ exports.writeComment = async (req, res) => {
         }
         // ================ 알림 추가 - 디바이스 토큰 =======================
         const sendCommentNotification = await notificationController.sendCommentNotification(
-            cr.u1_id,   //알림 받을 사람 = 커뮤니티 작성자
+            cr.u_id,   //알림 받을 사람 = 커뮤니티 작성자
             comment,
             cr.cr_title
         );

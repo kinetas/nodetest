@@ -125,11 +125,11 @@ app.get('/health', (req, res) => {
   res.status(200).send('Healthy');
 });
 
-// app.use('/socket.io', createProxyMiddleware({
-//   target: process.env.CHAT_SERVER_URL, // 예: 'http://chat_server:3001'
-//   changeOrigin: true,
-//   ws: true // ⭐ WebSocket 연결 허용
-// }));
+app.use('/socket.io', createProxyMiddleware({
+  target: process.env.CHAT_SERVER_URL, // 예: 'http://chat_server:3001'
+  changeOrigin: true,
+  ws: true // ⭐ WebSocket 연결 허용
+}));
 
 const server = http.createServer(app);
 

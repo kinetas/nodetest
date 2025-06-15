@@ -125,18 +125,15 @@ app.get('/health', (req, res) => {
   res.status(200).send('Healthy');
 });
 
-app.use('/socket.io', createProxyMiddleware({
-  target: process.env.CHAT_SERVER_URL, // 예: 'http://chat_server:3001'
+const socketProxy = createProxyMiddleware('/socket.io', {
+  target: process.env.CHAT_SERVER_URL,
   changeOrigin: true,
-  ws: true // ⭐ WebSocket 연결 허용
-}));
-
-const server = http.createServer(app);
-
-server.on('upgrade', (req, socket, head) => {
-  console.log('[GATEWAY] WebSocket upgrade 요청 수신');
-  app.emit('upgrade', req, socket, head);
+  ws: true,
 });
+app.use('/socket.io', socketProxy);
+
+// ✅ WebSocket 업그레이드 직접 연결
+server.on('upgrade', socketProxy.upgrade);
 // ✅ Gateway 서버 시작
 server.listen(3000, '0.0.0.0', () => {
   console.log('🚪 API Gateway running on port 3000');

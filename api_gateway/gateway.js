@@ -132,8 +132,12 @@ const socketProxy = createProxyMiddleware('/socket.io', {
 });
 app.use('/socket.io', socketProxy);
 
-// ✅ WebSocket 업그레이드 직접 연결
+// ✅ server를 먼저 정의
+const server = http.createServer(app);
+
+// ✅ 그다음 upgrade 핸들러 등록
 server.on('upgrade', socketProxy.upgrade);
+
 // ✅ Gateway 서버 시작
 server.listen(3000, '0.0.0.0', () => {
   console.log('🚪 API Gateway running on port 3000');

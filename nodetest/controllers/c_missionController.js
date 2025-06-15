@@ -565,15 +565,15 @@ exports.writeComment = async (req, res) => {
             return res.status(404).json({ success: false, message: '커뮤니티를 찾을 수 없습니다.' });
         }
         // ================ 알림 추가 - 디바이스 토큰 =======================
-        const sendCommentNotification = await notificationController.sendCommentNotification(
-            cr.u1_id,   //알림 받을 사람 = 커뮤니티 작성자
-            comment,
-            cr.cr_title
-        );
+        // const sendCommentNotification = await notificationController.sendCommentNotification(
+        //     cr.u1_id,   //알림 받을 사람 = 커뮤니티 작성자
+        //     comment,
+        //     cr.cr_title
+        // );
 
-        if(!sendCommentNotification){
-            return res.status(400).json({ success: false, message: '댓글 송신 알림 전송을 실패했습니다.' });
-        }
+        // if(!sendCommentNotification){
+        //     return res.status(400).json({ success: false, message: '댓글 송신 알림 전송을 실패했습니다.' });
+        // }
         // ================ 알림 추가 - 디바이스 토큰 =======================
         // ==============  추가  ====================
 

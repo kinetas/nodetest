@@ -510,6 +510,9 @@ exports.getOneCommunity = async (req, res) => {
             return res.status(404).json({ message: '해당 커뮤니티 글을 찾을 수 없습니다.' });
         }
 
+        // ✅ 조회수 증가
+        await communities.increment('hits');
+
         // ✅ 이미지가 있으면 Base64로 변환
         if (communities.image) {
             communities.image = communities.image.toString('base64');

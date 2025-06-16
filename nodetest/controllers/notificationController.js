@@ -370,6 +370,13 @@ const sendMessageNotification = async (userId, messageContent) => {
     return await sendNotification(userId, title, body);
 };
 
+// ==============  추가  ====================
+const sendCommentNotification = async (userId, commentContent, cr_title) => {
+    const title = `${cr_title} 커뮤니티에 새로운 댓글이 달렸습니다.`;
+    const body = `내용: "${commentContent}"`;
+    return await sendNotification(userId, title, body);
+};
+
 module.exports = {
     sendNotificationController,
     sendFriendRequestNotification,
@@ -385,4 +392,5 @@ module.exports = {
     sendVoteMissionSuccessNotification,
     sendVoteMissionFailureNotification,
     sendMissionCreateAuthenticationNotification,
+    sendCommentNotification,// ==============  추가  ====================
 };

@@ -168,7 +168,7 @@ exports.updateLpOnMission = async (req, res) => {
 };
 
 exports.getUserInfoById = async (req, res) => {
-  const { user_id } = req.params;
+  const user_id = req.query.user_id;
   const requester_id = req.headers['x-user-id'];
 
   if (!requester_id) {

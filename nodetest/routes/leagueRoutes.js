@@ -8,5 +8,5 @@ router.get('/detail', leagueController.getLeagueDetail);
 //lp 지급 api
 router.post('/mission-lp', leagueController.updateLpOnMission);
 //유저 정보 조회 api
-router.get('/user-info/:user_id', leagueController.getUserInfoById);
+router.get('/user-info', leagueController.getUserInfoById);
 module.exports = router;

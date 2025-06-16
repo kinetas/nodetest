@@ -16,7 +16,7 @@ exports.getShopItems = async (req, res) => {
 
 //보유 포인트 조회
 exports.getUserPoints = async (req, res) => {
-  const { user_id } = req.params;
+  const user_id = req.query.user_id;
   try {
     const result = await db.query(
       `SELECT points FROM user_points WHERE user_id = :user_id`,
@@ -34,7 +34,7 @@ exports.getUserPoints = async (req, res) => {
 
 //내가 가진 아이템 전체 조회
 exports.getMyItems = async (req, res) => {
-  const { user_id } = req.params;
+  const user_id = req.query.user_id;
 
   try {
     const items = await db.query(

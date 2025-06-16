@@ -124,7 +124,7 @@
     //유저정보 보기
    async function viewUserInfo(user_id) {
   try {
-    const res = await fetch(`/nodetest/league/user-info/${user_id}`, {
+    const res = await fetch(`/nodetest/league/user-info/user=${user_id}`, {
       headers: {
         'x-user-id': currentUserId // 로그인한 유저 ID를 명시
       }
@@ -207,7 +207,7 @@ async function applyItem(itemId) {
 
     async function getLeagueDetail() {
       const user_id = getUserId();
-      const res = await fetch(`/nodetest/league/detail`);
+      const res = await fetch(`/nodetest/league/detail?user_id=${user_id}`);
 
       if (!res.ok) {
         const text = await res.text();

@@ -261,7 +261,7 @@ async function applyItem(itemId) {
     async function viewMyItems() {
   const user_id = getUserId();
 
-  const res = await fetch(`/nodetest/shop/my-items/${currentUserId}`, {
+  const res = await fetch(`/nodetest/shop/my-items?user_id=${currentUserId}`, {
   headers: {
     'Authorization': `Bearer ${jwtToken}` 
   }

@@ -65,8 +65,8 @@ exports.assignInitialLeague = async (req, res) => {
 
 // 본인이 속한 리그 불러오기
 exports.getLeagueDetail = async (req, res) => {
-  const user_id = req.params.user_id;
-
+  const user_id = req.query.user_id;
+  
   if (!user_id) {
     return res.status(400).json({ message: 'user_id가 없습니다.' });
   }

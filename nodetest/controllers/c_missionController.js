@@ -510,7 +510,7 @@ exports.getOneCommunity = async (req, res) => {
         }
 
         // ✅ 조회수 증가
-        await community.increment('hits');
+        await communities.increment('hits');
 
         // ✅ 이미지가 있으면 Base64로 변환
         if (communities.image) {

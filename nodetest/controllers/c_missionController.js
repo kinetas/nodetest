@@ -549,11 +549,14 @@ exports.getCommunityComments = async (req, res) => {
 exports.writeComment = async (req, res) => {
     const { cr_num, comment } = req.body;
     const u_id = req.currentUserId;
-    console.log("댓글 작성 - currentUserId:", req.currentUserId);
-    console.log("u_id: ", u_id);
+    
+    console.log("🔥 댓글 작성 API 진입");
+    console.log("req.currentUserId:", u_id);
+    console.log("req.body:", req.body);
     try {
         // 사용자 닉네임 조회
         const user = await User.findOne({ where: { u_id } });
+        console.log("DB 조회 결과 user:", user);
         if (!user) {
             return res.status(404).json({ success: false, message: '사용자를 찾을 수 없습니다.' });
         }

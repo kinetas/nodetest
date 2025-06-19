@@ -549,9 +549,9 @@ exports.getCommunityComments = async (req, res) => {
 exports.writeComment = async (req, res) => {
     const { cr_num, comment } = req.body;
     const u_id = req.currentUserId;
-
+    console.log("댓글 작성 - currentUserId:", req.currentUserId);
+    console.log("u_id: ", u_id);
     try {
-        console.log("u_id: ", u_id);
         // 사용자 닉네임 조회
         const user = await User.findOne({ where: { u_id } });
         if (!user) {

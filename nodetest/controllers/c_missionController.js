@@ -551,6 +551,7 @@ exports.writeComment = async (req, res) => {
     const u_id = req.currentUserId;
 
     try {
+        console.log("u_id: ", u_id);
         // 사용자 닉네임 조회
         const user = await User.findOne({ where: { u_id } });
         if (!user) {

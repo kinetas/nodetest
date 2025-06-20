@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart'; // ✅ 추가
+import 'dart:convert'; // ✅ 추가 필요
 
 class SessionTokenManager {
   static const _tokenKey = 'access_token';

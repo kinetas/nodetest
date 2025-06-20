@@ -14,7 +14,7 @@
     <button onclick="goBackToRoomList()">나가기</button>
 
     <h2>채팅방 최근 메시지</h2>
-    <div id="chatMessages">최근 메시지를 불러오는 중...</div>
+    <div id="chatLastMessages">최근 메시지를 불러오는 중...</div>
 
     <h1>방 미션 출력</h1>
     <div>
@@ -99,11 +99,11 @@
         })
         .then(res => res.json())
         .then(data => {
-            const chatMessages = document.getElementById("chatMessages");
-            chatMessages.innerHTML = ""; // 기존 메시지 지우기
+            const chatLastMessages = document.getElementById("chatLastMessages");
+            chatLastMessages.innerHTML = ""; // 기존 메시지 지우기
 
             if (!data || !data.message_contents) {
-                chatMessages.textContent = "최근 메시지가 없습니다.";
+                chatLastMessages.textContent = "최근 메시지가 없습니다.";
                 return;
             }
 
@@ -121,11 +121,11 @@
                 messageElement.appendChild(img);
             }
 
-            chatMessages.appendChild(messageElement);
+            chatLastMessages.appendChild(messageElement);
         })
         .catch(error => {
             console.error("최근 메시지 불러오기 실패:", error);
-            document.getElementById("chatMessages").textContent = "메시지를 불러오는 중 오류 발생";
+            document.getElementById("chatLastMessages").textContent = "메시지를 불러오는 중 오류 발생";
         });
 
         // ✅ 서버 연결 후 방 입장

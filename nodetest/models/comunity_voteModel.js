@@ -36,6 +36,10 @@ const CVote = sequelize.define('CVote', {
     type: DataTypes.BLOB('long'), // 이미지 데이터를 BLOB으로 저장
     allowNull: true,
   },
+  vote_create_date: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  }
 }, {
   tableName: 'comunity_vote',
   timestamps: false,

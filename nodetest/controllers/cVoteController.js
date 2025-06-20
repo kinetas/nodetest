@@ -59,7 +59,8 @@ exports.createVote = async (req, res) => {
             c_good: 0,
             c_bad: 0,
             c_deletedate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-            c_image
+            c_image,
+            vote_create_date: new Date(Date.now()),
         });
         res.json({ success: true, vote: newVote });
     } catch (error) {
@@ -151,6 +152,7 @@ exports.getVoteDetails = async (req, res) => {
                 c_bad: vote.c_bad,
                 c_deletedate: vote.c_deletedate,
                 c_image: vote.c_image ? vote.c_image.toString('base64') : null,
+                vote_create_date: vote.vote_create_date,
             },
         });
     } catch (error) {

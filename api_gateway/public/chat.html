@@ -13,6 +13,9 @@
     <button onclick="sendMessage()">전송</button>
     <button onclick="goBackToRoomList()">나가기</button>
 
+    <h2>채팅방 최근 메시지</h2>
+    <div id="chatLastMessages">최근 메시지를 불러오는 중...</div>
+
     <h1>방 미션 출력</h1>
     <div>
         <input type="text" id="u2_id_input" placeholder="상대방 ID 입력"    >
@@ -87,6 +90,80 @@
                 });
             });
         };
+
+                // 채팅방 최근 메시지
+        fetch(`/nodetest/chat/last-message/${roomId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const chatLastMessages = document.getElementById("chatLastMessages");
+            chatLastMessages.innerHTML = ""; // 기존 메시지 지우기
+
+            if (!data || !data.message_contents) {
+                chatLastMessages.textContent = "최근 메시지가 없습니다.";
+                return;
+            }
+
+            const messageElement = document.createElement("div");
+            const utcDate = new Date(data.send_date);
+            const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000));
+            const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
+
+            messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
+
+            if (data.image) {
+                const img = document.createElement("img");
+                img.src = `data:${data.image_type};base64,${data.image}`;
+                img.style.maxWidth = "200px";
+                messageElement.appendChild(img);
+            }
+
+            chatLastMessages.appendChild(messageElement);
+        })
+        .catch(error => {
+            console.error("최근 메시지 불러오기 실패:", error);
+            document.getElementById("chatLastMessages").textContent = "메시지를 불러오는 중 오류 발생";
+        });
+
+        // 채팅방 최근 메시지
+        fetch(`/nodetest/chat/last-message/${roomId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const chatLastMessages = document.getElementById("chatLastMessages");
+            chatLastMessages.innerHTML = ""; // 기존 메시지 지우기
+
+            if (!data || !data.message_contents) {
+                chatLastMessages.textContent = "최근 메시지가 없습니다.";
+                return;
+            }
+
+            const messageElement = document.createElement("div");
+            const utcDate = new Date(data.send_date);
+            const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000));
+            const formattedDate = kstDate.toISOString().slice(0, 19).replace('T', ' ');
+
+            messageElement.textContent = `[${formattedDate}] ${data.u1_id}: ${data.message_contents}`;
+
+            if (data.image) {
+                const img = document.createElement("img");
+                img.src = `data:${data.image_type};base64,${data.image}`;
+                img.style.maxWidth = "200px";
+                messageElement.appendChild(img);
+            }
+
+            chatLastMessages.appendChild(messageElement);
+        })
+        .catch(error => {
+            console.error("최근 메시지 불러오기 실패:", error);
+            document.getElementById("chatLastMessages").textContent = "메시지를 불러오는 중 오류 발생";
+        });
 
         // ✅ 서버 연결 후 방 입장
         socket.on("connect", () => {

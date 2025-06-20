@@ -13,6 +13,9 @@
     <button onclick="sendMessage()">전송</button>
     <button onclick="goBackToRoomList()">나가기</button>
 
+    <h2>채팅방 최근 메시지</h2>
+    <div id="lastMessage">로딩 중...</div>
+
     <h1>방 미션 출력</h1>
     <div>
         <input type="text" id="u2_id_input" placeholder="상대방 ID 입력"    >
@@ -87,6 +90,25 @@
                 });
             });
         };
+
+        // 채팅방 최근 메시지
+        async function loadLastMessage() {
+        try {
+            const response = await fetch(`/chat/last-message/${roomId}`);
+            if (!response.ok) throw new Error('불러오기 실패');
+
+            const data = await response.json();
+
+            const msgBox = document.getElementById('lastMessage');
+            msgBox.innerHTML = `
+            <p><strong>${data.sender}</strong>: ${data.content}</p>
+            <p><small>${new Date(data.send_date).toLocaleString()}</small></p>
+            `;
+        } catch (err) {
+            document.getElementById('lastMessage').innerText = '최근 메시지를 불러오는 데 실패했습니다.';
+            console.error(err);
+        }
+        }
 
         // ✅ 서버 연결 후 방 입장
         socket.on("connect", () => {
@@ -204,6 +226,8 @@
                 console.error("미션 출력 오류:", error);
             });
         }
+
+        loadLastMessage();
     </script>
 </body>
 </html>

@@ -1,10 +1,53 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../../SessionTokenManager.dart';
 
-class MissionVoteDetailScreen extends StatelessWidget {
-  const MissionVoteDetailScreen({super.key});
+class MissionVoteDetailScreen extends StatefulWidget {
+  final String cNum;
+
+  const MissionVoteDetailScreen({Key? key, required this.cNum}) : super(key: key);
+
+  @override
+  State<MissionVoteDetailScreen> createState() => _MissionVoteDetailScreenState();
+}
+
+class _MissionVoteDetailScreenState extends State<MissionVoteDetailScreen> {
+  Map<String, dynamic>? voteData;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchVoteDetail();
+  }
+
+  Future<void> fetchVoteDetail() async {
+    final response = await SessionTokenManager.get('http://27.113.11.48:3000/nodetest/api/cVote');
+
+    if (response.statusCode == 200) {
+      final votes = json.decode(response.body)['votes'];
+      final match = votes.firstWhere((v) => v['c_number'] == widget.cNum, orElse: () => null);
+      if (match != null) {
+        setState(() {
+          voteData = match;
+          isLoading = false;
+        });
+      }
+    } else {
+      print('❌ 투표 상세 조회 실패: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading || voteData == null) {
+      return Scaffold( // 🔧 여기서 const 제거
+        appBar: AppBar(title: Text('미션투표')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -39,9 +82,12 @@ class MissionVoteDetailScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text('유저 닉네임', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('2025/04/14 11:10 · 조회 00 · 추천 00', style: TextStyle(fontSize: 12)),
+                  children: [
+                    Text(voteData?['u_id'] ?? '익명', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      '${voteData?['c_date']?.toString().split("T")[0]} · 추천 ${voteData?['c_good'] ?? 0} · 반대 ${voteData?['c_bad'] ?? 0}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                   ],
                 ),
               ],
@@ -50,25 +96,25 @@ class MissionVoteDetailScreen extends StatelessWidget {
 
             /// 찬반 수
             Row(
-              children: const [
-                Text('찬성 00', style: TextStyle(color: Colors.cyan, fontSize: 13)),
-                SizedBox(width: 12),
-                Text('반대 00', style: TextStyle(color: Colors.red, fontSize: 13)),
+              children: [
+                Text('찬성 ${voteData?['c_good'] ?? 0}', style: const TextStyle(color: Colors.cyan, fontSize: 13)),
+                const SizedBox(width: 12),
+                Text('반대 ${voteData?['c_bad'] ?? 0}', style: const TextStyle(color: Colors.red, fontSize: 13)),
               ],
             ),
             const SizedBox(height: 20),
 
             /// 제목
-            const Text(
-              '제목이 들어갈 부분\n예) 이런 미션 했습니다.',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              voteData?['c_title'] ?? '',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
 
             /// 내용
-            const Text(
-              '미션에 대한 내용',
-              style: TextStyle(fontSize: 16),
+            Text(
+              voteData?['c_contents'] ?? '',
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 24),
 
@@ -79,17 +125,15 @@ class MissionVoteDetailScreen extends StatelessWidget {
               color: Colors.grey[300],
               child: const Icon(Icons.image, size: 48),
             ),
-
             const SizedBox(height: 30),
 
             /// 투표 버튼
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                /// 찬성
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: 찬성 로직 처리
+                    // TODO: 찬성 처리 로직
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,
@@ -100,11 +144,9 @@ class MissionVoteDetailScreen extends StatelessWidget {
                   ),
                   child: const Text('찬성'),
                 ),
-
-                /// 반대
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: 반대 로직 처리
+                    // TODO: 반대 처리 로직
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.black,

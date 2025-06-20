@@ -6,8 +6,9 @@ import '../../SessionTokenManager.dart';
 import 'SignUpScreen.dart';
 import 'FindAccountScreen.dart';
 import '../../DeviceTokenManager.dart';
-import '../../WebRTC/WebRTCService/CallbackupVersion.dart'; // ✅ signaling 연결
+import '../../WebRTC/NewWebRTC/CallbackupVersion.dart';
 import '../../UserInfo/UserInfo_Id.dart';
+import '../../IdTokenManager.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _checkAutoLogin() async {
     print("🔍 자동 로그인 체크 시작");
     final isLoggedIn = await SessionTokenManager.isLoggedIn();
-    print("✅ 자동 로그인 여부: $isLoggedIn");
+    print("✅ 자동 로그인 여부: \$isLoggedIn");
 
     if (isLoggedIn) {
       print("🚀 자동 로그인 → MainScreen 이동");
@@ -48,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _signaling = Signaling(url: 'ws://27.113.11.48:3005/ws');
       _signaling!.setMyId(myId);
       _signaling!.setOnMessage((from, type, payload) {
-        print("📨 signaling 메시지 수신: $type from $from");
+        print("📨 signaling 메시지 수신: \$type from \$from");
       });
       _signaling!.connect();
       print("🔗 signaling 서버에 연결 시도 완료");
@@ -62,11 +63,11 @@ class _LoginScreenState extends State<LoginScreen> {
     final pw = _passwordController.text.trim();
     final deviceToken = await DeviceTokenManager().getDeviceToken();
 
-    print("📥 입력된 ID: '$id', PW: '\${'*' * pw.length}', Token: $deviceToken");
+    print("📥 입력된 ID: '\$id', PW: '\${'*' * pw.length}', Token: \$deviceToken");
 
-    if (id.isEmpty || pw.isEmpty || deviceToken == null) {
+    if (id.isEmpty || pw.isEmpty) {
       setState(() {
-        _resultMessage = '아이디, 비밀번호, 또는 디바이스 토큰이 비어 있습니다.';
+        _resultMessage = '아이디 또는 비밀번호를 입력해주세요.';
       });
       print("❌ 입력값 부족");
       return;
@@ -83,20 +84,24 @@ class _LoginScreenState extends State<LoginScreen> {
           'deviceToken': deviceToken,
         }),
       );
-      print("📨 응답 코드: ${response.statusCode}");
+      print("📨 응답 코드: \${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("📦 응답 데이터: $data");
+        print("📦 응답 데이터: \$data");
 
         if (data['success'] == true) {
           final jwtToken = data['jwtToken'];
-          print("🪪 JWT 토큰 수신: $jwtToken");
+          final idToken = data['idToken'];
+
+          print("🪪 JWT 토큰 수신: \$jwtToken");
+          print("🪪 ID 토큰 수신: \$idToken");
 
           await SessionTokenManager.saveToken(jwtToken);
-          print("✅ JWT 저장 완료");
+          await IdTokenManager.saveIdToken(idToken);
+          print("✅ 토큰 저장 완료");
 
-          await _connectSignaling(); // ✅ 로그인 후 signaling 연결
+          await _connectSignaling();
 
           print("🚀 MainScreen으로 이동");
           Navigator.pushReplacement(
@@ -108,19 +113,19 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             _resultMessage = msg;
           });
-          print("❌ 로그인 실패: $msg");
+          print("❌ 로그인 실패: \$msg");
         }
       } else {
         setState(() {
-          _resultMessage = '서버 오류: ${response.statusCode}';
+          _resultMessage = '서버 오류: \${response.statusCode}';
         });
         print("❌ 서버 오류");
       }
     } catch (e) {
       setState(() {
-        _resultMessage = '에러 발생: $e';
+        _resultMessage = '에러 발생: \$e';
       });
-      print("❌ 예외 발생: $e");
+      print("❌ 예외 발생: \$e");
     }
   }
 

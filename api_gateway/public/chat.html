@@ -94,7 +94,7 @@
         // 채팅방 최근 메시지
         async function loadLastMessage() {
         try {
-            const response = await fetch(`/chat/last-message/${roomId}`);
+            const response = await fetch(`/nodetest/chat/last-message/${roomId}`);
             if (!response.ok) throw new Error('불러오기 실패');
 
             const data = await response.json();

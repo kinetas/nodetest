@@ -149,7 +149,7 @@ exports.getMessages = async (r_id) => {
 //채팅방에서 가장 최근 메시지를 가져오는 함수
 exports.getLastMessage = async (r_id) => {
   try {
-    const lastMessage = await Message.findOne({
+    const lastMessage = await RMessage.findOne({
       where: { r_id },
       order: [['send_date', 'DESC']]
     });

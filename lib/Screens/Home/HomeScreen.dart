@@ -3,7 +3,7 @@ import '../Mission/AchievementPanel_screen.dart';
 import '../CalendarScreen/WeeklyCalendarScreen.dart';
 import '../Friends/FriendListWidget.dart';
 import '../CalendarScreen/MonthlyCalendarScreen.dart';
-import '../Community/LatestPostList.dart';
+import '../NewCommunity/LatestPostList.dart';
 import '../Mission/MyMission/MyMissionList.dart';
 
 class HomeScreen extends StatefulWidget {

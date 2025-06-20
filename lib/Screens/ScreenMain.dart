@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'Home/HomeScreen.dart';
 import 'Chat/MainChatScreen.dart';
 import 'Mission/MissionScreen.dart';
-import 'Community/CommunityScreen.dart';
+import 'NewCommunity/CommunityScreen.dart';
 import 'Profile/ProfileScreenMain.dart';
 import '../Screens/Login_page/LoginScreen.dart';
 import '../SessionTokenManager.dart';

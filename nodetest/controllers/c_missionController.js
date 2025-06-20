@@ -288,6 +288,35 @@ exports.getCommunityMissionSimple = async (req, res) => {
     }
 };
 
+// 로그인한 유저가 생성한 커뮤니티 미션 목록 조회
+exports.getMyCommunityMissions = async (req, res) => {
+    const u_id = req.currentUserId;
+
+    try {
+        const myMissions = await CRoom.findAll({
+            where: {
+                u_id,
+                community_type: 'mission'
+            },
+            order: [['maded_time', 'DESC']]
+        });
+
+        const missionList = myMissions.map(m => ({
+            cr_num: m.cr_num,
+            cr_title: m.cr_title,
+            contents: shortenContent(m.contents, 100),
+            cr_status: m.cr_status,
+            deadline: m.deadline,
+            maded_time: m.maded_time
+        }));
+
+        res.json({ missions: missionList });
+    } catch (error) {
+        console.error('내 커뮤니티 미션 조회 오류:', error);
+        res.status(500).json({ message: '내 커뮤니티 미션 조회 중 오류 발생' });
+    }
+};
+
 
 //============일반===============
 

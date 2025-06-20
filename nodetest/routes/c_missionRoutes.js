@@ -13,6 +13,7 @@ router.post('/accept', loginRequired, c_missionController.acceptCommunityMission
 router.delete('/delete', loginRequired, c_missionController.deleteCommunityMission);
 router.get('/list', loginRequired, c_missionController.getCommunityMission);
 router.get('/getCommunityMissionSimple', loginRequired, c_missionController.getCommunityMissionSimple);
+router.get('/getMyCommunityMissions', loginRequired, c_missionController.getMyCommunityMissions);
 
 // 일반 커뮤니티
 router.post('/createGeneralCommunity', loginRequired, upload.single('image'), c_missionController.createCommunity);

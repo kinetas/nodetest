@@ -17,6 +17,10 @@
 
     <ul id="communityMissionList">로딩 중...</ul>
 
+    <!-- 내가 생성한 커뮤니티 미션 -->
+    <h3>내가 만든 커뮤니티 미션</h3>
+    <ul id="myCommunityMissionList">로딩 중...</ul>
+
     <!-- 일반 커뮤니티 생성 UI -->
     <h3>새로운 커뮤니티 글 생성</h3>
     <div>
@@ -133,6 +137,34 @@
                 loadGeneralCommunities(); // ✅ 새로고침해서 추천 수 반영
             })
             .catch(error => console.error('추천 오류:', error));
+        }
+
+        // ✅ 내가 만든 커뮤니티 미션 불러오기
+        function loadMyCommunityMissions() {
+            fetch('/nodetest/api/comumunity_missions/getMyCommunityMissions', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const list = document.getElementById('myCommunityMissionList');
+                list.innerHTML = '';
+                data.missions.forEach(mission => {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <strong>${mission.cr_title}</strong><br>
+                        내용: ${mission.contents}<br>
+                        상태: ${mission.cr_status}, 기한: ${new Date(mission.deadline).toLocaleString()}
+                        <br>생성일: ${new Date(mission.maded_time).toLocaleString()}
+                        <br>
+                        <button onclick="deleteCommunityMission('${mission.cr_num}')">삭제</button>
+                        <button onclick="location.href='/community_comments.html?cr_num=${mission.cr_num}'">상세보기</button>
+                    `;
+                    list.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('내 커뮤니티 미션 로딩 오류:', error));
         }
 
         // 일반 커뮤니티 생성

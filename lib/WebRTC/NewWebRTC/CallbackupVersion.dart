@@ -102,7 +102,7 @@ class WebRTCPeer {
     final config = {
       'iceServers': [
         {'urls': 'stun:stun.l.google.com:19302'},
-        {'urls': 'turn:27.113.11.48:15000', 'username': 'user', 'credential': 'pass'},
+        {'urls': 'turn::15000', 'username': 'user', 'credential': 'pass'},
       ]
     };
     _peerConnection = await createPeerConnection(config);

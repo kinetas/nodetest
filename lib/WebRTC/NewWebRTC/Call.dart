@@ -30,7 +30,6 @@ class _CallScreenState extends State<CallScreen> {
 
   Timer? _callTimer;
   int _callDuration = 0;
-
   bool _disposed = false;
 
   String _formatDuration(int seconds) {
@@ -48,7 +47,7 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
-    _stopCall();
+    _stopCall(); // 리소스 정리
     super.dispose();
   }
 
@@ -58,7 +57,7 @@ class _CallScreenState extends State<CallScreen> {
     });
   }
 
-  Future<void> _stopCall() async {
+  Future<void> _stopCall({bool notify = true}) async {
     if (_disposed) return;
     _disposed = true;
 
@@ -68,9 +67,17 @@ class _CallScreenState extends State<CallScreen> {
     await _peerConnection?.close();
     await _localRenderer.dispose();
     await _remoteRenderer.dispose();
+    await _localStream?.dispose();
 
-    _channel.sink.add(json.encode({'type': 'leave', 'from': widget.myId, 'to': widget.friendId}));
-    _channel.sink.close();
+    if (notify) {
+      _channel.sink.add(json.encode({
+        'type': 'leave',
+        'from': widget.myId,
+        'to': widget.friendId,
+      }));
+    }
+
+    await _channel.sink.close();
   }
 
   Future<void> _initRenderers() async {
@@ -112,7 +119,21 @@ class _CallScreenState extends State<CallScreen> {
           break;
         case 'call_rejected':
           print('📵 상대방이 전화를 거절했습니다.');
-          Navigator.pop(context);
+          if (mounted) {
+            await _stopCall(notify: false);
+            Navigator.pop(context);
+            await Future.delayed(const Duration(milliseconds: 300));
+            _showDialog('통화 종료', '상대방이 전화를 거절했습니다.');
+          }
+          break;
+        case 'leave':
+          print('📴 상대방이 통화를 종료했습니다.');
+          if (mounted) {
+            await _stopCall(notify: false);
+            Navigator.pop(context);
+            await Future.delayed(const Duration(milliseconds: 300));
+            _showDialog('통화 종료', '상대방이 통화를 종료했습니다.');
+          }
           break;
       }
     }, onDone: () {
@@ -124,34 +145,41 @@ class _CallScreenState extends State<CallScreen> {
     await _setupWebRTC();
 
     if (!widget.isCaller) {
-      _sendMessage('accept_call', {'from': widget.myId, 'to': widget.friendId});
+      _sendMessage('accept_call', {});
       _startCallTimer();
     }
   }
 
   Future<void> _setupWebRTC() async {
     final config = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]};
-
     _peerConnection = await createPeerConnection(config);
 
-    _localStream = await navigator.mediaDevices.getUserMedia({'audio': true, 'video': {'facingMode': 'user'}});
+    _localStream = await navigator.mediaDevices.getUserMedia({
+      'audio': true,
+      'video': {'facingMode': 'user'}
+    });
+
     _localRenderer.srcObject = _localStream;
 
-    _localStream!.getTracks().forEach((track) => _peerConnection!.addTrack(track, _localStream!));
+    for (var track in _localStream!.getTracks()) {
+      _peerConnection!.addTrack(track, _localStream!);
+    }
 
     _peerConnection!.onTrack = (event) {
-      if (event.streams.isNotEmpty) setState(() => _remoteRenderer.srcObject = event.streams[0]);
+      if (event.streams.isNotEmpty) {
+        setState(() => _remoteRenderer.srcObject = event.streams[0]);
+      }
     };
 
     _peerConnection!.onIceCandidate = (candidate) {
       if (candidate.candidate != null) {
-        _sendMessage('candidate', {
-          'candidate': candidate.toMap(),
-        });
+        _sendMessage('candidate', {'candidate': candidate.toMap()});
       }
     };
 
-    if (widget.isCaller) await _createAndSendOffer();
+    if (widget.isCaller) {
+      await _createAndSendOffer();
+    }
   }
 
   Future<void> _createAndSendOffer() async {
@@ -174,23 +202,82 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   Future<void> _handleCandidate(Map<String, dynamic> candidate) async {
-    await _peerConnection!.addCandidate(RTCIceCandidate(candidate['candidate'], candidate['sdpMid'], candidate['sdpMLineIndex']));
+    await _peerConnection!.addCandidate(
+      RTCIceCandidate(candidate['candidate'], candidate['sdpMid'], candidate['sdpMLineIndex']),
+    );
   }
 
   void _sendMessage(String type, Map<String, dynamic> data) {
-    _channel.sink.add(json.encode({'type': type, 'from': widget.myId, 'to': widget.friendId, ...data}));
+    _channel.sink.add(json.encode({
+      'type': type,
+      'from': widget.myId,
+      'to': widget.friendId,
+      ...data,
+    }));
+  }
+
+  void _showDialog(String title, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // AlertDialog만 닫기
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(children: [
-        Positioned.fill(child: RTCVideoView(_remoteRenderer)),
-        Positioned(top: 40, right: 20, child: SizedBox(width: 120, height: 160, child: RTCVideoView(_localRenderer, mirror: true))),
-        Positioned(top: 40, left: 20, child: Text('⏱️ ${_formatDuration(_callDuration)}', style: const TextStyle(color: Colors.white))),
-        Align(alignment: Alignment.bottomCenter, child: FloatingActionButton(backgroundColor: Colors.red, child: const Icon(Icons.call_end), onPressed: () => Navigator.pop(context))),
-      ]),
+      body: Stack(
+        children: [
+          Positioned.fill(child: RTCVideoView(_remoteRenderer)),
+          Positioned(
+            top: 40,
+            right: 20,
+            child: SizedBox(
+              width: 120,
+              height: 160,
+              child: RTCVideoView(_localRenderer, mirror: true),
+            ),
+          ),
+          Positioned(
+            top: 40,
+            left: 20,
+            child: Text(
+              '⏱️ ${_formatDuration(_callDuration)}',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: FloatingActionButton(
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.call_end),
+              onPressed: () async {
+                await _stopCall();
+                if (mounted) {
+                  Navigator.pop(context);
+                  await Future.delayed(const Duration(milliseconds: 300));
+                  _showDialog('통화 종료', '통화를 종료했습니다.');
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

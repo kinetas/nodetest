@@ -181,16 +181,100 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // 응답 상태 코드 처리
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = json.decode(response.body);
-        if (responseData['message'] == "회원가입이 완료되었습니다.") {
-          _showDialogWithRedirect('회원가입 성공', '회원가입이 완료되었습니다! 로그인해주세요!');
+        final message = responseData['message']?.toString() ?? '응답 메시지 없음';
+
+        print('[✅ 회원가입 응답 성공] $message');
+
+        if (message.contains("회원가입이 완료되었습니다")) {
+          print('[✅ 회원가입 성공] $message');
+
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text('회원가입 완료'),
+              content: Text('회원가입이 완료되었습니다!'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => StartLoginScreen()),
+                          (route) => false, // 모든 이전 화면 제거
+                    );
+                  },
+                  child: Text('확인'),
+                ),
+              ],
+            ),
+          );
         } else {
-          _showDialog('오류', '알 수 없는 응답입니다: ${response.body}');
+          // message는 있지만 실패한 경우
+          String errorMsg;
+          try {
+            final errorData = json.decode(response.body);
+            errorMsg = errorData['message']?.toString() ?? '알 수 없는 오류가 발생했습니다.';
+          } catch (e) {
+            errorMsg = response.body.toString();
+          }
+
+          print('[⚠️ 회원가입 실패 메시지] $errorMsg');
+
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: Text('회원가입 실패'),
+              content: Text(errorMsg),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('확인'),
+                ),
+              ],
+            ),
+          );
         }
       } else {
-        _showDialog('오류', '회원가입에 실패했습니다: ${response.body}');
+        // HTTP 상태코드가 200/201 이외인 경우
+        String errorMsg;
+        try {
+          final errorData = json.decode(response.body);
+          errorMsg = errorData['message']?.toString() ?? '알 수 없는 오류가 발생했습니다.';
+        } catch (e) {
+          errorMsg = response.body.toString();
+        }
+
+        print('[❌ 회원가입 실패 응답] statusCode: ${response.statusCode}, body: ${response.body}');
+
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('회원가입 실패'),
+            content: Text(errorMsg),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('확인'),
+              ),
+            ],
+          ),
+        );
       }
     } catch (e) {
-      _showDialog('오류', '회원가입 중 문제가 발생했습니다: $e');
+      print('[🔥 예외 발생] $e');
+
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('네트워크 오류'),
+          content: Text('회원가입 중 문제가 발생했습니다.\n\n$e'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('확인'),
+            ),
+          ],
+        ),
+      );
     }
   }
 

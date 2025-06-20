@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionTokenManager.dart';
-import 'CommunityPostDialog.dart'; // 플로팅 카드 상세 뷰 위젯 임포트!
+import '../Community/CommunityPostDialog.dart';
 
 class LatestPosts extends StatefulWidget {
   final VoidCallback onNavigateToCommunity;
@@ -23,42 +23,72 @@ class _LatestPostsState extends State<LatestPosts> {
   }
 
   Future<void> fetchLatestPosts() async {
-    final url = 'http://27.113.11.48:3000/nodetest/api/comumunity_missions/list';
-
     try {
-      final response = await SessionTokenManager.get(url);
+      final responses = await Future.wait([
+        SessionTokenManager.get('http://27.113.11.48:3000/nodetest/api/comumunity_missions/printGeneralCommunityList'),
+        SessionTokenManager.get('http://27.113.11.48:3000/nodetest/api/comumunity_missions/list'),
+        SessionTokenManager.get('http://27.113.11.48:3000/nodetest/api/cVote'),
+      ]);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final missions = List<Map<String, dynamic>>.from(data['missions'] ?? []);
+      List<Map<String, dynamic>> allPosts = [];
 
-        setState(() {
-          posts = missions.take(2).map((mission) {
-            return {
-              'cr_num': mission['cr_num']?.toString() ?? '',
-              'cr_title': mission['cr_title']?.toString() ?? '제목 없음',
-              'cr_status': mission['cr_status']?.toString() ?? '',
-              'contents': mission['contents']?.toString() ?? '내용 없음',
-              'deadline': mission['deadline']?.toString() ?? '',
-            };
-          }).toList();
-          isLoading = false;
-        });
-      } else {
-        print('Failed to load latest posts: ${response.statusCode}');
-        setState(() {
-          isLoading = false;
-        });
+      if (responses[0].statusCode == 200) {
+        final data = json.decode(responses[0].body)['communities'];
+        final generalPosts = data.map<Map<String, dynamic>>((item) => {
+          'cr_num': item['cr_num'].toString(),
+          'cr_title': item['cr_title'] ?? '제목 없음',
+          'cr_status': '자유게시판',
+          'contents': item['contents'] ?? '내용 없음',
+          'deadline': item['maded_time'] ?? '',
+          'timestamp': DateTime.tryParse(item['maded_time'] ?? '') ?? DateTime.now(),
+        }).toList();
+        allPosts.addAll(generalPosts);
       }
-    } catch (e) {
-      print('Error fetching latest posts: $e');
+
+      if (responses[1].statusCode == 200) {
+        final data = json.decode(responses[1].body)['missions'];
+        final recruitPosts = data.map<Map<String, dynamic>>((item) => {
+          'cr_num': item['cr_num'].toString(),
+          'cr_title': item['cr_title'] ?? '제목 없음',
+          'cr_status': '미션구인',
+          'contents': item['contents'] ?? '내용 없음',
+          'deadline': item['deadline'] ?? '',
+          'timestamp': DateTime.tryParse(item['maded_time'] ?? '') ?? DateTime.now(),
+        }).toList();
+        allPosts.addAll(recruitPosts);
+      }
+
+      if (responses[2].statusCode == 200) {
+        final data = json.decode(responses[2].body)['votes'];
+        final votePosts = data.map<Map<String, dynamic>>((item) => {
+          'cr_num': item['c_number'].toString(),
+          'cr_title': item['c_title'] ?? '제목 없음',
+          'cr_status': '미션투표',
+          'contents': item['c_contents'] ?? '내용 없음',
+          'deadline': item['c_deletedate'] ?? '',
+          'timestamp': DateTime.tryParse(item['c_deletedate'] ?? '') ?? DateTime.now(),
+        }).toList();
+        allPosts.addAll(votePosts);
+      }
+
+      allPosts.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
+
       setState(() {
+        posts = allPosts.take(2).map((p) => {
+          'cr_num': p['cr_num'].toString(),
+          'cr_title': p['cr_title'].toString(),
+          'cr_status': p['cr_status'].toString(),
+          'contents': p['contents'].toString(),
+          'deadline': p['deadline'].toString(),
+        }).toList();
         isLoading = false;
       });
+    } catch (e) {
+      print('Error fetching latest posts: $e');
+      setState(() => isLoading = false);
     }
   }
 
-  // 날짜 포맷 변환 (2025-05-30T11:55:00.000Z -> 2025년 5월 30일 20시 55분)
   String formatDeadline(String? isoString) {
     if (isoString == null || isoString.isEmpty) return '';
     try {
@@ -136,7 +166,6 @@ class _LatestPostsState extends State<LatestPosts> {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: GestureDetector(
                 onTap: () {
-                  // 게시글 클릭 시 플로팅 상세카드 다이얼로그로
                   showDialog(
                     context: context,
                     barrierDismissible: true,
@@ -175,7 +204,6 @@ class _LatestPostsState extends State<LatestPosts> {
                         ),
                       ),
                       SizedBox(height: 6),
-                      // 마감일 표기
                       if ((post['deadline'] ?? '').isNotEmpty)
                         Row(
                           children: [

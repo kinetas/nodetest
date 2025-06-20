@@ -13,6 +13,8 @@ dependencies:
   
   flutter_webrtc: 0.9.40 #WEB RTC
   
+  vibration: ^1.7.4
+  audioplayers: ^5.2.1
   openid_client: ^0.4.8
   uuid: ^4.3.1
   agora_rtc_engine: ^6.2.5

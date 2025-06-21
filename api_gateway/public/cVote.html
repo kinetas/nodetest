@@ -156,10 +156,12 @@
 
                 data.votes.forEach((vote) => {
                     const div = document.createElement("div");
+                    const utcDate = new Date(vote.vote_create_date);
+                    const kstDate = new Date(utcDate.getTime() + (9 * 60 * 60 * 1000));
                     div.innerHTML = `
                         <h3>${vote.c_title}</h3>
                         <p>${vote.c_contents}</p>
-                        <p>생성시간: ${vote.vote_create_date}</p>
+                        <p>생성시간: ${kstDate}</p>
                         <p>마감시간: ${vote.c_deletedate}</p>
                         <p>좋아요: ${vote.c_good} / 싫어요: ${vote.c_bad}</p>
                         <button onclick="viewVoteDetails('${vote.c_number}')">상세 보기</button>

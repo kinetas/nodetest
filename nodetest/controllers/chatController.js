@@ -141,17 +141,7 @@ exports.getLastMessage = async (r_id) => {
       order: [['send_date', 'DESC']]
     });
 
-    // return lastMessage;
-    return lastMessage.map(msg => {
-      const json = msg.toJSON();
-
-      // ✅ image가 존재하면 base64로 변환
-      if (json.image) {
-        json.image = Buffer.from(json.image).toString('base64');
-      }
-
-      return json;
-    });
+    return lastMessage;
   } catch (error) {
     console.error('❌ 마지막 메시지 가져오기 오류:', error);
     throw error;

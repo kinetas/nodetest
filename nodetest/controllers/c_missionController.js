@@ -14,6 +14,8 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨]
 const sequelize = require('../config/db');
 
+const CVote = require('../models/comunity_voteModel');
+
 //======================Token===============================
 
 exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
@@ -712,6 +714,51 @@ exports.getAllCommunity = async (req, res) => {
     } catch (error) {
         console.error('모든 커뮤니티 리스트 오류:', error);
         res.status(500).json({ message: '모든 커뮤니티 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// 커뮤니티 (미션, 투표, 일반, 인기) 최신 두 개 가져오기
+exports.getLastTwoCommunities = async (req, res) => {
+    try {
+        const roomData = await CRoom.findAll({
+            attributes: [
+                'cr_num',
+                'cr_title',
+                'contents',
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                'maded_time'
+            ],
+            order: [['maded_time', 'DESC']],
+            limit: 5
+        });
+
+        const voteData = await CVote.findAll({
+            attributes: [
+                ['c_number', 'cr_num'],
+                ['c_title', 'cr_title'],
+                ['c_contents', 'contents'],
+                [sequelize.literal(`'vote'`), 'community_type'], // 강제로 타입 표시
+                ['c_good', 'recommended_num'],
+                ['c_bad', 'hits'], // 투표에선 c_bad를 비유적 hits로
+                [sequelize.literal(`null`), 'cr_status'],
+                ['vote_create_date', 'maded_time']
+            ],
+            order: [['vote_create_date', 'DESC']],
+            limit: 5
+        });
+
+        // 통합 후 정렬
+        const combined = [...roomData, ...voteData]
+            .sort((a, b) => new Date(b.maded_time) - new Date(a.maded_time))
+            .slice(0, 2); // 최신 2개만
+
+        res.json({ latest: combined });
+    } catch (error) {
+        console.error('최신 커뮤니티 2개 불러오기 실패:', error);
+        res.status(500).json({ message: '최신 커뮤니티 목록을 불러오는 중 오류가 발생했습니다.' });
     }
 };
 

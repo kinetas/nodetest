@@ -112,6 +112,9 @@
 
     <button onclick="window.location.href='/ai'">AI</button>
 
+    <h2>최신 커뮤니티 글</h2>
+    <ul id="latestCommunityList">로딩 중...</ul>
+
     <script>
         const jwtToken = localStorage.getItem('jwt_token');
         console.log("jwt_token: ", jwtToken)
@@ -363,24 +366,51 @@
 
         //프로필 변경 요청
         const form = document.getElementById('profileImageForm');
-        form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const fileInput = document.getElementById('imageFile');
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
+            form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('imageFile');
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
 
-        const response = await fetch('/auth/api/user-info/chaingeProfileImage', {
-            method: 'POST',
+            const response = await fetch('/auth/api/user-info/chaingeProfileImage', {
+                method: 'POST',
+                headers: {
+                'Authorization': `Bearer ${jwtToken}`
+                },
+                body: formData
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            location.reload();
+        });
+
+        // ✅ 최신 커뮤니티 글 2개 가져오기
+        fetch('/nodetest/api/comumunity_missions/getLastTwoCommunities', {
             headers: {
-            'Authorization': `Bearer ${jwtToken}`
-            },
-            body: formData
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('latestCommunityList');
+            list.innerHTML = '';
+
+            (data.latest || []).forEach(item => {
+                const li = document.createElement('li');
+                if (item.type === 'room') {
+                    li.textContent = `[미션] ${item.cr_title} - 추천: ${item.recommended_num}, 조회수: ${item.hits}`;
+                } else if (item.type === 'vote') {
+                    li.textContent = `[투표] ${item.c_title} - 찬성: ${item.c_good}, 반대: ${item.c_bad}`;
+                }
+                list.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error('최신 커뮤니티 불러오기 오류:', err);
+            document.getElementById('latestCommunityList').textContent = '불러오기 실패';
         });
 
-        const result = await response.json();
-        alert(result.message);
-        location.reload();
-        });
     </script>
 </body>
 </html>

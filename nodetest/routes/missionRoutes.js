@@ -26,6 +26,7 @@ router.get('/missions/grantedAuthority', loginRequired, getMissionsWithGrantedAu
 router.get('/missions/selfRequested', loginRequired, getRequestedSelfMissions); //printmissionlist
 router.get('/missions/getCreateMissionNumber', loginRequired, getCreateMissionNumber); //printmissionlist
 router.get('/missions/getAssignedMissionNumber', loginRequired, getAssignedMissionNumber); //printmissionlist
+router.get('/missions/getMyRequestedMissions', loginRequired, getMyRequestedMissions); //printmissionlist
 
 router.post('/missioncreate', loginRequired, createMission); // dashboard
 router.delete('/missiondelete', loginRequired, deleteMission); //printmissionlist

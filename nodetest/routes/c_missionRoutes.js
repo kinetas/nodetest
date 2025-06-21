@@ -14,7 +14,6 @@ router.delete('/delete', loginRequired, c_missionController.deleteCommunityMissi
 router.get('/list', loginRequired, c_missionController.getCommunityMission);
 router.get('/getCommunityMissionSimple', loginRequired, c_missionController.getCommunityMissionSimple);
 router.get('/getMyCommunityMissions', loginRequired, c_missionController.getMyCommunityMissions);
-router.get('/getMyRequestedCommunityMissions', loginRequired, c_missionController.getMyRequestedCommunityMissions);
 
 // 일반 커뮤니티
 router.post('/createGeneralCommunity', loginRequired, upload.single('image'), c_missionController.createCommunity);

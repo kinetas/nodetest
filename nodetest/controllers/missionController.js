@@ -112,7 +112,8 @@ exports.createMission = async (req, res) => {
 
         // 마감기한이 과거인 경우 에러 반환
         const now = new Date();
-        if (new Date(m_deadline) < now) {
+        const deadline_true = new Date(new Date(m_deadline).getTime() - 9 * 60 * 60 * 1000); // ✅ KST → UTC 변환
+        if (deadline_true < now) {
             return res.status(400).json({
                 success: false,
                 message: '미션 마감기한은 현재 시간보다 이후여야 합니다.',
@@ -190,7 +191,7 @@ exports.createMission = async (req, res) => {
                     u1_id,
                     u2_id: assignedU2Id,    // 입력받은 u2_id 또는 u1_id를 저장
                     m_title,
-                    m_deadline,
+                    m_deadline: deadline_true,
                     m_reword,
                     m_status: '진행중',
                     r_id: room.r_id, // Room ID를 저장
@@ -255,7 +256,7 @@ exports.createMission = async (req, res) => {
                 u1_id,
                 u2_id: assignedU2Id,    // 입력받은 u2_id 또는 u1_id를 저장
                 m_title,
-                m_deadline,
+                m_deadline: deadline_true,
                 m_reword,
                 m_status: stat,
                 r_id: room.r_id, // Room ID를 저장
@@ -340,7 +341,7 @@ exports.createMission = async (req, res) => {
                 u1_id,
                 u2_id: assignedU2Id,    // 입력받은 u2_id 또는 u1_id를 저장
                 m_title,
-                m_deadline,
+                m_deadline: deadline_true,
                 m_reword,
                 m_status: stat,
                 r_id: room?.r_id || null, // Room ID를 저장

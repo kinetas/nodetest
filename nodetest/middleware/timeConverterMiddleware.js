@@ -40,7 +40,7 @@ const timeConverterMiddleware = (req, res, next) => {
             MRecommand: [],
             mResults: ['m_deadline'],
             RMessage: ['send_date'],
-            missions: ['m_deadline'],
+            missions: ['m_deadline', 'vote_create_date'],
             messages: ['send_date'],
             NotificationLog: [],
             rooms: [], // 시간 필드 없음

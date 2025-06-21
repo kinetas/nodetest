@@ -350,6 +350,20 @@ exports.createMission = async (req, res) => {
                 category,
             });
 
+            await Mission.create({
+                m_id: missionId,
+                u1_id: assignedU2Id,
+                u2_id: u1_id,    // 입력받은 u2_id 또는 u1_id를 저장
+                m_title,
+                m_deadline: deadline_true,
+                m_reword,
+                m_status: stat,
+                r_id: room?.r_id || null, // Room ID를 저장
+                m_extended: false,
+                missionAuthenticationAuthority: assignedU2Id,
+                category,
+            });
+
             // ================ 알림 추가 - 디바이스 토큰 =======================
             
             const sendMissionCreateNotification = await notificationController.sendMissionCreateNotification(

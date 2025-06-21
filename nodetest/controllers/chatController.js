@@ -133,8 +133,7 @@ exports.getMessages = async (r_id) => {
 
       // ✅ 이미지 URL이 존재할 경우, 전체 경로 붙이기
       if (json.image) {
-        const serverUrl = 'http://27.113.11.48:3000'; // ← 실제 API 서버 주소로 교체하세요
-        json.image = `${serverUrl}${json.image}`;
+        json.image = `data:${json.image_type || 'image/png'};base64,${Buffer.from(json.image).toString('base64')}`;
       }
 
       return json;

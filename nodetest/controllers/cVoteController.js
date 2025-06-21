@@ -30,6 +30,21 @@ exports.getVotes = async (req, res) => {
     }
 };
 
+exports.getVotesCNumber = async (req, res) => {
+    try {
+        const votes = await CVote.findAll({
+            attributes: [
+                'c_number'
+            ],
+            order: [[sequelize.literal("DATEDIFF(c_deletedate, CURDATE())"), "ASC"]]
+        });
+        res.json({ success: true, votes });
+    } catch (error) {
+        console.error("Error fetching votes:", error);
+        res.status(500).json({ success: false, message: "투표 정보를 가져오는데 실패했습니다." });
+    }
+};
+
 exports.getMyVotes = async (req, res) => {
     const u_id = req.currentUserId; // ✅ JWT에서 추출
     try {

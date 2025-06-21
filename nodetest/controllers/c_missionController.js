@@ -737,14 +737,12 @@ exports.getLastTwoCommunities = async (req, res) => {
 
         const voteData = await CVote.findAll({
             attributes: [
-                ['c_number', 'cr_num'],
-                ['c_title', 'cr_title'],
-                ['c_contents', 'contents'],
-                [sequelize.literal(`'vote'`), 'community_type'], // 강제로 타입 표시
-                ['c_good', 'recommended_num'],
-                ['c_bad', 'hits'], // 투표에선 c_bad를 비유적 hits로
-                [sequelize.literal(`null`), 'cr_status'],
-                ['vote_create_date', 'maded_time']
+                ['c_number'],
+                ['c_title'],
+                ['c_contents'],
+                ['c_good'],
+                ['c_bad'],
+                ['vote_create_date']
             ],
             order: [['vote_create_date', 'DESC']],
             limit: 5

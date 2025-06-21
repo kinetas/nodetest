@@ -33,14 +33,14 @@ const timeConverterMiddleware = (req, res, next) => {
             c_v_notdup: [],
             CComment: [],
             comunityRooms: ['deadline'], // 예시 필드
-            comunityVotes: ['c_deletedate'],
+            comunityVotes: ['c_deletedate', 'vote_create_date'],
             CWrite: [],
             iFriends: [], // 시간 필드 없음
             MRecoCount: [],
             MRecommand: [],
             mResults: ['m_deadline'],
             RMessage: ['send_date'],
-            missions: ['m_deadline', 'vote_create_date'],
+            missions: ['m_deadline'],
             messages: ['send_date'],
             NotificationLog: [],
             rooms: [], // 시간 필드 없음

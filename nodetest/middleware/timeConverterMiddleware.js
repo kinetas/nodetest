@@ -34,6 +34,7 @@ const timeConverterMiddleware = (req, res, next) => {
             CComment: [],
             comunityRooms: ['deadline'], // 예시 필드
             comunityVotes: ['c_deletedate', 'vote_create_date'],
+            CVote: ['c_deletedate', 'vote_create_date'],
             CWrite: [],
             iFriends: [], // 시간 필드 없음
             MRecoCount: [],

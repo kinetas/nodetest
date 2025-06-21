@@ -36,6 +36,15 @@ exports.getMyVotes = async (req, res) => {
     try {
         const myVotes = await CVote.findAll({
             where: { u_id },
+            attributes: [
+                'c_number',
+                'c_title',
+                'c_contents',          // DB 컬럼명이 'cr_contents'가 아닌 'contents'로 보임
+                'c_good',
+                'c_bad',
+                'recommended_num',
+                'vote_create_date'
+            ],
             order: [["c_deletedate", "DESC"]]
         });
         res.json({ success: true, myVotes });

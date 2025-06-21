@@ -720,43 +720,78 @@ exports.getAllCommunity = async (req, res) => {
 // 커뮤니티 (미션, 투표, 일반, 인기) 최신 두 개 가져오기
 exports.getLastTwoCommunities = async (req, res) => {
     try {
+        // 1. 최근 커뮤니티 미션 5개
         const roomData = await CRoom.findAll({
             attributes: [
                 'cr_num',
                 'cr_title',
-                'contents',
+                ['contents', 'cr_contents'],
                 'community_type',
                 'hits',
                 'recommended_num',
                 'cr_status',
-                'maded_time'
+                ['maded_time', 'created_at']
             ],
             order: [['maded_time', 'DESC']],
-            limit: 5
+            limit: 5,
+            raw: true
         });
 
+        // 2. 최근 커뮤니티 투표 5개
         const voteData = await CVote.findAll({
             attributes: [
-                ['c_number'],
-                ['c_title'],
-                ['c_contents'],
-                ['c_good'],
-                ['c_bad'],
-                ['vote_create_date']
+                ['c_number', 'c_number'],
+                ['c_title', 'c_title'],
+                ['c_contents', 'c_contents'],
+                ['c_good', 'c_good'],
+                ['c_bad', 'c_bad'],
+                ['vote_create_date', 'created_at']
             ],
             order: [['vote_create_date', 'DESC']],
-            limit: 5
+            limit: 5,
+            raw: true
         });
 
-        // 통합 후 정렬
-        const combined = [...roomData, ...voteData]
-            .sort((a, b) => new Date(b.maded_time) - new Date(a.maded_time))
-            .slice(0, 2); // 최신 2개만
+        // 3. 공통 created_at 기준으로 통합 후 최신 2개만 추출
+        const combined = [
+            ...roomData.map(item => ({ ...item, type: 'room' })),
+            ...voteData.map(item => ({ ...item, type: 'vote' }))
+        ]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 2);
 
-        res.json({ latest: combined });
+        // 4. 타입별로 필요한 필드만 선택적으로 전달
+        const result = combined.map(item => {
+            if (item.type === 'room') {
+                return {
+                    type: 'room',
+                    cr_num: item.cr_num,
+                    cr_title: item.cr_title,
+                    cr_contents: item.cr_contents,
+                    community_type: item.community_type,
+                    hits: item.hits,
+                    recommended_num: item.recommended_num,
+                    cr_status: item.cr_status,
+                    maded_time: item.created_at
+                };
+            } else {
+                return {
+                    type: 'vote',
+                    c_number: item.c_number,
+                    c_title: item.c_title,
+                    c_contents: item.c_contents,
+                    c_good: item.c_good,
+                    c_bad: item.c_bad,
+                    vote_create_date: item.created_at
+                };
+            }
+        });
+
+        res.json({ latest: result });
+
     } catch (error) {
-        console.error('최신 커뮤니티 2개 불러오기 실패:', error);
-        res.status(500).json({ message: '최신 커뮤니티 목록을 불러오는 중 오류가 발생했습니다.' });
+        console.error('최신 커뮤니티 가져오기 오류:', error);
+        res.status(500).json({ message: '최신 커뮤니티 목록을 불러오는 중 오류 발생' });
     }
 };
 

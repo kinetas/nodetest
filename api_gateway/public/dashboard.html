@@ -396,9 +396,14 @@
         .then(data => {
             const list = document.getElementById('latestCommunityList');
             list.innerHTML = '';
-            (data.latest || []).forEach(c => {
+
+            (data.latest || []).forEach(item => {
                 const li = document.createElement('li');
-                li.textContent = `[${c.community_type}] ${c.cr_title} - 추천수: ${c.recommended_num}, 조회수: ${c.hits}`;
+                if (item.type === 'room') {
+                    li.textContent = `[미션] ${item.cr_title} - 추천: ${item.recommended_num}, 조회수: ${item.hits}`;
+                } else if (item.type === 'vote') {
+                    li.textContent = `[투표] ${item.c_title} - 찬성: ${item.c_good}, 반대: ${item.c_bad}`;
+                }
                 list.appendChild(li);
             });
         })

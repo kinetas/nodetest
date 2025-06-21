@@ -394,6 +394,7 @@ try {
     message_contents: message_contents || '[이미지]', // 클라이언트에서 기본 메시지
     send_date: newMessage.send_date,//여기서 보낼 때 시간 뜸
     image: fileBuffer ? fileBuffer.toString('base64') : null, // Base64로 인코딩하여 클라이언트에 전송
+    image_type: image_type || 'image/png',
     is_read: newMessage.is_read,
   });
   console.log(`Sending message to room ${r_id}:`, {

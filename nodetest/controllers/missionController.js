@@ -277,20 +277,6 @@ exports.createMission = async (req, res) => {
                 missionAuthenticationAuthority: u1_id,
                 category,
             });
-            
-            await Mission.create({
-                m_id: uuidv4(),
-                u1_id: assignedU2Id,
-                u2_id: u1_id,
-                m_title,
-                m_deadline,
-                m_reword,
-                m_status: '진행중',
-                r_id: room.r_id, // Room ID를 저장
-                m_extended: false,
-                missionAuthenticationAuthority: assignedU2Id,
-                category,
-            });
 
             res.status(201).json({ success: true, message: '미션이 생성되었습니다.' });
         } else {

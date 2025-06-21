@@ -36,4 +36,7 @@ router.post('/recommendComment', loginRequired, c_missionController.recommendCom
 // 모든 커뮤니티
 router.get('/getAllCommunityList', loginRequired, c_missionController.getAllCommunity);
 
+// 커뮤니티 (미션, 투표, 일반, 인기) 최신 두 개 가져오기
+router.get('/getLastTwoCommunities', loginRequired, c_missionController.getLastTwoCommunities);
+
 module.exports = router;

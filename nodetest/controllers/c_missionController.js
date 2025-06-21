@@ -14,6 +14,8 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 const { Op } = require('sequelize'); // [추가됨]
 const sequelize = require('../config/db');
 
+const CVote = require('../models/comunity_voteModel');
+
 //======================Token===============================
 
 exports.deleteCommunityRoomAndRelatedData = async (cr_num) => {
@@ -257,6 +259,16 @@ exports.getCommunityMission = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
             where: { community_type: 'mission' },
+            attributes: [
+                'cr_num',
+                'cr_title',
+                'contents',          // DB 컬럼명이 'cr_contents'가 아닌 'contents'로 보임
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                'maded_time'
+            ],
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
         }); // 모든 커뮤니티 미션 가져오기
         res.json({ missions });
@@ -271,6 +283,16 @@ exports.getCommunityMissionSimple = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
             where: { community_type: 'mission' },
+            attributes: [
+                'cr_num',
+                'cr_title',
+                'contents',          // DB 컬럼명이 'cr_contents'가 아닌 'contents'로 보임
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                'maded_time'
+            ],
             order: [['deadline', 'ASC']],
         });
 
@@ -308,7 +330,9 @@ exports.getMyCommunityMissions = async (req, res) => {
             contents: shortenContent(m.contents, 100),
             cr_status: m.cr_status,
             deadline: m.deadline,
-            maded_time: m.maded_time
+            maded_time: m.maded_time,
+            hits: m.hits,
+            recommended_num: m.recommended_num
         }));
 
         res.json({ missions: missionList });
@@ -375,7 +399,8 @@ exports.printGeneralCommunity = async (req, res) => {
             hits: c.hits,
             recommended_num: c.recommended_num,
             maded_time: c.maded_time,
-            image: c.image ? c.image.toString('base64') : null
+            community_type: c.community_type,
+            cr_status: c.cr_status
         }));
 
         res.json({ communities: communityList });
@@ -396,11 +421,12 @@ exports.printGeneralCommunitySimple = async (req, res) => {
         const communityList = communities.map(c => ({
             cr_num: c.cr_num,
             cr_title: c.cr_title,
-            contents: shortenContent(c.contents, 100),
+            contents: c.contents,
             hits: c.hits,
             recommended_num: c.recommended_num,
             maded_time: c.maded_time,
-            image: c.image ? c.image.toString('base64') : null
+            community_type: c.community_type,
+            cr_status: c.cr_status
         }));
 
         res.json({ communities: communityList });
@@ -491,7 +517,8 @@ exports.getPopularyityCommunity = async (req, res) => {
             hits: c.hits,
             recommended_num: c.recommended_num,
             maded_time: c.maded_time,
-            image: c.image ? c.image.toString('base64') : null
+            community_type: c.community_type,
+            cr_status: c.cr_status
         }));
 
         res.json({ communities: communityList });
@@ -512,11 +539,12 @@ exports.getPopularyityCommunitySimple = async (req, res) => {
         const communityList = communities.map(c => ({
             cr_num: c.cr_num,
             cr_title: c.cr_title,
-            contents: shortenContent(c.contents, 100),
+            contents: c.contents,
             hits: c.hits,
             recommended_num: c.recommended_num,
             maded_time: c.maded_time,
-            image: c.image ? c.image.toString('base64') : null
+            community_type: c.community_type,
+            cr_status: c.cr_status
         }));
 
         res.json({ communities: communityList });
@@ -661,12 +689,100 @@ exports.recommendComment = async (req, res) => {
 exports.getAllCommunity = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
+            attributes: [
+                'cr_num',
+                'cr_title',
+                'contents',
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                'maded_time'
+            ],
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
         }); // 모든 커뮤니티 가져오기
         res.json({ missions });
     } catch (error) {
         console.error('모든 커뮤니티 리스트 오류:', error);
         res.status(500).json({ message: '모든 커뮤니티 리스트를 불러오는 중 오류가 발생했습니다.' });
+    }
+};
+
+// 커뮤니티 (미션, 투표, 일반, 인기) 최신 두 개 가져오기
+exports.getLastTwoCommunities = async (req, res) => {
+    try {
+        // 1. 최근 커뮤니티 미션 5개
+        const roomData = await CRoom.findAll({
+            attributes: [
+                'cr_num',
+                'cr_title',
+                ['contents', 'cr_contents'],
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                ['maded_time', 'created_at']
+            ],
+            order: [['maded_time', 'DESC']],
+            limit: 5,
+            raw: true
+        });
+
+        // 2. 최근 커뮤니티 투표 5개
+        const voteData = await CVote.findAll({
+            attributes: [
+                ['c_number', 'c_number'],
+                ['c_title', 'c_title'],
+                ['c_contents', 'c_contents'],
+                ['c_good', 'c_good'],
+                ['c_bad', 'c_bad'],
+                ['vote_create_date', 'created_at']
+            ],
+            order: [['vote_create_date', 'DESC']],
+            limit: 5,
+            raw: true
+        });
+
+        // 3. 공통 created_at 기준으로 통합 후 최신 2개만 추출
+        const combined = [
+            ...roomData.map(item => ({ ...item, type: 'room' })),
+            ...voteData.map(item => ({ ...item, type: 'vote' }))
+        ]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, 2);
+
+        // 4. 타입별로 필요한 필드만 선택적으로 전달
+        const result = combined.map(item => {
+            if (item.type === 'room') {
+                return {
+                    type: 'room',
+                    cr_num: item.cr_num,
+                    cr_title: item.cr_title,
+                    cr_contents: item.cr_contents,
+                    community_type: item.community_type,
+                    hits: item.hits,
+                    recommended_num: item.recommended_num,
+                    cr_status: item.cr_status,
+                    maded_time: item.created_at
+                };
+            } else {
+                return {
+                    type: 'vote',
+                    c_number: item.c_number,
+                    c_title: item.c_title,
+                    c_contents: item.c_contents,
+                    c_good: item.c_good,
+                    c_bad: item.c_bad,
+                    vote_create_date: item.created_at
+                };
+            }
+        });
+
+        res.json({ latest: result });
+
+    } catch (error) {
+        console.error('최신 커뮤니티 가져오기 오류:', error);
+        res.status(500).json({ message: '최신 커뮤니티 목록을 불러오는 중 오류 발생' });
     }
 };
 

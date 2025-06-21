@@ -13,6 +13,15 @@ const { v4: uuidv4, validate: uuidValidate } = require('uuid');
 exports.getVotes = async (req, res) => {
     try {
         const votes = await CVote.findAll({
+            attributes: [
+                'c_number',
+                'c_title',
+                'c_contents',          // DB 컬럼명이 'cr_contents'가 아닌 'contents'로 보임
+                'c_good',
+                'c_bad',
+                'recommended_num',
+                'vote_create_date'
+            ],
             order: [[sequelize.literal("DATEDIFF(c_deletedate, CURDATE())"), "ASC"]]
         });
         res.json({ success: true, votes });

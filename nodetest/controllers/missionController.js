@@ -198,20 +198,6 @@ exports.createMission = async (req, res) => {
                     missionAuthenticationAuthority,
                     category,
                 });
-                
-                await Mission.create({
-                    m_id: uuidv4(),
-                    u1_id: assignedU2Id,
-                    u2_id: u1_id,
-                    m_title,
-                    m_deadline,
-                    m_reword,
-                    m_status: '진행중',
-                    r_id: room.r_id, // Room ID를 저장
-                    m_extended: false,
-                    missionAuthenticationAuthority: assignedU2Id,
-                    category,
-                });
 
                 // ================ 알림 추가 - 디바이스 토큰 =======================
             

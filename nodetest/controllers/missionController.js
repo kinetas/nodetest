@@ -1364,6 +1364,7 @@ exports.requestVoteForMission = async (req, res) => {
             c_bad: 0,
             c_deletedate,
             c_image, // 사진 저장 (null일 수도 있음)
+            vote_create_date: new Date(),
         });
 
         res.json({ success: true, message: '투표가 성공적으로 생성되었습니다.', vote: newVote });

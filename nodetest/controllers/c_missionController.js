@@ -256,6 +256,16 @@ exports.getCommunityMission = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
             where: { community_type: 'mission' },
+            attributes: [
+                'cr_num',
+                'cr_title',
+                'contents',          // DB 컬럼명이 'cr_contents'가 아닌 'contents'로 보임
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                'maded_time'
+            ],
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
         }); // 모든 커뮤니티 미션 가져오기
         res.json({ missions });
@@ -307,7 +317,9 @@ exports.getMyCommunityMissions = async (req, res) => {
             contents: shortenContent(m.contents, 100),
             cr_status: m.cr_status,
             deadline: m.deadline,
-            maded_time: m.maded_time
+            maded_time: m.maded_time,
+            hits: m.hits,
+            recommended_num: m.recommended_num
         }));
 
         res.json({ missions: missionList });
@@ -373,7 +385,8 @@ exports.printGeneralCommunity = async (req, res) => {
             hits: c.hits,
             recommended_num: c.recommended_num,
             maded_time: c.maded_time,
-            image: c.image ? c.image.toString('base64') : null
+            community_type: c.community_type,
+            cr_status: c.cr_status
         }));
 
         res.json({ communities: communityList });
@@ -489,7 +502,8 @@ exports.getPopularyityCommunity = async (req, res) => {
             hits: c.hits,
             recommended_num: c.recommended_num,
             maded_time: c.maded_time,
-            image: c.image ? c.image.toString('base64') : null
+            community_type: c.community_type,
+            cr_status: c.cr_status
         }));
 
         res.json({ communities: communityList });
@@ -682,6 +696,16 @@ exports.recommendComment = async (req, res) => {
 exports.getAllCommunity = async (req, res) => {
     try {
         const missions = await CRoom.findAll({
+            attributes: [
+                'cr_num',
+                'cr_title',
+                'contents',
+                'community_type',
+                'hits',
+                'recommended_num',
+                'cr_status',
+                'maded_time'
+            ],
             order: [['deadline', 'ASC']], // deadline 기준 오름차순 정렬
         }); // 모든 커뮤니티 가져오기
         res.json({ missions });

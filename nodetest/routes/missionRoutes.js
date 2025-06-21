@@ -4,7 +4,8 @@ const router = express.Router();
 const { getUserMissions, getAssignedMissions, getCreatedMissions, getCompletedMissions, 
         getGivenCompletedMissions, getFriendAssignedMissions, getFriendCompletedMissions, getMissionsWithGrantedAuthority, 
         requestMissionApproval, createMission, deleteMission, successMission, failureMission, printRoomMission,
-        requestVoteForMission, getRequestedSelfMissions, getCreatedMissionsReq, getCreateMissionNumber, getAssignedMissionNumber  } = require('../controllers/missionController');
+        requestVoteForMission, getRequestedSelfMissions, getCreatedMissionsReq, getCreateMissionNumber, getAssignedMissionNumber,
+        getMyRequestedMissions  } = require('../controllers/missionController');
 
  const loginRequired = require('../middleware/loginRequired'); // ✅ JWT 인증 미들웨어
 

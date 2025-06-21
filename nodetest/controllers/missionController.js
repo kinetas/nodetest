@@ -622,6 +622,48 @@ exports.getGivenCompletedMissions = async (req, res) => {
     }
 };
 
+// 미션 인증 요청 받은 미션들 가져오기
+exports.getMyRequestedMissions = async (req, res) => {
+    try {
+        const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용
+
+        // 1. 자신이 부여한 미션 가져오기
+        const createdMissions = await Mission.findAll({
+            where: {
+                u1_id: userId, // 미션을 부여한 사용자
+                u2_id: { [Op.ne]: userId }, // 자신에게 부여한 미션은 제외
+                m_status: '요청', // "요청"인 미션만
+            },
+        });
+
+        // 2. 각 미션에 대해 Room 테이블에서 r_title 가져오기
+        const missionsWithRoomTitle = await Promise.all(
+            createdMissions.map(async (mission) => {
+                const room = await Room.findOne({
+                    where: { r_id: mission.r_id },
+                });
+
+                return {
+                    m_id: mission.m_id,
+                    m_title: mission.m_title,
+                    m_deadline: mission.m_deadline,
+                    m_status: mission.m_status,
+                    r_id: mission.r_id,
+                    r_title: room ? room.r_title : '없음',
+                    u1_id: mission.u1_id,
+                    u2_id: mission.u2_id,
+                };
+            })
+        );
+
+        // 3. 결과 응답
+        res.json({ missions: missionsWithRoomTitle });
+    } catch (error) {
+        console.error('인증 요청받은 미션 조회 오류:', error);
+        res.status(500).json({ message: '인증 요청받은 미션을 불러오는데 실패했습니다.' });
+    }
+};
+
 // ====== 1. 친구가 수행해야 하는 미션 ======
 exports.getFriendAssignedMissions = async (req, res) => {
     const userId = req.currentUserId; // ✅ JWT에서 추출한 사용자 ID 사용

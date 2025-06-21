@@ -342,37 +342,6 @@ exports.getMyCommunityMissions = async (req, res) => {
     }
 };
 
-// 로그인한 유저가 생성한 커뮤니티 미션 목록 조회
-exports.getMyRequestedCommunityMissions = async (req, res) => {
-    const u_id = req.currentUserId;
-
-    try {
-        const myMissions = await CRoom.findAll({
-            where: {
-                u_id,
-                community_type: 'mission',
-                cr_status: '요청중'
-            },
-            order: [['maded_time', 'DESC']]
-        });
-
-        const missionList = myMissions.map(m => ({
-            cr_num: m.cr_num,
-            cr_title: m.cr_title,
-            contents: shortenContent(m.contents, 100),
-            deadline: m.deadline,
-            maded_time: m.maded_time,
-            hits: m.hits,
-            recommended_num: m.recommended_num
-        }));
-
-        res.json({ missions: missionList });
-    } catch (error) {
-        console.error('내 커뮤니티 미션 조회 오류:', error);
-        res.status(500).json({ message: '내 커뮤니티 미션 조회 중 오류 발생' });
-    }
-};
-
 //============일반===============
 
 // 일반 커뮤니티 생성 함수

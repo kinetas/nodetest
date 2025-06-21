@@ -111,6 +111,9 @@
     <button onclick="deleteAccountToken()">계정 탈퇴</button> <!-- 추가: 계정 탈퇴 버튼 -->
 
     <button onclick="window.location.href='/ai'">AI</button>
+
+    <h2>최신 커뮤니티 글</h2>
+    <ul id="latestCommunityList">로딩 중...</ul>
     
 
     <script>
@@ -381,6 +384,27 @@
         const result = await response.json();
         alert(result.message);
         location.reload();
+        });
+
+        // ✅ 최신 커뮤니티 글 2개 가져오기
+        fetch('/nodetest/api/comumunity_missions/getLastTwoCommunities', {
+            headers: {
+                'Authorization': `Bearer ${jwtToken}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('latestCommunityList');
+            list.innerHTML = '';
+            (data.latest || []).forEach(c => {
+                const li = document.createElement('li');
+                li.textContent = `[${c.community_type}] ${c.cr_title} - 추천수: ${c.recommended_num}, 조회수: ${c.hits}`;
+                list.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error('최신 커뮤니티 불러오기 오류:', err);
+            document.getElementById('latestCommunityList').textContent = '불러오기 실패';
         });
     </script>
 </body>

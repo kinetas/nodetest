@@ -340,7 +340,7 @@ exports.getMyRequestedCommunityMissions = async (req, res) => {
             where: {
                 u_id,
                 community_type: 'mission',
-                m_status: '요청중'
+                m_status: '요청'
             },
             order: [['maded_time', 'DESC']]
         });

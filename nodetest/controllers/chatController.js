@@ -124,6 +124,11 @@ exports.getMessages = async (r_id) => {
         json.image = Buffer.from(json.image).toString('base64');
       }
 
+      // ✅ message_contents가 없고 image가 있는 경우 "[이미지]"로 대체
+      if (!json.message_contents && json.image) {
+        json.message_contents = "[이미지]";
+      }
+
       return json;
     });
 

@@ -754,7 +754,10 @@ exports.getLastTwoCommunities = async (req, res) => {
 
         // 3. 공통 created_at 기준으로 통합 후 최신 2개만 추출
         const combined = [
-            ...roomData.map(item => ({ ...item, type: 'room' })),
+            ...roomData.map(item => {
+                const type = item.community_type === 'mission' ? 'room_mission' : 'room_general';
+                return { ...item, type };
+            }),
             ...voteData.map(item => ({ ...item, type: 'vote' }))
         ]
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -762,9 +765,9 @@ exports.getLastTwoCommunities = async (req, res) => {
 
         // 4. 타입별로 필요한 필드만 선택적으로 전달
         const result = combined.map(item => {
-            if (item.type === 'room') {
+            if (item.type === 'room_mission' || item.type === 'room_general') {
                 return {
-                    type: 'room',
+                    type: item.type,
                     cr_num: item.cr_num,
                     cr_title: item.cr_title,
                     cr_contents: item.cr_contents,

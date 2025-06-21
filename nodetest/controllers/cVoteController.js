@@ -56,7 +56,6 @@ exports.getMyVotes = async (req, res) => {
                 'c_contents',          // DB 컬럼명이 'cr_contents'가 아닌 'contents'로 보임
                 'c_good',
                 'c_bad',
-                'recommended_num',
                 'vote_create_date'
             ],
             order: [["c_deletedate", "DESC"]]

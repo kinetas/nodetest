@@ -151,6 +151,12 @@ exports.getLastMessage = async (r_id) => {
       json.image = Buffer.from(json.image).toString('base64');
     }
 
+    // ✅ message_contents가 없고 image가 있는 경우 "[이미지]"로 대체
+    if (!json.message_contents && json.image) {
+      json.message_contents = "[이미지]";
+    }
+
+
     return json;
   } catch (error) {
     console.error('❌ 마지막 메시지 가져오기 오류:', error);

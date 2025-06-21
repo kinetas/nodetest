@@ -512,5 +512,3 @@ server.listen(3001, () => {
 
 // // io, sendMessage, server 내보내기
 // module.exports = { io, sendMessage, server };
-
-socket.emit('messageSent', { success: true, m_id: newMessage.m_id });

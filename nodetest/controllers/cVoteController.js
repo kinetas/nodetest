@@ -18,6 +18,7 @@ exports.getVotes = async (req, res) => {
                 'c_contents',
                 'c_good',
                 'c_bad',
+                'c_deletedate',
                 'vote_create_date'
             ],
             order: [[sequelize.literal("DATEDIFF(c_deletedate, CURDATE())"), "ASC"]]
@@ -55,6 +56,7 @@ exports.getMyVotes = async (req, res) => {
                 'c_contents',
                 'c_good',
                 'c_bad',
+                'c_deletedate',
                 'vote_create_date'
             ],
             order: [["c_deletedate", "DESC"]]

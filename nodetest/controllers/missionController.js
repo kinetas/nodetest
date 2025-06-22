@@ -351,7 +351,7 @@ exports.createMission = async (req, res) => {
             });
 
             await Mission.create({
-                m_id: missionId,
+                m_id: uuidv4(),
                 u1_id: assignedU2Id,
                 u2_id: u1_id,    // 입력받은 u2_id 또는 u1_id를 저장
                 m_title,

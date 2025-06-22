@@ -1,6 +1,7 @@
+import 'package:capstone_1_project/SessionTokenManager.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // JSON 파싱용
-import '../../SessionCookieManager.dart';
+import '../../../SessionCookieManager.dart';
 
 class AchievementPanel extends StatefulWidget {
   final VoidCallback onClose;
@@ -46,14 +47,14 @@ class _AchievementPanelState extends State<AchievementPanel> {
     try {
       // URL 및 파라미터 매핑
       Map<String, Map<String, String>> urlsAndKeys = {
-        '일일': {'url': 'http://27.113.11.48:3000/nodetest/result/daily', 'key': 'dailyRate'},
-        '주간': {'url': 'http://27.113.11.48:3000/nodetest/result/weekly', 'key': 'weeklyRate'},
-        '월간': {'url': 'http://27.113.11.48:3000/nodetest/result/monthly', 'key': 'monthlyRate'},
-        '연간': {'url': 'http://27.113.11.48:3000/nodetest/result/yearly', 'key': 'yearlyRate'},
+        '일일': {'url': 'http://13.125.65.151:3000/nodetest/result/daily', 'key': 'dailyRate'},
+        '주간': {'url': 'http://13.125.65.151:3000/nodetest/result/weekly', 'key': 'weeklyRate'},
+        '월간': {'url': 'http://13.125.65.151:3000/nodetest/result/monthly', 'key': 'monthlyRate'},
+        '연간': {'url': 'http://13.125.65.151:3000/nodetest/result/yearly', 'key': 'yearlyRate'},
       };
 
       for (var period in achievementPeriods) {
-        final response = await SessionCookieManager.get(urlsAndKeys[period]!['url']!);
+        final response = await SessionTokenManager.get(urlsAndKeys[period]!['url']!);
 
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);

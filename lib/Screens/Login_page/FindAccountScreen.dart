@@ -126,7 +126,7 @@ class _FindAccountScreenState extends State<FindAccountScreen> {
       return;
     }
 
-    final url = Uri.parse('http://27.113.11.48:3000/auth/api/auth/findUid');
+    final url = Uri.parse('http://13.125.65.151:3000/auth/api/auth/findUid');
     final body = {
       "name": name,
       "nickname": nickname,

@@ -20,7 +20,7 @@
 //   }
 //
 //   Future<void> fetchVotes() async {
-//     final url = 'http://27.113.11.48:3000/nodetest/api/cVote/';
+//     final url = 'http://13.125.65.151:3000/nodetest/api/cVote/';
 //
 //     try {
 //       final response = await SessionTokenManager.get(url); // ✅ 변경됨

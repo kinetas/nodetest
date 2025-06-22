@@ -1,7 +1,6 @@
-import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:http/http.dart' as http;
-import 'SessionTokenManager.dart';
+
 
 class DeviceTokenManager {
   static final DeviceTokenManager _instance = DeviceTokenManager._internal();

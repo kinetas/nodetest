@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'Home/HomeScreen.dart';
 import 'Chat/MainChatScreen.dart';
-import 'Mission/MissionScreen.dart';
+import 'Mission/NewMissionScreen/MissionScreen.dart';
 import 'NewCommunity/CommunityScreen.dart';
 import 'Profile/ProfileScreenMain.dart';
-import '../Screens/Login_page/LoginScreen.dart';
+import 'Login_page/LoginScreen.dart';
 import '../SessionTokenManager.dart';
 
 class MainScreen extends StatefulWidget {

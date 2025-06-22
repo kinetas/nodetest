@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:capstone_1_project/Screens/Mission/NewMissionScreen/SelectCreateMission.dart';
 
-// ChatBotAI_widget.dart
 class ChatBotAIWidget extends StatelessWidget {
   final String message;
   final bool isUser;
-  final VoidCallback? onAddPressed;
+  final bool isLoading; // ✅ AI 응답 로딩 상태
   final VoidCallback? onRetryPressed;
+  final VoidCallback? onTapAdd;
 
   const ChatBotAIWidget({
     super.key,
     required this.message,
     required this.isUser,
-    this.onAddPressed,
+    this.isLoading = false, // 기본값 false
     this.onRetryPressed,
+    this.onTapAdd,
   });
 
   @override
@@ -26,7 +28,7 @@ class ChatBotAIWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: isUser ? Colors.blue[600] : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 offset: Offset(1, 2),
@@ -40,43 +42,54 @@ class ChatBotAIWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  message,
+                  isLoading ? "AI가 답변을 생성 중이에요…" : message,
                   style: TextStyle(
                     color: isUser ? Colors.white : Colors.black87,
                     fontSize: 15,
+                    fontStyle: isLoading ? FontStyle.italic : FontStyle.normal,
                   ),
                 ),
-                if (!isUser && (onAddPressed != null || onRetryPressed != null)) ...[
+                if (!isUser && !isLoading) ...[
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      if (onAddPressed != null)
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: onAddPressed,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              foregroundColor: Colors.white,
-                            ),
-                            child: Text("이 미션 추가하기"),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: onTapAdd ?? () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => SelectCreateMission(
+                                  initialTitle: message,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.add_task),
+                          label: const Text("미션 추가"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
                           ),
                         ),
-                      if (onRetryPressed != null)
+                      ),
+                      if (onRetryPressed != null) ...[
                         const SizedBox(width: 8),
-                      if (onRetryPressed != null)
                         Expanded(
-                          child: OutlinedButton(
+                          child: OutlinedButton.icon(
                             onPressed: onRetryPressed,
+                            icon: const Icon(Icons.refresh),
+                            label: const Text("다시 생성"),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.blue,
-                              side: BorderSide(color: Colors.blue),
+                              side: const BorderSide(color: Colors.blue),
                             ),
-                            child: Text("다시 생성하기"),
                           ),
                         ),
+                      ],
                     ],
-                  )
-                ]
+                  ),
+                ],
               ],
             ),
           ),

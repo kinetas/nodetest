@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import '../Mission/MyMission/MyMissionList.dart'; // MyMissionList import
-import '../Mission/RequestedMissionList.dart'; // RequestedMissionList import
-import '../Mission/GiveMissionList.dart'; // GiveMissionList import
-import '../Mission/MyMission/MyCompleteMissionList.dart'; // MyCompleteMissionList import
+import '../Mission/NewMissionScreen/MyMissionList.dart'; // MyMissionList import
+import '../Mission/NewMissionScreen/RequestedMissionList.dart'; // RequestedMissionList import
+import '../Mission/NewMissionScreen/GiveMissionList.dart'; // GiveMissionList import
+import '../Mission/NewMissionScreen/MyCompleteMissionList.dart'; // MyCompleteMissionList import
 
 class ChatPlusButton extends StatelessWidget {
   final Map<String, dynamic> roomData; // roomData 전달받기

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../Camera&Photo/CameraMain.dart';
+import '../../../Camera&Photo/CameraMain.dart';
 
 class MissionVerificationScreen extends StatefulWidget {
   final String rId;
@@ -7,7 +7,7 @@ class MissionVerificationScreen extends StatefulWidget {
   final String u2Id;
   final String mId;
   final String missionAuthenticationAuthority;
-  final String? voteM; // 선택적 파라미터 (null 가능)
+  final String? voteM; // 선택적 파라미터
 
   MissionVerificationScreen({
     required this.rId,
@@ -27,11 +27,21 @@ class _MissionVerificationScreenState extends State<MissionVerificationScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToCameraScreen(); // 카메라 화면으로 자동 이동
+    _navigateToCameraScreen(); // 자동 이동
   }
 
   Future<void> _navigateToCameraScreen() async {
-    await Future.delayed(Duration(milliseconds: 500)); // 짧은 대기 시간 추가
+    await Future.delayed(Duration(milliseconds: 500)); // 로딩 대기
+
+    // 📤 디버깅 출력
+    print('📸 [MissionVerificationScreen → CameraScreen]');
+    print('rId: ${widget.rId}');
+    print('u1Id: ${widget.u1Id}');
+    print('u2Id: ${widget.u2Id}');
+    print('mId: ${widget.mId}');
+    print('missionAuthenticationAuthority: ${widget.missionAuthenticationAuthority}');
+    print('voteM: ${widget.voteM}');
+
     if (mounted) {
       Navigator.pushReplacement(
         context,
@@ -57,7 +67,7 @@ class _MissionVerificationScreenState extends State<MissionVerificationScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // 뒤로가기
+            Navigator.pop(context); // 뒤로 가기
           },
         ),
       ),
@@ -65,7 +75,7 @@ class _MissionVerificationScreenState extends State<MissionVerificationScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(), // 로딩 표시
+            CircularProgressIndicator(),
             SizedBox(height: 16),
             Text("카메라를 로딩 중입니다..."),
           ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'GiveMissionList.dart'; // 부여한 미션 목록
-import 'RequestedMissionList.dart'; // 부여한 미션 중 완료된 목록
+import 'NewMissionScreen/GiveMissionList.dart'; // 부여한 미션 목록
+import 'NewMissionScreen/RequestedMissionList.dart'; // 부여한 미션 중 완료된 목록
 
 class OtherMission extends StatefulWidget {
   @override
@@ -8,17 +8,17 @@ class OtherMission extends StatefulWidget {
 }
 
 class _OtherMissionState extends State<OtherMission> with SingleTickerProviderStateMixin {
-  late TabController _tabController; // TabController 초기화
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this); // 2개의 탭
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabController.dispose(); // TabController 해제
+    _tabController.dispose();
     super.dispose();
   }
 
@@ -26,47 +26,37 @@ class _OtherMissionState extends State<OtherMission> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           '부여한 미션',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: const IconThemeData(color: Colors.black),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white70,
-          indicatorColor: Colors.white,
+          labelColor: Colors.blue, // 선택된 탭의 글자 색상
+          unselectedLabelColor: Colors.black54, // 선택되지 않은 탭 글자 색상
+          indicatorColor: Colors.blue, // 선택 탭 아래 포인트 색상
           indicatorWeight: 3,
-          tabs: [
+          tabs: const [
             Tab(
-              text: '인증 요청 미션',
-              icon: Icon(Icons.check_circle_outline), // 두 번째 탭 아이콘
+              text: '인증 요청이 온 미션',
+              icon: Icon(Icons.check_circle_outline),
             ),
             Tab(
-              text: '부여한 미션',
-              icon: Icon(Icons.list_alt), // 첫 번째 탭 아이콘
+              text: '상대방 미션',
+              icon: Icon(Icons.list_alt),
             ),
-
           ],
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.lightBlue.shade100, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: TabBarView(
-          controller: _tabController,
-          children: [
-
-            RequestedMissionScreen(), // 부여한 미션 중 완료된 탭 연결
-            GiveMissionList(), // 부여한 미션 탭 연결
-          ],
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          RequestedMissionScreen(),
+          GiveMissionList(),
+        ],
       ),
     );
   }

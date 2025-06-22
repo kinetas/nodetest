@@ -31,7 +31,7 @@ class _CommunityPostDialogState extends State<CommunityPostDialog> {
   }
 
   Future<void> fetchPostContent() async {
-    final url = 'http://27.113.11.48:3000/nodetest/api/comumunity_missions/list';
+    final url = 'http://13.125.65.151:3000/nodetest/api/comumunity_missions/list';
     try {
       final response = await SessionTokenManager.get(url);
       if (response.statusCode == 200) {

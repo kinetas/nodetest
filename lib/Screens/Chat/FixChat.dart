@@ -1,110 +1,116 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import '../../SessionTokenManager.dart'; // ✅ Token 기반
+import '../../SessionTokenManager.dart';
 
-class FixChat extends StatelessWidget {
-  final String u2Id;
-  final String rType;
+class FixChat {
+  static void show(
+      BuildContext context, {
+        required String u2Id,
+        required String rType,
+        void Function()? onUpdated,
+      }) {
+    final nameCtrl = TextEditingController();
+    bool isEditing = false;
 
-  FixChat({required this.u2Id, required this.rType});
-
-  Future<void> _renameRoom(BuildContext context) async {
-    final TextEditingController _renameController = TextEditingController();
-
-    await showDialog(
+    showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('방 이름 수정'),
-        content: TextField(
-          controller: _renameController,
-          decoration: InputDecoration(hintText: '새로운 방 이름 입력'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final newName = _renameController.text.trim();
-              if (newName.isEmpty) return;
+      barrierDismissible: true,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text('채팅방 관리'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('상대 ID: $u2Id'),
+                  SizedBox(height: 8),
+                  Text('채팅방 타입: $rType'),
+                  if (isEditing) ...[
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: nameCtrl,
+                      decoration: InputDecoration(
+                        hintText: '새로운 채팅방 이름',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    if (!isEditing) {
+                      setState(() => isEditing = true);
+                    } else {
+                      final newName = nameCtrl.text.trim();
+                      if (newName.isEmpty) return;
 
-              final url = 'http://27.113.11.48:3000/nodetest/api/rooms/rename';
-              final body = json.encode({
-                'u2_id': u2Id,
-                'r_type': rType,
-                'new_title': newName,
-              });
+                      final url = 'http://13.125.65.151:3000/nodetest/api/rooms/update';
+                      final body = json.encode({
+                        'u2_id': u2Id,
+                        'r_type': rType,
+                        'newRoomName': newName,
+                      });
 
-              final response = await SessionTokenManager.post(url, body: body);
+                      SessionTokenManager.put(url, body: body).then((resp) {
+                        Navigator.pop(context);
+                        final msg = json.decode(resp.body)['message'] ?? '응답 없음';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(resp.statusCode == 200 ? '이름이 변경되었습니다' : '실패: $msg')),
+                        );
+                        if (resp.statusCode == 200 && onUpdated != null) onUpdated();
+                      });
+                    }
+                  },
+                  child: Text(isEditing ? '확인' : '이름 수정', style: TextStyle(color: Colors.blue)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text('정말 삭제하시겠습니까?'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('취소')),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: Text('삭제', style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    );
 
-              if (response.statusCode == 200) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('방 이름이 수정되었습니다.')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('수정 실패: ${response.statusCode}')),
-                );
-              }
-              Navigator.pop(context); // 닫기
-              Navigator.pop(context); // FixChat 닫기
-            },
-            child: Text('수정'),
-          ),
-        ],
-      ),
-    );
-  }
+                    if (confirmed != true) return;
 
-  Future<void> _deleteRoom(BuildContext context) async {
-    final url = 'http://27.113.11.48:3000/nodetest/api/rooms/delete';
-    final body = json.encode({
-      'u2_id': u2Id,
-      'r_type': rType,
-    });
+                    final url = 'http://13.125.65.151:3000/nodetest/api/rooms/$u2Id/$rType';
+                    final resp = await SessionTokenManager.delete(url, body: json.encode({
+                      'u2_id': u2Id,
+                      'r_type': rType,
+                    }));
 
-    final response = await SessionTokenManager.delete(url, body: body);
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('방이 삭제되었습니다.')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('삭제 실패: ${response.statusCode}')),
-      );
-    }
-    Navigator.pop(context); // FixChat 닫기
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text("채팅방 관리"),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('상대방 아이디: $u2Id'),
-          Text('방 타입: $rType'),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () => _renameRoom(context),
-            child: Text('방 이름 수정'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            onPressed: () => _deleteRoom(context),
-            child: Text('방 삭제'),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('닫기'),
-        ),
-      ],
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(resp.statusCode == 200 ? '방이 삭제되었습니다.' : '삭제 실패: ${resp.statusCode}')),
+                    );
+                    if (resp.statusCode == 200 && onUpdated != null) {
+                      onUpdated();
+                    }
+                  },
+                  child: Text('삭제', style: TextStyle(color: Colors.red)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('닫기'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

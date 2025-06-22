@@ -34,11 +34,18 @@ class _PhotoWaterMarkState extends State<PhotoWaterMark> {
   @override
   void initState() {
     super.initState();
-    print("PhotoWaterMark에서 받은 경로: ${widget.imagePath}");
-    print("PhotoWaterMark에서 받은 missionAuthenticationAuthority: ${widget.missionAuthenticationAuthority}");
-    print("PhotoWaterMark에서 받은 u1Id: ${widget.u1Id}");
-    print("PhotoWaterMark에서 받은 u2Id: ${widget.u2Id}");
-    _applyPolaroidEffect(widget.imagePath); // 전달받은 경로로 폴라로이드 효과 적용
+
+    // 📸 디버깅 로그 — 모든 파라미터 출력
+    print("📸 [PhotoWaterMark 시작]");
+    print("📷 imagePath: ${widget.imagePath}");
+    print("🆔 rId: ${widget.rId}");
+    print("👤 u1Id: ${widget.u1Id}");
+    print("👥 u2Id: ${widget.u2Id}");
+    print("🎯 mId: ${widget.mId}");
+    print("🔐 missionAuthenticationAuthority: ${widget.missionAuthenticationAuthority}");
+    print("🗳️ voteM: ${widget.voteM}");
+
+    _applyPolaroidEffect(widget.imagePath);
   }
 
   Future<void> _applyPolaroidEffect(String imagePath) async {

@@ -14,7 +14,7 @@ import 'firebase_options.dart';
 import 'screens/Login_page/StartLogin_screen.dart';
 import 'screens/ScreenMain.dart';
 import 'screens/Login_page/FindAccountScreen.dart';
-import 'WebRTC/NewWebRTC/Call.dart';
+
 import 'WebRTC/NewWebRTC/RingScreen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -42,27 +42,30 @@ void main() async {
 
   runApp(MyApp());
 }
-
 void _handleFCMClick(RemoteMessage message) {
   final data = message.data;
-  final fromId = data['fromId'] ?? 'unknown';
-  final toId = data['toId'] ?? 'unknown';
+  final type = data['type'] ?? 'chat';
 
-  navigatorKey.currentState?.push(
-    MaterialPageRoute(
-      builder: (_) => RingScreen(
-        callerId: fromId,
-        myId: toId,
+  if (type == 'call' || type == 'incoming_call') {
+    final fromId = data['fromId'] ?? 'unknown';
+    final toId = data['toId'] ?? 'unknown';
+
+    navigatorKey.currentState?.push(
+      MaterialPageRoute(
+        builder: (_) => RingScreen(
+          callerId: fromId,
+          myId: toId,
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 void _sendSignalingMessage(String type, String from, String to) async {
   final token = await SessionTokenManager.getToken();
   if (token == null) return;
 
-  final channel = WebSocketChannel.connect(Uri.parse('ws://27.113.11.48:3005'));
+  final channel = WebSocketChannel.connect(Uri.parse('ws://:3005'));
 
   final authMessage = {
     'type': 'auth',
@@ -124,18 +127,23 @@ class _MyAppState extends State<MyApp> {
         );
       }
 
-      final fromId = message.data['fromId'] ?? 'unknown';
-      final toId = message.data['toId'] ?? 'unknown';
+      final data = message.data;
+      final type = data['type'] ?? 'chat';
 
-      if (navigatorKey.currentContext != null) {
-        navigatorKey.currentState?.push(
-          MaterialPageRoute(
-            builder: (_) => RingScreen(
-              callerId: fromId,
-              myId: toId,
+      if (type == 'call' || type == 'incoming_call') {
+        final fromId = data['fromId'] ?? 'unknown';
+        final toId = data['toId'] ?? 'unknown';
+
+        if (navigatorKey.currentContext != null) {
+          navigatorKey.currentState?.push(
+            MaterialPageRoute(
+              builder: (_) => RingScreen(
+                callerId: fromId,
+                myId: toId,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     });
 
@@ -181,7 +189,7 @@ class _MyAppState extends State<MyApp> {
       final accessToken = params['access_token'];
       if (accessToken != null) {
         final jwtRes = await http.get(
-          Uri.parse("http://27.113.11.48:3000/nodetest/api/auth/issueJwtFromKeycloak"),
+          Uri.parse("http://13.125.65.151:3000/nodetest/api/auth/issueJwtFromKeycloak"),
           headers: {"Authorization": "Bearer $accessToken"},
         );
         if (jwtRes.statusCode == 200) {

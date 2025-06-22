@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../Mission/AchievementPanel_screen.dart';
+import '../Mission/NewMissionScreen/AchievementPanel_screen.dart';
 import '../CalendarScreen/WeeklyCalendarScreen.dart';
 import '../Friends/FriendListWidget.dart';
 import '../CalendarScreen/MonthlyCalendarScreen.dart';
 import '../NewCommunity/LatestPostList.dart';
-import '../Mission/MyMission/MyMissionList.dart';
+import '../Mission/NewMissionScreen/MyMissionList.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onNavigateToCommunity;
@@ -25,6 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _onRefresh() async {
+    // 🔄 새로고침 시 WeeklyCalendar와 친구목록, 최신글 등 필요한 상태 초기화
+    setState(() {
+      _selectedDate = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Color primaryColor = Colors.lightBlue;
@@ -32,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // ✅ 뒤로가기 버튼 제거
+        automaticallyImplyLeading: false,
         title: Text(
           '홈 화면',
           style: TextStyle(
@@ -48,68 +55,66 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: backgroundColor,
       body: Stack(
         children: [
-          NestedScrollView(
-            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-              return [
-                SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ✅ 주간 캘린더
-                      WeeklyCalendar(
-                        onAddPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MonthlyCalendarScreen()),
-                          );
-                        },
-                        onGraphPressed: _toggleAchievementPanel,
-                        onDateSelected: (selected) {
-                          setState(() {
-                            _selectedDate = selected;
-                          });
-                        },
-                      ),
-
-                      // ✅ 드롭다운 영역 (선택된 날짜의 미션)
-                      if (_selectedDate != null)
-                        AnimatedSwitcher(
-                          duration: Duration(milliseconds: 300),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: MyMissionList(
-                                key: ValueKey(_selectedDate),
-                                selectedDate: _selectedDate,
+          RefreshIndicator(
+            onRefresh: _onRefresh,
+            edgeOffset: 0,
+            displacement: 50,
+            child: NestedScrollView(
+              physics: const AlwaysScrollableScrollPhysics(), // 🔄 필수: 안 내려가도 refresh 가능
+              headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                return [
+                  SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        WeeklyCalendar(
+                          onAddPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MonthlyCalendarScreen()),
+                            );
+                          },
+                          onGraphPressed: _toggleAchievementPanel,
+                          onDateSelected: (selected) {
+                            setState(() {
+                              _selectedDate = selected;
+                            });
+                          },
+                        ),
+                        if (_selectedDate != null)
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 6,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: MyMissionList(
+                                  key: ValueKey(_selectedDate),
+                                  selectedDate: _selectedDate,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-
-                      SizedBox(height: 20),
-
-                      // ✅ 최신 게시글
-                      LatestPosts(
-                        onNavigateToCommunity: widget.onNavigateToCommunity,
-                      ),
-                      SizedBox(height: 20),
-                    ],
+                        const SizedBox(height: 20),
+                        LatestPosts(onNavigateToCommunity: widget.onNavigateToCommunity),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
-                ),
-              ];
-            },
-            body: FriendListWidget(),
+                ];
+              },
+              body: FriendListWidget(),
+            ),
           ),
 
           // ✅ 성취도 패널

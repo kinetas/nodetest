@@ -26,7 +26,7 @@ class _CreateFreeState extends State<CreateFree> {
   }
 
   Future<void> _submit() async {
-    final uri = Uri.parse('http://27.113.11.48:3000/nodetest/api/comumunity_missions/createGeneralCommunity');
+    final uri = Uri.parse('http://13.125.65.151:3000/nodetest/api/comumunity_missions/createGeneralCommunity');
     final request = http.MultipartRequest('POST', uri);
 
     final token = await SessionTokenManager.getToken();

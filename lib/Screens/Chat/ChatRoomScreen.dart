@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import '../../SessionTokenManager.dart'; // ✅ 토큰 매니저 import
+import '../../SessionTokenManager.dart';
 import 'ChatContent.dart';
 import 'ChatPlusButton.dart';
+
 
 class ChatRoomScreen extends StatefulWidget {
   final Map<String, dynamic> roomData;
@@ -30,6 +31,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   void dispose() {
+    print('🧹 소켓 연결 해제 및 컨트롤러 dispose');
     socket.disconnect();
     socket.dispose();
     _messageController.dispose();
@@ -41,16 +43,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     print('🔐 JWT Token for Socket: $token');
 
     socket = IO.io(
-      'http://27.113.11.48:3001',
+      'http://13.125.65.151:3000/',
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .setAuth({'token': token})
+          .setPath('/socket.io')
           .build(),
     );
 
     socket.onConnect((_) {
-      print('✅ Socket connected');
+      print('✅ [Socket] Connected');
+      print('📡 joinRoom emit: r_id=${widget.roomData['r_id']}, u2_id=${widget.roomData['u2_id']}');
       socket.emit('joinRoom', {
         'r_id': widget.roomData['r_id'],
         'u2_id': widget.roomData['u2_id'],
@@ -58,11 +62,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     });
 
     socket.onDisconnect((_) {
-      print('⚠️ Socket disconnected');
+      print('⚠️ [Socket] Disconnected');
+    });
+
+    socket.onConnectError((error) {
+      print('❌ [Socket] Connect Error: $error');
+    });
+
+    socket.onError((error) {
+      print('❌ [Socket] Error: $error');
     });
 
     socket.on('receiveMessage', (data) {
-      print('📥 Message received: $data');
+      print('📥 [Socket] Message received from server: $data');
       _chatContentKey.currentState?.addMessage(data);
     });
 
@@ -71,24 +83,43 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   void _sendMessage({String? base64Image, String? imageType}) {
     final messageContent = _messageController.text.trim();
-    if (messageContent.isEmpty && base64Image == null) return;
+    final hasText = messageContent.isNotEmpty;
+    final hasImage = base64Image != null;
+
+    print('📝 [Message] Preparing to send...');
+    print('🔎 message: "$messageContent"');
+    print('🔎 base64Image: ${base64Image != null ? "YES (${base64Image.length} chars)" : "NO"}');
+    print('🔎 imageType: $imageType');
+
+    if (!hasText && !hasImage) {
+      print('⚠️ [Message] No content to send (text or image required)');
+      return;
+    }
 
     final messageData = {
       'r_id': widget.roomData['r_id'],
       'u2_id': widget.roomData['u2_id'],
-      if (messageContent.isNotEmpty) 'message_contents': messageContent,
-      if (base64Image != null) 'image': base64Image,
+      if (hasText) 'message_contents': messageContent,
+      if (hasImage) 'image': base64Image,
       if (imageType != null) 'image_type': imageType,
     };
 
-    print('📤 Sending message: $messageData');
-    socket.emit('sendMessage', messageData);
+    print('📤 [Socket] Emitting sendMessage: $messageData');
+
+    if (socket.connected) {
+      socket.emit('sendMessage', messageData);
+      print('✅ [Socket] sendMessage emitted');
+    } else {
+      print('❌ [Socket] Not connected — sendMessage emit failed');
+    }
+
     _messageController.clear();
   }
 
   void _togglePlusOptions() {
     setState(() {
       _showPlusOptions = !_showPlusOptions;
+      print('➕ [UI] Plus options ${_showPlusOptions ? "shown" : "hidden"}');
     });
   }
 
@@ -139,7 +170,10 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 ),
                 IconButton(
                   icon: Icon(Icons.send, color: Colors.lightBlue),
-                  onPressed: _sendMessage,
+                  onPressed: () {
+                    print('📨 [UI] Send button clicked');
+                    _sendMessage();
+                  },
                 ),
               ],
             ),

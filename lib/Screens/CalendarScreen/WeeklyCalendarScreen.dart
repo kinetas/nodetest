@@ -1,18 +1,19 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import '../../SessionTokenManager.dart';
 
 class WeeklyCalendar extends StatefulWidget {
-  final VoidCallback onAddPressed;
-  final VoidCallback onGraphPressed;
+  final VoidCallback? onAddPressed;
+  final VoidCallback? onGraphPressed;
   final void Function(DateTime?)? onDateSelected;
+  final bool hideTopButtons; // ✅ 추가: 상단 버튼 숨길지 여부
 
   WeeklyCalendar({
-    required this.onAddPressed,
-    required this.onGraphPressed,
+    this.onAddPressed,
+    this.onGraphPressed,
     this.onDateSelected,
+    this.hideTopButtons = false, // 기본값은 false
   });
 
   @override
@@ -39,7 +40,7 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
   }
 
   Future<void> fetchAssignedMissions() async {
-    final url = 'http://27.113.11.48:3000/nodetest/api/missions/missions/assigned';
+    final url = 'http://13.125.65.151:3000/nodetest/api/missions/missions/assigned';
 
     try {
       final response = await SessionTokenManager.get(url);
@@ -131,22 +132,23 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.refresh, color: primaryColor),
-                    onPressed: _goToToday,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.bar_chart, color: primaryColor),
-                    onPressed: widget.onGraphPressed,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.add, color: primaryColor),
-                    onPressed: widget.onAddPressed,
-                  ),
-                ],
-              ),
+              if (!widget.hideTopButtons) // ✅ 조건적으로 버튼 표시
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: primaryColor),
+                      onPressed: _goToToday,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.bar_chart, color: primaryColor),
+                      onPressed: widget.onGraphPressed,
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add, color: primaryColor),
+                      onPressed: widget.onAddPressed,
+                    ),
+                  ],
+                ),
             ],
           ),
           SizedBox(height: 8),
@@ -214,8 +216,7 @@ class _WeeklyCalendarState extends State<WeeklyCalendar> {
                                 fontWeight: FontWeight.bold,
                                 color: isSelected
                                     ? Colors.white
-                                    : (date.weekday ==
-                                    DateTime.sunday
+                                    : (date.weekday == DateTime.sunday
                                     ? Colors.red
                                     : date.weekday ==
                                     DateTime.saturday

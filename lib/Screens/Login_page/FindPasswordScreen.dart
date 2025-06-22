@@ -1,3 +1,4 @@
+import 'package:capstone_1_project/SessionTokenManager.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../SessionCookieManager.dart'; // 세션 쿠키 관리
@@ -15,7 +16,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final passwordRegex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
 
   Future<void> _resetPassword(BuildContext context) async {
-    final uri = Uri.parse("http://27.113.11.48:3000/auth/api/auth/changePassword");
+    final uri = Uri.parse("http://13.125.65.151:3000/auth/api/auth/changePassword");
 
     if (newPasswordController.text != confirmPasswordController.text) {
       _showDialog("오류", "비밀번호가 일치하지 않습니다.");
@@ -33,7 +34,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         "newPassword": newPasswordController.text,
       };
 
-      final response = await SessionCookieManager.post(
+      final response = await SessionTokenManager.post(
         uri.toString(),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(requestData),

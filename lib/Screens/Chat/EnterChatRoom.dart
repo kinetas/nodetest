@@ -24,12 +24,12 @@ class _EnterChatRoomState extends State<EnterChatRoom> {
   Future<void> enterChatRoom() async {
     try {
       final token = await SessionTokenManager.getToken();
-      final url = 'http://27.113.11.48:3000/nodetest/api/rooms/enter';
+      final url = 'http://13.125.65.151:3000/nodetest/api/rooms/enter';
       final body = {
+
         'r_id': widget.roomData['r_id'], // 전달받은 room 데이터에서 r_id 가져오기
         'u2_id': widget.roomData['u2_id'], // 전달받은 room 데이터에서 u2_id 가져오기
       };
-
       print('📤 [방 입장 요청] $body');
       final response = await SessionTokenManager.post(
         url,

@@ -28,7 +28,7 @@ class _PhotoVoteUploadState extends State<PhotoVoteUpload> {
     setState(() => isUploading = true);
 
     final dio = Dio();
-    final url = 'http://27.113.11.48:3000/nodetest/api/missions/missionVote';
+    final url = 'http://13.125.65.151:3000/nodetest/api/missions/missionVote';
 
     try {
       final token = await SessionTokenManager.getToken();

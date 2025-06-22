@@ -47,7 +47,7 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
-    _stopCall(); // 리소스 정리
+    _stopCall();
     super.dispose();
   }
 
@@ -61,7 +61,6 @@ class _CallScreenState extends State<CallScreen> {
     if (_disposed) return;
     _disposed = true;
 
-    print('📴 통화 종료');
     _callTimer?.cancel();
 
     await _peerConnection?.close();
@@ -83,7 +82,6 @@ class _CallScreenState extends State<CallScreen> {
   Future<void> _initRenderers() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    print('📷 렌더러 초기화 완료');
   }
 
   Future<String> _getJwtToken() async {
@@ -95,13 +93,11 @@ class _CallScreenState extends State<CallScreen> {
   void _connectSignaling() async {
     final token = await _getJwtToken();
 
-    print('🌐 WebSocket 연결 중...');
     _channel = WebSocketChannel.connect(Uri.parse('ws://27.113.11.48:3005'));
     _channel.sink.add(json.encode({'type': 'auth', 'token': token}));
 
     _channel.stream.listen((data) async {
       final msg = json.decode(data);
-      print('📩 수신 메시지: $msg');
       switch (msg['type']) {
         case 'offer':
           await _handleOffer(msg['sdp']);
@@ -113,33 +109,19 @@ class _CallScreenState extends State<CallScreen> {
           await _handleCandidate(msg['candidate']);
           break;
         case 'accept_call':
-          print('📞 상대방이 수락했습니다.');
           await _createAndSendOffer();
           _startCallTimer();
           break;
         case 'call_rejected':
-          print('📵 상대방이 전화를 거절했습니다.');
-          if (mounted) {
-            await _stopCall(notify: false);
-            Navigator.pop(context);
-            await Future.delayed(const Duration(milliseconds: 300));
-            _showDialog('통화 종료', '상대방이 전화를 거절했습니다.');
-          }
-          break;
         case 'leave':
-          print('📴 상대방이 통화를 종료했습니다.');
           if (mounted) {
             await _stopCall(notify: false);
-            Navigator.pop(context);
-            await Future.delayed(const Duration(milliseconds: 300));
-            _showDialog('통화 종료', '상대방이 통화를 종료했습니다.');
+            if (Navigator.canPop(context)) Navigator.pop(context);
+            _showDialog('통화 종료',
+                msg['type'] == 'call_rejected' ? '상대방이 거절했습니다.' : '상대방이 종료했습니다.');
           }
           break;
       }
-    }, onDone: () {
-      print('🛑 signaling closed');
-    }, onError: (e) {
-      print('❌ signaling error: $e');
     });
 
     await _setupWebRTC();
@@ -220,25 +202,18 @@ class _CallScreenState extends State<CallScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(); // AlertDialog만 닫기
-              },
-              child: const Text('확인'),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('확인'))],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -246,36 +221,51 @@ class _CallScreenState extends State<CallScreen> {
           Positioned.fill(child: RTCVideoView(_remoteRenderer)),
           Positioned(
             top: 40,
-            right: 20,
-            child: SizedBox(
-              width: 120,
-              height: 160,
-              child: RTCVideoView(_localRenderer, mirror: true),
-            ),
-          ),
-          Positioned(
-            top: 40,
             left: 20,
             child: Text(
               '⏱️ ${_formatDuration(_callDuration)}',
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: FloatingActionButton(
-              backgroundColor: Colors.red,
-              child: const Icon(Icons.call_end),
-              onPressed: () async {
-                await _stopCall();
-                if (mounted) {
-                  Navigator.pop(context);
-                  await Future.delayed(const Duration(milliseconds: 300));
-                  _showDialog('통화 종료', '통화를 종료했습니다.');
-                }
-              },
+          Positioned(
+            right: 20,
+            top: 40,
+            child: Container(
+              width: size.width * 0.3,
+              height: size.height * 0.2,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white70),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: RTCVideoView(_localRenderer, mirror: true),
+              ),
             ),
           ),
+          Positioned(
+            bottom: 60,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.call_end, color: Colors.white),
+                label: Text('통화 종료', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+                onPressed: () async {
+                  await _stopCall();
+                  if (mounted) {
+                    Navigator.pop(context);
+                    _showDialog('통화 종료', '통화를 종료했습니다.');
+                  }
+                },
+              ),
+            ),
+          )
         ],
       ),
     );

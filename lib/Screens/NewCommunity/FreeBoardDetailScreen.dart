@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 import '../../SessionTokenManager.dart';
+import 'Comment.dart';
 
 class FreeBoardDetailScreen extends StatefulWidget {
   final String crNum;
-
   const FreeBoardDetailScreen({super.key, required this.crNum});
 
   @override
@@ -16,6 +17,10 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
   bool isAuthor = false;
   Map<String, dynamic>? post;
   bool isLoading = true;
+  bool hasRecommended = false;
+  int commentCount = 0;
+
+  final TextEditingController _commentController = TextEditingController();
 
   @override
   void initState() {
@@ -33,10 +38,10 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('http://27.113.11.48:3000/nodetest/api/comumunity_missions/getOneCommunity'),
+      Uri.parse('http://13.125.65.151:3000/nodetest/api/comumunity_missions/getOneCommunity'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token', // ✅ 추가
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode({'cr_num': widget.crNum}),
     );
@@ -45,6 +50,7 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
       final data = jsonDecode(response.body)['communities'];
       setState(() {
         post = data;
+        hasRecommended = false;
         isLoading = false;
       });
     } else {
@@ -55,16 +61,12 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
   }
 
   Future<void> recommendPost() async {
+    if (hasRecommended) return;
     final token = await SessionTokenManager.getToken();
-    if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('로그인이 필요합니다.')),
-      );
-      return;
-    }
+    if (token == null) return;
 
     final response = await http.post(
-      Uri.parse('http://27.113.11.48:3000/nodetest/api/comumunity_missions/recommendCommunity'),
+      Uri.parse('http://13.125.65.151:3000/nodetest/api/comumunity_missions/recommendCommunity'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -74,24 +76,38 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
 
     final result = jsonDecode(response.body);
     if (response.statusCode == 200 && result['success'] == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message'] ?? '추천 완료!')),
-      );
-      fetchPostDetail();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('추천 실패: ${result['message'] ?? response.statusCode}')),
-      );
+      setState(() {
+        hasRecommended = true;
+        post!['recommended_num'] = (post!['recommended_num'] ?? 0) + 1;
+      });
     }
+  }
+
+  void updateCommentCount(int count) {
+    setState(() {
+      commentCount = count;
+    });
+  }
+
+  void showImageDialog(Uint8List imageBytes) {
+    showDialog(
+      context: context,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: InteractiveViewer(
+            child: Image.memory(imageBytes, fit: BoxFit.contain),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     if (isLoading || post == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('자유게시판')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -101,50 +117,52 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
         foregroundColor: Colors.black,
         elevation: 1,
         leading: const BackButton(),
-        actions: [
-          if (isAuthor)
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.more_vert),
-            ),
-        ],
       ),
       body: Column(
         children: [
-          _buildPostDetail(),
-          const Divider(height: 1),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [_buildComment()],
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildPostDetail(),
+                  const SizedBox(height: 20),
+                  Divider(height: 32, color: Colors.grey[300]),
+                  Text('댓글 $commentCount개', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  CommentSection(
+                    crNum: widget.crNum,
+                    onCommentCountChanged: updateCommentCount,
+                  ),
+                ],
+              ),
             ),
           ),
-          _buildBottomInputBar(),
+          _buildCommentInputBar(),
         ],
       ),
     );
   }
 
   Widget _buildPostDetail() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildAuthorRow(),
-          const SizedBox(height: 12),
-          Text(
-            post?['cr_title'] ?? '',
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(post?['contents'] ?? ''),
-          const SizedBox(height: 12),
-          if (post?['image'] != null)
-            Container(
-              height: 180,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildAuthorRow(),
+        const SizedBox(height: 12),
+        Text(post?['cr_title'] ?? '', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Text(post?['contents'] ?? '', style: const TextStyle(fontSize: 16)),
+        const SizedBox(height: 12),
+        if (post?['image'] != null)
+          GestureDetector(
+            onTap: () => showImageDialog(base64Decode(post!['image'])),
+            child: Container(
+              height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
                 color: Colors.grey[300],
                 image: DecorationImage(
                   image: MemoryImage(base64Decode(post!['image'])),
@@ -152,82 +170,51 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
                 ),
               ),
             ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.thumb_up_alt_outlined),
-                onPressed: recommendPost,
-              ),
-              const Icon(Icons.notifications_none),
-              const Icon(Icons.bookmark_border),
-            ],
           ),
-        ],
-      ),
+      ],
     );
   }
 
   Widget _buildAuthorRow() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.grey[300],
-          child: const Icon(Icons.person),
-        ),
+        const CircleAvatar(backgroundColor: Colors.grey, child: Icon(Icons.person)),
         const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(post?['u_id'] ?? '유저', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(
-              '${(post?['maded_time'] ?? '').toString().split("T")[0]} · 조회 ${post?['hits']} · 추천 ${post?['recommended_num']}',
-              style: const TextStyle(fontSize: 12),
-            ),
-          ],
+        Expanded(
+          child: Text(post?['u_id'] ?? '유저', style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
-      ],
-    );
-  }
-
-  Widget _buildComment() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 12),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(radius: 14, backgroundColor: Colors.grey[300]),
+            Text(
+              '${(post?['maded_time'] ?? '').toString().split("T")[0]}',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
             const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('유저 닉네임', style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4),
-                  Text('댓글 내용'),
-                  SizedBox(height: 4),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('추천 00', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                      Text('04/14 11:12', style: TextStyle(fontSize: 12, color: Colors.grey)),
-                    ],
+            Text('조회 ${post?['hits'] ?? 0}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: recommendPost,
+              child: Row(
+                children: [
+                  Icon(
+                    hasRecommended ? Icons.favorite : Icons.favorite_border,
+                    size: 16,
+                    color: hasRecommended ? Colors.red : Colors.grey,
                   ),
+                  const SizedBox(width: 4),
+                  Text('${post?['recommended_num'] ?? 0}',
+                      style: const TextStyle(fontSize: 12, color: Colors.grey)),
                 ],
               ),
             ),
-            const Icon(Icons.more_vert, size: 16, color: Colors.grey),
           ],
         ),
-        const SizedBox(height: 12),
       ],
     );
   }
 
-  Widget _buildBottomInputBar() {
+  Widget _buildCommentInputBar() {
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -236,19 +223,25 @@ class _FreeBoardDetailScreenState extends State<FreeBoardDetailScreen> {
         ),
         child: Row(
           children: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
-            const Expanded(
+            Expanded(
               child: TextField(
-                decoration: InputDecoration(
+                controller: _commentController,
+                decoration: const InputDecoration(
                   hintText: '댓글을 입력하세요',
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.lightBlue),
                 ),
               ),
             ),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.send, color: Colors.lightBlue),
+              icon: const Icon(Icons.send, color: Colors.blue),
+              onPressed: () async {
+                FocusScope.of(context).unfocus();
+                final text = _commentController.text.trim();
+                if (text.isNotEmpty) {
+                  await CommentSection.sendCommentExternally(text, widget.crNum);
+                  _commentController.clear();
+                }
+              },
             ),
           ],
         ),

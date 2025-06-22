@@ -30,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
 
       if (idToken != null) {
         final response = await SessionTokenManager.post(
-          'http://27.113.11.48:3000/auth/api/auth/logoutToken',
+          'http://13.125.65.151:3000/auth/api/auth/logoutToken',
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'idToken': idToken}),
         );

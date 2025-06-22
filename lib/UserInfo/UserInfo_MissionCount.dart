@@ -35,10 +35,10 @@ class UserInfoMissionCount {
 
     // 4개 API 비동기 호출
     final responses = await Future.wait([
-      http.get(Uri.parse('http://27.113.11.48:3000/nodetest/result/success-count'), headers: headers),
-      http.get(Uri.parse('http://27.113.11.48:3000/nodetest/result/fail-count'), headers: headers),
-      http.get(Uri.parse('http://27.113.11.48:3000/nodetest/dashboard/missions/getCreateMissionNumber'), headers: headers),
-      http.get(Uri.parse('http://27.113.11.48:3000/nodetest/dashboard/missions/getAssignedMissionNumber'), headers: headers),
+      http.get(Uri.parse('http://13.125.65.151:3000/nodetest/result/success-count'), headers: headers),
+      http.get(Uri.parse('http://13.125.65.151:3000/nodetest/result/fail-count'), headers: headers),
+      http.get(Uri.parse('http://13.125.65.151:3000/nodetest/dashboard/missions/getCreateMissionNumber'), headers: headers),
+      http.get(Uri.parse('http://13.125.65.151:3000/nodetest/dashboard/missions/getAssignedMissionNumber'), headers: headers),
     ]);
 
     // 각 응답 본문에서 값 추출

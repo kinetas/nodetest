@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import '../SessionTokenManager.dart'; // ✅ 세션 토큰 기반 요청 처리
 
 class UserInfoId {
-  final String apiUrl = "http://27.113.11.48:3000/auth/api/user-info/user-id";
+  final String apiUrl = "http://13.125.65.151:3000/auth/api/user-info/user-id";
+
 
   // u_id 값을 가져오는 메서드
   Future<String?> fetchUserId() async {
@@ -29,7 +30,7 @@ class UserInfoId {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData != null && responseData['userId'] != null) {
-          return responseData['userId'];
+          return responseData['userId'] ?? responseData['u_id'];
         } else {
           throw Exception("userId not found in the response.");
         }

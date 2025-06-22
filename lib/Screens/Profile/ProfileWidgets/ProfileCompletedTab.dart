@@ -20,7 +20,7 @@ class _ProfileCompletedTabState extends State<ProfileCompletedTab> {
   Future<void> fetchCompletedMissions() async {
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/api/missions/missions/completed',
+        'http://13.125.65.151:3000/nodetest/api/missions/missions/completed',
       );
 
       if (response.statusCode == 200) {

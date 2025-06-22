@@ -4,17 +4,29 @@ import 'package:http/http.dart' as http;
 import '../../SessionTokenManager.dart';
 
 class CreateRecruit extends StatefulWidget {
+  final String? initialTitle;
+  final String? initialCategory; // ✅ 추가
+
+  const CreateRecruit({Key? key, this.initialTitle, this.initialCategory}) : super(key: key);
+
   @override
   _CreateRecruitState createState() => _CreateRecruitState();
 }
 
 class _CreateRecruitState extends State<CreateRecruit> {
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+  late final TextEditingController _titleController;
+  final TextEditingController _contentController = TextEditingController();
   String? _selectedCategory;
   DateTime? _selectedDate;
 
   final List<String> _categories = ['운동', '공부', '습관', '식단'];
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.initialTitle ?? '');
+    _selectedCategory = widget.initialCategory; // ✅ 초기 카테고리 설정
+  }
 
   Future<void> _submit() async {
     final title = _titleController.text.trim();
@@ -31,7 +43,7 @@ class _CreateRecruitState extends State<CreateRecruit> {
       return;
     }
 
-    final url = Uri.parse('http://27.113.11.48:3000/nodetest/api/comumunity_missions/create');
+    final url = Uri.parse('http://13.125.65.151:3000/nodetest/api/comumunity_missions/create');
     final response = await http.post(
       url,
       headers: {
@@ -49,7 +61,7 @@ class _CreateRecruitState extends State<CreateRecruit> {
     final result = jsonDecode(response.body);
 
     if (response.statusCode == 200 && result['success'] == true) {
-      Navigator.pop(context);
+      Navigator.pop(context, true);
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('작성 실패: ${result['message'] ?? '오류'}')));

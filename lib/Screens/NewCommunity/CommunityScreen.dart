@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'dart:convert';
 import '../../SessionTokenManager.dart';
 import 'CreateRecruit.dart';
@@ -41,7 +41,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
 
   Future<void> fetchGeneralPosts() async {
     final response = await SessionTokenManager.get(
-      'http://27.113.11.48:3000/nodetest/api/comumunity_missions/printGeneralCommunityList',
+      'http://13.125.65.151:3000/nodetest/api/comumunity_missions/printGeneralCommunityList',
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body)['communities'];
@@ -64,7 +64,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
 
   Future<void> fetchRecruitPosts() async {
     final response = await SessionTokenManager.get(
-      'http://27.113.11.48:3000/nodetest/api/comumunity_missions/list',
+      'http://13.125.65.151:3000/nodetest/api/comumunity_missions/list',
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body)['missions'];
@@ -88,21 +88,24 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
 
   Future<void> fetchVotePosts() async {
     final response = await SessionTokenManager.get(
-      'http://27.113.11.48:3000/nodetest/api/cVote',
+      'http://13.125.65.151:3000/nodetest/api/cVote',
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body)['votes'];
       setState(() {
-        votePosts = data.map<Map<String, dynamic>>((item) => {
-          'c_number': item['c_number'],
-          'title': item['c_title'],
-          'content': item['c_contents'],
-          'category': '미션투표',
-          'time': _formatTime(item['c_deletedate']),
-          'likes': item['c_good'] ?? 0,
-          'dislikes': item['c_bad'] ?? 0,
-          'hits': 0,
-          'timestamp': DateTime.tryParse(item['c_deletedate'] ?? '') ?? DateTime.now(),
+        votePosts = data.map<Map<String, dynamic>>((item) {
+          final rawTime = item['maded_time'] ?? item['vote_create_date'] ?? item['c_deletedate'];
+          return {
+            'c_number': item['c_number'],
+            'title': item['c_title'],
+            'content': item['c_contents'],
+            'category': '미션투표',
+            'time': _formatTime(rawTime),
+            'likes': item['c_good'] ?? 0,
+            'dislikes': item['c_bad'] ?? 0,
+            'hits': 0,
+            'timestamp': DateTime.tryParse(rawTime ?? '') ?? DateTime.now(),
+          };
         }).toList();
       });
     } else {
@@ -112,7 +115,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
 
   Future<void> fetchPopularPosts() async {
     final response = await SessionTokenManager.get(
-      'http://27.113.11.48:3000/nodetest/api/comumunity_missions/getpopularyityCommunityList',
+      'http://13.125.65.151:3000/nodetest/api/comumunity_missions/getpopularyityCommunityList',
     );
     if (response.statusCode == 200) {
       final data = json.decode(response.body)['communities'];
@@ -137,75 +140,85 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     final time = DateTime.tryParse(iso ?? '');
     if (time == null) return '';
     final diff = DateTime.now().difference(time);
+    if (diff.inSeconds < 0) return '방금 전';
+    if (diff.inMinutes < 1) return '방금 전';
     if (diff.inMinutes < 60) return '${diff.inMinutes}분 전';
     if (diff.inHours < 24) return '${diff.inHours}시간 전';
     return '${diff.inDays}일 전';
   }
 
   Widget _buildPostTile(Map<String, dynamic> post) {
-    Widget? extra;
-    if (post['category'] == '미션구인') {
-      extra = Row(
-          children: [
-            Icon(Icons.people_outline, size: 14),
-            Text(' ${post['people']}', style: TextStyle(fontSize: 12))
-          ]
+    final bool isRecruit = post['category'] == '미션구인';
+    final bool isVote = post['category'] == '미션투표';
+
+    Widget? extraInfo;
+    if (isRecruit) {
+      extraInfo = Row(
+        children: [
+          Icon(Icons.people_alt_outlined, size: 14, color: Colors.grey),
+          SizedBox(width: 4),
+          Text('${post['people']}', style: TextStyle(fontSize: 12, color: Colors.black54)),
+        ],
       );
-    } else if (post['category'] == '미션투표') {
-      extra = Row(
-          children: [
-            Text('찬성 ${post['likes']}', style: TextStyle(fontSize: 12, color: Colors.cyan)),
-            SizedBox(width: 8),
-            Text('반대 ${post['dislikes']}', style: TextStyle(fontSize: 12, color: Colors.red)),
-          ]
+    } else if (isVote) {
+      extraInfo = Row(
+        children: [
+          Text('👍 ${post['likes']}', style: TextStyle(fontSize: 12, color: Colors.black87)),
+          SizedBox(width: 8),
+          Text('👎 ${post['dislikes']}', style: TextStyle(fontSize: 12, color: Colors.black87)),
+        ],
       );
     }
 
-    return ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        title: Text(post['title'] ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
+    return InkWell(
+      onTap: () {
+        if (isRecruit) {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => MissionRecruitDetailScreen(crNum: post['cr_num'])));
+        } else if (isVote) {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => MissionVoteDetailScreen(cNum: post['c_number'])));
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => FreeBoardDetailScreen(crNum: post['cr_num'])));
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(post['content'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+            Text(
+              post['title'] ?? '',
+              style: TextStyle(fontSize: 15.5, fontWeight: FontWeight.w600, color: Colors.black),
+            ),
             SizedBox(height: 6),
+            Text(
+              post['content'] ?? '',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 13.5, color: Colors.black87),
+            ),
+            SizedBox(height: 8),
             Row(
               children: [
-                Text(
-                    '조회 ${post['hits']}  |  추천 ${post['likes']}  |  ${post['category']}  | ',
-                    style: TextStyle(fontSize: 12)
-                ),
-                if (extra != null) extra,
+                if (!isVote)
+                  Text(
+                    '${post['category']} • 조회 ${post['hits']} • 추천 ${post['likes']}',
+                    style: TextStyle(fontSize: 12.0, color: Colors.grey[600]),
+                  ),
+                if (extraInfo != null) ...[
+                  if (!isVote) SizedBox(width: 10),
+                  extraInfo,
+                ],
                 Spacer(),
-                Text(post['time'], style: TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(
+                  post['time'],
+                  style: TextStyle(fontSize: 12.0, color: Colors.grey[500]),
+                ),
               ],
-            )
+            ),
+            Divider(height: 20, thickness: 0.7, color: Colors.grey[200]),
           ],
         ),
-        onTap: () {
-          if (post['category'] == '미션구인') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MissionRecruitDetailScreen(crNum: post['cr_num']),
-              ),
-            );
-          } else if (post['category'] == '미션투표') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MissionVoteDetailScreen(cNum: post['c_number']),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => FreeBoardDetailScreen(crNum: post['cr_num']),
-              ),
-            );
-          }
-        }
+      ),
     );
   }
 

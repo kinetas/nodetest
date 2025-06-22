@@ -40,7 +40,7 @@ class _CreateVoteState extends State<CreateVote> {
       return;
     }
 
-    final uri = Uri.parse('http://27.113.11.48:3000/nodetest/api/cVote/create');
+    final uri = Uri.parse('http://13.125.65.151:3000/nodetest/api/cVote/create');
     final request = http.MultipartRequest('POST', uri);
     request.headers['Authorization'] = 'Bearer $token';
 

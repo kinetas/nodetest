@@ -21,7 +21,7 @@ class _ProfileInProgressTabState extends State<ProfileInProgressTab> {
   Future<void> fetchProgressingMissions() async {
     try {
       final response = await SessionTokenManager.get(
-        'http://27.113.11.48:3000/nodetest/api/missions/missions/assigned',
+        'http://13.125.65.151:3000/nodetest/api/missions/missions/assigned',
       );
 
       if (response.statusCode == 200) {

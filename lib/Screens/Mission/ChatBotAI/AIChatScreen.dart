@@ -24,7 +24,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
     }
 
     final response = await http.post(
-      Uri.parse("http://27.113.11.48:3000/ai/recommend"),
+      Uri.parse("http://13.125.65.151:3000/ai/recommend"),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

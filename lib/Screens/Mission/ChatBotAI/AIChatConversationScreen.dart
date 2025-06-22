@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../../SessionTokenManager.dart';
-import 'ChatBotAI_widget.dart'; // ✅ 말풍선 위젯 import
+import 'ChatBotAI_widget.dart';
+import '../NewMissionScreen/SelectCreateMission.dart';
 
 class AIChatConversationScreen extends StatefulWidget {
   @override
@@ -23,6 +24,7 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
 
     setState(() {
       messages.add({'sender': 'user', 'text': text});
+      messages.add({'sender': 'ai', 'text': 'AI가 답변을 생성 중이에요…', 'isLoading': true}); // ✅ 로딩 메시지
       isLoading = true;
       _controller.clear();
     });
@@ -30,6 +32,7 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
     final token = await SessionTokenManager.getToken();
     if (token == null) {
       setState(() {
+        messages.removeWhere((msg) => msg['isLoading'] == true); // ✅ 제거
         messages.add({'sender': 'system', 'text': '❗ 토큰이 없습니다. 다시 로그인하세요.'});
         isLoading = false;
       });
@@ -37,7 +40,7 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
     }
 
     final response = await http.post(
-      Uri.parse("http://27.113.11.48:3000/ai/recommend"),
+      Uri.parse("http://13.125.65.151:3000/ai/recommend"),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -48,6 +51,7 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
     if (response.statusCode == 200) {
       final json = jsonDecode(utf8.decode(response.bodyBytes));
       setState(() {
+        messages.removeWhere((msg) => msg['isLoading'] == true); // ✅ 로딩 제거
         messages.add({
           'sender': 'ai',
           'text': json["message"],
@@ -60,6 +64,7 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
       });
     } else {
       setState(() {
+        messages.removeWhere((msg) => msg['isLoading'] == true); // ✅ 로딩 제거
         messages.add({
           'sender': 'system',
           'text': '❗ 요청 실패 (${response.statusCode}): ${response.body}'
@@ -72,27 +77,27 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
   Widget _buildMessage(Map<String, dynamic> message) {
     final isUser = message['sender'] == 'user';
     final isAI = message['sender'] == 'ai';
-
-    if (!isAI) {
-      return ChatBotAIWidget(
-        message: message['text'] ?? '',
-        isUser: isUser,
-      );
-    }
+    final isLoadingMessage = message['isLoading'] == true;
 
     return ChatBotAIWidget(
       message: message['text'] ?? '',
-      isUser: false,
-      onAddPressed: () {
-        Navigator.pop(context, {
-          'title': message['title'],
-          'message': message['message'],
-          'category': message['category'],
-          'source': message['source'],
-        });
-      },
-      onRetryPressed: lastUserInput != null
+      isUser: isUser,
+      isLoading: isLoadingMessage,
+      onRetryPressed: (!isUser && !isLoadingMessage && lastUserInput != null)
           ? () => _sendMessage(overrideText: lastUserInput)
+          : null,
+      onTapAdd: (!isUser && !isLoadingMessage)
+          ? () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SelectCreateMission(
+              initialTitle: message['title'] ?? message['text'] ?? '',
+              initialCategory: message['category'] ?? '',
+            ),
+          ),
+        );
+      }
           : null,
     );
   }
@@ -160,11 +165,6 @@ class _AIChatConversationScreenState extends State<AIChatConversationScreen> {
               itemBuilder: (context, index) => _buildMessage(messages[index]),
             ),
           ),
-          if (isLoading)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
-            ),
           _buildInputArea(),
         ],
       ),

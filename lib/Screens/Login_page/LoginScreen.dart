@@ -18,7 +18,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _autoLogin = false;
   String _resultMessage = '';
   Signaling? _signaling;
 
@@ -31,14 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _checkAutoLogin() async {
     print("🔍 자동 로그인 체크 시작");
     final isLoggedIn = await SessionTokenManager.isLoggedIn();
-    print("✅ 자동 로그인 여부: \$isLoggedIn");
+    print("✅ 자동 로그인 여부: $isLoggedIn");
 
     if (isLoggedIn) {
       print("🚀 자동 로그인 → MainScreen 이동");
       _connectSignaling();
-      Navigator.pushReplacement(
-        context,
+      Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => MainScreen()),
+            (route) => false, // 모든 이전 라우트 제거
       );
     }
   }
@@ -49,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _signaling = Signaling(url: 'ws://27.113.11.48:3005/ws');
       _signaling!.setMyId(myId);
       _signaling!.setOnMessage((from, type, payload) {
-        print("📨 signaling 메시지 수신: \$type from \$from");
+        print("📨 signaling 메시지 수신: $type from $from");
       });
       _signaling!.connect();
       print("🔗 signaling 서버에 연결 시도 완료");
@@ -63,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final pw = _passwordController.text.trim();
     final deviceToken = await DeviceTokenManager().getDeviceToken();
 
-    print("📥 입력된 ID: '\$id', PW: '\${'*' * pw.length}', Token: \$deviceToken");
+    print("📥 입력된 ID: '$id', PW: '${'*' * pw.length}', Token: $deviceToken");
 
     if (id.isEmpty || pw.isEmpty) {
       setState(() {
@@ -76,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       print("📡 로그인 요청 시작...");
       final response = await http.post(
-        Uri.parse('http://27.113.11.48:3000/auth/api/auth/keycloak-direct-login'),
+        Uri.parse('http://13.125.65.151:3000/auth/api/auth/keycloak-direct-login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'username': id,
@@ -84,18 +83,18 @@ class _LoginScreenState extends State<LoginScreen> {
           'deviceToken': deviceToken,
         }),
       );
-      print("📨 응답 코드: \${response.statusCode}");
+      print("📨 응답 코드: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print("📦 응답 데이터: \$data");
+        print("📦 응답 데이터: $data");
 
         if (data['success'] == true) {
           final jwtToken = data['jwtToken'];
           final idToken = data['idToken'];
 
-          print("🪪 JWT 토큰 수신: \$jwtToken");
-          print("🪪 ID 토큰 수신: \$idToken");
+          print("🪪 JWT 토큰 수신: $jwtToken");
+          print("🪪 ID 토큰 수신: $idToken");
 
           await SessionTokenManager.saveToken(jwtToken);
           await IdTokenManager.saveIdToken(idToken);
@@ -113,19 +112,19 @@ class _LoginScreenState extends State<LoginScreen> {
           setState(() {
             _resultMessage = msg;
           });
-          print("❌ 로그인 실패: \$msg");
+          print("❌ 로그인 실패: $msg");
         }
       } else {
         setState(() {
-          _resultMessage = '서버 오류: \${response.statusCode}';
+          _resultMessage = '서버 오류: ${response.statusCode}';
         });
         print("❌ 서버 오류");
       }
     } catch (e) {
       setState(() {
-        _resultMessage = '에러 발생: \$e';
+        _resultMessage = '에러 발생: $e';
       });
-      print("❌ 예외 발생: \$e");
+      print("❌ 예외 발생: $e");
     }
   }
 
@@ -199,21 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _autoLogin,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        _autoLogin = value ?? false;
-                      });
-                    },
-                  ),
-                  Text("자동 로그인"),
-                ],
-              ),
-              SizedBox(height: 20),
+              SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   onPressed: _login,

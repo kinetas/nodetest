@@ -1,8 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import '../../SessionTokenManager.dart';
 import 'EnterChatRoom.dart';
+import 'FixChat.dart';
 
 class OpenRoomList extends StatefulWidget {
   @override
@@ -10,7 +11,7 @@ class OpenRoomList extends StatefulWidget {
 }
 
 class _OpenRoomListState extends State<OpenRoomList> {
-  List<dynamic> openRooms = [];
+  List<Map<String, dynamic>> openRooms = [];
   bool isLoading = true;
 
   @override
@@ -20,31 +21,60 @@ class _OpenRoomListState extends State<OpenRoomList> {
   }
 
   Future<void> fetchOpenRooms() async {
-    try {
-      final response = await SessionTokenManager.get('http://27.113.11.48:3000/nodetest/api/rooms');
+    setState(() => isLoading = true);
+    final resp = await SessionTokenManager.get('http://13.125.65.151:3000/nodetest/api/rooms');
+    if (resp.statusCode == 200) {
+      final data = json.decode(resp.body);
+      final rooms = ((data is List) ? data : data['rooms'])
+          .where((r) => r['r_type'] == 'open')
+          .cast<Map<String, dynamic>>()
+          .toList();
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          openRooms = (data is List)
-              ? data.where((room) => room['r_type'] == 'open').toList()
-              : (data['rooms'] as List).where((room) => room['r_type'] == 'open').toList();
-          isLoading = false;
-        });
-      } else {
-        print('❌ 서버 오류: ${response.statusCode}');
-        setState(() => isLoading = false);
+      for (var room in rooms) {
+        final rId = room['r_id'];
+        final lastResp = await SessionTokenManager.get(
+            'http://13.125.65.151:3000/nodetest/chat/last-message/$rId');
+        if (lastResp.statusCode == 200) {
+          final msg = json.decode(lastResp.body);
+          room['last_message'] = msg['message_contents'] ?? '';
+          room['last_send_date'] = msg['send_date'];
+        } else {
+          room['last_message'] = '';
+          room['last_send_date'] = null;
+        }
       }
-    } catch (e) {
-      print('❌ 네트워크 오류: $e');
+
+      // 최신 메시지 순 정렬
+      rooms.sort((a, b) {
+        final aTime = DateTime.tryParse(a['last_send_date'] ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bTime = DateTime.tryParse(b['last_send_date'] ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bTime.compareTo(aTime); // 최신이 먼저
+      });
+
+      setState(() {
+        openRooms = rooms;
+        isLoading = false;
+      });
+    } else {
+      print('❌ 서버 오류: ${resp.statusCode}');
       setState(() => isLoading = false);
     }
+  }
+
+  String _formatTime(String? dtStr) {
+    if (dtStr == null) return '';
+    final dt = DateTime.tryParse(dtStr)?.toLocal();
+    if (dt == null) return '';
+    final diff = DateTime.now().difference(dt);
+    if (diff.inDays == 0) return DateFormat('a h:mm', 'ko_KR').format(dt);
+    if (diff.inDays == 1) return '어제';
+    return DateFormat('M월 d일').format(dt);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ✅ 그라데이션 제거
+      backgroundColor: Colors.white,
       body: isLoading
           ? Center(child: CircularProgressIndicator(color: Colors.lightBlue))
           : openRooms.isEmpty
@@ -54,41 +84,77 @@ class _OpenRoomListState extends State<OpenRoomList> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey),
         ),
       )
-          : ListView.builder(
-        itemCount: openRooms.length,
-        itemBuilder: (context, index) {
-          final room = openRooms[index];
-          return Card(
-            color: Colors.white, // ✅ 카드 배경 고정
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            elevation: 2,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: ListTile(
+          : RefreshIndicator(
+        onRefresh: fetchOpenRooms,
+        child: ListView.separated(
+          padding: const EdgeInsets.only(top: 8),
+          separatorBuilder: (_, __) =>
+              Divider(indent: 72, endIndent: 16, color: Colors.grey[300]),
+          itemCount: openRooms.length,
+          itemBuilder: (ctx, i) {
+            final room = openRooms[i];
+            final title = room['r_title'] ?? '제목 없음';
+            final lastMsg = room['last_message'] ?? '메시지 없음';
+            final updatedAt = _formatTime(room['last_send_date']);
+            final unread = room['unread_count'] ?? 0;
+
+            return ListTile(
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => EnterChatRoom(roomData: room),
+                  ),
+                );
+                fetchOpenRooms(); // 돌아왔을 때 새로고침
+              },
+              onLongPress: () {
+                FixChat.show(
+                  context,
+                  u2Id: room['u2_id'],
+                  rType: room['r_type'],
+                  onUpdated: () {
+                    fetchOpenRooms(); // ✅ 방 수정/삭제 후 리스트 자동 새로고침
+                  },
+                );
+              },
               leading: CircleAvatar(
+                radius: 24,
                 backgroundColor: Colors.lightBlue[100],
                 child: Text(
-                  (room['r_title'] ?? '방')[0].toUpperCase(),
+                  title[0].toUpperCase(),
                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
                 ),
               ),
-              title: Text(
-                room['r_title'] ?? '제목 없음',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-              ),
+              title: Text(title, style: TextStyle(fontWeight: FontWeight.w600)),
               subtitle: Text(
-                '방 ID: ${room['r_id']}',
-                style: TextStyle(color: Colors.black87),
+                lastMsg,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 13, color: Colors.grey[700]),
               ),
-              trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 16),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => EnterChatRoom(roomData: room)),
-                );
-              },
-            ),
-          );
-        },
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(updatedAt, style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  if (unread > 0)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text('$unread',
+                          style: TextStyle(color: Colors.white, fontSize: 11)),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

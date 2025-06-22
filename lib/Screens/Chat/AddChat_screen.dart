@@ -17,7 +17,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
   bool _isLoading = false;
 
   Future<void> _createChatRoom() async {
-    const String apiUrl = 'http://27.113.11.48:3000/nodetest/api/rooms';
+    const String apiUrl = 'http://13.125.65.151:3000/nodetest/api/rooms';
 
     try {
       setState(() => _isLoading = true);
@@ -42,7 +42,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
       if (response.statusCode == 200 &&
           responseData['message'] == "방이 성공적으로 추가되었습니다.") {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('✅ 채팅방이 생성되었습니다')),
+          const SnackBar(content: Text('✅ 채팅방이 생성되었습니다')),
         );
         Navigator.pop(context);
       } else {
@@ -84,13 +84,13 @@ class _AddChatScreenState extends State<AddChatScreen> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            _buildTextField(_u2IdController, '상대방 사용자 ID'),
+            _buildTextField(_u2IdController, '상대방 사용자 ID', true),
             const SizedBox(height: 20),
-            _buildTextField(_roomNameController, '채팅방 이름 (선택사항)'),
+            _buildTextField(_roomNameController, '채팅방 이름 (선택사항)', false),
             const SizedBox(height: 40),
             _isLoading
                 ? const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue))
                 : ElevatedButton(
               onPressed: _createChatRoom,
               style: ElevatedButton.styleFrom(
@@ -112,13 +112,13 @@ class _AddChatScreenState extends State<AddChatScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText) {
+  Widget _buildTextField(TextEditingController controller, String labelText, bool highlight) {
     return TextField(
       controller: controller,
       style: const TextStyle(fontSize: 16),
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(color: Colors.black87),
+        labelStyle: TextStyle(color: highlight ? Colors.lightBlue : Colors.black87, fontWeight: FontWeight.w600),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -128,7 +128,7 @@ class _AddChatScreenState extends State<AddChatScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.lightBlue),
+          borderSide: const BorderSide(color: Colors.lightBlue, width: 2),
         ),
       ),
     );

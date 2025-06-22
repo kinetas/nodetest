@@ -119,22 +119,32 @@ class _CameraScreenState extends State<CameraScreen> {
 
   void _goToPhotoWaterMark() {
     if (_capturedPhotoPath != null) {
+      // 📸 디버깅 로그 출력
+      print('📤 [CameraScreen → PhotoWaterMark]');
+      print('imagePath: $_capturedPhotoPath');
+      print('rId: ${widget.rId}');
+      print('u1Id: ${widget.u1Id}');
+      print('u2Id: ${widget.u2Id}');
+      print('mId: ${widget.mId}');
+      print('missionAuthenticationAuthority: ${widget.missionAuthenticationAuthority}');
+      print('voteM: ${widget.voteM}');
+
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PhotoWaterMark(
             imagePath: _capturedPhotoPath!, // 촬영된 사진 경로 전달
-            rId: widget.rId,               // rId 전달
-            u1Id: widget.u1Id,             // u1Id 전달
-            u2Id: widget.u2Id,             // u2Id 전달
+            rId: widget.rId,
+            u1Id: widget.u1Id,
+            u2Id: widget.u2Id,
             mId: widget.mId,
-            missionAuthenticationAuthority: widget.missionAuthenticationAuthority, // 권한 전달
-            voteM: widget.voteM,           // voteM 전달
+            missionAuthenticationAuthority: widget.missionAuthenticationAuthority,
+            voteM: widget.voteM,
           ),
         ),
       );
     } else {
-      print("사진 경로가 설정되지 않았습니다!");
+      print("❌ 사진 경로가 설정되지 않았습니다!");
     }
   }
 

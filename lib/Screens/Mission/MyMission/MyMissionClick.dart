@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../MissionVerificationScreen.dart'; // MissionVerificationScreen import
+import '../NewMissionScreen/MissionVerificationScreen.dart'; // MissionVerificationScreen import
 
 
 class MissionClick extends StatelessWidget {

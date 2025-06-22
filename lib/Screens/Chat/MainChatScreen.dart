@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'GeneralRoomList.dart';
 import 'OpenRoomList.dart';
@@ -37,29 +35,34 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final Color pointColor = Colors.lightBlue;
+    final Color backgroundColor = Colors.white;
+    final Color textColor = Colors.black87;
+
     return Scaffold(
-      backgroundColor: Colors.lightBlue,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text(
+        backgroundColor: backgroundColor,
+        elevation: 1,
+        title: Text(
           '채팅',
           style: TextStyle(
-            color: Colors.white,
+            color: textColor,
             fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.lightBlue,
-        elevation: 2,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(36), // 탭 높이를 더 낮게 조정
+          preferredSize: const Size.fromHeight(36),
           child: Container(
             alignment: Alignment.center,
             child: TabBar(
               controller: _tabController,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
-              indicatorColor: Colors.white,
+              labelColor: pointColor,
+              unselectedLabelColor: Colors.grey[500],
+              indicatorColor: pointColor,
               indicatorWeight: 2,
               labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               tabs: const [
@@ -79,10 +82,10 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddChatModal,
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: pointColor,
         elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-        child: const Icon(Icons.add, size: 32),
+        child: const Icon(Icons.add, size: 32, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

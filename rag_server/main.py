@@ -7,17 +7,14 @@ import os, requests, json, re, time, jwt
 from fastapi import Request, HTTPException
 from bs4 import BeautifulSoup
 from langchain_community.vectorstores import Chroma
-# from langchain_ollama import OllamaEmbeddings
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import random
 from openai import OpenAI
 
 
-# ✅ 환경 변수 로딩
+# 환경 변수 로딩
 load_dotenv()
-# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-# GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 USER_DB_API = "http://13.125.65.151:3000/nodetest/api/ai/user-top-categories"
 INTENT_API = "http://intent_server:8002/intent-classify"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -46,7 +43,7 @@ def extract_user_id_from_token(request: Request):
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="유효하지 않은 토큰")
 
-# ✅ FastAPI 초기화
+# FastAPI 초기화
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -62,11 +59,8 @@ embedding = HuggingFaceEmbeddings(
 )
 db = Chroma(persist_directory="/chroma/chroma", embedding_function=embedding)
 
-# class ChatRequest(BaseModel):
-#     user_id: str
-#     question: str
 
-# ✅ 블로그 본문 크롤링 함수
+# 블로그 본문 크롤링 함수
 def crawl_naver_blog(url):
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
@@ -90,7 +84,7 @@ def crawl_naver_blog(url):
         print("❌ 크롤링 실패:", e)
     return None
 
-# ✅ API 모델
+# API 모델
 class ChatRequest(BaseModel):
     category: str
    
@@ -100,29 +94,34 @@ async def recommend(req: ChatRequest, request: Request):
     user_id = extract_user_id_from_token(request)
     query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
 
-    # 1️⃣ Intent 분류
+    # 1 Intent 분류
     try:
         intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
         intent = intent_res.json().get("intent", "SPECIFIC")
+        print(f"🧠 Intent 분류 결과: {intent}")
     except:
         intent = "SPECIFIC"
+        print(f"⚠️ Intent API 호출 실패: {e}")
 
-    # 2️⃣ GENERAL이면 user_db에서 top3 카테고리 요청
+    # 2️ GENERAL이면 user_db에서 top3 카테고리 요청
     if intent == "GENERAL":
         try:
             user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
             top3 = user_res.json().get("top3", [])
+            print(f"📊 사용자 Top3 카테고리: {top3}")
             if top3:
                 chosen = random.choice(top3)
+                print(f"🎯 선택된 카테고리: {chosen}")
                 query = f"{chosen} {query}"
+                
         except:
-            pass
+            print(f"⚠️ User DB API 호출 실패: {e}")
 
-    # 🔍 RAG 검색
+    # RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)
     filtered_docs_with_scores = [(doc, score) for doc, score in docs_with_scores if score > 1]
 
-    # 📌 Step 1 프롬프트 구성
+    # Step 1 프롬프트 구성
     if not filtered_docs_with_scores:
         step1_prompt = (
             f"사용자 요청: {query}\n\n"
@@ -160,9 +159,9 @@ async def recommend(req: ChatRequest, request: Request):
     try:
         # res1 = requests.post(GROQ_API_URL, headers=headers, json=step1_body)
         # message = res1.json()["choices"][0]["message"]["content"].strip()
-        print("✅ 생성된 미션 문장:\n", message)
+        print(" 생성된 미션 문장:\n", message)
 
-        # ✅ Step 2: category + title만 생성
+        # Step 2: category + title만 생성
         step2_prompt = (
             "아래 미션 문장을 보고 category와 title을 반드시 **한국어**로 추출해서 단일 JSON 오브젝트 형식으로만 출력해.\n"
             "JSON 외에 다른 설명은 출력하지 마. 배열([]), 코드블럭(```), 마크다운도 절대 사용하지 마.\n"
@@ -204,7 +203,7 @@ async def recommend(req: ChatRequest, request: Request):
 
         parsed = json.loads(raw_json)
 
-        # ✅ 최종 조합
+        # 최종 조합
         result = {
             "message": message,
             "category": parsed["category"],
@@ -220,7 +219,7 @@ async def recommend(req: ChatRequest, request: Request):
             "raw_groq_response": content if 'content' in locals() else "응답 없음"
         })
 
-# ✅ 디버깅용 문서 확인용 API
+# 디버깅용 문서 확인용 API
 @app.get("/documents")
 async def get_documents():
     try:

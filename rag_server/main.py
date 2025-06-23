@@ -140,13 +140,13 @@ async def recommend(req: ChatRequest, request: Request):
                         SELECT category, COUNT(*) as cnt
                         FROM m_result
                         WHERE u_id = %s AND category IS NOT NULL
-                        GROUP BY m_category
+                        GROUP BY category
                         ORDER BY cnt DESC
                         LIMIT 3
                     """
                     cursor.execute(sql, (user_id,))
                     rows = cursor.fetchall()
-                    top3 = [row['m_category'] for row in rows]
+                    top3 = [row['category'] for row in rows]
 
             print(f"📊 사용자 Top3 카테고리: {top3}")
             if top3:

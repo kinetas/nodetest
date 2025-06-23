@@ -10,6 +10,7 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import random
+import pymysql
 from openai import OpenAI
 
 
@@ -18,6 +19,11 @@ load_dotenv()
 USER_DB_API = "http://13.125.65.151:3000/nodetest/api/ai/user-top-categories"
 INTENT_API = "http://intent_server:8002/intent-classify"
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+DB_HOST = os.getenv("AWS_DATABASE_HOST")
+DB_USER = os.getenv("AWS_DATABASE_USER")
+DB_PASSWORD = os.getenv("AWS_DATABASE_PASSWORD")
+DB_NAME = os.getenv("AWS_DATABASE_NAME")
+DB_PORT = int(os.getenv("AWS_DATABASE_PORT", 3306))
 
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY")
@@ -105,18 +111,55 @@ async def recommend(req: ChatRequest, request: Request):
         print(f"⚠️ Intent API 호출 실패: {e}")
 
     # 2️ GENERAL이면 user_db에서 top3 카테고리 요청
+    # if intent == "GENERAL":
+    #     try:
+    #         user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
+    #         top3 = user_res.json().get("top3", [])
+    #         print(f"📊 사용자 Top3 카테고리: {top3}")
+    #         if top3:
+    #             chosen = random.choice(top3)
+    #             print(f"🎯 선택된 카테고리: {chosen}")
+    #             query = f"{chosen} {query}"
+                
+    #     except:
+    #         print(f"⚠️ User DB API 호출 실패: {e}")
     if intent == "GENERAL":
         try:
-            user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
-            top3 = user_res.json().get("top3", [])
+            conn = pymysql.connect(
+                host=DB_HOST,
+                user=DB_USER,
+                password=DB_PASSWORD,
+                database=DB_NAME,
+                port=DB_PORT,
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor
+            )
+            with conn:
+                with conn.cursor() as cursor:
+                    sql = """
+                        SELECT m_category, COUNT(*) as cnt
+                        FROM m_result
+                        WHERE u_id = %s AND m_category IS NOT NULL
+                        GROUP BY m_category
+                        ORDER BY cnt DESC
+                        LIMIT 3
+                    """
+                    cursor.execute(sql, (user_id,))
+                    rows = cursor.fetchall()
+                    top3 = [row['m_category'] for row in rows]
+
             print(f"📊 사용자 Top3 카테고리: {top3}")
             if top3:
                 chosen = random.choice(top3)
                 print(f"🎯 선택된 카테고리: {chosen}")
-                query = f"{chosen} {query}"
-                
-        except:
-            print(f"⚠️ User DB API 호출 실패: {e}")
+                query = f"{chosen} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
+            else:
+                query = f"오늘 해볼 만한 미션 하나 추천해줘."
+
+        except Exception as e:
+            print(f"⚠️ DB에서 카테고리 조회 실패: {e}")
+            query = f"오늘 해볼 만한 미션 하나 추천해줘."
+
 
     # RAG 검색
     docs_with_scores = db.similarity_search_with_score(query, k=10)

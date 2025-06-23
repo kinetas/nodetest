@@ -92,11 +92,12 @@ class ChatRequest(BaseModel):
 async def recommend(req: ChatRequest, request: Request):
     start_time = time.time()
     user_id = extract_user_id_from_token(request)
+    user_input = req.category.strip()
     query = f"{req.category} 관련해서 오늘 해볼 만한 미션 하나 추천해줘."
 
     # 1 Intent 분류
     try:
-        intent_res = requests.post(INTENT_API, json={"text": query}, timeout=2)
+        intent_res = requests.post(INTENT_API, json={"text": user_input}, timeout=2)
         intent = intent_res.json().get("intent", "SPECIFIC")
         print(f"🧠 Intent 분류 결과: {intent}")
     except:

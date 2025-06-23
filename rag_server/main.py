@@ -137,9 +137,9 @@ async def recommend(req: ChatRequest, request: Request):
             with conn:
                 with conn.cursor() as cursor:
                     sql = """
-                        SELECT m_category, COUNT(*) as cnt
+                        SELECT category, COUNT(*) as cnt
                         FROM m_result
-                        WHERE u_id = %s AND m_category IS NOT NULL
+                        WHERE u_id = %s AND category IS NOT NULL
                         GROUP BY m_category
                         ORDER BY cnt DESC
                         LIMIT 3

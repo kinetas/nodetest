@@ -110,19 +110,6 @@ async def recommend(req: ChatRequest, request: Request):
         intent = "SPECIFIC"
         print(f"⚠️ Intent API 호출 실패: {e}")
 
-    # 2️ GENERAL이면 user_db에서 top3 카테고리 요청
-    # if intent == "GENERAL":
-    #     try:
-    #         user_res = requests.post(USER_DB_API, json={"user_id": user_id}, timeout=2)
-    #         top3 = user_res.json().get("top3", [])
-    #         print(f"📊 사용자 Top3 카테고리: {top3}")
-    #         if top3:
-    #             chosen = random.choice(top3)
-    #             print(f"🎯 선택된 카테고리: {chosen}")
-    #             query = f"{chosen} {query}"
-                
-    #     except:
-    #         print(f"⚠️ User DB API 호출 실패: {e}")
     if intent == "GENERAL":
         try:
             conn = pymysql.connect(
@@ -255,6 +242,27 @@ async def recommend(req: ChatRequest, request: Request):
             "source": url,
             "response_time_sec": round(time.time() - start_time, 2)
         }
+        try:
+            conn = pymysql.connect(
+                host=DB_HOST,
+                user=DB_USER,
+                password=DB_PASSWORD,
+                database=DB_NAME,
+                port=DB_PORT,
+                charset='utf8mb4',
+                cursorclass=pymysql.cursors.DictCursor
+            )
+            with conn:
+                with conn.cursor() as cursor:
+                    insert_sql = """
+                        INSERT INTO mission_chat_log (user_id, content)
+                        VALUES (%s, %s)
+                    """
+                    cursor.execute(insert_sql, (user_id, result["message"]))
+                    conn.commit()
+                    print(f"✅ 채팅 로그 저장 완료: user_id={user_id}")
+        except Exception as e:
+            print(f"⚠️ 채팅 로그 저장 실패: {e}")
         return result
 
     except Exception as e:
